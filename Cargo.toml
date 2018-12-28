@@ -1,0 +1,43 @@
+[package]
+name = "glow"
+version = "0.1.0"
+description = "OpenGL bindings for gfx, based on gl-rs"
+authors = ["Joshua Groves <josh@joshgroves.com>"]
+homepage = "https://github.com/grovesNL/glow.git"
+license = "Apache-2.0"
+build = "build.rs"
+edition = "2018"
+
+[lib]
+name = "glow"
+path = "src/lib.rs"
+
+[target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
+glutin = "0.19"
+
+[target.wasm32-unknown-unknown.dependencies]
+js-sys = "0.3"
+wasm-bindgen = "0.2"
+slotmap = "0.3"
+
+[target.wasm32-unknown-unknown.dependencies.web-sys]
+version = "0.3"
+features = [
+  'Document',
+  'Element',
+  'HtmlCanvasElement',
+  'WebGlBuffer',
+  'WebGlRenderingContext',
+  'WebGl2RenderingContext',
+  'WebGlProgram',
+  'WebGlShader',
+  'Window',
+]
+
+[build-dependencies]
+gl_generator = "0.9"
+
+[workspace]
+members = [
+  "examples/hello",
+]

@@ -1,0 +1,14 @@
+[package]
+name = "hello"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+glow = { path = "../../" }
+
+[target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
+glutin = "0.19"
+
+[target.wasm32-unknown-unknown.dependencies]
+web-sys = { version = "0.3", features=["console"] }
+wasm-bindgen = "0.2"

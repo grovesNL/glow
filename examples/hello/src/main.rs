@@ -91,16 +91,16 @@ fn main() {
         let shader = context
             .create_shader(*shader_type)
             .expect("Cannot create shader");
-        context.shader_source(&shader, shader_source);
-        context.compile_shader(&shader);
-        if !context.get_shader_compile_status(&shader) {
-            panic!(context.get_shader_info_log(&shader));
+        context.shader_source(shader, shader_source);
+        context.compile_shader(shader);
+        if !context.get_shader_compile_status(shader) {
+            panic!(context.get_shader_info_log(shader));
         }
-        context.attach_shader(&program, &shader);
+        context.attach_shader(program, shader);
     }
 
-    context.link_program(&program);
-    if !context.get_program_link_status(&program) {
-        panic!(context.get_program_info_log(&program));
+    context.link_program(program);
+    if !context.get_program_link_status(program) {
+        panic!(context.get_program_info_log(program));
     }
 }

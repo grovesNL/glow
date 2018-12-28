@@ -24,26 +24,40 @@ pub(crate) const INFO_LOG_LENGTH: u32 = 0x8B84;
 pub(crate) const LINK_STATUS: u32 = 0x8B82;
 
 pub trait RenderingContext {
-    type Shader: std::fmt::Debug;
-    type Program: std::fmt::Debug;
+    type Shader: Copy
+        + Clone
+        + std::fmt::Debug
+        + Eq
+        + std::hash::Hash
+        + Ord
+        + PartialEq
+        + PartialOrd;
+    type Program: Copy
+        + Clone
+        + std::fmt::Debug
+        + Eq
+        + std::hash::Hash
+        + Ord
+        + PartialEq
+        + PartialOrd;
 
     fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String>;
 
-    fn shader_source(&self, shader: &Self::Shader, source: &str);
+    fn shader_source(&self, shader: Self::Shader, source: &str);
 
-    fn compile_shader(&self, shader: &Self::Shader);
+    fn compile_shader(&self, shader: Self::Shader);
 
-    fn get_shader_compile_status(&self, shader: &Self::Shader) -> bool;
+    fn get_shader_compile_status(&self, shader: Self::Shader) -> bool;
 
-    fn get_shader_info_log(&self, shader: &Self::Shader) -> String;
+    fn get_shader_info_log(&self, shader: Self::Shader) -> String;
 
     fn create_program(&self) -> Result<Self::Program, String>;
 
-    fn attach_shader(&self, program: &Self::Program, shader: &Self::Shader);
+    fn attach_shader(&self, program: Self::Program, shader: Self::Shader);
 
-    fn link_program(&self, program: &Self::Program);
+    fn link_program(&self, program: Self::Program);
 
-    fn get_program_link_status(&self, program: &Self::Program) -> bool;
+    fn get_program_link_status(&self, program: Self::Program) -> bool;
 
-    fn get_program_info_log(&self, program: &Self::Program) -> String;
+    fn get_program_info_log(&self, program: Self::Program) -> String;
 }

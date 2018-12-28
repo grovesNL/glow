@@ -52,34 +52,34 @@ fn main() {
         #[cfg(target_arch = "wasm32")]
         let (vertex_shader_source, fragment_shader_source) = (
             r#"#version 300 es
-        in vec4 position;
-        void main() {
-            gl_Position = position;
-        }
-        "#,
+            in vec4 position;
+            void main() {
+                gl_Position = position;
+            }
+            "#,
             r#"#version 300 es
-        precision mediump float;
-        out vec4 color;
-        void main() {
-            color = vec4(1.0, 1.0, 1.0, 1.0);
-        }
-        "#,
+            precision mediump float;
+            out vec4 color;
+            void main() {
+                color = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+            "#,
         );
         #[cfg(not(target_arch = "wasm32"))]
         let (vertex_shader_source, fragment_shader_source) = (
             r#"#version 410
-        in vec4 position;
-        void main() {
-            gl_Position = position;
-        }
-        "#,
+            in vec4 position;
+            void main() {
+                gl_Position = position;
+            }
+            "#,
             r#"#version 410
-        precision mediump float;
-        out vec4 color;
-        void main() {
-            color = vec4(1.0, 1.0, 1.0, 1.0);
-        }
-        "#,
+            precision mediump float;
+            out vec4 color;
+            void main() {
+                color = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+            "#,
         );
 
         let shaders = [

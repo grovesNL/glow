@@ -52,7 +52,7 @@ impl RenderingContext for WebRenderingContext {
     type Shader = WebShaderKey;
     type Program = WebProgramKey;
 
-    fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
+    unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.create_shader(shader_type as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.create_shader(shader_type as u32),
@@ -68,27 +68,27 @@ impl RenderingContext for WebRenderingContext {
         }
     }
 
-    fn shader_source(&self, shader: Self::Shader, source: &str) {
+    unsafe fn shader_source(&self, shader: Self::Shader, source: &str) {
         let shaders = self.shaders.borrow();
-        let raw_shader = shaders.1.get(shader).expect("Invalid shader");
+        let raw_shader = shaders.1.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.shader_source(raw_shader, source),
             RawRenderingContext::WebGl2(ref gl) => gl.shader_source(raw_shader, source),
         }
     }
 
-    fn compile_shader(&self, shader: Self::Shader) {
+    unsafe fn compile_shader(&self, shader: Self::Shader) {
         let shaders = self.shaders.borrow();
-        let raw_shader = shaders.1.get(shader).expect("Invalid shader");
+        let raw_shader = shaders.1.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.compile_shader(raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.compile_shader(raw_shader),
         }
     }
 
-    fn get_shader_compile_status(&self, shader: Self::Shader) -> bool {
+    unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool {
         let shaders = self.shaders.borrow();
-        let raw_shader = shaders.1.get(shader).expect("Invalid shader");
+        let raw_shader = shaders.1.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.get_shader_parameter(raw_shader, COMPILE_STATUS)
@@ -100,16 +100,16 @@ impl RenderingContext for WebRenderingContext {
             .unwrap_or(false)
     }
 
-    fn get_shader_info_log(&self, shader: Self::Shader) -> String {
+    unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String {
         let shaders = self.shaders.borrow();
-        let raw_shader = shaders.1.get(shader).expect("Invalid shader");
+        let raw_shader = shaders.1.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_shader_info_log(raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.get_shader_info_log(raw_shader),
         }.unwrap_or_else(|| String::from(""))
     }
 
-    fn create_program(&self) -> Result<Self::Program, String> {
+    unsafe fn create_program(&self) -> Result<Self::Program, String> {
         let shaders = self.shaders.borrow();
         let raw_program = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.create_program(),
@@ -126,29 +126,29 @@ impl RenderingContext for WebRenderingContext {
         }
     }
 
-    fn attach_shader(&self, program: Self::Program, shader: Self::Shader) {
+    unsafe fn attach_shader(&self, program: Self::Program, shader: Self::Shader) {
         let programs = self.programs.borrow();
         let shaders = self.shaders.borrow();
-        let raw_program = programs.1.get(program).expect("Invalid program");
-        let raw_shader = shaders.1.get(shader).expect("Invalid shader");
+        let raw_program = programs.1.get_unchecked(program);
+        let raw_shader = shaders.1.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.attach_shader(raw_program, raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.attach_shader(raw_program, raw_shader),
         }
     }
 
-    fn link_program(&self, program: Self::Program) {
+    unsafe fn link_program(&self, program: Self::Program) {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get(program).expect("Invalid program");
+        let raw_program = programs.1.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.link_program(raw_program),
             RawRenderingContext::WebGl2(ref gl) => gl.link_program(raw_program),
         }
     }
 
-    fn get_program_link_status(&self, program: Self::Program) -> bool {
+    unsafe fn get_program_link_status(&self, program: Self::Program) -> bool {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get(program).expect("Invalid program");
+        let raw_program = programs.1.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.get_program_parameter(raw_program, LINK_STATUS)
@@ -160,9 +160,9 @@ impl RenderingContext for WebRenderingContext {
             .unwrap_or(false)
     }
 
-    fn get_program_info_log(&self, program: Self::Program) -> String {
+    unsafe fn get_program_info_log(&self, program: Self::Program) -> String {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get(program).expect("Invalid program");
+        let raw_program = programs.1.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_program_info_log(raw_program),
             RawRenderingContext::WebGl2(ref gl) => gl.get_program_info_log(raw_program),

@@ -41,23 +41,23 @@ pub trait RenderingContext {
         + PartialEq
         + PartialOrd;
 
-    fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String>;
+    unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String>;
 
-    fn shader_source(&self, shader: Self::Shader, source: &str);
+    unsafe fn shader_source(&self, shader: Self::Shader, source: &str);
 
-    fn compile_shader(&self, shader: Self::Shader);
+    unsafe fn compile_shader(&self, shader: Self::Shader);
 
-    fn get_shader_compile_status(&self, shader: Self::Shader) -> bool;
+    unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool;
 
-    fn get_shader_info_log(&self, shader: Self::Shader) -> String;
+    unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String;
 
-    fn create_program(&self) -> Result<Self::Program, String>;
+    unsafe fn create_program(&self) -> Result<Self::Program, String>;
 
-    fn attach_shader(&self, program: Self::Program, shader: Self::Shader);
+    unsafe fn attach_shader(&self, program: Self::Program, shader: Self::Shader);
 
-    fn link_program(&self, program: Self::Program);
+    unsafe fn link_program(&self, program: Self::Program);
 
-    fn get_program_link_status(&self, program: Self::Program) -> bool;
+    unsafe fn get_program_link_status(&self, program: Self::Program) -> bool;
 
-    fn get_program_info_log(&self, program: Self::Program) -> String;
+    unsafe fn get_program_info_log(&self, program: Self::Program) -> String;
 }

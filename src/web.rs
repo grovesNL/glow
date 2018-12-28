@@ -2,7 +2,8 @@ use super::*;
 
 use std::cell::RefCell;
 use slotmap::{new_key_type, SecondaryMap, SlotMap};
-use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlRenderingContext, WebGlShader};
+use web_sys::{WebGl2RenderingContext, WebGlBuffer, WebGlProgram, WebGlRenderingContext,
+              WebGlShader};
 
 #[derive(Debug)]
 enum RawRenderingContext {
@@ -14,9 +15,9 @@ enum RawRenderingContext {
 // See https://github.com/orlp/slotmap/blob/b5df4ac7ee8aa795668bf79ebf8929d2f39bec8e/src/lib.rs#L198
 type SlotMapWithoutCopy<K, V> = (SlotMap<K, ()>, SecondaryMap<K, V>);
 
-type TrackedResource<K: slotmap::Key, V> = RefCell<SlotMapWithoutCopy<K, V>>;
+type TrackedResource<K, V> = RefCell<SlotMapWithoutCopy<K, V>>;
 
-fn trackedResource<K: slotmap::Key, V>() -> TrackedResource<K, V> {
+fn tracked_resource<K: slotmap::Key, V>() -> TrackedResource<K, V> {
     RefCell::new((SlotMap::with_key(), SecondaryMap::new()))
 }
 
@@ -25,32 +26,37 @@ pub struct WebRenderingContext {
     raw: RawRenderingContext,
     shaders: TrackedResource<WebShaderKey, WebGlShader>,
     programs: TrackedResource<WebProgramKey, WebGlProgram>,
+    buffers: TrackedResource<WebBufferKey, WebGlBuffer>,
 }
 
 impl WebRenderingContext {
     pub fn from_webgl1_context(context: WebGlRenderingContext) -> Self {
         WebRenderingContext {
             raw: RawRenderingContext::WebGl1(context),
-            shaders: trackedResource(),
-            programs: trackedResource(),
+            shaders: tracked_resource(),
+            programs: tracked_resource(),
+            buffers: tracked_resource(),
         }
     }
 
     pub fn from_webgl2_context(context: WebGl2RenderingContext) -> Self {
         WebRenderingContext {
             raw: RawRenderingContext::WebGl2(context),
-            shaders: trackedResource(),
-            programs: trackedResource(),
+            shaders: tracked_resource(),
+            programs: tracked_resource(),
+            buffers: tracked_resource(),
         }
     }
 }
 
 new_key_type! { pub struct WebShaderKey; }
 new_key_type! { pub struct WebProgramKey; }
+new_key_type! { pub struct WebBufferKey; }
 
 impl RenderingContext for WebRenderingContext {
     type Shader = WebShaderKey;
     type Program = WebProgramKey;
+    type Buffer = WebBufferKey;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
@@ -110,7 +116,6 @@ impl RenderingContext for WebRenderingContext {
     }
 
     unsafe fn create_program(&self) -> Result<Self::Program, String> {
-        let shaders = self.shaders.borrow();
         let raw_program = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.create_program(),
             RawRenderingContext::WebGl2(ref gl) => gl.create_program(),
@@ -167,5 +172,39 @@ impl RenderingContext for WebRenderingContext {
             RawRenderingContext::WebGl1(ref gl) => gl.get_program_info_log(raw_program),
             RawRenderingContext::WebGl2(ref gl) => gl.get_program_info_log(raw_program),
         }.unwrap_or_else(|| String::from(""))
+    }
+
+    unsafe fn use_program(&self, program: Option<Self::Program>) {
+        let programs = self.programs.borrow();
+        let raw_program = program.map(|p| programs.1.get_unchecked(p));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.use_program(raw_program),
+            RawRenderingContext::WebGl2(ref gl) => gl.use_program(raw_program),
+        }
+    }
+
+    unsafe fn create_buffer(&self) -> Result<Self::Buffer, String> {
+        let raw_buffer = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.create_buffer(),
+            RawRenderingContext::WebGl2(ref gl) => gl.create_buffer(),
+        };
+
+        match raw_buffer {
+            Some(p) => {
+                let key = self.buffers.borrow_mut().0.insert(());
+                self.buffers.borrow_mut().1.insert(key, p);
+                Ok(key)
+            }
+            None => Err(String::from("Unable to create buffer object")),
+        }
+    }
+
+    unsafe fn bind_buffer(&self, target: BufferBindingTarget, buffer: Option<Self::Buffer>) {
+        let buffers = self.buffers.borrow();
+        let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_buffer(target as u32, raw_buffer),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_buffer(target as u32, raw_buffer),
+        }
     }
 }

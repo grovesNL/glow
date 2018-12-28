@@ -26,6 +26,7 @@ impl std::fmt::Debug for NativeRenderingContext {
 impl RenderingContext for NativeRenderingContext {
     type Shader = native_gl::types::GLuint;
     type Program = native_gl::types::GLuint;
+    type Buffer = native_gl::types::GLuint;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let gl = &self.raw;
@@ -103,18 +104,33 @@ impl RenderingContext for NativeRenderingContext {
         if length > 0 {
             let mut log = String::with_capacity(length as usize);
             log.extend(std::iter::repeat('\0').take(length as usize));
-            unsafe {
-                gl.GetProgramInfoLog(
-                    program,
-                    length,
-                    &mut length,
-                    (&log[..]).as_ptr() as *mut native_gl::types::GLchar,
-                );
-            }
+            gl.GetProgramInfoLog(
+                program,
+                length,
+                &mut length,
+                (&log[..]).as_ptr() as *mut native_gl::types::GLchar,
+            );
             log.truncate(length as usize);
             log
         } else {
             String::from("")
         }
+    }
+
+    unsafe fn use_program(&self, program: Option<Self::Program>) {
+        let gl = &self.raw;
+        gl.UseProgram(program.unwrap_or(0));
+    }
+
+    unsafe fn create_buffer(&self) -> Result<Self::Buffer, String> {
+        let gl = &self.raw;
+        let mut buffer = 0;
+        gl.GenBuffers(1, &mut buffer);
+        Ok(buffer)
+    }
+
+    unsafe fn bind_buffer(&self, target: BufferBindingTarget, buffer: Option<Self::Buffer>) {
+        let gl = &self.raw;
+        gl.BindBuffer(target as u32, buffer.unwrap_or(0));
     }
 }

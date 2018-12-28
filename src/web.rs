@@ -207,4 +207,11 @@ impl RenderingContext for WebRenderingContext {
             RawRenderingContext::WebGl2(ref gl) => gl.bind_buffer(target as u32, raw_buffer),
         }
     }
+
+    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.draw_arrays(mode as u32, first, count),
+            RawRenderingContext::WebGl2(ref gl) => gl.draw_arrays(mode as u32, first, count),
+        }
+    }
 }

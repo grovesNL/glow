@@ -133,4 +133,9 @@ impl RenderingContext for NativeRenderingContext {
         let gl = &self.raw;
         gl.BindBuffer(target as u32, buffer.unwrap_or(0));
     }
+
+    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
+        let gl = &self.raw;
+        gl.DrawArrays(mode as u32, first, count);
+    }
 }

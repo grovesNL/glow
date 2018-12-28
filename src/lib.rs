@@ -52,6 +52,23 @@ pub enum BufferBindingTarget {
     Uniform = 0x8A11,
 }
 
+/// The kind of primitive to render.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum PrimitiveMode {
+    Points = 0x0000,
+    LineStrip = 0x0003,
+    LineLoop = 0x0002,
+    Lines = 0x0001,
+    LineStripAdjacency = 0x000B,
+    LinesAdjacency = 0x000A,
+    TriangleStrip = 0x0005,
+    TriangleFan = 0x0006,
+    Triangles = 0x0004,
+    TriangleStripAdjacency = 0x000D,
+    TrianglesAdjacency = 0x000C,
+    Patches = 0x000E,
+}
+
 pub(crate) const COMPILE_STATUS: u32 = 0x8B81;
 pub(crate) const INFO_LOG_LENGTH: u32 = 0x8B84;
 pub(crate) const LINK_STATUS: u32 = 0x8B82;
@@ -107,4 +124,6 @@ pub trait RenderingContext {
     unsafe fn create_buffer(&self) -> Result<Self::Buffer, String>;
 
     unsafe fn bind_buffer(&self, target: BufferBindingTarget, buffer: Option<Self::Buffer>);
+
+    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32);
 }

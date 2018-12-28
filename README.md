@@ -2,6 +2,8 @@
 
 GL on Whatever: a set of bindings to run GL anywhere (Open GL, OpenGL ES, and WebGL) and avoid target-specific code.
 
+This is heavily work-in-progress and should be considered experimental.
+
 ## License
 
 This project is licensed under either of [Apache License, Version

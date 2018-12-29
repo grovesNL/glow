@@ -98,8 +98,18 @@ pub trait RenderingContext {
         + Ord
         + PartialEq
         + PartialOrd;
+    type VertexArray: Copy
+        + Clone
+        + std::fmt::Debug
+        + Eq
+        + std::hash::Hash
+        + Ord
+        + PartialEq
+        + PartialOrd;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String>;
+
+    unsafe fn delete_shader(&self, shader: Self::Shader);
 
     unsafe fn shader_source(&self, shader: Self::Shader, source: &str);
 
@@ -111,7 +121,11 @@ pub trait RenderingContext {
 
     unsafe fn create_program(&self) -> Result<Self::Program, String>;
 
+    unsafe fn delete_program(&self, program: Self::Program);
+
     unsafe fn attach_shader(&self, program: Self::Program, shader: Self::Shader);
+
+    unsafe fn detach_shader(&self, program: Self::Program, shader: Self::Shader);
 
     unsafe fn link_program(&self, program: Self::Program);
 
@@ -126,4 +140,16 @@ pub trait RenderingContext {
     unsafe fn bind_buffer(&self, target: BufferBindingTarget, buffer: Option<Self::Buffer>);
 
     unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32);
+
+    unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String>;
+
+    unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray);
+
+    unsafe fn bind_vertex_array(&self, vertex_array: Option<Self::VertexArray>);
+}
+
+pub trait RenderLoop {
+    type Window;
+
+    fn run<F: FnMut(&mut bool) + 'static>(&self, callback: F);
 }

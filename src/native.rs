@@ -1,5 +1,7 @@
 use super::*;
 
+use std::sync::Arc;
+
 mod native_gl {
     include!(concat!(env!("OUT_DIR"), "/opengl_bindings.rs"));
 }
@@ -27,10 +29,16 @@ impl RenderingContext for NativeRenderingContext {
     type Shader = native_gl::types::GLuint;
     type Program = native_gl::types::GLuint;
     type Buffer = native_gl::types::GLuint;
+    type VertexArray = native_gl::types::GLuint;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let gl = &self.raw;
         Ok(gl.CreateShader(shader_type as u32))
+    }
+
+    unsafe fn delete_shader(&self, shader: Self::Shader) {
+        let gl = &self.raw;
+        gl.DeleteShader(shader);
     }
 
     unsafe fn shader_source(&self, shader: Self::Shader, source: &str) {
@@ -80,9 +88,19 @@ impl RenderingContext for NativeRenderingContext {
         Ok(gl.CreateProgram())
     }
 
+    unsafe fn delete_program(&self, program: Self::Program) {
+        let gl = &self.raw;
+        gl.DeleteProgram(program);
+    }
+
     unsafe fn attach_shader(&self, program: Self::Program, shader: Self::Shader) {
         let gl = &self.raw;
         gl.AttachShader(program, shader);
+    }
+
+    unsafe fn detach_shader(&self, program: Self::Program, shader: Self::Shader) {
+        let gl = &self.raw;
+        gl.DetachShader(program, shader);
     }
 
     unsafe fn link_program(&self, program: Self::Program) {
@@ -137,5 +155,44 @@ impl RenderingContext for NativeRenderingContext {
     unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
         let gl = &self.raw;
         gl.DrawArrays(mode as u32, first, count);
+    }
+
+    unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
+        let gl = &self.raw;
+        let mut vertex_array = 0;
+        gl.GenVertexArrays(1, &mut vertex_array);
+        Ok(vertex_array)
+    }
+
+    unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
+        let gl = &self.raw;
+        gl.DeleteVertexArrays(1, &vertex_array);
+    }
+
+    unsafe fn bind_vertex_array(&self, vertex_array: Option<Self::VertexArray>) {
+        let gl = &self.raw;
+        gl.BindVertexArray(vertex_array.unwrap_or(0));
+    }
+}
+
+pub struct NativeRenderLoop {
+    window: Arc<glutin::GlWindow>,
+}
+
+impl NativeRenderLoop {
+    pub fn from_glutin_window(window: Arc<glutin::GlWindow>) -> Self {
+        NativeRenderLoop { window }
+    }
+}
+
+impl RenderLoop for NativeRenderLoop {
+    type Window = Arc<glutin::GlWindow>;
+
+    fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
+        let mut running = true;
+        while running {
+            callback(&mut running);
+            (*self.window).swap_buffers().unwrap();
+        }
     }
 }

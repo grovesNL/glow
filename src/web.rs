@@ -1,9 +1,10 @@
 use super::*;
 
+use wasm_bindgen::prelude::*;
 use std::cell::RefCell;
 use slotmap::{new_key_type, SecondaryMap, SlotMap};
 use web_sys::{WebGl2RenderingContext, WebGlBuffer, WebGlProgram, WebGlRenderingContext,
-              WebGlShader};
+              WebGlShader, WebGlVertexArrayObject};
 
 #[derive(Debug)]
 enum RawRenderingContext {
@@ -27,6 +28,7 @@ pub struct WebRenderingContext {
     shaders: TrackedResource<WebShaderKey, WebGlShader>,
     programs: TrackedResource<WebProgramKey, WebGlProgram>,
     buffers: TrackedResource<WebBufferKey, WebGlBuffer>,
+    vertex_arrays: TrackedResource<WebVertexArrayKey, WebGlVertexArrayObject>,
 }
 
 impl WebRenderingContext {
@@ -36,6 +38,7 @@ impl WebRenderingContext {
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),
+            vertex_arrays: tracked_resource(),
         }
     }
 
@@ -45,6 +48,7 @@ impl WebRenderingContext {
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),
+            vertex_arrays: tracked_resource(),
         }
     }
 }
@@ -52,11 +56,13 @@ impl WebRenderingContext {
 new_key_type! { pub struct WebShaderKey; }
 new_key_type! { pub struct WebProgramKey; }
 new_key_type! { pub struct WebBufferKey; }
+new_key_type! { pub struct WebVertexArrayKey; }
 
 impl RenderingContext for WebRenderingContext {
     type Shader = WebShaderKey;
     type Program = WebProgramKey;
     type Buffer = WebBufferKey;
+    type VertexArray = WebVertexArrayKey;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
@@ -71,6 +77,17 @@ impl RenderingContext for WebRenderingContext {
                 Ok(key)
             }
             None => Err(String::from("Unable to create shader object")),
+        }
+    }
+
+    unsafe fn delete_shader(&self, shader: Self::Shader) {
+        let mut shaders = self.shaders.borrow_mut();
+        match shaders.1.remove(shader) {
+            Some(ref s) => match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.delete_shader(Some(s)),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_shader(Some(s)),
+            },
+            None => {}
         }
     }
 
@@ -131,6 +148,17 @@ impl RenderingContext for WebRenderingContext {
         }
     }
 
+    unsafe fn delete_program(&self, program: Self::Program) {
+        let mut programs = self.programs.borrow_mut();
+        match programs.1.remove(program) {
+            Some(ref p) => match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.delete_program(Some(p)),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_program(Some(p)),
+            },
+            None => {}
+        }
+    }
+
     unsafe fn attach_shader(&self, program: Self::Program, shader: Self::Shader) {
         let programs = self.programs.borrow();
         let shaders = self.shaders.borrow();
@@ -139,6 +167,17 @@ impl RenderingContext for WebRenderingContext {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.attach_shader(raw_program, raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.attach_shader(raw_program, raw_shader),
+        }
+    }
+
+    unsafe fn detach_shader(&self, program: Self::Program, shader: Self::Shader) {
+        let programs = self.programs.borrow();
+        let shaders = self.shaders.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        let raw_shader = shaders.1.get_unchecked(shader);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.detach_shader(raw_program, raw_shader),
+            RawRenderingContext::WebGl2(ref gl) => gl.detach_shader(raw_program, raw_shader),
         }
     }
 
@@ -213,5 +252,86 @@ impl RenderingContext for WebRenderingContext {
             RawRenderingContext::WebGl1(ref gl) => gl.draw_arrays(mode as u32, first, count),
             RawRenderingContext::WebGl2(ref gl) => gl.draw_arrays(mode as u32, first, count),
         }
+    }
+
+    unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
+        let raw_vertex_array = match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Vertex array objects are not supported")
+            }
+            // TODO: Extension
+            RawRenderingContext::WebGl2(ref gl) => gl.create_vertex_array(),
+        };
+
+        match raw_vertex_array {
+            Some(va) => {
+                let key = self.vertex_arrays.borrow_mut().0.insert(());
+                self.vertex_arrays.borrow_mut().1.insert(key, va);
+                Ok(key)
+            }
+            None => Err(String::from("Unable to create vertex array object")),
+        }
+    }
+
+    unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
+        let mut vertex_arrays = self.vertex_arrays.borrow_mut();
+        match vertex_arrays.1.remove(vertex_array) {
+            Some(ref va) => match self.raw {
+                RawRenderingContext::WebGl1(ref _gl) => {
+                    panic!("Vertex array objects are not supported")
+                }
+                // TODO: Extension
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_vertex_array(Some(va)),
+            },
+            None => {}
+        }
+    }
+
+    unsafe fn bind_vertex_array(&self, vertex_array: Option<Self::VertexArray>) {
+        let vertex_arrays = self.vertex_arrays.borrow();
+        let raw_vertex_array = vertex_array.map(|va| vertex_arrays.1.get_unchecked(va));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Vertex array objects are not supported")
+            }
+            // TODO: Extension
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_vertex_array(raw_vertex_array),
+        }
+    }
+}
+
+pub struct WebRenderLoop;
+
+impl WebRenderLoop {
+    pub fn from_request_animation_frame() -> Self {
+        WebRenderLoop
+    }
+}
+
+impl RenderLoop for WebRenderLoop {
+    type Window = ();
+
+    fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
+        fn request_animation_frame(f: &Closure<FnMut()>) {
+            use wasm_bindgen::JsCast;
+            web_sys::window()
+                .unwrap()
+                .request_animation_frame(f.as_ref().unchecked_ref())
+                .unwrap();
+        }
+
+        let mut running = true;
+        let f = std::rc::Rc::new(std::cell::RefCell::new(None));
+        let g = f.clone();
+        *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+            callback(&mut running);
+            if !running {
+                let _ = f.borrow_mut().take();
+                return;
+            }
+            request_animation_frame(f.borrow().as_ref().unwrap());
+        }) as Box<FnMut()>));
+
+        request_animation_frame(g.borrow().as_ref().unwrap());
     }
 }

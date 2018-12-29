@@ -31,6 +31,7 @@ features = [
   'WebGl2RenderingContext',
   'WebGlProgram',
   'WebGlShader',
+  'WebGlVertexArrayObject',
   'Window',
 ]
 

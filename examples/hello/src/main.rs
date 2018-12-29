@@ -12,7 +12,7 @@ fn main() {
     unsafe {
         // Create a context from a WebGL2 context on wasm32 targets
         #[cfg(target_arch = "wasm32")]
-        let (_window, context, _events_loop, render_loop) = {
+        let (_window, context, _events_loop, render_loop, shader_version) = {
             use wasm_bindgen::JsCast;
             let canvas = web_sys::window()
                 .unwrap()
@@ -33,12 +33,13 @@ fn main() {
                 glow::WebRenderingContext::from_webgl2_context(webgl2_context),
                 (),
                 glow::WebRenderLoop::from_request_animation_frame(),
+                "#version 300 es",
             )
         };
 
         // Create a context from a glutin window on non-wasm32 targets
         #[cfg(not(target_arch = "wasm32"))]
-        let (window, context, mut events_loop, render_loop) = {
+        let (window, context, mut events_loop, render_loop, shader_version) = {
             use glutin::GlContext;
             let events_loop = glutin::EventsLoop::new();
             let window_builder = glutin::WindowBuilder::new()
@@ -51,7 +52,13 @@ fn main() {
             window.make_current().unwrap();
             let window_ref = std::sync::Arc::new(window);
             let render_loop = glow::NativeRenderLoop::from_glutin_window(window_ref.clone());
-            (window_ref, context, events_loop, render_loop)
+            (
+                window_ref,
+                context,
+                events_loop,
+                render_loop,
+                "#version 410",
+            )
         };
 
         let vertex_array = context
@@ -91,12 +98,7 @@ fn main() {
             let shader = context
                 .create_shader(*shader_type)
                 .expect("Cannot create shader");
-            // Provide different shader versions for wasm32 and non-wasm32 targets
-            #[cfg(target_arch = "wasm32")]
-            let version = "#version 300 es";
-            #[cfg(not(target_arch = "wasm32"))]
-            let version = "#version 410";
-            context.shader_source(shader, &format!("{}\n{}", version, shader_source));
+            context.shader_source(shader, &format!("{}\n{}", shader_version, shader_source));
             context.compile_shader(shader);
             if !context.get_shader_compile_status(shader) {
                 panic!(context.get_shader_info_log(shader));

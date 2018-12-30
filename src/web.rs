@@ -348,6 +348,62 @@ impl RenderingContext for WebRenderingContext {
             RawRenderingContext::WebGl2(ref gl) => gl.pixel_storei(parameter as u32, value as i32),
         }
     }
+
+    unsafe fn enable(&self, parameter: Parameter) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.enable(parameter as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.enable(parameter as u32),
+        }
+    }
+
+    unsafe fn disable(&self, parameter: Parameter) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.disable(parameter as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.disable(parameter as u32),
+        }
+    }
+
+    unsafe fn front_face(&self, value: FrontFace) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.front_face(value as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.front_face(value as u32),
+        }
+    }
+
+    unsafe fn cull_face(&self, value: CullFace) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.cull_face(value as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.cull_face(value as u32),
+        }
+    }
+
+    unsafe fn color_mask(&self, red: bool, green: bool, blue: bool, alpha: bool) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.color_mask(red, green, blue, alpha),
+            RawRenderingContext::WebGl2(ref gl) => gl.color_mask(red, green, blue, alpha),
+        }
+    }
+
+    unsafe fn blend_color(&self, red: f32, green: f32, blue: f32, alpha: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.blend_color(red, green, blue, alpha),
+            RawRenderingContext::WebGl2(ref gl) => gl.blend_color(red, green, blue, alpha),
+        }
+    }
+
+    unsafe fn line_width(&self, width: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.line_width(width),
+            RawRenderingContext::WebGl2(ref gl) => gl.line_width(width),
+        }
+    }
+
+    unsafe fn polygon_offset(&self, factor: f32, units: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.polygon_offset(factor, units),
+            RawRenderingContext::WebGl2(ref gl) => gl.polygon_offset(factor, units),
+        }
+    }
 }
 
 pub struct WebRenderLoop;

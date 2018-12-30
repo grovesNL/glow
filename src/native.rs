@@ -213,6 +213,46 @@ impl RenderingContext for NativeRenderingContext {
         let gl = &self.raw;
         gl.PixelStorei(parameter as u32, value as i32);
     }
+
+    unsafe fn enable(&self, parameter: Parameter) {
+        let gl = &self.raw;
+        gl.Enable(parameter as u32);
+    }
+
+    unsafe fn disable(&self, parameter: Parameter) {
+        let gl = &self.raw;
+        gl.Disable(parameter as u32);
+    }
+
+    unsafe fn front_face(&self, value: FrontFace) {
+        let gl = &self.raw;
+        gl.FrontFace(value as u32);
+    }
+
+    unsafe fn cull_face(&self, value: CullFace) {
+        let gl = &self.raw;
+        gl.CullFace(value as u32);
+    }
+
+    unsafe fn color_mask(&self, red: bool, green: bool, blue: bool, alpha: bool) {
+        let gl = &self.raw;
+        gl.ColorMask(red as u8, green as u8, blue as u8, alpha as u8);
+    }
+
+    unsafe fn blend_color(&self, red: f32, green: f32, blue: f32, alpha: f32) {
+        let gl = &self.raw;
+        gl.BlendColor(red, green, blue, alpha);
+    }
+
+    unsafe fn line_width(&self, width: f32) {
+        let gl = &self.raw;
+        gl.LineWidth(width);
+    }
+
+    unsafe fn polygon_offset(&self, factor: f32, units: f32) {
+        let gl = &self.raw;
+        gl.PolygonOffset(factor, units);
+    }
 }
 
 pub struct NativeRenderLoop {

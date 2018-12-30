@@ -179,6 +179,26 @@ impl RenderingContext for NativeRenderingContext {
         gl.ClearColor(red, green, blue, alpha);
     }
 
+    unsafe fn supports_f64_precision() -> bool {
+        // TODO: Handle OpenGL ES
+        true
+    }
+
+    unsafe fn clear_depth_f64(&self, depth: f64) {
+        let gl = &self.raw;
+        gl.ClearDepth(depth);
+    }
+
+    unsafe fn clear_depth_f32(&self, depth: f32) {
+        let gl = &self.raw;
+        gl.ClearDepthf(depth);
+    }
+
+    unsafe fn clear_stencil(&self, stencil: i32) {
+        let gl = &self.raw;
+        gl.ClearStencil(stencil);
+    }
+
     unsafe fn clear(&self, mask: ClearMask) {
         let gl = &self.raw;
         gl.Clear(mask.bits());

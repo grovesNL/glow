@@ -160,6 +160,14 @@ pub trait RenderingContext {
 
     unsafe fn clear_color(&self, red: f32, green: f32, blue: f32, alpha: f32);
 
+    unsafe fn supports_f64_precision() -> bool;
+
+    unsafe fn clear_depth_f64(&self, depth: f64);
+
+    unsafe fn clear_depth_f32(&self, depth: f32);
+
+    unsafe fn clear_stencil(&self, stencil: i32);
+
     unsafe fn clear(&self, mask: ClearMask);
 }
 

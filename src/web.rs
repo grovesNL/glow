@@ -306,6 +306,28 @@ impl RenderingContext for WebRenderingContext {
         }
     }
 
+    unsafe fn supports_f64_precision() -> bool {
+        false
+    }
+
+    unsafe fn clear_depth_f64(&self, _depth: f64) {
+        panic!("64-bit float precision is not supported in WebGL")
+    }
+
+    unsafe fn clear_depth_f32(&self, depth: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.clear_depth(depth),
+            RawRenderingContext::WebGl2(ref gl) => gl.clear_depth(depth),
+        }
+    }
+
+    unsafe fn clear_stencil(&self, stencil: i32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.clear_stencil(stencil),
+            RawRenderingContext::WebGl2(ref gl) => gl.clear_stencil(stencil),
+        }
+    }
+
     unsafe fn clear(&self, mask: ClearMask) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.clear(mask.bits()),

@@ -203,6 +203,16 @@ impl RenderingContext for NativeRenderingContext {
         let gl = &self.raw;
         gl.Clear(mask.bits());
     }
+
+    unsafe fn pixel_store_i32(&self, parameter: PixelStoreI32Parameter, value: i32) {
+        let gl = &self.raw;
+        gl.PixelStorei(parameter as u32, value);
+    }
+
+    unsafe fn pixel_store_bool(&self, parameter: PixelStoreBoolParameter, value: bool) {
+        let gl = &self.raw;
+        gl.PixelStorei(parameter as u32, value as i32);
+    }
 }
 
 pub struct NativeRenderLoop {

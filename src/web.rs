@@ -334,6 +334,20 @@ impl RenderingContext for WebRenderingContext {
             RawRenderingContext::WebGl2(ref gl) => gl.clear(mask.bits()),
         }
     }
+
+    unsafe fn pixel_store_i32(&self, parameter: PixelStoreI32Parameter, value: i32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.pixel_storei(parameter as u32, value),
+            RawRenderingContext::WebGl2(ref gl) => gl.pixel_storei(parameter as u32, value),
+        }
+    }
+
+    unsafe fn pixel_store_bool(&self, parameter: PixelStoreBoolParameter, value: bool) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.pixel_storei(parameter as u32, value as i32),
+            RawRenderingContext::WebGl2(ref gl) => gl.pixel_storei(parameter as u32, value as i32),
+        }
+    }
 }
 
 pub struct WebRenderLoop;

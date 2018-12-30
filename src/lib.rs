@@ -71,6 +71,30 @@ pub enum PrimitiveMode {
     Patches = 0x000E,
 }
 
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum PixelStoreI32Parameter {
+    PackRowLength = 0x0D02,
+    PackImageHeight = 0x806C,
+    PackSkipRows = 0x0D03,
+    PackSkipPixels = 0x0D04,
+    PackSkipImages = 0x806B,
+    PackAlignment = 0x0D05,
+    UnpackRowLength = 0x0CF2,
+    UnpackImageHeight = 0x806E,
+    UnpackSkipRows = 0x0CF3,
+    UnpackSkipPixels = 0x0CF4,
+    UnpackSkipImages = 0x806D,
+    UnpackAlignment = 0x0CF5,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum PixelStoreBoolParameter {
+    PackSwapBytes = 0x0D00,
+    PackLsbFirst = 0x0D01,
+    UnpackSwapBytes = 0x0CF0,
+    UnpackLsbFirst = 0x0CF1,
+}
+
 /// The buffers to clear.
 bitflags! {
     pub struct ClearMask: u32 {
@@ -169,6 +193,10 @@ pub trait RenderingContext {
     unsafe fn clear_stencil(&self, stencil: i32);
 
     unsafe fn clear(&self, mask: ClearMask);
+
+    unsafe fn pixel_store_i32(&self, parameter: PixelStoreI32Parameter, value: i32);
+
+    unsafe fn pixel_store_bool(&self, parameter: PixelStoreBoolParameter, value: bool);
 }
 
 pub trait RenderLoop {

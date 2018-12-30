@@ -12,6 +12,9 @@ edition = "2018"
 name = "glow"
 path = "src/lib.rs"
 
+[dependencies]
+bitflags = "1.0"
+
 [target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
 glutin = "0.19"
 

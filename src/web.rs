@@ -298,6 +298,20 @@ impl RenderingContext for WebRenderingContext {
             RawRenderingContext::WebGl2(ref gl) => gl.bind_vertex_array(raw_vertex_array),
         }
     }
+
+    unsafe fn clear_color(&self, red: f32, green: f32, blue: f32, alpha: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.clear_color(red, green, blue, alpha),
+            RawRenderingContext::WebGl2(ref gl) => gl.clear_color(red, green, blue, alpha),
+        }
+    }
+
+    unsafe fn clear(&self, mask: ClearMask) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.clear(mask.bits()),
+            RawRenderingContext::WebGl2(ref gl) => gl.clear(mask.bits()),
+        }
+    }
 }
 
 pub struct WebRenderLoop;

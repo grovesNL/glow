@@ -173,6 +173,16 @@ impl RenderingContext for NativeRenderingContext {
         let gl = &self.raw;
         gl.BindVertexArray(vertex_array.unwrap_or(0));
     }
+
+    unsafe fn clear_color(&self, red: f32, green: f32, blue: f32, alpha: f32) {
+        let gl = &self.raw;
+        gl.ClearColor(red, green, blue, alpha);
+    }
+
+    unsafe fn clear(&self, mask: ClearMask) {
+        let gl = &self.raw;
+        gl.Clear(mask.bits());
+    }
 }
 
 pub struct NativeRenderLoop {

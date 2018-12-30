@@ -8,6 +8,8 @@ mod web;
 #[cfg(target_arch = "wasm32")]
 pub use self::web::*;
 
+use bitflags::bitflags;
+
 /// The type of the shader.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum ShaderType {
@@ -67,6 +69,15 @@ pub enum PrimitiveMode {
     TriangleStripAdjacency = 0x000D,
     TrianglesAdjacency = 0x000C,
     Patches = 0x000E,
+}
+
+/// The buffers to clear.
+bitflags! {
+    pub struct ClearMask: u32 {
+        const Color = 0x00004000;
+        const Stencil = 0x00000400;
+        const Depth = 0x00000100;
+    }
 }
 
 pub(crate) const COMPILE_STATUS: u32 = 0x8B81;
@@ -146,6 +157,10 @@ pub trait RenderingContext {
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray);
 
     unsafe fn bind_vertex_array(&self, vertex_array: Option<Self::VertexArray>);
+
+    unsafe fn clear_color(&self, red: f32, green: f32, blue: f32, alpha: f32);
+
+    unsafe fn clear(&self, mask: ClearMask);
 }
 
 pub trait RenderLoop {

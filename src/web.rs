@@ -23,7 +23,7 @@ fn tracked_resource<K: slotmap::Key, V>() -> TrackedResource<K, V> {
 }
 
 #[derive(Debug)]
-pub struct WebRenderingContext {
+pub struct Context {
     raw: RawRenderingContext,
     shaders: TrackedResource<WebShaderKey, WebGlShader>,
     programs: TrackedResource<WebProgramKey, WebGlProgram>,
@@ -31,9 +31,9 @@ pub struct WebRenderingContext {
     vertex_arrays: TrackedResource<WebVertexArrayKey, WebGlVertexArrayObject>,
 }
 
-impl WebRenderingContext {
+impl Context {
     pub fn from_webgl1_context(context: WebGlRenderingContext) -> Self {
-        WebRenderingContext {
+        Context {
             raw: RawRenderingContext::WebGl1(context),
             shaders: tracked_resource(),
             programs: tracked_resource(),
@@ -43,7 +43,7 @@ impl WebRenderingContext {
     }
 
     pub fn from_webgl2_context(context: WebGl2RenderingContext) -> Self {
-        WebRenderingContext {
+        Context {
             raw: RawRenderingContext::WebGl2(context),
             shaders: tracked_resource(),
             programs: tracked_resource(),
@@ -58,7 +58,7 @@ new_key_type! { pub struct WebProgramKey; }
 new_key_type! { pub struct WebBufferKey; }
 new_key_type! { pub struct WebVertexArrayKey; }
 
-impl RenderingContext for WebRenderingContext {
+impl super::Context for Context {
     type Shader = WebShaderKey;
     type Program = WebProgramKey;
     type Buffer = WebBufferKey;
@@ -406,15 +406,15 @@ impl RenderingContext for WebRenderingContext {
     }
 }
 
-pub struct WebRenderLoop;
+pub struct RenderLoop;
 
-impl WebRenderLoop {
+impl RenderLoop {
     pub fn from_request_animation_frame() -> Self {
-        WebRenderLoop
+        RenderLoop
     }
 }
 
-impl RenderLoop for WebRenderLoop {
+impl super::RenderLoop for RenderLoop {
     type Window = ();
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {

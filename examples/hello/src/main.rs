@@ -1,4 +1,4 @@
-use glow::{self, RenderLoop, RenderingContext};
+use glow::{self, Context, RenderLoop};
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -29,9 +29,9 @@ fn main() {
                 .dyn_into::<web_sys::WebGl2RenderingContext>()
                 .unwrap();
             (
-                glow::WebRenderingContext::from_webgl2_context(webgl2_context),
+                glow::web::Context::from_webgl2_context(webgl2_context),
                 (),
-                glow::WebRenderLoop::from_request_animation_frame(),
+                glow::web::RenderLoop::from_request_animation_frame(),
                 "#version 300 es",
             )
         };
@@ -47,10 +47,10 @@ fn main() {
             let context_builder = glutin::ContextBuilder::new().with_vsync(true);
             let window =
                 glutin::GlWindow::new(window_builder, context_builder, &events_loop).unwrap();
-            let context = glow::NativeRenderingContext::from_glutin_window(&window);
+            let context = glow::native::Context::from_glutin_window(&window);
             window.make_current().unwrap();
             let render_loop =
-                glow::NativeRenderLoop::from_glutin_window(std::sync::Arc::new(window));
+                glow::native::RenderLoop::from_glutin_window(std::sync::Arc::new(window));
             (context, events_loop, render_loop, "#version 410")
         };
 

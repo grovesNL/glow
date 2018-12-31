@@ -1,13 +1,12 @@
 #[cfg(not(target_arch = "wasm32"))]
-mod native;
-#[cfg(not(target_arch = "wasm32"))]
-pub use self::native::*;
+pub mod native;
 
 #[cfg(target_arch = "wasm32")]
-mod web;
-#[cfg(target_arch = "wasm32")]
-pub use self::web::*;
+pub mod web;
 
+// TODO: Blocked by https://github.com/gfx-rs/gfx/issues/2512
+#[macro_use]
+extern crate bitflags;
 use bitflags::bitflags;
 
 /// The type of the shader.
@@ -99,15 +98,15 @@ pub enum Parameter {
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum BufferBindingTarget {
     /// Vertex attributes.
-    ArrayBuffer = 0x8892,
+    Array = 0x8892,
     /// Atomic counter storage.
-    AtomicCounterBuffer = 0x92C0,
+    AtomicCounter = 0x92C0,
     /// Buffer copy source.
-    CopyReadBuffer = 0x8F36,
+    CopyRead = 0x8F36,
     /// Buffer copy destination.
-    CopyWriteBuffer = 0x8F37,
+    CopyWrite = 0x8F37,
     /// Indirect compute dispatch commands.
-    DispatchIndirectBuffer = 0x90EE,
+    DispatchIndirect = 0x90EE,
     /// Indirect command arguments.
     DrawIndirect = 0x8F3F,
     /// Vertex array indices.
@@ -196,7 +195,7 @@ pub(crate) const LINK_STATUS: u32 = 0x8B82;
 #[allow(unused)]
 pub(crate) const INFO_LOG_LENGTH: u32 = 0x8B84;
 
-pub trait RenderingContext {
+pub trait Context {
     type Shader: Copy
         + Clone
         + std::fmt::Debug

@@ -6,26 +6,26 @@ mod native_gl {
     include!(concat!(env!("OUT_DIR"), "/opengl_bindings.rs"));
 }
 
-pub struct NativeRenderingContext {
+pub struct Context {
     raw: native_gl::Gl,
 }
 
-impl NativeRenderingContext {
+impl Context {
     pub fn from_glutin_window(window: &glutin::GlWindow) -> Self {
         use glutin::GlContext;
         let raw = native_gl::Gl::load_with(|s| window.get_proc_address(s) as *const _);
-        NativeRenderingContext { raw }
+        Context { raw }
     }
 }
 
-impl std::fmt::Debug for NativeRenderingContext {
+impl std::fmt::Debug for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         // TODO
         write!(f, "TODO")
     }
 }
 
-impl RenderingContext for NativeRenderingContext {
+impl super::Context for Context {
     type Shader = native_gl::types::GLuint;
     type Program = native_gl::types::GLuint;
     type Buffer = native_gl::types::GLuint;
@@ -255,17 +255,17 @@ impl RenderingContext for NativeRenderingContext {
     }
 }
 
-pub struct NativeRenderLoop {
+pub struct RenderLoop {
     window: Arc<glutin::GlWindow>,
 }
 
-impl NativeRenderLoop {
+impl RenderLoop {
     pub fn from_glutin_window(window: Arc<glutin::GlWindow>) -> Self {
-        NativeRenderLoop { window }
+        RenderLoop { window }
     }
 }
 
-impl RenderLoop for NativeRenderLoop {
+impl super::RenderLoop for RenderLoop {
     type Window = Arc<glutin::GlWindow>;
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {

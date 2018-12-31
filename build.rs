@@ -18,7 +18,8 @@ fn main() {
                 "GL_ARB_draw_buffers_blend",
                 "GL_ARB_program_interface_query",
             ],
-        ).write_bindings(gl_generator::StructGenerator, &mut file)
-            .unwrap();
+        )
+        .write_bindings(gl_generator::StructGenerator, &mut file)
+        .unwrap();
     }
 }

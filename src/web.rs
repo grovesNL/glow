@@ -1,10 +1,12 @@
 use super::*;
 
-use wasm_bindgen::prelude::*;
-use std::cell::RefCell;
 use slotmap::{new_key_type, SecondaryMap, SlotMap};
-use web_sys::{WebGl2RenderingContext, WebGlBuffer, WebGlProgram, WebGlRenderingContext,
-              WebGlSampler, WebGlShader, WebGlTexture, WebGlVertexArrayObject};
+use std::cell::RefCell;
+use wasm_bindgen::prelude::*;
+use web_sys::{
+    WebGl2RenderingContext, WebGlBuffer, WebGlProgram, WebGlRenderingContext, WebGlSampler,
+    WebGlShader, WebGlSync, WebGlTexture, WebGlVertexArrayObject,
+};
 
 #[derive(Debug)]
 enum RawRenderingContext {
@@ -31,6 +33,7 @@ pub struct Context {
     vertex_arrays: TrackedResource<WebVertexArrayKey, WebGlVertexArrayObject>,
     textures: TrackedResource<WebTextureKey, WebGlTexture>,
     samplers: TrackedResource<WebSamplerKey, WebGlSampler>,
+    fences: TrackedResource<WebFenceKey, WebGlSync>,
 }
 
 impl Context {
@@ -43,6 +46,7 @@ impl Context {
             vertex_arrays: tracked_resource(),
             textures: tracked_resource(),
             samplers: tracked_resource(),
+            fences: tracked_resource(),
         }
     }
 
@@ -55,6 +59,7 @@ impl Context {
             vertex_arrays: tracked_resource(),
             textures: tracked_resource(),
             samplers: tracked_resource(),
+            fences: tracked_resource(),
         }
     }
 }
@@ -65,6 +70,7 @@ new_key_type! { pub struct WebBufferKey; }
 new_key_type! { pub struct WebVertexArrayKey; }
 new_key_type! { pub struct WebTextureKey; }
 new_key_type! { pub struct WebSamplerKey; }
+new_key_type! { pub struct WebFenceKey; }
 
 impl super::Context for Context {
     type Shader = WebShaderKey;
@@ -73,6 +79,7 @@ impl super::Context for Context {
     type VertexArray = WebVertexArrayKey;
     type Texture = WebTextureKey;
     type Sampler = WebSamplerKey;
+    type Fence = WebFenceKey;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
@@ -129,8 +136,9 @@ impl super::Context for Context {
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.get_shader_parameter(raw_shader, COMPILE_STATUS)
             }
-        }.as_bool()
-            .unwrap_or(false)
+        }
+        .as_bool()
+        .unwrap_or(false)
     }
 
     unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String {
@@ -139,7 +147,8 @@ impl super::Context for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_shader_info_log(raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.get_shader_info_log(raw_shader),
-        }.unwrap_or_else(|| String::from(""))
+        }
+        .unwrap_or_else(|| String::from(""))
     }
 
     unsafe fn create_program(&self) -> Result<Self::Program, String> {
@@ -210,8 +219,9 @@ impl super::Context for Context {
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.get_program_parameter(raw_program, LINK_STATUS)
             }
-        }.as_bool()
-            .unwrap_or(false)
+        }
+        .as_bool()
+        .unwrap_or(false)
     }
 
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String {
@@ -220,7 +230,8 @@ impl super::Context for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_program_info_log(raw_program),
             RawRenderingContext::WebGl2(ref gl) => gl.get_program_info_log(raw_program),
-        }.unwrap_or_else(|| String::from(""))
+        }
+        .unwrap_or_else(|| String::from(""))
     }
 
     unsafe fn use_program(&self, program: Option<Self::Program>) {
@@ -366,11 +377,19 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn enable_i(&self, _parameter: Parameter, _buffer: u32) {
+        panic!("Draw buffer enable is not supported")
+    }
+
     unsafe fn disable(&self, parameter: Parameter) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.disable(parameter as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.disable(parameter as u32),
         }
+    }
+
+    unsafe fn disable_i(&self, _parameter: Parameter, _buffer: u32) {
+        panic!("Draw buffer disable is not supported")
     }
 
     unsafe fn front_face(&self, value: FrontFace) {
@@ -391,6 +410,24 @@ impl super::Context for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.color_mask(red, green, blue, alpha),
             RawRenderingContext::WebGl2(ref gl) => gl.color_mask(red, green, blue, alpha),
+        }
+    }
+
+    unsafe fn color_mask_i(
+        &self,
+        _buffer: u32,
+        _red: bool,
+        _green: bool,
+        _blue: bool,
+        _alpha: bool,
+    ) {
+        panic!("Draw buffer color masks are not supported")
+    }
+
+    unsafe fn depth_mask(&self, value: bool) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.depth_mask(value),
+            RawRenderingContext::WebGl2(ref gl) => gl.depth_mask(value),
         }
     }
 
@@ -448,6 +485,48 @@ impl super::Context for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.active_texture(unit),
             RawRenderingContext::WebGl2(ref gl) => gl.active_texture(unit),
+        }
+    }
+
+    unsafe fn fence_sync(
+        &self,
+        condition: FenceSyncCondition,
+        flags: FenceSyncFlags,
+    ) -> Result<Self::Fence, String> {
+        let raw_fence = match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Fences are not supported"), // TODO: Extension
+            RawRenderingContext::WebGl2(ref gl) => gl.fence_sync(condition as u32, flags.bits()),
+        };
+        match raw_fence {
+            Some(f) => {
+                let key = self.fences.borrow_mut().0.insert(());
+                self.fences.borrow_mut().1.insert(key, f);
+                Ok(key)
+            }
+            None => Err(String::from("Unable to create fence object")),
+        }
+    }
+
+    unsafe fn tex_parameter_i32(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        value: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.tex_parameteri(target as u32, parameter as u32, value)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_parameteri(target as u32, parameter as u32, value)
+            }
+        }
+    }
+
+    unsafe fn depth_func(&self, func: Func) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.depth_func(func as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.depth_func(func as u32),
         }
     }
 }

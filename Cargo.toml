@@ -26,18 +26,19 @@ slotmap = "0.3"
 [target.wasm32-unknown-unknown.dependencies.web-sys]
 version = "0.3"
 features = [
-  'Document',
-  'Element',
-  'HtmlCanvasElement',
-  'WebGlBuffer',
-  'WebGlRenderingContext',
-  'WebGl2RenderingContext',
-  'WebGlProgram',
+  "Document",
+  "Element",
+  "HtmlCanvasElement",
+  "WebGlBuffer",
+  "WebGlSync",
+  "WebGlRenderingContext",
+  "WebGl2RenderingContext",
+  "WebGlProgram",
   "WebGlSampler",
-  'WebGlShader',
+  "WebGlShader",
   "WebGlTexture",
-  'WebGlVertexArrayObject',
-  'Window',
+  "WebGlVertexArrayObject",
+  "Window",
 ]
 
 [build-dependencies]

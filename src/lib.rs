@@ -208,12 +208,56 @@ pub enum TextureBindingTarget {
     D2MultisampleArray = 0x9102,
 }
 
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum TextureParameter {
+    DepthStencilMode = 0x90EA,
+    BaseLevel = 0x813C,
+    CompareFunc = 0x884D,
+    CompareMode = 0x884C,
+    LodBias = 0x8501,
+    MinFilter = 0x2801,
+    MagFilter = 0x2800,
+    MinLod = 0x813A,
+    MaxLod = 0x813B,
+    MaxLevel = 0x813D,
+    SwizzleR = 0x8E42,
+    SwizzleG = 0x8E43,
+    SwizzleB = 0x8E44,
+    SwizzleA = 0x8E45,
+    WrapS = 0x2802,
+    WrapT = 0x2803,
+    WrapR = 0x8072,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum Func {
+    Never = 0x0200,
+    Less = 0x0201,
+    Equal = 0x0202,
+    LessOrEqual = 0x0203,
+    Greater = 0x0204,
+    NotEqual = 0x0205,
+    GreaterOrEqual = 0x0206,
+    Always = 0x0207,
+}
+
 /// The buffers to clear.
 bitflags! {
     pub struct ClearMask: u32 {
         const Color = 0x00004000;
         const Stencil = 0x00000400;
         const Depth = 0x00000100;
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum FenceSyncCondition {
+    GpuCommandsComplete = 0x9117,
+}
+
+bitflags! {
+    pub struct FenceSyncFlags: u32 {
+        const _Unused = 0;
     }
 }
 
@@ -271,6 +315,7 @@ pub trait Context {
         + Ord
         + PartialEq
         + PartialOrd;
+    type Fence: Copy + Clone + std::fmt::Debug + Eq + std::hash::Hash + Ord + PartialEq + PartialOrd;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String>;
 
@@ -330,13 +375,21 @@ pub trait Context {
 
     unsafe fn enable(&self, parameter: Parameter);
 
+    unsafe fn enable_i(&self, parameter: Parameter, buffer: u32);
+
     unsafe fn disable(&self, parameter: Parameter);
+
+    unsafe fn disable_i(&self, parameter: Parameter, buffer: u32);
 
     unsafe fn front_face(&self, value: FrontFace);
 
     unsafe fn cull_face(&self, value: CullFace);
 
     unsafe fn color_mask(&self, red: bool, green: bool, blue: bool, alpha: bool);
+
+    unsafe fn color_mask_i(&self, buffer: u32, red: bool, green: bool, blue: bool, alpha: bool);
+
+    unsafe fn depth_mask(&self, value: bool);
 
     unsafe fn blend_color(&self, red: f32, green: f32, blue: f32, alpha: f32);
 
@@ -353,6 +406,21 @@ pub trait Context {
     unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>);
 
     unsafe fn active_texture(&self, unit: u32);
+
+    unsafe fn fence_sync(
+        &self,
+        condition: FenceSyncCondition,
+        flags: FenceSyncFlags,
+    ) -> Result<Self::Fence, String>;
+
+    unsafe fn tex_parameter_i32(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        value: i32,
+    );
+
+    unsafe fn depth_func(&self, func: Func);
 }
 
 pub trait RenderLoop {

@@ -32,6 +32,7 @@ impl super::Context for Context {
     type VertexArray = native_gl::types::GLuint;
     type Texture = native_gl::types::GLuint;
     type Sampler = native_gl::types::GLuint;
+    type Fence = native_gl::types::GLsync;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let gl = &self.raw;
@@ -221,9 +222,19 @@ impl super::Context for Context {
         gl.Enable(parameter as u32);
     }
 
+    unsafe fn enable_i(&self, parameter: Parameter, buffer: u32) {
+        let gl = &self.raw;
+        gl.Enablei(buffer, parameter as u32);
+    }
+
     unsafe fn disable(&self, parameter: Parameter) {
         let gl = &self.raw;
         gl.Disable(parameter as u32);
+    }
+
+    unsafe fn disable_i(&self, parameter: Parameter, buffer: u32) {
+        let gl = &self.raw;
+        gl.Disablei(buffer, parameter as u32);
     }
 
     unsafe fn front_face(&self, value: FrontFace) {
@@ -239,6 +250,16 @@ impl super::Context for Context {
     unsafe fn color_mask(&self, red: bool, green: bool, blue: bool, alpha: bool) {
         let gl = &self.raw;
         gl.ColorMask(red as u8, green as u8, blue as u8, alpha as u8);
+    }
+
+    unsafe fn color_mask_i(&self, buffer: u32, red: bool, green: bool, blue: bool, alpha: bool) {
+        let gl = &self.raw;
+        gl.ColorMaski(buffer, red as u8, green as u8, blue as u8, alpha as u8);
+    }
+
+    unsafe fn depth_mask(&self, value: bool) {
+        let gl = &self.raw;
+        gl.DepthMask(value as u8);
     }
 
     unsafe fn blend_color(&self, red: f32, green: f32, blue: f32, alpha: f32) {
@@ -279,6 +300,30 @@ impl super::Context for Context {
     unsafe fn active_texture(&self, unit: u32) {
         let gl = &self.raw;
         gl.ActiveTexture(unit);
+    }
+
+    unsafe fn fence_sync(
+        &self,
+        condition: FenceSyncCondition,
+        flags: FenceSyncFlags,
+    ) -> Result<Self::Fence, String> {
+        let gl = &self.raw;
+        Ok(gl.FenceSync(condition as u32, flags.bits()))
+    }
+
+    unsafe fn tex_parameter_i32(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        value: i32,
+    ) {
+        let gl = &self.raw;
+        gl.TexParameteri(target as u32, parameter as u32, value);
+    }
+
+    unsafe fn depth_func(&self, func: Func) {
+        let gl = &self.raw;
+        gl.DepthFunc(func as u32);
     }
 }
 

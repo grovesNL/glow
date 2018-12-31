@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 use std::cell::RefCell;
 use slotmap::{new_key_type, SecondaryMap, SlotMap};
 use web_sys::{WebGl2RenderingContext, WebGlBuffer, WebGlProgram, WebGlRenderingContext,
-              WebGlShader, WebGlVertexArrayObject};
+              WebGlSampler, WebGlShader, WebGlTexture, WebGlVertexArrayObject};
 
 #[derive(Debug)]
 enum RawRenderingContext {
@@ -29,6 +29,8 @@ pub struct Context {
     programs: TrackedResource<WebProgramKey, WebGlProgram>,
     buffers: TrackedResource<WebBufferKey, WebGlBuffer>,
     vertex_arrays: TrackedResource<WebVertexArrayKey, WebGlVertexArrayObject>,
+    textures: TrackedResource<WebTextureKey, WebGlTexture>,
+    samplers: TrackedResource<WebSamplerKey, WebGlSampler>,
 }
 
 impl Context {
@@ -39,6 +41,8 @@ impl Context {
             programs: tracked_resource(),
             buffers: tracked_resource(),
             vertex_arrays: tracked_resource(),
+            textures: tracked_resource(),
+            samplers: tracked_resource(),
         }
     }
 
@@ -49,6 +53,8 @@ impl Context {
             programs: tracked_resource(),
             buffers: tracked_resource(),
             vertex_arrays: tracked_resource(),
+            textures: tracked_resource(),
+            samplers: tracked_resource(),
         }
     }
 }
@@ -57,12 +63,16 @@ new_key_type! { pub struct WebShaderKey; }
 new_key_type! { pub struct WebProgramKey; }
 new_key_type! { pub struct WebBufferKey; }
 new_key_type! { pub struct WebVertexArrayKey; }
+new_key_type! { pub struct WebTextureKey; }
+new_key_type! { pub struct WebSamplerKey; }
 
 impl super::Context for Context {
     type Shader = WebShaderKey;
     type Program = WebProgramKey;
     type Buffer = WebBufferKey;
     type VertexArray = WebVertexArrayKey;
+    type Texture = WebTextureKey;
+    type Sampler = WebSamplerKey;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
@@ -402,6 +412,42 @@ impl super::Context for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.polygon_offset(factor, units),
             RawRenderingContext::WebGl2(ref gl) => gl.polygon_offset(factor, units),
+        }
+    }
+
+    unsafe fn polygon_mode(&self, _face: PolygonFace, _mode: PolygonMode) {
+        panic!("Polygon mode is not supported")
+    }
+
+    unsafe fn finish(&self) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.finish(),
+            RawRenderingContext::WebGl2(ref gl) => gl.finish(),
+        }
+    }
+
+    unsafe fn bind_texture(&self, target: TextureBindingTarget, texture: Option<Self::Texture>) {
+        let textures = self.textures.borrow();
+        let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_texture(target as u32, raw_texture),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_texture(target as u32, raw_texture),
+        }
+    }
+
+    unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>) {
+        let samplers = self.samplers.borrow();
+        let raw_sampler = sampler.map(|s| samplers.1.get_unchecked(s));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Bind sampler is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_sampler(unit, raw_sampler),
+        }
+    }
+
+    unsafe fn active_texture(&self, unit: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.active_texture(unit),
+            RawRenderingContext::WebGl2(ref gl) => gl.active_texture(unit),
         }
     }
 }

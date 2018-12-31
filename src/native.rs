@@ -30,6 +30,8 @@ impl super::Context for Context {
     type Program = native_gl::types::GLuint;
     type Buffer = native_gl::types::GLuint;
     type VertexArray = native_gl::types::GLuint;
+    type Texture = native_gl::types::GLuint;
+    type Sampler = native_gl::types::GLuint;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let gl = &self.raw;
@@ -253,15 +255,38 @@ impl super::Context for Context {
         let gl = &self.raw;
         gl.PolygonOffset(factor, units);
     }
+
+    unsafe fn polygon_mode(&self, face: PolygonFace, mode: PolygonMode) {
+        let gl = &self.raw;
+        gl.PolygonMode(face as u32, mode as u32);
+    }
+
+    unsafe fn finish(&self) {
+        let gl = &self.raw;
+        gl.Finish();
+    }
+
+    unsafe fn bind_texture(&self, target: TextureBindingTarget, texture: Option<Self::Texture>) {
+        let gl = &self.raw;
+        gl.BindTexture(target as u32, texture.unwrap_or(0));
+    }
+
+    unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>) {
+        let gl = &self.raw;
+        gl.BindSampler(unit, sampler.unwrap_or(0));
+    }
+
+    unsafe fn active_texture(&self, unit: u32) {
+        let gl = &self.raw;
+        gl.ActiveTexture(unit);
+    }
 }
 
-pub struct RenderLoop {
-    window: Arc<glutin::GlWindow>,
-}
+pub struct RenderLoop;
 
 impl RenderLoop {
-    pub fn from_glutin_window(window: Arc<glutin::GlWindow>) -> Self {
-        RenderLoop { window }
+    pub fn from_window() -> Self {
+        RenderLoop
     }
 }
 

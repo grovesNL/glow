@@ -12,7 +12,7 @@ fn main() {
     unsafe {
         // Create a context from a WebGL2 context on wasm32 targets
         #[cfg(target_arch = "wasm32")]
-        let (context, _events_loop, render_loop, shader_version) = {
+        let (_window, context, _events_loop, render_loop, shader_version) = {
             use wasm_bindgen::JsCast;
             let canvas = web_sys::window()
                 .unwrap()
@@ -29,6 +29,7 @@ fn main() {
                 .dyn_into::<web_sys::WebGl2RenderingContext>()
                 .unwrap();
             (
+                (),
                 glow::web::Context::from_webgl2_context(webgl2_context),
                 (),
                 glow::web::RenderLoop::from_request_animation_frame(),
@@ -38,7 +39,7 @@ fn main() {
 
         // Create a context from a glutin window on non-wasm32 targets
         #[cfg(not(target_arch = "wasm32"))]
-        let (context, mut events_loop, render_loop, shader_version) = {
+        let (window, context, mut events_loop, render_loop, shader_version) = {
             use glutin::GlContext;
             let events_loop = glutin::EventsLoop::new();
             let window_builder = glutin::WindowBuilder::new()
@@ -49,9 +50,8 @@ fn main() {
                 glutin::GlWindow::new(window_builder, context_builder, &events_loop).unwrap();
             let context = glow::native::Context::from_glutin_window(&window);
             window.make_current().unwrap();
-            let render_loop =
-                glow::native::RenderLoop::from_glutin_window(std::sync::Arc::new(window));
-            (context, events_loop, render_loop, "#version 410")
+            let render_loop = glow::native::RenderLoop::from_window();
+            (window, context, events_loop, render_loop, "#version 410")
         };
 
         let vertex_array = context
@@ -116,13 +116,16 @@ fn main() {
         render_loop.run(move |running: &mut bool| {
             // Handle events differently between targets
             #[cfg(not(target_arch = "wasm32"))]
-            events_loop.poll_events(|event| match event {
-                glutin::Event::WindowEvent { event, .. } => match event {
-                    glutin::WindowEvent::CloseRequested => *running = false,
+            {
+                events_loop.poll_events(|event| match event {
+                    glutin::Event::WindowEvent { event, .. } => match event {
+                        glutin::WindowEvent::CloseRequested => *running = false,
+                        _ => (),
+                    },
                     _ => (),
-                },
-                _ => (),
-            });
+                });
+                window.swap_buffers().unwrap();
+            }
 
             context.clear(glow::ClearMask::Color);
             context.draw_arrays(glow::PrimitiveMode::Triangles, 0, 3);

@@ -181,6 +181,33 @@ pub enum CullFace {
     FrontAndBack = 0x0408,
 }
 
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum PolygonFace {
+    FrontAndBack = 0x0408,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum PolygonMode {
+    Point = 0x1B00,
+    Line = 0x1B01,
+    Fill = 0x1B02,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum TextureBindingTarget {
+    D1 = 0x0DE0,
+    D2 = 0x0DE1,
+    D3 = 0x806F,
+    D1Array = 0x8C18,
+    D2Array = 0x8C1A,
+    Rectangle = 0x84F5,
+    CubeMap = 0x8513,
+    CubeMapArray = 0x9009,
+    Buffer = 0x8C2A,
+    D2Multisample = 0x9100,
+    D2MultisampleArray = 0x9102,
+}
+
 /// The buffers to clear.
 bitflags! {
     pub struct ClearMask: u32 {
@@ -221,6 +248,22 @@ pub trait Context {
         + PartialEq
         + PartialOrd;
     type VertexArray: Copy
+        + Clone
+        + std::fmt::Debug
+        + Eq
+        + std::hash::Hash
+        + Ord
+        + PartialEq
+        + PartialOrd;
+    type Texture: Copy
+        + Clone
+        + std::fmt::Debug
+        + Eq
+        + std::hash::Hash
+        + Ord
+        + PartialEq
+        + PartialOrd;
+    type Sampler: Copy
         + Clone
         + std::fmt::Debug
         + Eq
@@ -300,6 +343,16 @@ pub trait Context {
     unsafe fn line_width(&self, width: f32);
 
     unsafe fn polygon_offset(&self, factor: f32, units: f32);
+
+    unsafe fn polygon_mode(&self, face: PolygonFace, mode: PolygonMode);
+
+    unsafe fn finish(&self);
+
+    unsafe fn bind_texture(&self, target: TextureBindingTarget, texture: Option<Self::Texture>);
+
+    unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>);
+
+    unsafe fn active_texture(&self, unit: u32);
 }
 
 pub trait RenderLoop {

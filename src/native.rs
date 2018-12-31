@@ -272,7 +272,6 @@ impl RenderLoop for NativeRenderLoop {
         let mut running = true;
         while running {
             callback(&mut running);
-            (*self.window).swap_buffers().unwrap();
         }
     }
 }

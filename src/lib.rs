@@ -192,8 +192,9 @@ bitflags! {
 }
 
 pub(crate) const COMPILE_STATUS: u32 = 0x8B81;
-pub(crate) const INFO_LOG_LENGTH: u32 = 0x8B84;
 pub(crate) const LINK_STATUS: u32 = 0x8B82;
+#[allow(unused)]
+pub(crate) const INFO_LOG_LENGTH: u32 = 0x8B84;
 
 pub trait RenderingContext {
     type Shader: Copy

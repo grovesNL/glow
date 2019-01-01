@@ -54,7 +54,8 @@ fn main() {
             (window, context, events_loop, render_loop, "#version 410")
         };
 
-        let vertex_array = gl.create_vertex_array()
+        let vertex_array = gl
+            .create_vertex_array()
             .expect("Cannot create vertex array");
         gl.bind_vertex_array(Some(vertex_array));
 
@@ -87,7 +88,8 @@ fn main() {
         let mut shaders = Vec::with_capacity(shader_sources.len());
 
         for (shader_type, shader_source) in shader_sources.iter() {
-            let shader = gl.create_shader(*shader_type)
+            let shader = gl
+                .create_shader(*shader_type)
                 .expect("Cannot create shader");
             gl.shader_source(shader, &format!("{}\n{}", shader_version, shader_source));
             gl.compile_shader(shader);

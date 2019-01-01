@@ -356,23 +356,6 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
-        match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.draw_arrays(mode as u32, first, count),
-            RawRenderingContext::WebGl2(ref gl) => gl.draw_arrays(mode as u32, first, count),
-        }
-    }
-
-    unsafe fn draw_buffer(&self, _buffer: u32) {
-        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
-        panic!("Draw buffer is not supported yet");
-    }
-
-    unsafe fn draw_buffers(&self, _buffers: &[u32]) {
-        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
-        panic!("Draw buffers is not supported yet");
-    }
-
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let raw_vertex_array = match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
@@ -554,6 +537,128 @@ impl super::Context for Context {
             RawRenderingContext::WebGl1(ref gl) => gl.disable_vertex_attrib_array(index),
             RawRenderingContext::WebGl2(ref gl) => gl.disable_vertex_attrib_array(index),
         }
+    }
+
+    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.draw_arrays(mode as u32, first, count),
+            RawRenderingContext::WebGl2(ref gl) => gl.draw_arrays(mode as u32, first, count),
+        }
+    }
+
+    unsafe fn draw_arrays_instanced(
+        &self,
+        mode: PrimitiveMode,
+        first: i32,
+        count: i32,
+        instance_count: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Draw arrays instanced is not supported") // TODO: Extension
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.draw_arrays_instanced(mode as u32, first, count, instance_count)
+            }
+        }
+    }
+
+    unsafe fn draw_arrays_instanced_base_instance(
+        &self,
+        _mode: PrimitiveMode,
+        _first: i32,
+        _count: i32,
+        _instance_count: i32,
+        _base_instance: u32,
+    ) {
+        panic!("Draw arrays instanced base instance is not supported");
+    }
+
+    unsafe fn draw_buffer(&self, _buffer: u32) {
+        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
+        panic!("Draw buffer is not supported yet");
+    }
+
+    unsafe fn draw_buffers(&self, _buffers: &[u32]) {
+        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
+        panic!("Draw buffers is not supported yet");
+    }
+
+    unsafe fn draw_elements(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.draw_elements_with_i32(mode as u32, count, element_type as u32, offset);
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.draw_elements_with_i32(mode as u32, count, element_type as u32, offset);
+            }
+        }
+    }
+
+    unsafe fn draw_elements_base_vertex(
+        &self,
+        _mode: PrimitiveMode,
+        _count: i32,
+        _element_type: ElementType,
+        _offset: i32,
+        _base_vertex: i32,
+    ) {
+        panic!("Draw elements base vertex is not supported");
+    }
+
+    unsafe fn draw_elements_instanced(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+        instance_count: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Draw elements instanced is not supported") // TODO: Extension
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.draw_elements_instanced_with_i32(
+                    mode as u32,
+                    count,
+                    element_type as u32,
+                    offset,
+                    instance_count,
+                );
+            }
+        }
+    }
+
+    unsafe fn draw_elements_instanced_base_vertex(
+        &self,
+        _mode: PrimitiveMode,
+        _count: i32,
+        _element_type: ElementType,
+        _offset: i32,
+        _instance_count: i32,
+        _base_vertex: i32,
+    ) {
+        panic!("Draw elements instanced base vertex is not supported");
+    }
+
+    unsafe fn draw_elements_instanced_base_vertex_base_instance(
+        &self,
+        _mode: PrimitiveMode,
+        _count: i32,
+        _element_type: ElementType,
+        _offset: i32,
+        _instance_count: i32,
+        _base_vertex: i32,
+        _base_instance: u32,
+    ) {
+        panic!("Draw elements instanced base vertex base instance is not supported");
     }
 
     unsafe fn enable(&self, parameter: Parameter) {

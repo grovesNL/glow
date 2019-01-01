@@ -205,21 +205,6 @@ impl super::Context for Context {
         gl.BindFramebuffer(target as u32, framebuffer.unwrap_or(0));
     }
 
-    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
-        let gl = &self.raw;
-        gl.DrawArrays(mode as u32, first, count);
-    }
-
-    unsafe fn draw_buffer(&self, buffer: u32) {
-        let gl = &self.raw;
-        gl.DrawBuffer(buffer);
-    }
-
-    unsafe fn draw_buffers(&self, buffers: &[u32]) {
-        let gl = &self.raw;
-        gl.DrawBuffers(buffers.len() as i32, buffers.as_ptr());
-    }
-
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let gl = &self.raw;
         let mut vertex_array = 0;
@@ -325,6 +310,144 @@ impl super::Context for Context {
     unsafe fn disable_vertex_attrib_array(&self, index: u32) {
         let gl = &self.raw;
         gl.DisableVertexAttribArray(index);
+    }
+
+    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
+        let gl = &self.raw;
+        gl.DrawArrays(mode as u32, first, count);
+    }
+
+    unsafe fn draw_arrays_instanced(
+        &self,
+        mode: PrimitiveMode,
+        first: i32,
+        count: i32,
+        instance_count: i32,
+    ) {
+        let gl = &self.raw;
+        gl.DrawArraysInstanced(mode as u32, first, count, instance_count);
+    }
+
+    unsafe fn draw_arrays_instanced_base_instance(
+        &self,
+        mode: PrimitiveMode,
+        first: i32,
+        count: i32,
+        instance_count: i32,
+        base_instance: u32,
+    ) {
+        let gl = &self.raw;
+        gl.DrawArraysInstancedBaseInstance(
+            mode as u32,
+            first,
+            count,
+            instance_count,
+            base_instance,
+        );
+    }
+
+    unsafe fn draw_buffer(&self, buffer: u32) {
+        let gl = &self.raw;
+        gl.DrawBuffer(buffer);
+    }
+
+    unsafe fn draw_buffers(&self, buffers: &[u32]) {
+        let gl = &self.raw;
+        gl.DrawBuffers(buffers.len() as i32, buffers.as_ptr());
+    }
+
+    unsafe fn draw_elements(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+    ) {
+        let gl = &self.raw;
+        gl.DrawElements(
+            mode as u32,
+            count,
+            element_type as u32,
+            offset as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn draw_elements_base_vertex(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+        base_vertex: i32,
+    ) {
+        let gl = &self.raw;
+        gl.DrawElementsBaseVertex(
+            mode as u32,
+            count,
+            element_type as u32,
+            offset as *const std::ffi::c_void,
+            base_vertex,
+        );
+    }
+
+    unsafe fn draw_elements_instanced(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+        instance_count: i32,
+    ) {
+        let gl = &self.raw;
+        gl.DrawElementsInstanced(
+            mode as u32,
+            count,
+            element_type as u32,
+            offset as *const std::ffi::c_void,
+            instance_count,
+        );
+    }
+
+    unsafe fn draw_elements_instanced_base_vertex(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+        instance_count: i32,
+        base_vertex: i32,
+    ) {
+        let gl = &self.raw;
+        gl.DrawElementsInstancedBaseVertex(
+            mode as u32,
+            count,
+            element_type as u32,
+            offset as *const std::ffi::c_void,
+            instance_count,
+            base_vertex,
+        );
+    }
+
+    unsafe fn draw_elements_instanced_base_vertex_base_instance(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+        instance_count: i32,
+        base_vertex: i32,
+        base_instance: u32,
+    ) {
+        let gl = &self.raw;
+        gl.DrawElementsInstancedBaseVertexBaseInstance(
+            mode as u32,
+            count,
+            element_type as u32,
+            offset as *const std::ffi::c_void,
+            instance_count,
+            base_vertex,
+            base_instance,
+        );
     }
 
     unsafe fn enable(&self, parameter: Parameter) {

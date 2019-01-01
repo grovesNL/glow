@@ -322,6 +322,13 @@ pub enum BlendMode {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum ElementType {
+    UnsignedByte = 0x1401,
+    UnsignedShort = 0x1403,
+    UnsignedInt = 0x1405,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum PatchParameterI32 {
     Vertices = 0x8E72,
     DefaultOuterLevel = 0x8E73,
@@ -465,12 +472,6 @@ pub trait Context {
         framebuffer: Option<Self::Framebuffer>,
     );
 
-    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32);
-
-    unsafe fn draw_buffer(&self, buffer: u32);
-
-    unsafe fn draw_buffers(&self, buffers: &[u32]);
-
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String>;
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray);
@@ -512,6 +513,76 @@ pub trait Context {
     unsafe fn disable_i(&self, parameter: Parameter, buffer: u32);
 
     unsafe fn disable_vertex_attrib_array(&self, index: u32);
+
+    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32);
+
+    unsafe fn draw_arrays_instanced(
+        &self,
+        mode: PrimitiveMode,
+        first: i32,
+        count: i32,
+        instance_count: i32,
+    );
+
+    unsafe fn draw_arrays_instanced_base_instance(
+        &self,
+        mode: PrimitiveMode,
+        first: i32,
+        count: i32,
+        instance_count: i32,
+        base_instance: u32,
+    );
+
+    unsafe fn draw_buffer(&self, buffer: u32);
+
+    unsafe fn draw_buffers(&self, buffers: &[u32]);
+
+    unsafe fn draw_elements(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+    );
+
+    unsafe fn draw_elements_base_vertex(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+        base_vertex: i32,
+    );
+
+    unsafe fn draw_elements_instanced(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+        instance_count: i32,
+    );
+
+    unsafe fn draw_elements_instanced_base_vertex(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+        instance_count: i32,
+        base_vertex: i32,
+    );
+
+    unsafe fn draw_elements_instanced_base_vertex_base_instance(
+        &self,
+        mode: PrimitiveMode,
+        count: i32,
+        element_type: ElementType,
+        offset: i32,
+        instance_count: i32,
+        base_vertex: i32,
+        base_instance: u32,
+    );
 
     unsafe fn enable(&self, parameter: Parameter);
 

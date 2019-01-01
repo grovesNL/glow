@@ -234,11 +234,46 @@ pub enum Func {
     Never = 0x0200,
     Less = 0x0201,
     Equal = 0x0202,
-    LessOrEqual = 0x0203,
+    LessEqual = 0x0203,
     Greater = 0x0204,
     NotEqual = 0x0205,
-    GreaterOrEqual = 0x0206,
+    GreaterEqual = 0x0206,
     Always = 0x0207,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum VertexDataTypeF32 {
+    Byte = 0x1400,
+    UnsignedByte = 0x1401,
+    Short = 0x1402,
+    UnsignedShort = 0x1403,
+    Int = 0x1404,
+    UnsignedInt = 0x1405,
+    HalfFloat = 0x140B,
+    Float = 0x1406,
+    Double = 0x140A,
+    Fixed = 0x140C,
+    Int_2_10_10_10_Rev = 0x8D9F,
+    UnsignedInt_2_10_10_Rev = 0x8368,
+    UnsignedInt_10F_11F_11F_Rev = 0x8C3B,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum VertexDataTypeI32 {
+    Byte = 0x1400,
+    UnsignedByte = 0x1401,
+    Short = 0x1402,
+    UnsignedShort = 0x1403,
+    Int = 0x1404,
+    UnsignedInt = 0x1405,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum VertexDataTypeF64 {
+    Double = 0x140A,
 }
 
 /// The buffers to clear.
@@ -421,6 +456,34 @@ pub trait Context {
     );
 
     unsafe fn depth_func(&self, func: Func);
+
+    unsafe fn vertex_attrib_pointer_f32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: VertexDataTypeF32,
+        normalized: bool,
+        stride: i32,
+        offset: i32,
+    );
+
+    unsafe fn vertex_attrib_pointer_i32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: VertexDataTypeI32,
+        stride: i32,
+        offset: i32,
+    );
+
+    unsafe fn vertex_attrib_pointer_f64(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: VertexDataTypeF64,
+        stride: i32,
+        offset: i32,
+    );
 }
 
 pub trait RenderLoop {

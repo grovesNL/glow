@@ -332,7 +332,7 @@ impl super::Context for Context {
     }
 
     unsafe fn clear_depth_f64(&self, _depth: f64) {
-        panic!("64-bit float precision is not supported in WebGL")
+        panic!("64-bit float precision is not supported in WebGL");
     }
 
     unsafe fn clear_depth_f32(&self, depth: f32) {
@@ -528,6 +528,46 @@ impl super::Context for Context {
             RawRenderingContext::WebGl1(ref gl) => gl.depth_func(func as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.depth_func(func as u32),
         }
+    }
+
+    unsafe fn vertex_attrib_pointer_f32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: VertexDataTypeF32,
+        normalized: bool,
+        stride: i32,
+        offset: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib_pointer_with_i32(index, size, data_type as u32, normalized, stride, offset),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_pointer_with_i32(index, size, data_type as u32, normalized, stride, offset),
+        }
+    }
+
+    unsafe fn vertex_attrib_pointer_i32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: VertexDataTypeI32,
+        stride: i32,
+        offset: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Integer vertex attrib pointer is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_i_pointer_with_i32(index, size, data_type as u32, stride, offset),
+        }
+    }
+
+    unsafe fn vertex_attrib_pointer_f64(
+        &self,
+        _index: u32,
+        _size: i32,
+        _data_type: VertexDataTypeF64,
+        _stride: i32,
+        _offset: i32,
+    ) {
+        panic!("64-bit float precision is not supported in WebGL");
     }
 }
 

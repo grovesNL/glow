@@ -325,6 +325,62 @@ impl super::Context for Context {
         let gl = &self.raw;
         gl.DepthFunc(func as u32);
     }
+
+    unsafe fn vertex_attrib_pointer_f32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: VertexDataTypeF32,
+        normalized: bool,
+        stride: i32,
+        offset: i32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexAttribPointer(
+            index,
+            size,
+            data_type as u32,
+            normalized as u8,
+            stride,
+            offset as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn vertex_attrib_pointer_i32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: VertexDataTypeI32,
+        stride: i32,
+        offset: i32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexAttribIPointer(
+            index,
+            size,
+            data_type as u32,
+            stride,
+            offset as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn vertex_attrib_pointer_f64(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: VertexDataTypeF64,
+        stride: i32,
+        offset: i32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexAttribLPointer(
+            index,
+            size,
+            data_type as u32,
+            stride,
+            offset as *const std::ffi::c_void,
+        );
+    }
 }
 
 pub struct RenderLoop;

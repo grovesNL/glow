@@ -34,6 +34,7 @@ impl super::Context for Context {
     type Sampler = native_gl::types::GLuint;
     type Fence = native_gl::types::GLsync;
     type Framebuffer = native_gl::types::GLuint;
+    type Renderbuffer = native_gl::types::GLuint;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let gl = &self.raw;
@@ -260,14 +261,29 @@ impl super::Context for Context {
         gl.PixelStorei(parameter as u32, value as i32);
     }
 
-    unsafe fn enable(&self, parameter: Parameter) {
+    unsafe fn delete_buffer(&self, buffer: Self::Buffer) {
         let gl = &self.raw;
-        gl.Enable(parameter as u32);
+        gl.DeleteBuffers(1, &buffer);
     }
 
-    unsafe fn enable_i(&self, parameter: Parameter, buffer: u32) {
+    unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer) {
         let gl = &self.raw;
-        gl.Enablei(buffer, parameter as u32);
+        gl.DeleteRenderbuffers(1, &renderbuffer);
+    }
+
+    unsafe fn delete_sampler(&self, sampler: Self::Sampler) {
+        let gl = &self.raw;
+        gl.DeleteSamplers(1, &sampler);
+    }
+
+    unsafe fn delete_sync(&self, fence: Self::Fence) {
+        let gl = &self.raw;
+        gl.DeleteSync(fence);
+    }
+
+    unsafe fn delete_texture(&self, texture: Self::Texture) {
+        let gl = &self.raw;
+        gl.DeleteTextures(1, &texture);
     }
 
     unsafe fn disable(&self, parameter: Parameter) {
@@ -278,6 +294,21 @@ impl super::Context for Context {
     unsafe fn disable_i(&self, parameter: Parameter, buffer: u32) {
         let gl = &self.raw;
         gl.Disablei(buffer, parameter as u32);
+    }
+
+    unsafe fn enable(&self, parameter: Parameter) {
+        let gl = &self.raw;
+        gl.Enable(parameter as u32);
+    }
+
+    unsafe fn enable_i(&self, parameter: Parameter, buffer: u32) {
+        let gl = &self.raw;
+        gl.Enablei(buffer, parameter as u32);
+    }
+
+    unsafe fn flush(&self) {
+        let gl = &self.raw;
+        gl.Flush();
     }
 
     unsafe fn front_face(&self, value: FrontFace) {

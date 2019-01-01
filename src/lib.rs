@@ -403,6 +403,14 @@ pub trait Context {
         + Ord
         + PartialEq
         + PartialOrd;
+    type Renderbuffer: Copy
+        + Clone
+        + std::fmt::Debug
+        + Eq
+        + std::hash::Hash
+        + Ord
+        + PartialEq
+        + PartialOrd;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String>;
 
@@ -481,13 +489,25 @@ pub trait Context {
 
     unsafe fn pixel_store_bool(&self, parameter: PixelStoreParameterBool, value: bool);
 
-    unsafe fn enable(&self, parameter: Parameter);
+    unsafe fn delete_buffer(&self, buffer: Self::Buffer);
 
-    unsafe fn enable_i(&self, parameter: Parameter, buffer: u32);
+    unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer);
+
+    unsafe fn delete_sampler(&self, texture: Self::Sampler);
+
+    unsafe fn delete_sync(&self, fence: Self::Fence);
+
+    unsafe fn delete_texture(&self, texture: Self::Texture);
 
     unsafe fn disable(&self, parameter: Parameter);
 
     unsafe fn disable_i(&self, parameter: Parameter, buffer: u32);
+
+    unsafe fn enable(&self, parameter: Parameter);
+
+    unsafe fn enable_i(&self, parameter: Parameter, buffer: u32);
+
+    unsafe fn flush(&self);
 
     unsafe fn front_face(&self, value: FrontFace);
 

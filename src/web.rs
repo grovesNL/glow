@@ -4,8 +4,9 @@ use slotmap::{new_key_type, SecondaryMap, SlotMap};
 use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use web_sys::{
-    WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlRenderingContext, WebGlSampler,
-    WebGlShader, WebGlSync, WebGlTexture, WebGlVertexArrayObject,
+    WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlRenderbuffer,
+    WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
+    WebGlVertexArrayObject,
 };
 
 #[derive(Debug)]
@@ -35,6 +36,7 @@ pub struct Context {
     samplers: TrackedResource<WebSamplerKey, WebGlSampler>,
     fences: TrackedResource<WebFenceKey, WebGlSync>,
     framebuffers: TrackedResource<WebFramebufferKey, WebGlFramebuffer>,
+    renderbuffers: TrackedResource<WebRenderbufferKey, WebGlRenderbuffer>,
 }
 
 impl Context {
@@ -49,6 +51,7 @@ impl Context {
             samplers: tracked_resource(),
             fences: tracked_resource(),
             framebuffers: tracked_resource(),
+            renderbuffers: tracked_resource(),
         }
     }
 
@@ -63,6 +66,7 @@ impl Context {
             samplers: tracked_resource(),
             fences: tracked_resource(),
             framebuffers: tracked_resource(),
+            renderbuffers: tracked_resource(),
         }
     }
 }
@@ -75,6 +79,7 @@ new_key_type! { pub struct WebTextureKey; }
 new_key_type! { pub struct WebSamplerKey; }
 new_key_type! { pub struct WebFenceKey; }
 new_key_type! { pub struct WebFramebufferKey; }
+new_key_type! { pub struct WebRenderbufferKey; }
 
 impl super::Context for Context {
     type Shader = WebShaderKey;
@@ -85,6 +90,7 @@ impl super::Context for Context {
     type Sampler = WebSamplerKey;
     type Fence = WebFenceKey;
     type Framebuffer = WebFramebufferKey;
+    type Renderbuffer = WebRenderbufferKey;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
@@ -293,8 +299,12 @@ impl super::Context for Context {
         let framebuffers = self.framebuffers.borrow();
         let raw_framebuffer = framebuffer.map(|f| framebuffers.1.get_unchecked(f));
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.bind_framebuffer(target as u32, raw_framebuffer),
-            RawRenderingContext::WebGl2(ref gl) => gl.bind_framebuffer(target as u32, raw_framebuffer),
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.bind_framebuffer(target as u32, raw_framebuffer)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.bind_framebuffer(target as u32, raw_framebuffer)
+            }
         }
     }
 
@@ -414,15 +424,59 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn enable(&self, parameter: Parameter) {
-        match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.enable(parameter as u32),
-            RawRenderingContext::WebGl2(ref gl) => gl.enable(parameter as u32),
+    unsafe fn delete_buffer(&self, buffer: Self::Buffer) {
+        let mut buffers = self.buffers.borrow_mut();
+        match buffers.1.remove(buffer) {
+            Some(ref b) => match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.delete_buffer(Some(b)),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_buffer(Some(b)),
+            },
+            None => {}
         }
     }
 
-    unsafe fn enable_i(&self, _parameter: Parameter, _buffer: u32) {
-        panic!("Draw buffer enable is not supported");
+    unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer) {
+        let mut renderbuffers = self.renderbuffers.borrow_mut();
+        match renderbuffers.1.remove(renderbuffer) {
+            Some(ref r) => match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.delete_renderbuffer(Some(r)),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_renderbuffer(Some(r)),
+            },
+            None => {}
+        }
+    }
+
+    unsafe fn delete_sampler(&self, sampler: Self::Sampler) {
+        let mut samplers = self.samplers.borrow_mut();
+        match samplers.1.remove(sampler) {
+            Some(ref s) => match self.raw {
+                RawRenderingContext::WebGl1(ref _gl) => panic!("Samplers are not supported"),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_sampler(Some(s)),
+            },
+            None => {}
+        }
+    }
+
+    unsafe fn delete_sync(&self, fence: Self::Fence) {
+        let mut fences = self.fences.borrow_mut();
+        match fences.1.remove(fence) {
+            Some(ref f) => match self.raw {
+                RawRenderingContext::WebGl1(ref _gl) => panic!("Fences are not supported"),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_sync(Some(f)),
+            },
+            None => {}
+        }
+    }
+
+    unsafe fn delete_texture(&self, texture: Self::Texture) {
+        let mut textures = self.textures.borrow_mut();
+        match textures.1.remove(texture) {
+            Some(ref t) => match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.delete_texture(Some(t)),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_texture(Some(t)),
+            },
+            None => {}
+        }
     }
 
     unsafe fn disable(&self, parameter: Parameter) {
@@ -434,6 +488,24 @@ impl super::Context for Context {
 
     unsafe fn disable_i(&self, _parameter: Parameter, _buffer: u32) {
         panic!("Draw buffer disable is not supported");
+    }
+
+    unsafe fn enable(&self, parameter: Parameter) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.enable(parameter as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.enable(parameter as u32),
+        }
+    }
+
+    unsafe fn enable_i(&self, _parameter: Parameter, _buffer: u32) {
+        panic!("Draw buffer enable is not supported");
+    }
+
+    unsafe fn flush(&self) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.flush(),
+            RawRenderingContext::WebGl2(ref gl) => gl.flush(),
+        }
     }
 
     unsafe fn front_face(&self, value: FrontFace) {
@@ -616,7 +688,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn depth_range_f64(&self, near: f64, far: f64) {
+    unsafe fn depth_range_f64(&self, _near: f64, _far: f64) {
         panic!("64-bit float precision is not supported in WebGL");
     }
 

@@ -160,6 +160,16 @@ impl super::Context for Context {
         gl.DrawArrays(mode as u32, first, count);
     }
 
+    unsafe fn draw_buffer(&self, buffer: u32) {
+        let gl = &self.raw;
+        gl.DrawBuffer(buffer);
+    }
+
+    unsafe fn draw_buffers(&self, buffers: &[u32]) {
+        let gl = &self.raw;
+        gl.DrawBuffers(buffers.len() as i32, buffers.as_ptr());
+    }
+
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let gl = &self.raw;
         let mut vertex_array = 0;
@@ -330,7 +340,7 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataTypeF32,
+        data_type: VertexDataType,
         normalized: bool,
         stride: i32,
         offset: i32,
@@ -339,7 +349,7 @@ impl super::Context for Context {
         gl.VertexAttribPointer(
             index,
             size,
-            data_type as u32,
+            data_type.0,
             normalized as u8,
             stride,
             offset as *const std::ffi::c_void,
@@ -350,7 +360,7 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataTypeI32,
+        data_type: VertexDataType,
         stride: i32,
         offset: i32,
     ) {
@@ -358,7 +368,7 @@ impl super::Context for Context {
         gl.VertexAttribIPointer(
             index,
             size,
-            data_type as u32,
+            data_type.0,
             stride,
             offset as *const std::ffi::c_void,
         );
@@ -368,7 +378,7 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataTypeF64,
+        data_type: VertexDataType,
         stride: i32,
         offset: i32,
     ) {
@@ -376,7 +386,7 @@ impl super::Context for Context {
         gl.VertexAttribLPointer(
             index,
             size,
-            data_type as u32,
+            data_type.0,
             stride,
             offset as *const std::ffi::c_void,
         );

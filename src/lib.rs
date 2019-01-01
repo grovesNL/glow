@@ -241,39 +241,24 @@ pub enum Func {
     Always = 0x0207,
 }
 
-#[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum VertexDataTypeF32 {
-    Byte = 0x1400,
-    UnsignedByte = 0x1401,
-    Short = 0x1402,
-    UnsignedShort = 0x1403,
-    Int = 0x1404,
-    UnsignedInt = 0x1405,
-    HalfFloat = 0x140B,
-    Float = 0x1406,
-    Double = 0x140A,
-    Fixed = 0x140C,
-    Int_2_10_10_10_Rev = 0x8D9F,
-    UnsignedInt_2_10_10_Rev = 0x8368,
-    UnsignedInt_10F_11F_11F_Rev = 0x8C3B,
-}
+pub struct VertexDataType(u32);
 
 #[allow(non_camel_case_types)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum VertexDataTypeI32 {
-    Byte = 0x1400,
-    UnsignedByte = 0x1401,
-    Short = 0x1402,
-    UnsignedShort = 0x1403,
-    Int = 0x1404,
-    UnsignedInt = 0x1405,
-}
-
-#[allow(non_camel_case_types)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum VertexDataTypeF64 {
-    Double = 0x140A,
+impl VertexDataType {
+    pub const BYTE: VertexDataType = VertexDataType(0x1400);
+    pub const UNSIGNED_BYTE: VertexDataType = VertexDataType(0x1401);
+    pub const SHORT: VertexDataType = VertexDataType(0x1402);
+    pub const UNSIGNED_SHORT: VertexDataType = VertexDataType(0x1403);
+    pub const INT: VertexDataType = VertexDataType(0x1404);
+    pub const UNSIGNED_INT: VertexDataType = VertexDataType(0x1405);
+    pub const HALF_FLOAT: VertexDataType = VertexDataType(0x140B);
+    pub const FLOAT: VertexDataType = VertexDataType(0x1406);
+    pub const DOUBLE: VertexDataType = VertexDataType(0x140A);
+    pub const FIXED: VertexDataType = VertexDataType(0x140C);
+    pub const INT_2_10_10_10_REV: VertexDataType = VertexDataType(0x8D9F);
+    pub const UNSIGNED_INT_2_10_10_10_REV: VertexDataType = VertexDataType(0x8368);
+    pub const UNSIGNED_INT_10F_11F_11F_REV: VertexDataType = VertexDataType(0x8C3B);
 }
 
 /// The buffers to clear.
@@ -430,6 +415,10 @@ pub trait Context {
 
     unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32);
 
+    unsafe fn draw_buffer(&self, buffer: u32);
+
+    unsafe fn draw_buffers(&self, buffers: &[u32]);
+
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String>;
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray);
@@ -505,7 +494,7 @@ pub trait Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataTypeF32,
+        data_type: VertexDataType,
         normalized: bool,
         stride: i32,
         offset: i32,
@@ -515,7 +504,7 @@ pub trait Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataTypeI32,
+        data_type: VertexDataType,
         stride: i32,
         offset: i32,
     );
@@ -524,7 +513,7 @@ pub trait Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataTypeF64,
+        data_type: VertexDataType,
         stride: i32,
         offset: i32,
     );

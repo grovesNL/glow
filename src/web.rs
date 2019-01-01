@@ -275,6 +275,16 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn draw_buffer(&self, _buffer: u32) {
+        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
+        panic!("Draw buffer is not supported yet");
+    }
+
+    unsafe fn draw_buffers(&self, _buffers: &[u32]) {
+        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
+        panic!("Draw buffers is not supported yet");
+    }
+
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let raw_vertex_array = match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
@@ -534,14 +544,14 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataTypeF32,
+        data_type: VertexDataType,
         normalized: bool,
         stride: i32,
         offset: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib_pointer_with_i32(index, size, data_type as u32, normalized, stride, offset),
-            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_pointer_with_i32(index, size, data_type as u32, normalized, stride, offset),
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib_pointer_with_i32(index, size, data_type.0, normalized, stride, offset),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_pointer_with_i32(index, size, data_type.0, normalized, stride, offset),
         }
     }
 
@@ -549,13 +559,13 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataTypeI32,
+        data_type: VertexDataType,
         stride: i32,
         offset: i32,
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Integer vertex attrib pointer is not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_i_pointer_with_i32(index, size, data_type as u32, stride, offset),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_i_pointer_with_i32(index, size, data_type.0, stride, offset),
         }
     }
 
@@ -563,7 +573,7 @@ impl super::Context for Context {
         &self,
         _index: u32,
         _size: i32,
-        _data_type: VertexDataTypeF64,
+        _data_type: VertexDataType,
         _stride: i32,
         _offset: i32,
     ) {

@@ -127,6 +127,14 @@ pub enum BufferBindingTarget {
     Uniform = 0x8A11,
 }
 
+/// A framebuffer binding target.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum FramebufferBindingTarget {
+    DrawFramebuffer,
+    ReadFramebuffer,
+    Framebuffer,
+}
+
 /// The kind of primitive to render.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum PrimitiveMode {
@@ -145,7 +153,7 @@ pub enum PrimitiveMode {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum PixelStoreI32Parameter {
+pub enum PixelStoreParameterI32 {
     PackRowLength = 0x0D02,
     PackImageHeight = 0x806C,
     PackSkipRows = 0x0D03,
@@ -161,7 +169,7 @@ pub enum PixelStoreI32Parameter {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum PixelStoreBoolParameter {
+pub enum PixelStoreParameterBool {
     PackSwapBytes = 0x0D00,
     PackLsbFirst = 0x0D01,
     UnpackSwapBytes = 0x0CF0,
@@ -314,6 +322,13 @@ pub enum BlendMode {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum PatchParameterI32 {
+    Vertices = 0x8E72,
+    DefaultOuterLevel = 0x8E73,
+    DefaultInnerLevel = 0x8E74,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum StencilOp {
     Keep = 0x1E00,
     Zero = 0,
@@ -380,6 +395,14 @@ pub trait Context {
         + PartialEq
         + PartialOrd;
     type Fence: Copy + Clone + std::fmt::Debug + Eq + std::hash::Hash + Ord + PartialEq + PartialOrd;
+    type Framebuffer: Copy
+        + Clone
+        + std::fmt::Debug
+        + Eq
+        + std::hash::Hash
+        + Ord
+        + PartialEq
+        + PartialOrd;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String>;
 
@@ -413,6 +436,21 @@ pub trait Context {
 
     unsafe fn bind_buffer(&self, target: BufferBindingTarget, buffer: Option<Self::Buffer>);
 
+    unsafe fn bind_buffer_range(
+        &self,
+        target: BufferBindingTarget,
+        index: u32,
+        buffer: Option<Self::Buffer>,
+        offset: i32,
+        size: i32,
+    );
+
+    unsafe fn bind_framebuffer(
+        &self,
+        target: FramebufferBindingTarget,
+        framebuffer: Option<Self::Framebuffer>,
+    );
+
     unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32);
 
     unsafe fn draw_buffer(&self, buffer: u32);
@@ -437,9 +475,11 @@ pub trait Context {
 
     unsafe fn clear(&self, mask: ClearMask);
 
-    unsafe fn pixel_store_i32(&self, parameter: PixelStoreI32Parameter, value: i32);
+    unsafe fn patch_parameter_i32(&self, parameter: PatchParameterI32, value: i32);
 
-    unsafe fn pixel_store_bool(&self, parameter: PixelStoreBoolParameter, value: bool);
+    unsafe fn pixel_store_i32(&self, parameter: PixelStoreParameterI32, value: i32);
+
+    unsafe fn pixel_store_bool(&self, parameter: PixelStoreParameterBool, value: bool);
 
     unsafe fn enable(&self, parameter: Parameter);
 
@@ -538,6 +578,8 @@ pub trait Context {
         stride: i32,
         offset: i32,
     );
+
+    unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32);
 
     unsafe fn blend_equation(&self, mode: BlendMode);
 

@@ -4,7 +4,7 @@ use slotmap::{new_key_type, SecondaryMap, SlotMap};
 use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use web_sys::{
-    WebGl2RenderingContext, WebGlBuffer, WebGlProgram, WebGlRenderingContext, WebGlSampler,
+    WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlRenderingContext, WebGlSampler,
     WebGlShader, WebGlSync, WebGlTexture, WebGlVertexArrayObject,
 };
 
@@ -34,6 +34,7 @@ pub struct Context {
     textures: TrackedResource<WebTextureKey, WebGlTexture>,
     samplers: TrackedResource<WebSamplerKey, WebGlSampler>,
     fences: TrackedResource<WebFenceKey, WebGlSync>,
+    framebuffers: TrackedResource<WebFramebufferKey, WebGlFramebuffer>,
 }
 
 impl Context {
@@ -47,6 +48,7 @@ impl Context {
             textures: tracked_resource(),
             samplers: tracked_resource(),
             fences: tracked_resource(),
+            framebuffers: tracked_resource(),
         }
     }
 
@@ -60,6 +62,7 @@ impl Context {
             textures: tracked_resource(),
             samplers: tracked_resource(),
             fences: tracked_resource(),
+            framebuffers: tracked_resource(),
         }
     }
 }
@@ -71,6 +74,7 @@ new_key_type! { pub struct WebVertexArrayKey; }
 new_key_type! { pub struct WebTextureKey; }
 new_key_type! { pub struct WebSamplerKey; }
 new_key_type! { pub struct WebFenceKey; }
+new_key_type! { pub struct WebFramebufferKey; }
 
 impl super::Context for Context {
     type Shader = WebShaderKey;
@@ -80,6 +84,7 @@ impl super::Context for Context {
     type Texture = WebTextureKey;
     type Sampler = WebSamplerKey;
     type Fence = WebFenceKey;
+    type Framebuffer = WebFramebufferKey;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
@@ -268,6 +273,31 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn bind_buffer_range(
+        &self,
+        _target: BufferBindingTarget,
+        _index: u32,
+        _buffer: Option<Self::Buffer>,
+        _offset: i32,
+        _size: i32,
+    ) {
+        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
+        panic!("Bind buffer range is not supported yet");
+    }
+
+    unsafe fn bind_framebuffer(
+        &self,
+        target: FramebufferBindingTarget,
+        framebuffer: Option<Self::Framebuffer>,
+    ) {
+        let framebuffers = self.framebuffers.borrow();
+        let raw_framebuffer = framebuffer.map(|f| framebuffers.1.get_unchecked(f));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_framebuffer(target as u32, raw_framebuffer),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_framebuffer(target as u32, raw_framebuffer),
+        }
+    }
+
     unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.draw_arrays(mode as u32, first, count),
@@ -366,14 +396,18 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn pixel_store_i32(&self, parameter: PixelStoreI32Parameter, value: i32) {
+    unsafe fn patch_parameter_i32(&self, _parameter: PatchParameterI32, _value: i32) {
+        panic!("Patch parameter is not supported");
+    }
+
+    unsafe fn pixel_store_i32(&self, parameter: PixelStoreParameterI32, value: i32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.pixel_storei(parameter as u32, value),
             RawRenderingContext::WebGl2(ref gl) => gl.pixel_storei(parameter as u32, value),
         }
     }
 
-    unsafe fn pixel_store_bool(&self, parameter: PixelStoreBoolParameter, value: bool) {
+    unsafe fn pixel_store_bool(&self, parameter: PixelStoreParameterBool, value: bool) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.pixel_storei(parameter as u32, value as i32),
             RawRenderingContext::WebGl2(ref gl) => gl.pixel_storei(parameter as u32, value as i32),
@@ -553,7 +587,7 @@ impl super::Context for Context {
         &self,
         _target: TextureBindingTarget,
         _parameter: TextureParameter,
-        value: &[f32],
+        _values: &[f32],
     ) {
         // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
         panic!("Texture parameters for `&[f32]` are not supported yet");
@@ -563,7 +597,7 @@ impl super::Context for Context {
         &self,
         _target: TextureBindingTarget,
         _parameter: TextureParameter,
-        value: &[i32],
+        _values: &[i32],
     ) {
         panic!("Texture parameters for `&[i32]` are not supported yet");
     }
@@ -631,6 +665,13 @@ impl super::Context for Context {
         _offset: i32,
     ) {
         panic!("64-bit float precision is not supported in WebGL");
+    }
+
+    unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.viewport(x, y, width, height),
+            RawRenderingContext::WebGl2(ref gl) => gl.viewport(x, y, width, height),
+        }
     }
 
     unsafe fn blend_func(&self, src: BlendFactor, dst: BlendFactor) {

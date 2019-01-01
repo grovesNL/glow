@@ -33,6 +33,7 @@ impl super::Context for Context {
     type Texture = native_gl::types::GLuint;
     type Sampler = native_gl::types::GLuint;
     type Fence = native_gl::types::GLsync;
+    type Framebuffer = native_gl::types::GLuint;
 
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let gl = &self.raw;
@@ -155,6 +156,33 @@ impl super::Context for Context {
         gl.BindBuffer(target as u32, buffer.unwrap_or(0));
     }
 
+    unsafe fn bind_buffer_range(
+        &self,
+        target: BufferBindingTarget,
+        index: u32,
+        buffer: Option<Self::Buffer>,
+        offset: i32,
+        size: i32,
+    ) {
+        let gl = &self.raw;
+        gl.BindBufferRange(
+            target as u32,
+            index,
+            buffer.unwrap_or(0),
+            offset as isize,
+            size as isize,
+        );
+    }
+
+    unsafe fn bind_framebuffer(
+        &self,
+        target: FramebufferBindingTarget,
+        framebuffer: Option<Self::Framebuffer>,
+    ) {
+        let gl = &self.raw;
+        gl.BindFramebuffer(target as u32, framebuffer.unwrap_or(0));
+    }
+
     unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
         let gl = &self.raw;
         gl.DrawArrays(mode as u32, first, count);
@@ -217,12 +245,17 @@ impl super::Context for Context {
         gl.Clear(mask.bits());
     }
 
-    unsafe fn pixel_store_i32(&self, parameter: PixelStoreI32Parameter, value: i32) {
+    unsafe fn patch_parameter_i32(&self, parameter: PatchParameterI32, value: i32) {
+        let gl = &self.raw;
+        gl.PatchParameteri(parameter as u32, value);
+    }
+
+    unsafe fn pixel_store_i32(&self, parameter: PixelStoreParameterI32, value: i32) {
         let gl = &self.raw;
         gl.PixelStorei(parameter as u32, value);
     }
 
-    unsafe fn pixel_store_bool(&self, parameter: PixelStoreBoolParameter, value: bool) {
+    unsafe fn pixel_store_bool(&self, parameter: PixelStoreParameterBool, value: bool) {
         let gl = &self.raw;
         gl.PixelStorei(parameter as u32, value as i32);
     }
@@ -420,6 +453,11 @@ impl super::Context for Context {
             stride,
             offset as *const std::ffi::c_void,
         );
+    }
+
+    unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32) {
+        let gl = &self.raw;
+        gl.Viewport(x, y, width, height);
     }
 
     unsafe fn blend_equation(&self, mode: BlendMode) {

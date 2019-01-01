@@ -481,11 +481,32 @@ pub trait Context {
         flags: FenceSyncFlags,
     ) -> Result<Self::Fence, String>;
 
+    unsafe fn tex_parameter_f32(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        value: f32,
+    );
+
     unsafe fn tex_parameter_i32(
         &self,
         target: TextureBindingTarget,
         parameter: TextureParameter,
         value: i32,
+    );
+
+    unsafe fn tex_parameter_f32_slice(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        values: &[f32],
+    );
+
+    unsafe fn tex_parameter_i32_slice(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        values: &[i32],
     );
 
     unsafe fn depth_func(&self, func: Func);
@@ -524,20 +545,16 @@ pub trait Context {
 
     unsafe fn blend_equation_separate(&self, mode_rgb: BlendMode, mode_alpha: BlendMode);
 
-    unsafe fn blend_equation_separate_i(&self, buffer: u32, mode_rgb: BlendMode, mode_alpha: BlendMode);
-
-    unsafe fn blend_func(
-        &self,
-        src: BlendFactor,
-        dst: BlendFactor,
-    );
-
-    unsafe fn blend_func_i(
+    unsafe fn blend_equation_separate_i(
         &self,
         buffer: u32,
-        src: BlendFactor,
-        dst: BlendFactor,
+        mode_rgb: BlendMode,
+        mode_alpha: BlendMode,
     );
+
+    unsafe fn blend_func(&self, src: BlendFactor, dst: BlendFactor);
+
+    unsafe fn blend_func_i(&self, buffer: u32, src: BlendFactor, dst: BlendFactor);
 
     unsafe fn blend_func_separate(
         &self,
@@ -564,12 +581,7 @@ pub trait Context {
 
     unsafe fn stencil_mask_separate(&self, face: Face, mask: u32);
 
-    unsafe fn stencil_op(
-        &self,
-        stencil_fail: StencilOp,
-        depth_fail: StencilOp,
-        pass: StencilOp,
-    );
+    unsafe fn stencil_op(&self, stencil_fail: StencilOp, depth_fail: StencilOp, pass: StencilOp);
 
     unsafe fn stencil_op_separate(
         &self,

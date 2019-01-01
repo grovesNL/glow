@@ -321,6 +321,16 @@ impl super::Context for Context {
         Ok(gl.FenceSync(condition as u32, flags.bits()))
     }
 
+    unsafe fn tex_parameter_f32(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        value: f32,
+    ) {
+        let gl = &self.raw;
+        gl.TexParameterf(target as u32, parameter as u32, value);
+    }
+
     unsafe fn tex_parameter_i32(
         &self,
         target: TextureBindingTarget,
@@ -329,6 +339,26 @@ impl super::Context for Context {
     ) {
         let gl = &self.raw;
         gl.TexParameteri(target as u32, parameter as u32, value);
+    }
+
+    unsafe fn tex_parameter_f32_slice(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        values: &[f32],
+    ) {
+        let gl = &self.raw;
+        gl.TexParameterfv(target as u32, parameter as u32, values.as_ptr());
+    }
+
+    unsafe fn tex_parameter_i32_slice(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        values: &[i32],
+    ) {
+        let gl = &self.raw;
+        gl.TexParameteriv(target as u32, parameter as u32, values.as_ptr());
     }
 
     unsafe fn depth_func(&self, func: Func) {

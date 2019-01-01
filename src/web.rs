@@ -517,6 +517,22 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn tex_parameter_f32(
+        &self,
+        target: TextureBindingTarget,
+        parameter: TextureParameter,
+        value: f32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.tex_parameterf(target as u32, parameter as u32, value)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_parameterf(target as u32, parameter as u32, value)
+            }
+        }
+    }
+
     unsafe fn tex_parameter_i32(
         &self,
         target: TextureBindingTarget,
@@ -531,6 +547,25 @@ impl super::Context for Context {
                 gl.tex_parameteri(target as u32, parameter as u32, value)
             }
         }
+    }
+
+    unsafe fn tex_parameter_f32_slice(
+        &self,
+        _target: TextureBindingTarget,
+        _parameter: TextureParameter,
+        value: &[f32],
+    ) {
+        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
+        panic!("Texture parameters for `&[f32]` are not supported yet");
+    }
+
+    unsafe fn tex_parameter_i32_slice(
+        &self,
+        _target: TextureBindingTarget,
+        _parameter: TextureParameter,
+        value: &[i32],
+    ) {
+        panic!("Texture parameters for `&[i32]` are not supported yet");
     }
 
     unsafe fn depth_func(&self, func: Func) {
@@ -550,8 +585,22 @@ impl super::Context for Context {
         offset: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib_pointer_with_i32(index, size, data_type.0, normalized, stride, offset),
-            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_pointer_with_i32(index, size, data_type.0, normalized, stride, offset),
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib_pointer_with_i32(
+                index,
+                size,
+                data_type.0,
+                normalized,
+                stride,
+                offset,
+            ),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_pointer_with_i32(
+                index,
+                size,
+                data_type.0,
+                normalized,
+                stride,
+                offset,
+            ),
         }
     }
 
@@ -564,8 +613,12 @@ impl super::Context for Context {
         offset: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("Integer vertex attrib pointer is not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_i_pointer_with_i32(index, size, data_type.0, stride, offset),
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Integer vertex attrib pointer is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.vertex_attrib_i_pointer_with_i32(index, size, data_type.0, stride, offset)
+            }
         }
     }
 
@@ -599,8 +652,18 @@ impl super::Context for Context {
         dst_alpha: BlendFactor,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.blend_func_separate(src_rgb as u32, dst_rgb as u32, src_alpha as u32, dst_alpha as u32),
-            RawRenderingContext::WebGl2(ref gl) => gl.blend_func_separate(src_rgb as u32, dst_rgb as u32, src_alpha as u32, dst_alpha as u32),
+            RawRenderingContext::WebGl1(ref gl) => gl.blend_func_separate(
+                src_rgb as u32,
+                dst_rgb as u32,
+                src_alpha as u32,
+                dst_alpha as u32,
+            ),
+            RawRenderingContext::WebGl2(ref gl) => gl.blend_func_separate(
+                src_rgb as u32,
+                dst_rgb as u32,
+                src_alpha as u32,
+                dst_alpha as u32,
+            ),
         }
     }
 
@@ -628,12 +691,21 @@ impl super::Context for Context {
 
     unsafe fn blend_equation_separate(&self, mode_rgb: BlendMode, mode_alpha: BlendMode) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.blend_equation_separate(mode_rgb as u32, mode_alpha as u32),
-            RawRenderingContext::WebGl2(ref gl) => gl.blend_equation_separate(mode_rgb as u32, mode_alpha as u32),
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.blend_equation_separate(mode_rgb as u32, mode_alpha as u32)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.blend_equation_separate(mode_rgb as u32, mode_alpha as u32)
+            }
         }
     }
 
-    unsafe fn blend_equation_separate_i(&self, _buffer: u32, _mode_rgb: BlendMode, _mode_alpha: BlendMode) {
+    unsafe fn blend_equation_separate_i(
+        &self,
+        _buffer: u32,
+        _mode_rgb: BlendMode,
+        _mode_alpha: BlendMode,
+    ) {
         panic!("Draw buffer blend equation separate is not supported");
     }
 
@@ -646,8 +718,12 @@ impl super::Context for Context {
 
     unsafe fn stencil_func_separate(&self, face: Face, func: Func, reference: i32, mask: u32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.stencil_func_separate(face as u32, func as u32, reference, mask),
-            RawRenderingContext::WebGl2(ref gl) => gl.stencil_func_separate(face as u32, func as u32, reference, mask),
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.stencil_func_separate(face as u32, func as u32, reference, mask)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.stencil_func_separate(face as u32, func as u32, reference, mask)
+            }
         }
     }
 
@@ -665,15 +741,14 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn stencil_op(
-        &self,
-        stencil_fail: StencilOp,
-        depth_fail: StencilOp,
-        pass: StencilOp,
-    ) {
+    unsafe fn stencil_op(&self, stencil_fail: StencilOp, depth_fail: StencilOp, pass: StencilOp) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.stencil_op(stencil_fail as u32, depth_fail as u32, pass as u32),
-            RawRenderingContext::WebGl2(ref gl) => gl.stencil_op(stencil_fail as u32, depth_fail as u32, pass as u32),
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.stencil_op(stencil_fail as u32, depth_fail as u32, pass as u32)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.stencil_op(stencil_fail as u32, depth_fail as u32, pass as u32)
+            }
         }
     }
 
@@ -685,8 +760,18 @@ impl super::Context for Context {
         pass: StencilOp,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.stencil_op_separate(face as u32, stencil_fail as u32, depth_fail as u32, pass as u32),
-            RawRenderingContext::WebGl2(ref gl) => gl.stencil_op_separate(face as u32, stencil_fail as u32, depth_fail as u32, pass as u32),
+            RawRenderingContext::WebGl1(ref gl) => gl.stencil_op_separate(
+                face as u32,
+                stencil_fail as u32,
+                depth_fail as u32,
+                pass as u32,
+            ),
+            RawRenderingContext::WebGl2(ref gl) => gl.stencil_op_separate(
+                face as u32,
+                stencil_fail as u32,
+                depth_fail as u32,
+                pass as u32,
+            ),
         }
     }
 }

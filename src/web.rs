@@ -609,6 +609,28 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn depth_range_f32(&self, near: f32, far: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.depth_range(near, far),
+            RawRenderingContext::WebGl2(ref gl) => gl.depth_range(near, far),
+        }
+    }
+
+    unsafe fn depth_range_f64(&self, near: f64, far: f64) {
+        panic!("64-bit float precision is not supported in WebGL");
+    }
+
+    unsafe fn scissor(&self, x: i32, y: i32, width: i32, height: i32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.scissor(x, y, width, height),
+            RawRenderingContext::WebGl2(ref gl) => gl.scissor(x, y, width, height),
+        }
+    }
+
+    unsafe fn scissor_slice(&self, _first: u32, _count: i32, _scissors: &[i32]) {
+        panic!("Scissor slice is not supported");
+    }
+
     unsafe fn vertex_attrib_pointer_f32(
         &self,
         index: u32,

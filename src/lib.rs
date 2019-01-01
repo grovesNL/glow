@@ -551,6 +551,14 @@ pub trait Context {
 
     unsafe fn depth_func(&self, func: Func);
 
+    unsafe fn depth_range_f32(&self, near: f32, far: f32);
+
+    unsafe fn depth_range_f64(&self, near: f64, far: f64);
+
+    unsafe fn scissor(&self, x: i32, y: i32, width: i32, height: i32);
+
+    unsafe fn scissor_slice(&self, first: u32, count: i32, scissors: &[i32]);
+
     unsafe fn vertex_attrib_pointer_f32(
         &self,
         index: u32,

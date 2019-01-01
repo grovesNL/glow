@@ -399,6 +399,26 @@ impl super::Context for Context {
         gl.DepthFunc(func as u32);
     }
 
+    unsafe fn depth_range_f32(&self, near: f32, far: f32) {
+        let gl = &self.raw;
+        gl.DepthRangef(near, far);
+    }
+
+    unsafe fn depth_range_f64(&self, near: f64, far: f64) {
+        let gl = &self.raw;
+        gl.DepthRange(near, far);
+    }
+
+    unsafe fn scissor(&self, x: i32, y: i32, width: i32, height: i32) {
+        let gl = &self.raw;
+        gl.Scissor(x, y, width, height);
+    }
+
+    unsafe fn scissor_slice(&self, first: u32, count: i32, scissors: &[i32]) {
+        let gl = &self.raw;
+        gl.ScissorArrayv(first, count, scissors.as_ptr());
+    }
+
     unsafe fn vertex_attrib_pointer_f32(
         &self,
         index: u32,

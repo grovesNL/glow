@@ -549,6 +549,13 @@ impl super::Context for Context {
         panic!("Draw buffer disable is not supported");
     }
 
+    unsafe fn disable_vertex_attrib_array(&self, index: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.disable_vertex_attrib_array(index),
+            RawRenderingContext::WebGl2(ref gl) => gl.disable_vertex_attrib_array(index),
+        }
+    }
+
     unsafe fn enable(&self, parameter: Parameter) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.enable(parameter as u32),
@@ -558,6 +565,13 @@ impl super::Context for Context {
 
     unsafe fn enable_i(&self, _parameter: Parameter, _buffer: u32) {
         panic!("Draw buffer enable is not supported");
+    }
+
+    unsafe fn enable_vertex_attrib_array(&self, index: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.enable_vertex_attrib_array(index),
+            RawRenderingContext::WebGl2(ref gl) => gl.enable_vertex_attrib_array(index),
+        }
     }
 
     unsafe fn flush(&self) {

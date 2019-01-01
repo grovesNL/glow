@@ -322,6 +322,11 @@ impl super::Context for Context {
         gl.Disablei(buffer, parameter as u32);
     }
 
+    unsafe fn disable_vertex_attrib_array(&self, index: u32) {
+        let gl = &self.raw;
+        gl.DisableVertexAttribArray(index);
+    }
+
     unsafe fn enable(&self, parameter: Parameter) {
         let gl = &self.raw;
         gl.Enable(parameter as u32);
@@ -330,6 +335,11 @@ impl super::Context for Context {
     unsafe fn enable_i(&self, parameter: Parameter, buffer: u32) {
         let gl = &self.raw;
         gl.Enablei(buffer, parameter as u32);
+    }
+
+    unsafe fn enable_vertex_attrib_array(&self, index: u32) {
+        let gl = &self.raw;
+        gl.EnableVertexAttribArray(index);
     }
 
     unsafe fn flush(&self) {

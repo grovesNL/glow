@@ -511,9 +511,13 @@ pub trait Context {
 
     unsafe fn disable_i(&self, parameter: Parameter, buffer: u32);
 
+    unsafe fn disable_vertex_attrib_array(&self, index: u32);
+
     unsafe fn enable(&self, parameter: Parameter);
 
     unsafe fn enable_i(&self, parameter: Parameter, buffer: u32);
+
+    unsafe fn enable_vertex_attrib_array(&self, index: u32);
 
     unsafe fn flush(&self);
 

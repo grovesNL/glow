@@ -36,9 +36,30 @@ impl super::Context for Context {
     type Framebuffer = native_gl::types::GLuint;
     type Renderbuffer = native_gl::types::GLuint;
 
+    unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {
+        let gl = &self.raw;
+        let mut name = 0;
+        gl.GenFramebuffers(1, &mut name);
+        Ok(name)
+    }
+
+    unsafe fn create_renderbuffer(&self) -> Result<Self::Renderbuffer, String> {
+        let gl = &self.raw;
+        let mut name = 0;
+        gl.GenRenderbuffers(1, &mut name);
+        Ok(name)
+    }
+
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let gl = &self.raw;
         Ok(gl.CreateShader(shader_type as u32))
+    }
+
+    unsafe fn create_texture(&self) -> Result<Self::Texture, String> {
+        let gl = &self.raw;
+        let mut name = 0;
+        gl.GenTextures(1, &mut name);
+        Ok(name)
     }
 
     unsafe fn delete_shader(&self, shader: Self::Shader) {
@@ -266,6 +287,11 @@ impl super::Context for Context {
         gl.DeleteBuffers(1, &buffer);
     }
 
+    unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer) {
+        let gl = &self.raw;
+        gl.DeleteFramebuffers(1, &framebuffer);
+    }
+
     unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer) {
         let gl = &self.raw;
         gl.DeleteRenderbuffers(1, &renderbuffer);
@@ -445,9 +471,9 @@ impl super::Context for Context {
         gl.Scissor(x, y, width, height);
     }
 
-    unsafe fn scissor_slice(&self, first: u32, count: i32, scissors: &[i32]) {
+    unsafe fn scissor_slice(&self, first: u32, count: i32, scissors: &[[i32; 4]]) {
         let gl = &self.raw;
-        gl.ScissorArrayv(first, count, scissors.as_ptr());
+        gl.ScissorArrayv(first, count, scissors.as_ptr() as *const i32);
     }
 
     unsafe fn vertex_attrib_pointer_f32(

@@ -92,6 +92,38 @@ impl super::Context for Context {
     type Framebuffer = WebFramebufferKey;
     type Renderbuffer = WebRenderbufferKey;
 
+    unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {
+        let raw_framebuffer = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.create_framebuffer(),
+            RawRenderingContext::WebGl2(ref gl) => gl.create_framebuffer(),
+        };
+
+        match raw_framebuffer {
+            Some(s) => {
+                let key = self.framebuffers.borrow_mut().0.insert(());
+                self.framebuffers.borrow_mut().1.insert(key, s);
+                Ok(key)
+            }
+            None => Err(String::from("Unable to create framebuffer object")),
+        }
+    }
+
+    unsafe fn create_renderbuffer(&self) -> Result<Self::Renderbuffer, String> {
+        let raw_renderbuffer = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.create_renderbuffer(),
+            RawRenderingContext::WebGl2(ref gl) => gl.create_renderbuffer(),
+        };
+
+        match raw_renderbuffer {
+            Some(s) => {
+                let key = self.renderbuffers.borrow_mut().0.insert(());
+                self.renderbuffers.borrow_mut().1.insert(key, s);
+                Ok(key)
+            }
+            None => Err(String::from("Unable to create renderbuffer object")),
+        }
+    }
+
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.create_shader(shader_type as u32),
@@ -105,6 +137,22 @@ impl super::Context for Context {
                 Ok(key)
             }
             None => Err(String::from("Unable to create shader object")),
+        }
+    }
+
+    unsafe fn create_texture(&self) -> Result<Self::Texture, String> {
+        let raw_texture = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.create_texture(),
+            RawRenderingContext::WebGl2(ref gl) => gl.create_texture(),
+        };
+
+        match raw_texture {
+            Some(t) => {
+                let key = self.textures.borrow_mut().0.insert(());
+                self.textures.borrow_mut().1.insert(key, t);
+                Ok(key)
+            }
+            None => Err(String::from("Unable to create texture object")),
         }
     }
 
@@ -435,6 +483,17 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer) {
+        let mut framebuffers = self.framebuffers.borrow_mut();
+        match framebuffers.1.remove(framebuffer) {
+            Some(ref f) => match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.delete_framebuffer(Some(f)),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_framebuffer(Some(f)),
+            },
+            None => {}
+        }
+    }
+
     unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer) {
         let mut renderbuffers = self.renderbuffers.borrow_mut();
         match renderbuffers.1.remove(renderbuffer) {
@@ -699,7 +758,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn scissor_slice(&self, _first: u32, _count: i32, _scissors: &[i32]) {
+    unsafe fn scissor_slice(&self, _first: u32, _count: i32, _scissors: &[[i32; 4]]) {
         panic!("Scissor slice is not supported");
     }
 

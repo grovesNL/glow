@@ -412,7 +412,13 @@ pub trait Context {
         + PartialEq
         + PartialOrd;
 
+    unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String>;
+
+    unsafe fn create_renderbuffer(&self) -> Result<Self::Renderbuffer, String>;
+
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String>;
+
+    unsafe fn create_texture(&self) -> Result<Self::Texture, String>;
 
     unsafe fn delete_shader(&self, shader: Self::Shader);
 
@@ -490,6 +496,8 @@ pub trait Context {
     unsafe fn pixel_store_bool(&self, parameter: PixelStoreParameterBool, value: bool);
 
     unsafe fn delete_buffer(&self, buffer: Self::Buffer);
+
+    unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer);
 
     unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer);
 
@@ -577,7 +585,7 @@ pub trait Context {
 
     unsafe fn scissor(&self, x: i32, y: i32, width: i32, height: i32);
 
-    unsafe fn scissor_slice(&self, first: u32, count: i32, scissors: &[i32]);
+    unsafe fn scissor_slice(&self, first: u32, count: i32, scissors: &[[i32; 4]]);
 
     unsafe fn vertex_attrib_pointer_f32(
         &self,

@@ -278,7 +278,7 @@ impl super::Context for Context {
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let raw_vertex_array = match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Vertex array objects are not supported")
+                panic!("Vertex array objects are not supported");
             }
             // TODO: Extension
             RawRenderingContext::WebGl2(ref gl) => gl.create_vertex_array(),
@@ -299,7 +299,7 @@ impl super::Context for Context {
         match vertex_arrays.1.remove(vertex_array) {
             Some(ref va) => match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => {
-                    panic!("Vertex array objects are not supported")
+                    panic!("Vertex array objects are not supported");
                 }
                 // TODO: Extension
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_vertex_array(Some(va)),
@@ -313,7 +313,7 @@ impl super::Context for Context {
         let raw_vertex_array = vertex_array.map(|va| vertex_arrays.1.get_unchecked(va));
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Vertex array objects are not supported")
+                panic!("Vertex array objects are not supported");
             }
             // TODO: Extension
             RawRenderingContext::WebGl2(ref gl) => gl.bind_vertex_array(raw_vertex_array),
@@ -378,7 +378,7 @@ impl super::Context for Context {
     }
 
     unsafe fn enable_i(&self, _parameter: Parameter, _buffer: u32) {
-        panic!("Draw buffer enable is not supported")
+        panic!("Draw buffer enable is not supported");
     }
 
     unsafe fn disable(&self, parameter: Parameter) {
@@ -389,7 +389,7 @@ impl super::Context for Context {
     }
 
     unsafe fn disable_i(&self, _parameter: Parameter, _buffer: u32) {
-        panic!("Draw buffer disable is not supported")
+        panic!("Draw buffer disable is not supported");
     }
 
     unsafe fn front_face(&self, value: FrontFace) {
@@ -399,7 +399,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn cull_face(&self, value: CullFace) {
+    unsafe fn cull_face(&self, value: Face) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.cull_face(value as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.cull_face(value as u32),
@@ -421,7 +421,7 @@ impl super::Context for Context {
         _blue: bool,
         _alpha: bool,
     ) {
-        panic!("Draw buffer color masks are not supported")
+        panic!("Draw buffer color masks are not supported");
     }
 
     unsafe fn depth_mask(&self, value: bool) {
@@ -453,7 +453,7 @@ impl super::Context for Context {
     }
 
     unsafe fn polygon_mode(&self, _face: PolygonFace, _mode: PolygonMode) {
-        panic!("Polygon mode is not supported")
+        panic!("Polygon mode is not supported");
     }
 
     unsafe fn finish(&self) {
@@ -568,6 +568,116 @@ impl super::Context for Context {
         _offset: i32,
     ) {
         panic!("64-bit float precision is not supported in WebGL");
+    }
+
+    unsafe fn blend_func(&self, src: BlendFactor, dst: BlendFactor) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.blend_func(src as u32, dst as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.blend_func(src as u32, dst as u32),
+        }
+    }
+
+    unsafe fn blend_func_i(&self, _buffer: u32, _src: BlendFactor, _dst: BlendFactor) {
+        panic!("Draw buffer blend func is not supported");
+    }
+
+    unsafe fn blend_func_separate(
+        &self,
+        src_rgb: BlendFactor,
+        dst_rgb: BlendFactor,
+        src_alpha: BlendFactor,
+        dst_alpha: BlendFactor,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.blend_func_separate(src_rgb as u32, dst_rgb as u32, src_alpha as u32, dst_alpha as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.blend_func_separate(src_rgb as u32, dst_rgb as u32, src_alpha as u32, dst_alpha as u32),
+        }
+    }
+
+    unsafe fn blend_func_separate_i(
+        &self,
+        _buffer: u32,
+        _src_rgb: BlendFactor,
+        _dst_rgb: BlendFactor,
+        _src_alpha: BlendFactor,
+        _dst_alpha: BlendFactor,
+    ) {
+        panic!("Draw buffer blend func separate is not supported");
+    }
+
+    unsafe fn blend_equation(&self, mode: BlendMode) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.blend_equation(mode as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.blend_equation(mode as u32),
+        }
+    }
+
+    unsafe fn blend_equation_i(&self, _buffer: u32, _mode: BlendMode) {
+        panic!("Draw buffer blend equation is not supported");
+    }
+
+    unsafe fn blend_equation_separate(&self, mode_rgb: BlendMode, mode_alpha: BlendMode) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.blend_equation_separate(mode_rgb as u32, mode_alpha as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.blend_equation_separate(mode_rgb as u32, mode_alpha as u32),
+        }
+    }
+
+    unsafe fn blend_equation_separate_i(&self, _buffer: u32, _mode_rgb: BlendMode, _mode_alpha: BlendMode) {
+        panic!("Draw buffer blend equation separate is not supported");
+    }
+
+    unsafe fn stencil_func(&self, func: Func, reference: i32, mask: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.stencil_func(func as u32, reference, mask),
+            RawRenderingContext::WebGl2(ref gl) => gl.stencil_func(func as u32, reference, mask),
+        }
+    }
+
+    unsafe fn stencil_func_separate(&self, face: Face, func: Func, reference: i32, mask: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.stencil_func_separate(face as u32, func as u32, reference, mask),
+            RawRenderingContext::WebGl2(ref gl) => gl.stencil_func_separate(face as u32, func as u32, reference, mask),
+        }
+    }
+
+    unsafe fn stencil_mask(&self, mask: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.stencil_mask(mask),
+            RawRenderingContext::WebGl2(ref gl) => gl.stencil_mask(mask),
+        }
+    }
+
+    unsafe fn stencil_mask_separate(&self, face: Face, mask: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.stencil_mask_separate(face as u32, mask),
+            RawRenderingContext::WebGl2(ref gl) => gl.stencil_mask_separate(face as u32, mask),
+        }
+    }
+
+    unsafe fn stencil_op(
+        &self,
+        stencil_fail: StencilOp,
+        depth_fail: StencilOp,
+        pass: StencilOp,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.stencil_op(stencil_fail as u32, depth_fail as u32, pass as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.stencil_op(stencil_fail as u32, depth_fail as u32, pass as u32),
+        }
+    }
+
+    unsafe fn stencil_op_separate(
+        &self,
+        face: Face,
+        stencil_fail: StencilOp,
+        depth_fail: StencilOp,
+        pass: StencilOp,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.stencil_op_separate(face as u32, stencil_fail as u32, depth_fail as u32, pass as u32),
+            RawRenderingContext::WebGl2(ref gl) => gl.stencil_op_separate(face as u32, stencil_fail as u32, depth_fail as u32, pass as u32),
+        }
     }
 }
 

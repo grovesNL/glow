@@ -175,7 +175,7 @@ pub enum FrontFace {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum CullFace {
+pub enum Face {
     Front = 0x0404,
     Back = 0x0405,
     FrontAndBack = 0x0408,
@@ -294,6 +294,50 @@ bitflags! {
     pub struct FenceSyncFlags: u32 {
         const _Unused = 0;
     }
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum BlendFactor {
+    Zero = 0,
+    One = 1,
+    SrcColor = 0x0300,
+    OneMinusSrcColor = 0x0301,
+    DstColor = 0x0306,
+    OneMinusDstColor = 0x0307,
+    SrcAlpha = 0x0302,
+    OneMinusSrcAlpha = 0x0303,
+    DstAlpha = 0x0304,
+    OneMinusDstAlpha = 0x0305,
+    ConstantColor = 0x8001,
+    OneMinusConstantColor = 0x8002,
+    ConstantAlpha = 0x8003,
+    OneMinusConstantAlpha = 0x8004,
+    SrcAlphaSaturate = 0x0308,
+    Src1Color = 0x88F9,
+    OneMinusSrc1Color = 0x88FA,
+    Src1Alpha = 0x8589,
+    OneMinusSrc1Alpha = 0x88FB,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum BlendMode {
+    FuncAdd = 0x8006,
+    FuncSubtract = 0x800A,
+    FuncReverseSubtract = 0x800B,
+    Min = 0x8007,
+    Max = 0x8008,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum StencilOp {
+    Keep = 0x1E00,
+    Zero = 0,
+    Replace = 0x1E01,
+    Increment = 0x1E02,
+    IncrementWrap = 0x8507,
+    Decrement = 0x1E03,
+    DecrementWrap = 0x8508,
+    Invert = 0x150A,
 }
 
 pub(crate) const COMPILE_STATUS: u32 = 0x8B81;
@@ -418,7 +462,7 @@ pub trait Context {
 
     unsafe fn front_face(&self, value: FrontFace);
 
-    unsafe fn cull_face(&self, value: CullFace);
+    unsafe fn cull_face(&self, value: Face);
 
     unsafe fn color_mask(&self, red: bool, green: bool, blue: bool, alpha: bool);
 
@@ -483,6 +527,67 @@ pub trait Context {
         data_type: VertexDataTypeF64,
         stride: i32,
         offset: i32,
+    );
+
+    unsafe fn blend_equation(&self, mode: BlendMode);
+
+    unsafe fn blend_equation_i(&self, buffer: u32, mode: BlendMode);
+
+    unsafe fn blend_equation_separate(&self, mode_rgb: BlendMode, mode_alpha: BlendMode);
+
+    unsafe fn blend_equation_separate_i(&self, buffer: u32, mode_rgb: BlendMode, mode_alpha: BlendMode);
+
+    unsafe fn blend_func(
+        &self,
+        src: BlendFactor,
+        dst: BlendFactor,
+    );
+
+    unsafe fn blend_func_i(
+        &self,
+        buffer: u32,
+        src: BlendFactor,
+        dst: BlendFactor,
+    );
+
+    unsafe fn blend_func_separate(
+        &self,
+        src_rgb: BlendFactor,
+        dst_rgb: BlendFactor,
+        src_alpha: BlendFactor,
+        dst_alpha: BlendFactor,
+    );
+
+    unsafe fn blend_func_separate_i(
+        &self,
+        buffer: u32,
+        src_rgb: BlendFactor,
+        dst_rgb: BlendFactor,
+        src_alpha: BlendFactor,
+        dst_alpha: BlendFactor,
+    );
+
+    unsafe fn stencil_func(&self, func: Func, reference: i32, mask: u32);
+
+    unsafe fn stencil_func_separate(&self, face: Face, func: Func, reference: i32, mask: u32);
+
+    unsafe fn stencil_mask(&self, mask: u32);
+
+    unsafe fn stencil_mask_separate(&self, face: Face, mask: u32);
+
+    unsafe fn stencil_op(
+        &self,
+        stencil_fail: StencilOp,
+        depth_fail: StencilOp,
+        pass: StencilOp,
+    );
+
+    unsafe fn stencil_op_separate(
+        &self,
+        face: Face,
+        stencil_fail: StencilOp,
+        depth_fail: StencilOp,
+        pass: StencilOp,
     );
 }
 

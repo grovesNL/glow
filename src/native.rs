@@ -242,7 +242,7 @@ impl super::Context for Context {
         gl.FrontFace(value as u32);
     }
 
-    unsafe fn cull_face(&self, value: CullFace) {
+    unsafe fn cull_face(&self, value: Face) {
         let gl = &self.raw;
         gl.CullFace(value as u32);
     }
@@ -379,6 +379,116 @@ impl super::Context for Context {
             data_type as u32,
             stride,
             offset as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn blend_equation(&self, mode: BlendMode) {
+        let gl = &self.raw;
+        gl.BlendEquation(mode as u32);
+    }
+
+    unsafe fn blend_equation_i(&self, buffer: u32, mode: BlendMode) {
+        let gl = &self.raw;
+        gl.BlendEquationi(buffer, mode as u32);
+    }
+
+    unsafe fn blend_equation_separate(&self, mode_rgb: BlendMode, mode_alpha: BlendMode) {
+        let gl = &self.raw;
+        gl.BlendEquationSeparate(mode_rgb as u32, mode_alpha as u32);
+    }
+
+    unsafe fn blend_equation_separate_i(
+        &self,
+        buffer: u32,
+        mode_rgb: BlendMode,
+        mode_alpha: BlendMode,
+    ) {
+        let gl = &self.raw;
+        gl.BlendEquationSeparatei(buffer, mode_rgb as u32, mode_alpha as u32);
+    }
+
+    unsafe fn blend_func(&self, src: BlendFactor, dst: BlendFactor) {
+        let gl = &self.raw;
+        gl.BlendFunc(src as u32, dst as u32);
+    }
+
+    unsafe fn blend_func_i(&self, buffer: u32, src: BlendFactor, dst: BlendFactor) {
+        let gl = &self.raw;
+        gl.BlendFunci(buffer, src as u32, dst as u32);
+    }
+
+    unsafe fn blend_func_separate(
+        &self,
+        src_rgb: BlendFactor,
+        dst_rgb: BlendFactor,
+        src_alpha: BlendFactor,
+        dst_alpha: BlendFactor,
+    ) {
+        let gl = &self.raw;
+        gl.BlendFuncSeparate(
+            src_rgb as u32,
+            dst_rgb as u32,
+            src_alpha as u32,
+            dst_alpha as u32,
+        );
+    }
+
+    unsafe fn blend_func_separate_i(
+        &self,
+        buffer: u32,
+        src_rgb: BlendFactor,
+        dst_rgb: BlendFactor,
+        src_alpha: BlendFactor,
+        dst_alpha: BlendFactor,
+    ) {
+        let gl = &self.raw;
+        gl.BlendFuncSeparatei(
+            buffer,
+            src_rgb as u32,
+            dst_rgb as u32,
+            src_alpha as u32,
+            dst_alpha as u32,
+        );
+    }
+
+    unsafe fn stencil_func(&self, func: Func, reference: i32, mask: u32) {
+        let gl = &self.raw;
+        gl.StencilFunc(func as u32, reference, mask);
+    }
+
+    unsafe fn stencil_func_separate(&self, face: Face, func: Func, reference: i32, mask: u32) {
+        let gl = &self.raw;
+        gl.StencilFuncSeparate(face as u32, func as u32, reference, mask);
+    }
+
+    unsafe fn stencil_mask(&self, mask: u32) {
+        let gl = &self.raw;
+        gl.StencilMask(mask);
+    }
+
+    unsafe fn stencil_mask_separate(&self, face: Face, mask: u32) {
+        let gl = &self.raw;
+        gl.StencilMaskSeparate(face as u32, mask);
+    }
+
+    unsafe fn stencil_op(&self, stencil_fail: StencilOp, depth_fail: StencilOp, pass: StencilOp) {
+        let gl = &self.raw;
+        gl.StencilOp(stencil_fail as u32, depth_fail as u32, pass as u32);
+    }
+
+    unsafe fn stencil_op_separate(
+        &self,
+        face: Face,
+        stencil_fail: StencilOp,
+        depth_fail: StencilOp,
+        pass: StencilOp,
+    ) {
+        let gl = &self.raw;
+        gl.StencilOpSeparate(
+            face as u32,
+            stencil_fail as u32,
+            depth_fail as u32,
+            pass as u32,
         );
     }
 }

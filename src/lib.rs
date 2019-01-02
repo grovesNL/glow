@@ -202,18 +202,27 @@ pub enum PolygonMode {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum TextureBindingTarget {
-    D1 = 0x0DE0,
-    D2 = 0x0DE1,
-    D3 = 0x806F,
-    D1Array = 0x8C18,
-    D2Array = 0x8C1A,
-    Rectangle = 0x84F5,
-    CubeMap = 0x8513,
-    CubeMapArray = 0x9009,
-    Buffer = 0x8C2A,
-    D2Multisample = 0x9100,
-    D2MultisampleArray = 0x9102,
+pub struct TextureBindingTarget(u32);
+
+#[allow(non_camel_case_types)]
+impl TextureBindingTarget {
+    pub const D1: TextureBindingTarget = TextureBindingTarget(0x0DE0);
+    pub const D2: TextureBindingTarget = TextureBindingTarget(0x0DE1);
+    pub const D3: TextureBindingTarget = TextureBindingTarget(0x806F);
+    pub const D1_ARRAY: TextureBindingTarget = TextureBindingTarget(0x8C18);
+    pub const D2_ARRAY: TextureBindingTarget = TextureBindingTarget(0x8C1A);
+    pub const RECTANGLE: TextureBindingTarget = TextureBindingTarget(0x84F5);
+    pub const CUBE_MAP: TextureBindingTarget = TextureBindingTarget(0x8513);
+    pub const CUBE_MAP_ARRAY: TextureBindingTarget = TextureBindingTarget(0x9009);
+    pub const CUBE_MAP_POSITIVE_X: TextureBindingTarget = TextureBindingTarget(0x8515);
+    pub const CUBE_MAP_NEGATIVE_X: TextureBindingTarget = TextureBindingTarget(0x8516);
+    pub const CUBE_MAP_POSITIVE_Y: TextureBindingTarget = TextureBindingTarget(0x8517);
+    pub const CUBE_MAP_NEGATIVE_Y: TextureBindingTarget = TextureBindingTarget(0x8518);
+    pub const CUBE_MAP_POSITIVE_Z: TextureBindingTarget = TextureBindingTarget(0x8519);
+    pub const CUBE_MAP_NEGATIVE_Z: TextureBindingTarget = TextureBindingTarget(0x851A);
+    pub const BUFFER: TextureBindingTarget = TextureBindingTarget(0x8C2A);
+    pub const D2_MULTISAMPLE: TextureBindingTarget = TextureBindingTarget(0x9100);
+    pub const D2_MULTISAMPLE_ARRAY: TextureBindingTarget = TextureBindingTarget(0x9102);
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -267,6 +276,62 @@ impl VertexDataType {
     pub const INT_2_10_10_10_REV: VertexDataType = VertexDataType(0x8D9F);
     pub const UNSIGNED_INT_2_10_10_10_REV: VertexDataType = VertexDataType(0x8368);
     pub const UNSIGNED_INT_10F_11F_11F_REV: VertexDataType = VertexDataType(0x8C3B);
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct TextureFormat(u32);
+
+impl TextureFormat {
+    pub const STENCIL_INDEX: TextureFormat = TextureFormat(0x1901);
+    pub const DEPTH_COMPONENT: TextureFormat = TextureFormat(0x1902);
+    pub const DEPTH_STENCIL: TextureFormat = TextureFormat(0x84F9);
+    pub const RED: TextureFormat = TextureFormat(0x1903);
+    pub const GREEN: TextureFormat = TextureFormat(0x1904);
+    pub const BLUE: TextureFormat = TextureFormat(0x1905);
+    pub const RG: TextureFormat = TextureFormat(0x8227);
+    pub const RGB: TextureFormat = TextureFormat(0x1907);
+    pub const RGBA: TextureFormat = TextureFormat(0x1908);
+    pub const BGR: TextureFormat = TextureFormat(0x80E0);
+    pub const BGRA: TextureFormat = TextureFormat(0x80E1);
+    pub const RED_INTEGER: TextureFormat = TextureFormat(0x8D94);
+    pub const GREEN_INTEGER: TextureFormat = TextureFormat(0x8D95);
+    pub const BLUE_INTEGER: TextureFormat = TextureFormat(0x8D96);
+    pub const RG_INTEGER: TextureFormat = TextureFormat(0x8228);
+    pub const RGB_INTEGER: TextureFormat = TextureFormat(0x8D98);
+    pub const RGBA_INTEGER: TextureFormat = TextureFormat(0x8D99);
+    pub const BGR_INTEGER: TextureFormat = TextureFormat(0x8D9A);
+    pub const BGRA_INTEGER: TextureFormat = TextureFormat(0x8D9B);
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct TextureType(u32);
+
+#[allow(non_camel_case_types)]
+impl TextureType {
+    pub const UNSIGNED_BYTE: TextureType = TextureType(0x1401);
+    pub const BYTE: TextureType = TextureType(0x1400);
+    pub const UNSIGNED_SHORT: TextureType = TextureType(0x1403);
+    pub const SHORT: TextureType = TextureType(0x1402);
+    pub const UNSIGNED_INT: TextureType = TextureType(0x1405);
+    pub const INT: TextureType = TextureType(0x1404);
+    pub const HALF_FLOAT: TextureType = TextureType(0x140B);
+    pub const FLOAT: TextureType = TextureType(0x1406);
+    pub const UNSIGNED_BYTE_3_3_2: TextureType = TextureType(0x8032);
+    pub const UNSIGNED_BYTE_2_3_3_REV: TextureType = TextureType(0x8362);
+    pub const UNSIGNED_SHORT_5_6_5: TextureType = TextureType(0x8363);
+    pub const UNSIGNED_SHORT_5_6_5_REV: TextureType = TextureType(0x8364);
+    pub const UNSIGNED_SHORT_4_4_4_4: TextureType = TextureType(0x8033);
+    pub const UNSIGNED_SHORT_4_4_4_4_REV: TextureType = TextureType(0x8365);
+    pub const UNSIGNED_SHORT_5_5_5_1: TextureType = TextureType(0x8034);
+    pub const UNSIGNED_SHORT_1_5_5_5_REV: TextureType = TextureType(0x8366);
+    pub const UNSIGNED_INT_8_8_8_8: TextureType = TextureType(0x8035);
+    pub const UNSIGNED_INT_8_8_8_8_REV: TextureType = TextureType(0x8367);
+    pub const UNSIGNED_INT_10_10_10_2: TextureType = TextureType(0x8036);
+    pub const UNSIGNED_INT_2_10_10_10_REV: TextureType = TextureType(0x8D9F);
+    pub const UNSIGNED_INT_24_8: TextureType = TextureType(0x84FA);
+    pub const UNSIGNED_INT_10F_11F_11F_REV: TextureType = TextureType(0x8C3B);
+    pub const UNSIGNED_INT_5_9_9_9_REV: TextureType = TextureType(0x8C3E);
+    pub const FLOAT_32_UNSIGNED_INT_24_8_REV: TextureType = TextureType(0x8DAD);
 }
 
 /// The buffers to clear.
@@ -423,6 +488,8 @@ pub trait Context {
 
     unsafe fn create_renderbuffer(&self) -> Result<Self::Renderbuffer, String>;
 
+    unsafe fn create_sampler(&self) -> Result<Self::Sampler, String>;
+
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String>;
 
     unsafe fn create_texture(&self) -> Result<Self::Texture, String>;
@@ -436,6 +503,15 @@ pub trait Context {
     unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool;
 
     unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String;
+
+    unsafe fn get_tex_image(
+        &self,
+        target: TextureBindingTarget,
+        level: i32,
+        format: TextureFormat,
+        ty: TextureType,
+        pixels: *mut std::ffi::c_void,
+    );
 
     unsafe fn create_program(&self) -> Result<Self::Program, String>;
 
@@ -593,6 +669,8 @@ pub trait Context {
     unsafe fn flush(&self);
 
     unsafe fn front_face(&self, value: FrontFace);
+
+    unsafe fn get_error(&self) -> u32;
 
     unsafe fn cull_face(&self, value: Face);
 

@@ -11,9 +11,11 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn from_glutin_window(window: &glutin::GlWindow) -> Self {
-        use glutin::GlContext;
-        let raw = native_gl::Gl::load_with(|s| window.get_proc_address(s) as *const _);
+    pub fn from_loader_function<F>(loader_function: F) -> Self
+    where
+        F: FnMut(&str) -> *const std::os::raw::c_void,
+    {
+        let raw = native_gl::Gl::load_with(loader_function);
         Context { raw }
     }
 }
@@ -47,6 +49,13 @@ impl super::Context for Context {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenRenderbuffers(1, &mut name);
+        Ok(name)
+    }
+
+    unsafe fn create_sampler(&self) -> Result<Self::Sampler, String> {
+        let gl = &self.raw;
+        let mut name = 0;
+        gl.GenSamplers(1, &mut name);
         Ok(name)
     }
 
@@ -107,6 +116,18 @@ impl super::Context for Context {
         } else {
             String::from("")
         }
+    }
+
+    unsafe fn get_tex_image(
+        &self,
+        target: TextureBindingTarget,
+        level: i32,
+        format: TextureFormat,
+        ty: TextureType,
+        pixels: *mut std::ffi::c_void,
+    ) {
+        let gl = &self.raw;
+        gl.GetTexImage(target.0, level, format.0, ty.0, pixels);
     }
 
     unsafe fn create_program(&self) -> Result<Self::Program, String> {
@@ -475,6 +496,11 @@ impl super::Context for Context {
         gl.FrontFace(value as u32);
     }
 
+    unsafe fn get_error(&self) -> u32 {
+        let gl = &self.raw;
+        gl.GetError()
+    }
+
     unsafe fn cull_face(&self, value: Face) {
         let gl = &self.raw;
         gl.CullFace(value as u32);
@@ -522,7 +548,7 @@ impl super::Context for Context {
 
     unsafe fn bind_texture(&self, target: TextureBindingTarget, texture: Option<Self::Texture>) {
         let gl = &self.raw;
-        gl.BindTexture(target as u32, texture.unwrap_or(0));
+        gl.BindTexture(target.0, texture.unwrap_or(0));
     }
 
     unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>) {
@@ -551,7 +577,7 @@ impl super::Context for Context {
         value: f32,
     ) {
         let gl = &self.raw;
-        gl.TexParameterf(target as u32, parameter as u32, value);
+        gl.TexParameterf(target.0, parameter as u32, value);
     }
 
     unsafe fn tex_parameter_i32(
@@ -561,7 +587,7 @@ impl super::Context for Context {
         value: i32,
     ) {
         let gl = &self.raw;
-        gl.TexParameteri(target as u32, parameter as u32, value);
+        gl.TexParameteri(target.0, parameter as u32, value);
     }
 
     unsafe fn tex_parameter_f32_slice(
@@ -571,7 +597,7 @@ impl super::Context for Context {
         values: &[f32],
     ) {
         let gl = &self.raw;
-        gl.TexParameterfv(target as u32, parameter as u32, values.as_ptr());
+        gl.TexParameterfv(target.0, parameter as u32, values.as_ptr());
     }
 
     unsafe fn tex_parameter_i32_slice(
@@ -581,7 +607,7 @@ impl super::Context for Context {
         values: &[i32],
     ) {
         let gl = &self.raw;
-        gl.TexParameteriv(target as u32, parameter as u32, values.as_ptr());
+        gl.TexParameteriv(target.0, parameter as u32, values.as_ptr());
     }
 
     unsafe fn depth_func(&self, func: Func) {

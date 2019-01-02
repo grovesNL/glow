@@ -48,7 +48,9 @@ fn main() {
             let context_builder = glutin::ContextBuilder::new().with_vsync(true);
             let window =
                 glutin::GlWindow::new(window_builder, context_builder, &events_loop).unwrap();
-            let context = glow::native::Context::from_glutin_window(&window);
+            let context = glow::native::Context::from_loader_function(|s| {
+                window.get_proc_address(s) as *const _
+            });
             window.make_current().unwrap();
             let render_loop = glow::native::RenderLoop::from_window();
             (window, context, events_loop, render_loop, "#version 410")

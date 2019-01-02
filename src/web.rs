@@ -124,6 +124,22 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn create_sampler(&self) -> Result<Self::Sampler, String> {
+        let raw_sampler = match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Sampler objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.create_sampler(),
+        };
+
+        match raw_sampler {
+            Some(s) => {
+                let key = self.samplers.borrow_mut().0.insert(());
+                self.samplers.borrow_mut().1.insert(key, s);
+                Ok(key)
+            }
+            None => Err(String::from("Unable to create sampler object")),
+        }
+    }
+
     unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.create_shader(shader_type as u32),
@@ -208,6 +224,17 @@ impl super::Context for Context {
             RawRenderingContext::WebGl2(ref gl) => gl.get_shader_info_log(raw_shader),
         }
         .unwrap_or_else(|| String::from(""))
+    }
+
+    unsafe fn get_tex_image(
+        &self,
+        _target: TextureBindingTarget,
+        _level: i32,
+        _format: TextureFormat,
+        _ty: TextureType,
+        _pixels: *mut std::ffi::c_void,
+    ) {
+        panic!("Get tex image is not supported");
     }
 
     unsafe fn create_program(&self) -> Result<Self::Program, String> {
@@ -693,6 +720,13 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn get_error(&self) -> u32 {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_error(),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_error(),
+        }
+    }
+
     unsafe fn cull_face(&self, value: Face) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.cull_face(value as u32),
@@ -761,8 +795,8 @@ impl super::Context for Context {
         let textures = self.textures.borrow();
         let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.bind_texture(target as u32, raw_texture),
-            RawRenderingContext::WebGl2(ref gl) => gl.bind_texture(target as u32, raw_texture),
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_texture(target.0, raw_texture),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_texture(target.0, raw_texture),
         }
     }
 
@@ -809,10 +843,10 @@ impl super::Context for Context {
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
-                gl.tex_parameterf(target as u32, parameter as u32, value)
+                gl.tex_parameterf(target.0, parameter as u32, value)
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_parameterf(target as u32, parameter as u32, value)
+                gl.tex_parameterf(target.0, parameter as u32, value)
             }
         }
     }
@@ -825,10 +859,10 @@ impl super::Context for Context {
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
-                gl.tex_parameteri(target as u32, parameter as u32, value)
+                gl.tex_parameteri(target.0, parameter as u32, value)
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_parameteri(target as u32, parameter as u32, value)
+                gl.tex_parameteri(target.0, parameter as u32, value)
             }
         }
     }

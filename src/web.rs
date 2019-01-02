@@ -886,6 +886,67 @@ impl super::Context for Context {
         panic!("Texture parameters for `&[i32]` are not supported yet");
     }
 
+    unsafe fn tex_sub_image_2d_u8_slice(
+        &self,
+        target: TextureBindingTarget,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: TextureFormat,
+        ty: TextureType,
+        pixels: Option<&mut [u8]>,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_u8_array(
+                    target.0, level, x_offset, y_offset, width, height, format.0, ty.0, pixels,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_u8_array(
+                    target.0, level, x_offset, y_offset, width, height, format.0, ty.0, pixels,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
+    unsafe fn tex_sub_image_2d_pixel_buffer_offset(
+        &self,
+        target: TextureBindingTarget,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: TextureFormat,
+        ty: TextureType,
+        pixel_buffer_offset: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Sub image 2D pixel buffer offset is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_i32(
+                    target.0,
+                    level,
+                    x_offset,
+                    y_offset,
+                    width,
+                    height,
+                    format.0,
+                    ty.0,
+                    pixel_buffer_offset,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
     unsafe fn depth_func(&self, func: Func) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.depth_func(func as u32),

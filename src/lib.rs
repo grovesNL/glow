@@ -244,6 +244,7 @@ pub enum TextureParameter {
     WrapS = 0x2802,
     WrapT = 0x2803,
     WrapR = 0x8072,
+    MaxAnisotropy = 0x84FF,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -728,6 +729,32 @@ pub trait Context {
         target: TextureBindingTarget,
         parameter: TextureParameter,
         values: &[i32],
+    );
+
+    unsafe fn tex_sub_image_2d_u8_slice(
+        &self,
+        target: TextureBindingTarget,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: TextureFormat,
+        ty: TextureType,
+        pixels: Option<&mut [u8]>,
+    );
+
+    unsafe fn tex_sub_image_2d_pixel_buffer_offset(
+        &self,
+        target: TextureBindingTarget,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: TextureFormat,
+        ty: TextureType,
+        pixel_buffer_offset: i32,
     );
 
     unsafe fn depth_func(&self, func: Func);

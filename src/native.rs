@@ -610,6 +610,58 @@ impl super::Context for Context {
         gl.TexParameteriv(target.0, parameter as u32, values.as_ptr());
     }
 
+    unsafe fn tex_sub_image_2d_u8_slice(
+        &self,
+        target: TextureBindingTarget,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: TextureFormat,
+        ty: TextureType,
+        pixels: Option<&mut [u8]>,
+    ) {
+        let gl = &self.raw;
+        gl.TexSubImage2D(
+            target.0,
+            level,
+            x_offset,
+            y_offset,
+            width,
+            height,
+            format.0,
+            ty.0,
+            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn tex_sub_image_2d_pixel_buffer_offset(
+        &self,
+        target: TextureBindingTarget,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: TextureFormat,
+        ty: TextureType,
+        pixel_buffer_offset: i32,
+    ) {
+        let gl = &self.raw;
+        gl.TexSubImage2D(
+            target.0,
+            level,
+            x_offset,
+            y_offset,
+            width,
+            height,
+            format.0,
+            ty.0,
+            pixel_buffer_offset as *const std::ffi::c_void,
+        );
+    }
+
     unsafe fn depth_func(&self, func: Func) {
         let gl = &self.raw;
         gl.DepthFunc(func as u32);

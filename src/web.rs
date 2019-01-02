@@ -228,7 +228,7 @@ impl super::Context for Context {
 
     unsafe fn get_tex_image(
         &self,
-        _target: TextureBindingTarget,
+        _target: TextureTarget,
         _level: i32,
         _format: TextureFormat,
         _ty: TextureType,
@@ -345,7 +345,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn bind_buffer(&self, target: BufferBindingTarget, buffer: Option<Self::Buffer>) {
+    unsafe fn bind_buffer(&self, target: BufferTarget, buffer: Option<Self::Buffer>) {
         let buffers = self.buffers.borrow();
         let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
         match self.raw {
@@ -356,7 +356,7 @@ impl super::Context for Context {
 
     unsafe fn bind_buffer_range(
         &self,
-        _target: BufferBindingTarget,
+        _target: BufferTarget,
         _index: u32,
         _buffer: Option<Self::Buffer>,
         _offset: i32,
@@ -368,7 +368,7 @@ impl super::Context for Context {
 
     unsafe fn bind_framebuffer(
         &self,
-        target: FramebufferBindingTarget,
+        target: FramebufferTarget,
         framebuffer: Option<Self::Framebuffer>,
     ) {
         let framebuffers = self.framebuffers.borrow();
@@ -482,6 +482,92 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn clear_buffer_i32_slice(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        values: &mut [i32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Clear buffer with `i32` slice is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.clear_bufferiv_with_i32_array(target as u32, draw_buffer as i32, values)
+            }
+        }
+    }
+
+    unsafe fn clear_buffer_u32_slice(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        values: &mut [u32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Clear buffer with `u32` slice is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.clear_bufferuiv_with_u32_array(target as u32, draw_buffer as i32, values)
+            }
+        }
+    }
+
+    unsafe fn clear_buffer_f32_slice(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        values: &mut [f32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Clear buffer with `f32` slice is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.clear_bufferfv_with_f32_array(target as u32, draw_buffer as i32, values)
+            }
+        }
+    }
+
+    unsafe fn clear_buffer_depth_stencil(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        depth: f32,
+        stencil: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Clear buffer depth stencil is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.clear_bufferfi(target as u32, draw_buffer as i32, depth, stencil)
+            }
+        }
+    }
+
+    unsafe fn copy_buffer_sub_data(
+        &self,
+        src_target: BufferTarget,
+        dst_target: BufferTarget,
+        src_offset: i32,
+        dst_offset: i32,
+        size: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Copy buffer subdata is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .copy_buffer_sub_data_with_i32_and_i32_and_i32(
+                    src_target as u32,
+                    dst_target as u32,
+                    src_offset,
+                    dst_offset,
+                    size,
+                ),
+        }
+    }
+
     unsafe fn delete_buffer(&self, buffer: Self::Buffer) {
         let mut buffers = self.buffers.borrow_mut();
         match buffers.1.remove(buffer) {
@@ -555,7 +641,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn disable_i(&self, _parameter: Parameter, _buffer: u32) {
+    unsafe fn disable_draw_buffer(&self, _parameter: Parameter, _draw_buffer: u32) {
         panic!("Draw buffer disable is not supported");
     }
 
@@ -564,6 +650,14 @@ impl super::Context for Context {
             RawRenderingContext::WebGl1(ref gl) => gl.disable_vertex_attrib_array(index),
             RawRenderingContext::WebGl2(ref gl) => gl.disable_vertex_attrib_array(index),
         }
+    }
+
+    unsafe fn dispatch_compute(&self, _groups_x: u32, _groups_y: u32, _groups_z: u32) {
+        panic!("Dispatch compute is not supported");
+    }
+
+    unsafe fn dispatch_compute_indirect(&self, _offset: i32) {
+        panic!("Dispatch compute indirect is not supported");
     }
 
     unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
@@ -601,7 +695,7 @@ impl super::Context for Context {
         panic!("Draw arrays instanced base instance is not supported");
     }
 
-    unsafe fn draw_buffer(&self, _buffer: u32) {
+    unsafe fn draw_buffer(&self, _draw_buffer: u32) {
         // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
         panic!("Draw buffer is not supported yet");
     }
@@ -695,7 +789,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn enable_i(&self, _parameter: Parameter, _buffer: u32) {
+    unsafe fn enable_draw_buffer(&self, _parameter: Parameter, _draw_buffer: u32) {
         panic!("Draw buffer enable is not supported");
     }
 
@@ -710,6 +804,58 @@ impl super::Context for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.flush(),
             RawRenderingContext::WebGl2(ref gl) => gl.flush(),
+        }
+    }
+
+    unsafe fn framebuffer_renderbuffer(
+        &self,
+        target: FramebufferTarget,
+        attachment: u32,
+        renderbuffer_target: RenderbufferTarget,
+        renderbuffer: Option<Self::Renderbuffer>,
+    ) {
+        let renderbuffers = self.renderbuffers.borrow();
+        let raw_renderbuffer = renderbuffer.map(|r| renderbuffers.1.get_unchecked(r));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Framebuffer renderbuffer is not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.framebuffer_renderbuffer(
+                target as u32,
+                attachment,
+                renderbuffer_target as u32,
+                raw_renderbuffer,
+            ),
+        }
+    }
+
+    unsafe fn framebuffer_texture(
+        &self,
+        _target: FramebufferTarget,
+        _attachment: u32,
+        _texture: Option<Self::Texture>,
+        _level: i32,
+    ) {
+        panic!("Framebuffer texture is not supported");
+    }
+
+    unsafe fn framebuffer_texture_layer(
+        &self,
+        target: FramebufferTarget,
+        attachment: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+        layer: i32,
+    ) {
+        let textures = self.textures.borrow();
+        let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Framebuffer texture layer is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.framebuffer_texture_layer(target as u32, attachment, raw_texture, level, layer)
+            }
         }
     }
 
@@ -741,9 +887,9 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn color_mask_i(
+    unsafe fn color_mask_draw_buffer(
         &self,
-        _buffer: u32,
+        _draw_buffer: u32,
         _red: bool,
         _green: bool,
         _blue: bool,
@@ -791,7 +937,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn bind_texture(&self, target: TextureBindingTarget, texture: Option<Self::Texture>) {
+    unsafe fn bind_texture(&self, target: TextureTarget, texture: Option<Self::Texture>) {
         let textures = self.textures.borrow();
         let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
         match self.raw {
@@ -837,7 +983,7 @@ impl super::Context for Context {
 
     unsafe fn tex_parameter_f32(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         value: f32,
     ) {
@@ -853,7 +999,7 @@ impl super::Context for Context {
 
     unsafe fn tex_parameter_i32(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         value: i32,
     ) {
@@ -869,7 +1015,7 @@ impl super::Context for Context {
 
     unsafe fn tex_parameter_f32_slice(
         &self,
-        _target: TextureBindingTarget,
+        _target: TextureTarget,
         _parameter: TextureParameter,
         _values: &[f32],
     ) {
@@ -879,7 +1025,7 @@ impl super::Context for Context {
 
     unsafe fn tex_parameter_i32_slice(
         &self,
-        _target: TextureBindingTarget,
+        _target: TextureTarget,
         _parameter: TextureParameter,
         _values: &[i32],
     ) {
@@ -888,7 +1034,7 @@ impl super::Context for Context {
 
     unsafe fn tex_sub_image_2d_u8_slice(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         level: i32,
         x_offset: i32,
         y_offset: i32,
@@ -916,7 +1062,7 @@ impl super::Context for Context {
 
     unsafe fn tex_sub_image_2d_pixel_buffer_offset(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         level: i32,
         x_offset: i32,
         y_offset: i32,
@@ -962,7 +1108,11 @@ impl super::Context for Context {
     }
 
     unsafe fn depth_range_f64(&self, _near: f64, _far: f64) {
-        panic!("64-bit float precision is not supported in WebGL");
+        panic!("Depth range with 64-bit float values is not supported");
+    }
+
+    unsafe fn depth_range_f64_slice(&self, _first: u32, _count: i32, _values: &[[f64; 2]]) {
+        panic!("Depth range with 64-bit float slices is not supported");
     }
 
     unsafe fn scissor(&self, x: i32, y: i32, width: i32, height: i32) {
@@ -1041,6 +1191,10 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn viewport_f32_slice(&self, _first: u32, _count: i32, _values: &[[f32; 4]]) {
+        panic!("Viewport `f32` slice is not supported");
+    }
+
     unsafe fn blend_func(&self, src: BlendFactor, dst: BlendFactor) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.blend_func(src as u32, dst as u32),
@@ -1048,7 +1202,12 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn blend_func_i(&self, _buffer: u32, _src: BlendFactor, _dst: BlendFactor) {
+    unsafe fn blend_func_draw_buffer(
+        &self,
+        _draw_buffer: u32,
+        _src: BlendFactor,
+        _dst: BlendFactor,
+    ) {
         panic!("Draw buffer blend func is not supported");
     }
 
@@ -1075,9 +1234,9 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn blend_func_separate_i(
+    unsafe fn blend_func_separate_draw_buffer(
         &self,
-        _buffer: u32,
+        _draw_buffer: u32,
         _src_rgb: BlendFactor,
         _dst_rgb: BlendFactor,
         _src_alpha: BlendFactor,
@@ -1093,7 +1252,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn blend_equation_i(&self, _buffer: u32, _mode: BlendMode) {
+    unsafe fn blend_equation_draw_buffer(&self, _draw_buffer: u32, _mode: BlendMode) {
         panic!("Draw buffer blend equation is not supported");
     }
 
@@ -1108,9 +1267,9 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn blend_equation_separate_i(
+    unsafe fn blend_equation_separate_draw_buffer(
         &self,
-        _buffer: u32,
+        _draw_buffer: u32,
         _mode_rgb: BlendMode,
         _mode_alpha: BlendMode,
     ) {

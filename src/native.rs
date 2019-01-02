@@ -120,7 +120,7 @@ impl super::Context for Context {
 
     unsafe fn get_tex_image(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         level: i32,
         format: TextureFormat,
         ty: TextureType,
@@ -194,14 +194,14 @@ impl super::Context for Context {
         Ok(buffer)
     }
 
-    unsafe fn bind_buffer(&self, target: BufferBindingTarget, buffer: Option<Self::Buffer>) {
+    unsafe fn bind_buffer(&self, target: BufferTarget, buffer: Option<Self::Buffer>) {
         let gl = &self.raw;
         gl.BindBuffer(target as u32, buffer.unwrap_or(0));
     }
 
     unsafe fn bind_buffer_range(
         &self,
-        target: BufferBindingTarget,
+        target: BufferTarget,
         index: u32,
         buffer: Option<Self::Buffer>,
         offset: i32,
@@ -219,7 +219,7 @@ impl super::Context for Context {
 
     unsafe fn bind_framebuffer(
         &self,
-        target: FramebufferBindingTarget,
+        target: FramebufferTarget,
         framebuffer: Option<Self::Framebuffer>,
     ) {
         let gl = &self.raw;
@@ -288,6 +288,65 @@ impl super::Context for Context {
         gl.PixelStorei(parameter as u32, value as i32);
     }
 
+    unsafe fn clear_buffer_i32_slice(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        values: &mut [i32],
+    ) {
+        let gl = &self.raw;
+        gl.ClearBufferiv(target as u32, draw_buffer as i32, values.as_ptr());
+    }
+
+    unsafe fn clear_buffer_u32_slice(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        values: &mut [u32],
+    ) {
+        let gl = &self.raw;
+        gl.ClearBufferuiv(target as u32, draw_buffer as i32, values.as_ptr());
+    }
+
+    unsafe fn clear_buffer_f32_slice(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        values: &mut [f32],
+    ) {
+        let gl = &self.raw;
+        gl.ClearBufferfv(target as u32, draw_buffer as i32, values.as_ptr());
+    }
+
+    unsafe fn clear_buffer_depth_stencil(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        depth: f32,
+        stencil: i32,
+    ) {
+        let gl = &self.raw;
+        gl.ClearBufferfi(target as u32, draw_buffer as i32, depth, stencil);
+    }
+
+    unsafe fn copy_buffer_sub_data(
+        &self,
+        src_target: BufferTarget,
+        dst_target: BufferTarget,
+        src_offset: i32,
+        dst_offset: i32,
+        size: i32,
+    ) {
+        let gl = &self.raw;
+        gl.CopyBufferSubData(
+            src_target as u32,
+            dst_target as u32,
+            src_offset as isize,
+            dst_offset as isize,
+            size as isize,
+        );
+    }
+
     unsafe fn delete_buffer(&self, buffer: Self::Buffer) {
         let gl = &self.raw;
         gl.DeleteBuffers(1, &buffer);
@@ -323,14 +382,24 @@ impl super::Context for Context {
         gl.Disable(parameter as u32);
     }
 
-    unsafe fn disable_i(&self, parameter: Parameter, buffer: u32) {
+    unsafe fn disable_draw_buffer(&self, parameter: Parameter, draw_buffer: u32) {
         let gl = &self.raw;
-        gl.Disablei(buffer, parameter as u32);
+        gl.Disablei(draw_buffer, parameter as u32);
     }
 
     unsafe fn disable_vertex_attrib_array(&self, index: u32) {
         let gl = &self.raw;
         gl.DisableVertexAttribArray(index);
+    }
+
+    unsafe fn dispatch_compute(&self, groups_x: u32, groups_y: u32, groups_z: u32) {
+        let gl = &self.raw;
+        gl.DispatchCompute(groups_x, groups_y, groups_z);
+    }
+
+    unsafe fn dispatch_compute_indirect(&self, offset: i32) {
+        let gl = &self.raw;
+        gl.DispatchComputeIndirect(offset as isize);
     }
 
     unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
@@ -367,9 +436,9 @@ impl super::Context for Context {
         );
     }
 
-    unsafe fn draw_buffer(&self, buffer: u32) {
+    unsafe fn draw_buffer(&self, draw_buffer: u32) {
         let gl = &self.raw;
-        gl.DrawBuffer(buffer);
+        gl.DrawBuffer(draw_buffer);
     }
 
     unsafe fn draw_buffers(&self, buffers: &[u32]) {
@@ -476,9 +545,9 @@ impl super::Context for Context {
         gl.Enable(parameter as u32);
     }
 
-    unsafe fn enable_i(&self, parameter: Parameter, buffer: u32) {
+    unsafe fn enable_draw_buffer(&self, parameter: Parameter, draw_buffer: u32) {
         let gl = &self.raw;
-        gl.Enablei(buffer, parameter as u32);
+        gl.Enablei(draw_buffer, parameter as u32);
     }
 
     unsafe fn enable_vertex_attrib_array(&self, index: u32) {
@@ -489,6 +558,51 @@ impl super::Context for Context {
     unsafe fn flush(&self) {
         let gl = &self.raw;
         gl.Flush();
+    }
+
+    unsafe fn framebuffer_renderbuffer(
+        &self,
+        target: FramebufferTarget,
+        attachment: u32,
+        renderbuffer_target: RenderbufferTarget,
+        renderbuffer: Option<Self::Renderbuffer>,
+    ) {
+        let gl = &self.raw;
+        gl.FramebufferRenderbuffer(
+            target as u32,
+            attachment,
+            renderbuffer_target as u32,
+            renderbuffer.unwrap_or(0),
+        );
+    }
+
+    unsafe fn framebuffer_texture(
+        &self,
+        target: FramebufferTarget,
+        attachment: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+    ) {
+        let gl = &self.raw;
+        gl.FramebufferTexture(target as u32, attachment, texture.unwrap_or(0), level);
+    }
+
+    unsafe fn framebuffer_texture_layer(
+        &self,
+        target: FramebufferTarget,
+        attachment: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+        layer: i32,
+    ) {
+        let gl = &self.raw;
+        gl.FramebufferTextureLayer(
+            target as u32,
+            attachment,
+            texture.unwrap_or(0),
+            level,
+            layer,
+        );
     }
 
     unsafe fn front_face(&self, value: FrontFace) {
@@ -511,9 +625,16 @@ impl super::Context for Context {
         gl.ColorMask(red as u8, green as u8, blue as u8, alpha as u8);
     }
 
-    unsafe fn color_mask_i(&self, buffer: u32, red: bool, green: bool, blue: bool, alpha: bool) {
+    unsafe fn color_mask_draw_buffer(
+        &self,
+        draw_buffer: u32,
+        red: bool,
+        green: bool,
+        blue: bool,
+        alpha: bool,
+    ) {
         let gl = &self.raw;
-        gl.ColorMaski(buffer, red as u8, green as u8, blue as u8, alpha as u8);
+        gl.ColorMaski(draw_buffer, red as u8, green as u8, blue as u8, alpha as u8);
     }
 
     unsafe fn depth_mask(&self, value: bool) {
@@ -546,7 +667,7 @@ impl super::Context for Context {
         gl.Finish();
     }
 
-    unsafe fn bind_texture(&self, target: TextureBindingTarget, texture: Option<Self::Texture>) {
+    unsafe fn bind_texture(&self, target: TextureTarget, texture: Option<Self::Texture>) {
         let gl = &self.raw;
         gl.BindTexture(target.0, texture.unwrap_or(0));
     }
@@ -572,7 +693,7 @@ impl super::Context for Context {
 
     unsafe fn tex_parameter_f32(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         value: f32,
     ) {
@@ -582,7 +703,7 @@ impl super::Context for Context {
 
     unsafe fn tex_parameter_i32(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         value: i32,
     ) {
@@ -592,7 +713,7 @@ impl super::Context for Context {
 
     unsafe fn tex_parameter_f32_slice(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         values: &[f32],
     ) {
@@ -602,7 +723,7 @@ impl super::Context for Context {
 
     unsafe fn tex_parameter_i32_slice(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         values: &[i32],
     ) {
@@ -612,7 +733,7 @@ impl super::Context for Context {
 
     unsafe fn tex_sub_image_2d_u8_slice(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         level: i32,
         x_offset: i32,
         y_offset: i32,
@@ -638,7 +759,7 @@ impl super::Context for Context {
 
     unsafe fn tex_sub_image_2d_pixel_buffer_offset(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         level: i32,
         x_offset: i32,
         y_offset: i32,
@@ -675,6 +796,11 @@ impl super::Context for Context {
     unsafe fn depth_range_f64(&self, near: f64, far: f64) {
         let gl = &self.raw;
         gl.DepthRange(near, far);
+    }
+
+    unsafe fn depth_range_f64_slice(&self, first: u32, count: i32, values: &[[f64; 2]]) {
+        let gl = &self.raw;
+        gl.DepthRangeArrayv(first, count, values.as_ptr() as *const f64);
     }
 
     unsafe fn scissor(&self, x: i32, y: i32, width: i32, height: i32) {
@@ -748,14 +874,19 @@ impl super::Context for Context {
         gl.Viewport(x, y, width, height);
     }
 
+    unsafe fn viewport_f32_slice(&self, first: u32, count: i32, values: &[[f32; 4]]) {
+        let gl = &self.raw;
+        gl.ViewportArrayv(first, count, values.as_ptr() as *const f32);
+    }
+
     unsafe fn blend_equation(&self, mode: BlendMode) {
         let gl = &self.raw;
         gl.BlendEquation(mode as u32);
     }
 
-    unsafe fn blend_equation_i(&self, buffer: u32, mode: BlendMode) {
+    unsafe fn blend_equation_draw_buffer(&self, draw_buffer: u32, mode: BlendMode) {
         let gl = &self.raw;
-        gl.BlendEquationi(buffer, mode as u32);
+        gl.BlendEquationi(draw_buffer, mode as u32);
     }
 
     unsafe fn blend_equation_separate(&self, mode_rgb: BlendMode, mode_alpha: BlendMode) {
@@ -763,14 +894,14 @@ impl super::Context for Context {
         gl.BlendEquationSeparate(mode_rgb as u32, mode_alpha as u32);
     }
 
-    unsafe fn blend_equation_separate_i(
+    unsafe fn blend_equation_separate_draw_buffer(
         &self,
-        buffer: u32,
+        draw_buffer: u32,
         mode_rgb: BlendMode,
         mode_alpha: BlendMode,
     ) {
         let gl = &self.raw;
-        gl.BlendEquationSeparatei(buffer, mode_rgb as u32, mode_alpha as u32);
+        gl.BlendEquationSeparatei(draw_buffer, mode_rgb as u32, mode_alpha as u32);
     }
 
     unsafe fn blend_func(&self, src: BlendFactor, dst: BlendFactor) {
@@ -778,9 +909,9 @@ impl super::Context for Context {
         gl.BlendFunc(src as u32, dst as u32);
     }
 
-    unsafe fn blend_func_i(&self, buffer: u32, src: BlendFactor, dst: BlendFactor) {
+    unsafe fn blend_func_draw_buffer(&self, draw_buffer: u32, src: BlendFactor, dst: BlendFactor) {
         let gl = &self.raw;
-        gl.BlendFunci(buffer, src as u32, dst as u32);
+        gl.BlendFunci(draw_buffer, src as u32, dst as u32);
     }
 
     unsafe fn blend_func_separate(
@@ -799,9 +930,9 @@ impl super::Context for Context {
         );
     }
 
-    unsafe fn blend_func_separate_i(
+    unsafe fn blend_func_separate_draw_buffer(
         &self,
-        buffer: u32,
+        draw_buffer: u32,
         src_rgb: BlendFactor,
         dst_rgb: BlendFactor,
         src_alpha: BlendFactor,
@@ -809,7 +940,7 @@ impl super::Context for Context {
     ) {
         let gl = &self.raw;
         gl.BlendFuncSeparatei(
-            buffer,
+            draw_buffer,
             src_rgb as u32,
             dst_rgb as u32,
             src_alpha as u32,

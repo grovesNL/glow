@@ -96,7 +96,7 @@ pub enum Parameter {
 
 /// A buffer binding target.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum BufferBindingTarget {
+pub enum BufferTarget {
     /// Vertex attributes.
     Array = 0x8892,
     /// Atomic counter storage.
@@ -129,10 +129,10 @@ pub enum BufferBindingTarget {
 
 /// A framebuffer binding target.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum FramebufferBindingTarget {
-    DrawFramebuffer,
-    ReadFramebuffer,
-    Framebuffer,
+pub enum FramebufferTarget {
+    DrawFramebuffer = 0x8CA9,
+    ReadFramebuffer = 0x8CA8,
+    Framebuffer = 0x8D40,
 }
 
 /// The kind of primitive to render.
@@ -202,27 +202,27 @@ pub enum PolygonMode {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct TextureBindingTarget(u32);
+pub struct TextureTarget(u32);
 
 #[allow(non_camel_case_types)]
-impl TextureBindingTarget {
-    pub const D1: TextureBindingTarget = TextureBindingTarget(0x0DE0);
-    pub const D2: TextureBindingTarget = TextureBindingTarget(0x0DE1);
-    pub const D3: TextureBindingTarget = TextureBindingTarget(0x806F);
-    pub const D1_ARRAY: TextureBindingTarget = TextureBindingTarget(0x8C18);
-    pub const D2_ARRAY: TextureBindingTarget = TextureBindingTarget(0x8C1A);
-    pub const RECTANGLE: TextureBindingTarget = TextureBindingTarget(0x84F5);
-    pub const CUBE_MAP: TextureBindingTarget = TextureBindingTarget(0x8513);
-    pub const CUBE_MAP_ARRAY: TextureBindingTarget = TextureBindingTarget(0x9009);
-    pub const CUBE_MAP_POSITIVE_X: TextureBindingTarget = TextureBindingTarget(0x8515);
-    pub const CUBE_MAP_NEGATIVE_X: TextureBindingTarget = TextureBindingTarget(0x8516);
-    pub const CUBE_MAP_POSITIVE_Y: TextureBindingTarget = TextureBindingTarget(0x8517);
-    pub const CUBE_MAP_NEGATIVE_Y: TextureBindingTarget = TextureBindingTarget(0x8518);
-    pub const CUBE_MAP_POSITIVE_Z: TextureBindingTarget = TextureBindingTarget(0x8519);
-    pub const CUBE_MAP_NEGATIVE_Z: TextureBindingTarget = TextureBindingTarget(0x851A);
-    pub const BUFFER: TextureBindingTarget = TextureBindingTarget(0x8C2A);
-    pub const D2_MULTISAMPLE: TextureBindingTarget = TextureBindingTarget(0x9100);
-    pub const D2_MULTISAMPLE_ARRAY: TextureBindingTarget = TextureBindingTarget(0x9102);
+impl TextureTarget {
+    pub const D1: TextureTarget = TextureTarget(0x0DE0);
+    pub const D2: TextureTarget = TextureTarget(0x0DE1);
+    pub const D3: TextureTarget = TextureTarget(0x806F);
+    pub const D1_ARRAY: TextureTarget = TextureTarget(0x8C18);
+    pub const D2_ARRAY: TextureTarget = TextureTarget(0x8C1A);
+    pub const RECTANGLE: TextureTarget = TextureTarget(0x84F5);
+    pub const CUBE_MAP: TextureTarget = TextureTarget(0x8513);
+    pub const CUBE_MAP_ARRAY: TextureTarget = TextureTarget(0x9009);
+    pub const CUBE_MAP_POSITIVE_X: TextureTarget = TextureTarget(0x8515);
+    pub const CUBE_MAP_NEGATIVE_X: TextureTarget = TextureTarget(0x8516);
+    pub const CUBE_MAP_POSITIVE_Y: TextureTarget = TextureTarget(0x8517);
+    pub const CUBE_MAP_NEGATIVE_Y: TextureTarget = TextureTarget(0x8518);
+    pub const CUBE_MAP_POSITIVE_Z: TextureTarget = TextureTarget(0x8519);
+    pub const CUBE_MAP_NEGATIVE_Z: TextureTarget = TextureTarget(0x851A);
+    pub const BUFFER: TextureTarget = TextureTarget(0x8C2A);
+    pub const D2_MULTISAMPLE: TextureTarget = TextureTarget(0x9100);
+    pub const D2_MULTISAMPLE_ARRAY: TextureTarget = TextureTarget(0x9102);
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -395,6 +395,19 @@ pub enum ElementType {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum FramebufferBufferTarget {
+    Color = 0x1800,
+    Depth = 0x1801,
+    Stencil = 0x1802,
+    DepthStencil = 0x84F9,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum RenderbufferTarget {
+    Renderbuffer = 0x8D41,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum PatchParameterI32 {
     Vertices = 0x8E72,
     DefaultOuterLevel = 0x8E73,
@@ -507,7 +520,7 @@ pub trait Context {
 
     unsafe fn get_tex_image(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         level: i32,
         format: TextureFormat,
         ty: TextureType,
@@ -532,11 +545,11 @@ pub trait Context {
 
     unsafe fn create_buffer(&self) -> Result<Self::Buffer, String>;
 
-    unsafe fn bind_buffer(&self, target: BufferBindingTarget, buffer: Option<Self::Buffer>);
+    unsafe fn bind_buffer(&self, target: BufferTarget, buffer: Option<Self::Buffer>);
 
     unsafe fn bind_buffer_range(
         &self,
-        target: BufferBindingTarget,
+        target: BufferTarget,
         index: u32,
         buffer: Option<Self::Buffer>,
         offset: i32,
@@ -545,7 +558,7 @@ pub trait Context {
 
     unsafe fn bind_framebuffer(
         &self,
-        target: FramebufferBindingTarget,
+        target: FramebufferTarget,
         framebuffer: Option<Self::Framebuffer>,
     );
 
@@ -573,6 +586,44 @@ pub trait Context {
 
     unsafe fn pixel_store_bool(&self, parameter: PixelStoreParameterBool, value: bool);
 
+    unsafe fn clear_buffer_i32_slice(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        values: &mut [i32],
+    );
+
+    unsafe fn clear_buffer_u32_slice(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        values: &mut [u32],
+    );
+
+    unsafe fn clear_buffer_f32_slice(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        values: &mut [f32],
+    );
+
+    unsafe fn clear_buffer_depth_stencil(
+        &self,
+        target: FramebufferBufferTarget,
+        draw_buffer: u32,
+        depth: f32,
+        stencil: i32,
+    );
+
+    unsafe fn copy_buffer_sub_data(
+        &self,
+        src_target: BufferTarget,
+        dst_target: BufferTarget,
+        src_offset: i32,
+        dst_offset: i32,
+        size: i32,
+    );
+
     unsafe fn delete_buffer(&self, buffer: Self::Buffer);
 
     unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer);
@@ -587,9 +638,13 @@ pub trait Context {
 
     unsafe fn disable(&self, parameter: Parameter);
 
-    unsafe fn disable_i(&self, parameter: Parameter, buffer: u32);
+    unsafe fn disable_draw_buffer(&self, parameter: Parameter, draw_buffer: u32);
 
     unsafe fn disable_vertex_attrib_array(&self, index: u32);
+
+    unsafe fn dispatch_compute(&self, groups_x: u32, groups_y: u32, groups_z: u32);
+
+    unsafe fn dispatch_compute_indirect(&self, offset: i32);
 
     unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32);
 
@@ -663,11 +718,36 @@ pub trait Context {
 
     unsafe fn enable(&self, parameter: Parameter);
 
-    unsafe fn enable_i(&self, parameter: Parameter, buffer: u32);
+    unsafe fn enable_draw_buffer(&self, parameter: Parameter, draw_buffer: u32);
 
     unsafe fn enable_vertex_attrib_array(&self, index: u32);
 
     unsafe fn flush(&self);
+
+    unsafe fn framebuffer_renderbuffer(
+        &self,
+        target: FramebufferTarget,
+        attachment: u32,
+        renderbuffer_target: RenderbufferTarget,
+        renderbuffer: Option<Self::Renderbuffer>,
+    );
+
+    unsafe fn framebuffer_texture(
+        &self,
+        target: FramebufferTarget,
+        attachment: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+    );
+
+    unsafe fn framebuffer_texture_layer(
+        &self,
+        target: FramebufferTarget,
+        attachment: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+        layer: i32,
+    );
 
     unsafe fn front_face(&self, value: FrontFace);
 
@@ -677,7 +757,14 @@ pub trait Context {
 
     unsafe fn color_mask(&self, red: bool, green: bool, blue: bool, alpha: bool);
 
-    unsafe fn color_mask_i(&self, buffer: u32, red: bool, green: bool, blue: bool, alpha: bool);
+    unsafe fn color_mask_draw_buffer(
+        &self,
+        buffer: u32,
+        red: bool,
+        green: bool,
+        blue: bool,
+        alpha: bool,
+    );
 
     unsafe fn depth_mask(&self, value: bool);
 
@@ -691,7 +778,7 @@ pub trait Context {
 
     unsafe fn finish(&self);
 
-    unsafe fn bind_texture(&self, target: TextureBindingTarget, texture: Option<Self::Texture>);
+    unsafe fn bind_texture(&self, target: TextureTarget, texture: Option<Self::Texture>);
 
     unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>);
 
@@ -705,35 +792,35 @@ pub trait Context {
 
     unsafe fn tex_parameter_f32(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         value: f32,
     );
 
     unsafe fn tex_parameter_i32(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         value: i32,
     );
 
     unsafe fn tex_parameter_f32_slice(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         values: &[f32],
     );
 
     unsafe fn tex_parameter_i32_slice(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         parameter: TextureParameter,
         values: &[i32],
     );
 
     unsafe fn tex_sub_image_2d_u8_slice(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         level: i32,
         x_offset: i32,
         y_offset: i32,
@@ -746,7 +833,7 @@ pub trait Context {
 
     unsafe fn tex_sub_image_2d_pixel_buffer_offset(
         &self,
-        target: TextureBindingTarget,
+        target: TextureTarget,
         level: i32,
         x_offset: i32,
         y_offset: i32,
@@ -762,6 +849,8 @@ pub trait Context {
     unsafe fn depth_range_f32(&self, near: f32, far: f32);
 
     unsafe fn depth_range_f64(&self, near: f64, far: f64);
+
+    unsafe fn depth_range_f64_slice(&self, first: u32, count: i32, values: &[[f64; 2]]);
 
     unsafe fn scissor(&self, x: i32, y: i32, width: i32, height: i32);
 
@@ -797,13 +886,15 @@ pub trait Context {
 
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32);
 
+    unsafe fn viewport_f32_slice(&self, first: u32, count: i32, values: &[[f32; 4]]);
+
     unsafe fn blend_equation(&self, mode: BlendMode);
 
-    unsafe fn blend_equation_i(&self, buffer: u32, mode: BlendMode);
+    unsafe fn blend_equation_draw_buffer(&self, draw_buffer: u32, mode: BlendMode);
 
     unsafe fn blend_equation_separate(&self, mode_rgb: BlendMode, mode_alpha: BlendMode);
 
-    unsafe fn blend_equation_separate_i(
+    unsafe fn blend_equation_separate_draw_buffer(
         &self,
         buffer: u32,
         mode_rgb: BlendMode,
@@ -812,7 +903,7 @@ pub trait Context {
 
     unsafe fn blend_func(&self, src: BlendFactor, dst: BlendFactor);
 
-    unsafe fn blend_func_i(&self, buffer: u32, src: BlendFactor, dst: BlendFactor);
+    unsafe fn blend_func_draw_buffer(&self, draw_buffer: u32, src: BlendFactor, dst: BlendFactor);
 
     unsafe fn blend_func_separate(
         &self,
@@ -822,9 +913,9 @@ pub trait Context {
         dst_alpha: BlendFactor,
     );
 
-    unsafe fn blend_func_separate_i(
+    unsafe fn blend_func_separate_draw_buffer(
         &self,
-        buffer: u32,
+        draw_buffer: u32,
         src_rgb: BlendFactor,
         dst_rgb: BlendFactor,
         src_alpha: BlendFactor,

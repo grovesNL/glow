@@ -383,6 +383,15 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn bind_renderbuffer(&self, target: RenderbufferTarget, renderbuffer: Option<Self::Renderbuffer>) {
+        let renderbuffers = self.renderbuffers.borrow();
+        let raw_renderbuffer = renderbuffer.map(|r| renderbuffers.1.get_unchecked(r));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_renderbuffer(target as u32, raw_renderbuffer),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_renderbuffer(target as u32, raw_renderbuffer),
+        }
+    }
+
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let raw_vertex_array = match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
@@ -547,6 +556,15 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn client_wait_sync(
+        &self,
+        _fence: Self::Fence,
+        _flags: ClientWaitSyncFlags,
+        _timeout: i32,
+    ) -> ClientWaitSyncStatus {
+        panic!("Client wait sync is not supported")
+    }
+
     unsafe fn copy_buffer_sub_data(
         &self,
         src_target: BufferTarget,
@@ -634,14 +652,14 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn disable(&self, parameter: Parameter) {
+    unsafe fn disable(&self, parameter: EnableParameter) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.disable(parameter as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.disable(parameter as u32),
         }
     }
 
-    unsafe fn disable_draw_buffer(&self, _parameter: Parameter, _draw_buffer: u32) {
+    unsafe fn disable_draw_buffer(&self, _parameter: EnableParameter, _draw_buffer: u32) {
         panic!("Draw buffer disable is not supported");
     }
 
@@ -782,14 +800,14 @@ impl super::Context for Context {
         panic!("Draw elements instanced base vertex base instance is not supported");
     }
 
-    unsafe fn enable(&self, parameter: Parameter) {
+    unsafe fn enable(&self, parameter: EnableParameter) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.enable(parameter as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.enable(parameter as u32),
         }
     }
 
-    unsafe fn enable_draw_buffer(&self, _parameter: Parameter, _draw_buffer: u32) {
+    unsafe fn enable_draw_buffer(&self, _parameter: EnableParameter, _draw_buffer: u32) {
         panic!("Draw buffer enable is not supported");
     }
 
@@ -870,6 +888,31 @@ impl super::Context for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_error(),
             RawRenderingContext::WebGl2(ref gl) => gl.get_error(),
+        }
+    }
+
+    unsafe fn get_parameter_indexed_i32(
+        &self,
+        parameter: GetParameterIndexed,
+        index: u32,
+    ) -> i32 {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Get parameter indexed is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_indexed_parameter(parameter as u32, index),
+        }
+        .unwrap()
+        .as_f64()
+        .unwrap() as i32
+    }
+
+    unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
+        let fences = self.fences.borrow();
+        let raw_fence = fence.map(|f| fences.1.get_unchecked(f));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Sync is not supported")
+            },
+            RawRenderingContext::WebGl2(ref gl) => gl.is_sync(raw_fence),
         }
     }
 

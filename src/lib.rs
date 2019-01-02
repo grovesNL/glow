@@ -21,7 +21,7 @@ pub enum ShaderType {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum Parameter {
+pub enum EnableParameter {
     /// If enabled, blend the computed fragment color values with the values in the color buffers.
     Blend = 0x0BE2,
     /// If enabled, clip geometry against user-defined half space 0.
@@ -92,6 +92,12 @@ pub enum Parameter {
     TextureCubeMapSeamless = 0x884F,
     /// If enabled and a vertex or geometry shader is active, then the derived point size is taken from the (potentially clipped) shader builtin gl_PointSize and clamped to the implementation-dependent point size range.
     ProgramPointSize = 0x8642,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum GetParameterIndexed {
+    MaxComputeWorkGroupCount = 0x91BE,
+    MaxComputeWorkGroupSize = 0x91BF,
 }
 
 /// A buffer binding target.
@@ -344,6 +350,36 @@ bitflags! {
     }
 }
 
+bitflags! {
+    pub struct ClientWaitSyncFlags: u32 {
+        const FlushCommands = 0x00000001;
+    }
+}
+
+pub enum ClientWaitSyncStatus {
+    /// Indicates that sync was signaled at the time that glClientWaitSync was called.
+    AlreadySignaled = 0x911A,
+    /// Indicates that at least timeout nanoseconds passed and sync did not become signaled.
+    TimeoutExpired = 0x911B,
+    /// Indicates that sync was signaled before the timeout expired.
+    ConditionSatisfied = 0x911C,
+    /// Indicates that an error occurred. Additionally, an OpenGL error will be generated.
+    WaitFailed = 0x911D,
+}
+
+impl ClientWaitSyncStatus {
+    #[allow(unused)]
+    fn from_u32(value: u32) -> ClientWaitSyncStatus {
+        match value {
+            0x911A => ClientWaitSyncStatus::AlreadySignaled,
+            0x911B => ClientWaitSyncStatus::TimeoutExpired,
+            0x911C => ClientWaitSyncStatus::ConditionSatisfied,
+            0x911D => ClientWaitSyncStatus::WaitFailed,
+            _ => panic!("Unknown client wait sync status: {}", value),
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum FenceSyncCondition {
     GpuCommandsComplete = 0x9117,
@@ -562,6 +598,8 @@ pub trait Context {
         framebuffer: Option<Self::Framebuffer>,
     );
 
+    unsafe fn bind_renderbuffer(&self, target: RenderbufferTarget, renderbuffer: Option<Self::Renderbuffer>);
+
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String>;
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray);
@@ -615,6 +653,8 @@ pub trait Context {
         stencil: i32,
     );
 
+    unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: ClientWaitSyncFlags, timeout: i32) -> ClientWaitSyncStatus;
+
     unsafe fn copy_buffer_sub_data(
         &self,
         src_target: BufferTarget,
@@ -636,9 +676,9 @@ pub trait Context {
 
     unsafe fn delete_texture(&self, texture: Self::Texture);
 
-    unsafe fn disable(&self, parameter: Parameter);
+    unsafe fn disable(&self, parameter: EnableParameter);
 
-    unsafe fn disable_draw_buffer(&self, parameter: Parameter, draw_buffer: u32);
+    unsafe fn disable_draw_buffer(&self, parameter: EnableParameter, draw_buffer: u32);
 
     unsafe fn disable_vertex_attrib_array(&self, index: u32);
 
@@ -716,9 +756,9 @@ pub trait Context {
         base_instance: u32,
     );
 
-    unsafe fn enable(&self, parameter: Parameter);
+    unsafe fn enable(&self, parameter: EnableParameter);
 
-    unsafe fn enable_draw_buffer(&self, parameter: Parameter, draw_buffer: u32);
+    unsafe fn enable_draw_buffer(&self, parameter: EnableParameter, draw_buffer: u32);
 
     unsafe fn enable_vertex_attrib_array(&self, index: u32);
 
@@ -752,6 +792,10 @@ pub trait Context {
     unsafe fn front_face(&self, value: FrontFace);
 
     unsafe fn get_error(&self) -> u32;
+
+    unsafe fn get_parameter_indexed_i32(&self, parameter: GetParameterIndexed, index: u32) -> i32;
+
+    unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool;
 
     unsafe fn cull_face(&self, value: Face);
 

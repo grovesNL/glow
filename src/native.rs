@@ -226,6 +226,15 @@ impl super::Context for Context {
         gl.BindFramebuffer(target as u32, framebuffer.unwrap_or(0));
     }
 
+    unsafe fn bind_renderbuffer(
+        &self,
+        target: RenderbufferTarget,
+        renderbuffer: Option<Self::Renderbuffer>,
+    ) {
+        let gl = &self.raw;
+        gl.BindRenderbuffer(target as u32, renderbuffer.unwrap_or(0));
+    }
+
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let gl = &self.raw;
         let mut vertex_array = 0;
@@ -329,6 +338,16 @@ impl super::Context for Context {
         gl.ClearBufferfi(target as u32, draw_buffer as i32, depth, stencil);
     }
 
+    unsafe fn client_wait_sync(
+        &self,
+        fence: Self::Fence,
+        flags: ClientWaitSyncFlags,
+        timeout: i32,
+    ) -> ClientWaitSyncStatus {
+        let gl = &self.raw;
+        ClientWaitSyncStatus::from_u32(gl.ClientWaitSync(fence, flags.bits(), timeout as u64))
+    }
+
     unsafe fn copy_buffer_sub_data(
         &self,
         src_target: BufferTarget,
@@ -377,12 +396,12 @@ impl super::Context for Context {
         gl.DeleteTextures(1, &texture);
     }
 
-    unsafe fn disable(&self, parameter: Parameter) {
+    unsafe fn disable(&self, parameter: EnableParameter) {
         let gl = &self.raw;
         gl.Disable(parameter as u32);
     }
 
-    unsafe fn disable_draw_buffer(&self, parameter: Parameter, draw_buffer: u32) {
+    unsafe fn disable_draw_buffer(&self, parameter: EnableParameter, draw_buffer: u32) {
         let gl = &self.raw;
         gl.Disablei(draw_buffer, parameter as u32);
     }
@@ -540,12 +559,12 @@ impl super::Context for Context {
         );
     }
 
-    unsafe fn enable(&self, parameter: Parameter) {
+    unsafe fn enable(&self, parameter: EnableParameter) {
         let gl = &self.raw;
         gl.Enable(parameter as u32);
     }
 
-    unsafe fn enable_draw_buffer(&self, parameter: Parameter, draw_buffer: u32) {
+    unsafe fn enable_draw_buffer(&self, parameter: EnableParameter, draw_buffer: u32) {
         let gl = &self.raw;
         gl.Enablei(draw_buffer, parameter as u32);
     }
@@ -613,6 +632,22 @@ impl super::Context for Context {
     unsafe fn get_error(&self) -> u32 {
         let gl = &self.raw;
         gl.GetError()
+    }
+
+    unsafe fn get_parameter_indexed_i32(
+        &self,
+        parameter: GetParameterIndexed,
+        index: u32,
+    ) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetIntegeri_v(parameter as u32, index, &mut value);
+        value
+    }
+
+    unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
+        let gl = &self.raw;
+        1 == gl.IsSync(fence.unwrap_or(0 as *const _))
     }
 
     unsafe fn cull_face(&self, value: Face) {

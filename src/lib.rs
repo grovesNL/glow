@@ -97,7 +97,7 @@ pub trait Context {
         level: i32,
         format: u32,
         ty: u32,
-        pixels: *mut std::ffi::c_void,
+        pixels: Option<&mut [u8]>,
     );
 
     unsafe fn create_program(&self) -> Result<Self::Program, String>;
@@ -156,6 +156,8 @@ pub trait Context {
     unsafe fn pixel_store_i32(&self, parameter: u32, value: i32);
 
     unsafe fn pixel_store_bool(&self, parameter: u32, value: bool);
+
+    unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&mut [u8]>, flags: u32);
 
     unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]);
 
@@ -286,6 +288,15 @@ pub trait Context {
         level: i32,
     );
 
+    unsafe fn framebuffer_texture_2d(
+        &self,
+        target: u32,
+        attachment: u32,
+        texture_target: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+    );
+
     unsafe fn framebuffer_texture_layer(
         &self,
         target: u32,
@@ -308,6 +319,38 @@ pub trait Context {
     unsafe fn get_parameter_string(&self, parameter: u32) -> String;
 
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool;
+
+    unsafe fn renderbuffer_storage(
+        &self,
+        target: u32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    );
+
+    unsafe fn tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&mut [u8]>,
+    );
+
+    unsafe fn tex_storage_2d(
+        &self,
+        target: u32,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    );
+
+    unsafe fn unmap_buffer(&self, target: u32);
 
     unsafe fn cull_face(&self, value: u32);
 

@@ -124,10 +124,16 @@ impl super::Context for Context {
         level: i32,
         format: u32,
         ty: u32,
-        pixels: *mut std::ffi::c_void,
+        pixels: Option<&mut [u8]>,
     ) {
         let gl = &self.raw;
-        gl.GetTexImage(target, level, format, ty, pixels);
+        gl.GetTexImage(
+            target,
+            level,
+            format,
+            ty,
+            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *mut std::ffi::c_void,
+        );
     }
 
     unsafe fn create_program(&self) -> Result<Self::Program, String> {
@@ -287,6 +293,16 @@ impl super::Context for Context {
     unsafe fn pixel_store_bool(&self, parameter: u32, value: bool) {
         let gl = &self.raw;
         gl.PixelStorei(parameter, value as i32);
+    }
+
+    unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&mut [u8]>, flags: u32) {
+        let gl = &self.raw;
+        gl.BufferStorage(
+            target,
+            size as isize,
+            data.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+            flags,
+        );
     }
 
     unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
@@ -566,6 +582,24 @@ impl super::Context for Context {
         gl.FramebufferTexture(target, attachment, texture.unwrap_or(0), level);
     }
 
+    unsafe fn framebuffer_texture_2d(
+        &self,
+        target: u32,
+        attachment: u32,
+        texture_target: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+    ) {
+        let gl = &self.raw;
+        gl.FramebufferTexture2D(
+            target,
+            attachment,
+            texture_target,
+            texture.unwrap_or(0),
+            level,
+        );
+    }
+
     unsafe fn framebuffer_texture_layer(
         &self,
         target: u32,
@@ -623,6 +657,60 @@ impl super::Context for Context {
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
         let gl = &self.raw;
         1 == gl.IsSync(fence.unwrap_or(0 as *const _))
+    }
+
+    unsafe fn renderbuffer_storage(
+        &self,
+        target: u32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    ) {
+        let gl = &self.raw;
+        gl.RenderbufferStorage(target, internal_format, width, height);
+    }
+
+    unsafe fn tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&mut [u8]>,
+    ) {
+        let gl = &self.raw;
+        gl.TexImage2D(
+            target,
+            level,
+            internal_format,
+            width,
+            height,
+            border,
+            format,
+            ty,
+            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn tex_storage_2d(
+        &self,
+        target: u32,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    ) {
+        let gl = &self.raw;
+        gl.TexStorage2D(target, levels, internal_format, width, height);
+    }
+
+    unsafe fn unmap_buffer(&self, target: u32) {
+        let gl = &self.raw;
+        gl.UnmapBuffer(target);
     }
 
     unsafe fn cull_face(&self, value: u32) {

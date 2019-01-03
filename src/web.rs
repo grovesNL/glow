@@ -232,7 +232,7 @@ impl super::Context for Context {
         _level: i32,
         _format: u32,
         _ty: u32,
-        _pixels: *mut std::ffi::c_void,
+        _pixels: Option<&mut [u8]>,
     ) {
         panic!("Get tex image is not supported");
     }
@@ -483,13 +483,23 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn buffer_storage(
+        &self,
+        _target: u32,
+        _size: i32,
+        _data: Option<&mut [u8]>,
+        _flags: u32,
+    ) {
+        panic!("Buffer storage is not supported");
+    }
+
     unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Clear buffer with `i32` slice is not supported")
+                panic!("Clear buffer with `i32` slice is not supported");
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.clear_bufferiv_with_i32_array(target, draw_buffer as i32, values)
+                gl.clear_bufferiv_with_i32_array(target, draw_buffer as i32, values);
             }
         }
     }
@@ -813,6 +823,26 @@ impl super::Context for Context {
         panic!("Framebuffer texture is not supported");
     }
 
+    unsafe fn framebuffer_texture_2d(
+        &self,
+        target: u32,
+        attachment: u32,
+        texture_target: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+    ) {
+        let textures = self.textures.borrow();
+        let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.framebuffer_texture_2d(target, attachment, texture_target, raw_texture, level);
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.framebuffer_texture_2d(target, attachment, texture_target, raw_texture, level);
+            }
+        }
+    }
+
     unsafe fn framebuffer_texture_layer(
         &self,
         target: u32,
@@ -825,10 +855,10 @@ impl super::Context for Context {
         let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Framebuffer texture layer is not supported")
+                panic!("Framebuffer texture layer is not supported");
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.framebuffer_texture_layer(target, attachment, raw_texture, level, layer)
+                gl.framebuffer_texture_layer(target, attachment, raw_texture, level, layer);
             }
         }
     }
@@ -898,6 +928,89 @@ impl super::Context for Context {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Sync is not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl.is_sync(raw_fence),
         }
+    }
+
+    unsafe fn renderbuffer_storage(
+        &self,
+        target: u32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.renderbuffer_storage(target, internal_format, width, height)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.renderbuffer_storage(target, internal_format, width, height)
+            }
+        }
+    }
+
+    unsafe fn tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&mut [u8]>,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    border,
+                    format,
+                    ty,
+                    pixels,
+                )
+                .unwrap();
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    border,
+                    format,
+                    ty,
+                    pixels,
+                )
+                .unwrap();
+            }
+        }
+    }
+
+    unsafe fn tex_storage_2d(
+        &self,
+        target: u32,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Tex storage 2D is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_storage_2d(target, levels, internal_format, width, height);
+            }
+        }
+    }
+
+    unsafe fn unmap_buffer(&self, _target: u32) {
+        panic!("Unmap buffer is not supported");
     }
 
     unsafe fn cull_face(&self, value: u32) {

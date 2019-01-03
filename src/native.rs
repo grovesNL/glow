@@ -37,6 +37,7 @@ impl super::Context for Context {
     type Fence = native_gl::types::GLsync;
     type Framebuffer = native_gl::types::GLuint;
     type Renderbuffer = native_gl::types::GLuint;
+    type UniformLocation = native_gl::types::GLuint;
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {
         let gl = &self.raw;
@@ -295,6 +296,31 @@ impl super::Context for Context {
         gl.PixelStorei(parameter, value as i32);
     }
 
+    unsafe fn bind_frag_data_location(
+        &self,
+        program: Self::Program,
+        color_number: u32,
+        name: &str,
+    ) {
+        let gl = &self.raw;
+        gl.BindFragDataLocation(program, color_number, name.as_ptr() as *const i8);
+    }
+
+    unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32) {
+        let gl = &self.raw;
+        gl.BufferData(target, size as isize, std::ptr::null(), usage);
+    }
+
+    unsafe fn buffer_data_u8_slice(&self, target: u32, data: &mut [u8], usage: u32) {
+        let gl = &self.raw;
+        gl.BufferData(
+            target,
+            data.len() as isize,
+            data.as_ptr() as *const std::ffi::c_void,
+            usage,
+        );
+    }
+
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&mut [u8]>, flags: u32) {
         let gl = &self.raw;
         gl.BufferStorage(
@@ -303,6 +329,11 @@ impl super::Context for Context {
             data.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
             flags,
         );
+    }
+
+    unsafe fn check_framebuffer_status(&self, target: u32) -> u32 {
+        let gl = &self.raw;
+        gl.CheckFramebufferStatus(target)
     }
 
     unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
@@ -542,7 +573,7 @@ impl super::Context for Context {
 
     unsafe fn enable_draw_buffer(&self, parameter: u32, draw_buffer: u32) {
         let gl = &self.raw;
-        gl.Enablei(draw_buffer, parameter);
+        gl.Enablei(parameter, draw_buffer);
     }
 
     unsafe fn enable_vertex_attrib_array(&self, index: u32) {
@@ -600,6 +631,26 @@ impl super::Context for Context {
         );
     }
 
+    unsafe fn framebuffer_texture_3d(
+        &self,
+        target: u32,
+        attachment: u32,
+        texture_target: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+        layer: i32,
+    ) {
+        let gl = &self.raw;
+        gl.FramebufferTexture3D(
+            target,
+            attachment,
+            texture_target,
+            texture.unwrap_or(0),
+            level,
+            layer,
+        );
+    }
+
     unsafe fn framebuffer_texture_layer(
         &self,
         target: u32,
@@ -654,6 +705,16 @@ impl super::Context for Context {
             .to_owned()
     }
 
+    unsafe fn get_uniform_location(
+        &self,
+        program: Self::Program,
+        name: &str,
+    ) -> Option<Self::UniformLocation> {
+        let gl = &self.raw;
+        Some(gl.GetUniformLocation(program, name.as_ptr() as *const i8)
+            as u32)
+    }
+
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
         let gl = &self.raw;
         1 == gl.IsSync(fence.unwrap_or(0 as *const _))
@@ -668,6 +729,26 @@ impl super::Context for Context {
     ) {
         let gl = &self.raw;
         gl.RenderbufferStorage(target, internal_format, width, height);
+    }
+
+    unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32) {
+        let gl = &self.raw;
+        gl.SamplerParameterf(sampler, name, value);
+    }
+
+    unsafe fn sampler_parameter_f32_slice(
+        &self,
+        sampler: Self::Sampler,
+        name: u32,
+        value: &mut [f32],
+    ) {
+        let gl = &self.raw;
+        gl.SamplerParameterfv(sampler, name, value.as_ptr());
+    }
+
+    unsafe fn sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32, value: i32) {
+        let gl = &self.raw;
+        gl.SamplerParameteri(sampler, name, value);
     }
 
     unsafe fn tex_image_2d(
@@ -706,6 +787,11 @@ impl super::Context for Context {
     ) {
         let gl = &self.raw;
         gl.TexStorage2D(target, levels, internal_format, width, height);
+    }
+
+    unsafe fn uniform_1_i32(&self, location: Option<Self::UniformLocation>, x: i32) {
+        let gl = &self.raw;
+        gl.Uniform1i(location.unwrap_or(0) as i32, x);
     }
 
     unsafe fn unmap_buffer(&self, target: u32) {
@@ -748,6 +834,17 @@ impl super::Context for Context {
     unsafe fn line_width(&self, width: f32) {
         let gl = &self.raw;
         gl.LineWidth(width);
+    }
+
+    unsafe fn map_buffer_range(
+        &self,
+        target: u32,
+        offset: i32,
+        length: i32,
+        access: u32,
+    ) -> *mut u8 {
+        let gl = &self.raw;
+        gl.MapBufferRange(target, offset as isize, length as isize, access) as *mut u8
     }
 
     unsafe fn polygon_offset(&self, factor: f32, units: f32) {

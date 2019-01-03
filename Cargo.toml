@@ -36,6 +36,7 @@ features = [
   "WebGlShader",
   "WebGlSync",
   "WebGlTexture",
+  "WebGlUniformLocation",
   "WebGlVertexArrayObject",
   "Window",
 ]

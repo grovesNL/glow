@@ -5,7 +5,7 @@ use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use web_sys::{
     WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlRenderbuffer,
-    WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
+    WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture, WebGlUniformLocation,
     WebGlVertexArrayObject,
 };
 
@@ -37,6 +37,7 @@ pub struct Context {
     fences: TrackedResource<WebFenceKey, WebGlSync>,
     framebuffers: TrackedResource<WebFramebufferKey, WebGlFramebuffer>,
     renderbuffers: TrackedResource<WebRenderbufferKey, WebGlRenderbuffer>,
+    uniform_locations: TrackedResource<WebUniformLocationKey, WebGlUniformLocation>,
 }
 
 impl Context {
@@ -52,6 +53,7 @@ impl Context {
             fences: tracked_resource(),
             framebuffers: tracked_resource(),
             renderbuffers: tracked_resource(),
+            uniform_locations: tracked_resource(),
         }
     }
 
@@ -67,6 +69,7 @@ impl Context {
             fences: tracked_resource(),
             framebuffers: tracked_resource(),
             renderbuffers: tracked_resource(),
+            uniform_locations: tracked_resource(),
         }
     }
 }
@@ -80,6 +83,7 @@ new_key_type! { pub struct WebSamplerKey; }
 new_key_type! { pub struct WebFenceKey; }
 new_key_type! { pub struct WebFramebufferKey; }
 new_key_type! { pub struct WebRenderbufferKey; }
+new_key_type! { pub struct WebUniformLocationKey; }
 
 impl super::Context for Context {
     type Shader = WebShaderKey;
@@ -91,6 +95,7 @@ impl super::Context for Context {
     type Fence = WebFenceKey;
     type Framebuffer = WebFramebufferKey;
     type Renderbuffer = WebRenderbufferKey;
+    type UniformLocation = WebUniformLocationKey;
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {
         let raw_framebuffer = match self.raw {
@@ -483,6 +488,28 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn bind_frag_data_location(&self, _program: Self::Program, _color_number: u32, _name: &str) {
+        panic!("Bind frag data location is not supported");
+    }
+
+    unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.buffer_data_with_i32(target, size, usage),
+            RawRenderingContext::WebGl2(ref gl) => gl.buffer_data_with_i32(target, size, usage),
+        }
+    }
+
+    unsafe fn buffer_data_u8_slice(&self, target: u32, data: &mut [u8], usage: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.buffer_data_with_u8_array(target, data, usage)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.buffer_data_with_u8_array(target, data, usage)
+            }
+        }
+    }
+
     unsafe fn buffer_storage(
         &self,
         _target: u32,
@@ -491,6 +518,13 @@ impl super::Context for Context {
         _flags: u32,
     ) {
         panic!("Buffer storage is not supported");
+    }
+
+    unsafe fn check_framebuffer_status(&self, target: u32) -> u32 {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.check_framebuffer_status(target),
+            RawRenderingContext::WebGl2(ref gl) => gl.check_framebuffer_status(target),
+        }
     }
 
     unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
@@ -843,6 +877,18 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn framebuffer_texture_3d(
+        &self,
+        _target: u32,
+        _attachment: u32,
+        _texture_target: u32,
+        _texture: Option<Self::Texture>,
+        _level: i32,
+        _layer: i32,
+    ) {
+        panic!("Framebuffer texture 3D is not supported");
+    }
+
     unsafe fn framebuffer_texture_layer(
         &self,
         target: u32,
@@ -921,6 +967,23 @@ impl super::Context for Context {
         .unwrap()
     }
 
+    unsafe fn get_uniform_location(&self, program: Self::Program, name: &str) -> Option<Self::UniformLocation> {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        let raw_uniform = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_uniform_location(raw_program, name),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_uniform_location(raw_program, name),
+        };
+        if let Some(u) = raw_uniform {
+            let mut uniform_locations = self.uniform_locations.borrow_mut();
+            let key = uniform_locations.0.insert(());
+            uniform_locations.1.insert(key, u);
+            Some(key)
+        } else {
+            None
+        }
+    }
+
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
         let fences = self.fences.borrow();
         let raw_fence = fence.map(|f| fences.1.get_unchecked(f));
@@ -939,10 +1002,45 @@ impl super::Context for Context {
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
-                gl.renderbuffer_storage(target, internal_format, width, height)
+                gl.renderbuffer_storage(target, internal_format, width, height);
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.renderbuffer_storage(target, internal_format, width, height)
+                gl.renderbuffer_storage(target, internal_format, width, height);
+            }
+        }
+    }
+
+    unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32) {
+        let samplers = self.samplers.borrow();
+        let raw_sampler = samplers.1.get_unchecked(sampler);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Samper parameter for `f32` is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.sampler_parameterf(raw_sampler, name, value);
+            }
+        }
+    }
+
+    unsafe fn sampler_parameter_f32_slice(
+        &self,
+        _sampler: Self::Sampler,
+        _name: u32,
+        _value: &mut [f32],
+    ) {
+        panic!("Sampler parameter for `f32` slice is not supported");
+    }
+
+    unsafe fn sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32, value: i32) {
+        let samplers = self.samplers.borrow();
+        let raw_sampler = samplers.1.get_unchecked(sampler);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Samper parameter for `i32` is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.sampler_parameteri(raw_sampler, name, value);
             }
         }
     }
@@ -1009,6 +1107,15 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn uniform_1_i32(&self, uniform_location: Option<Self::UniformLocation>, x: i32) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform1i(raw_uniform_location, x),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform1i(raw_uniform_location, x),
+        }
+    }
+
     unsafe fn unmap_buffer(&self, _target: u32) {
         panic!("Unmap buffer is not supported");
     }
@@ -1057,6 +1164,16 @@ impl super::Context for Context {
             RawRenderingContext::WebGl1(ref gl) => gl.line_width(width),
             RawRenderingContext::WebGl2(ref gl) => gl.line_width(width),
         }
+    }
+
+    unsafe fn map_buffer_range(
+        &self,
+        _target: u32,
+        _offset: i32,
+        _length: i32,
+        _access: u32,
+    ) -> *mut u8 {
+        panic!("Map buffer range is not supported")
     }
 
     unsafe fn polygon_offset(&self, factor: f32, units: f32) {

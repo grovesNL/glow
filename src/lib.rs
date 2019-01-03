@@ -70,6 +70,14 @@ pub trait Context {
         + Ord
         + PartialEq
         + PartialOrd;
+    type UniformLocation: Copy
+        + Clone
+        + std::fmt::Debug
+        + Eq
+        + std::hash::Hash
+        + Ord
+        + PartialEq
+        + PartialOrd;
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String>;
 
@@ -157,7 +165,15 @@ pub trait Context {
 
     unsafe fn pixel_store_bool(&self, parameter: u32, value: bool);
 
+    unsafe fn bind_frag_data_location(&self, program: Self::Program, color_number: u32, name: &str);
+
+    unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32);
+
+    unsafe fn buffer_data_u8_slice(&self, target: u32, data: &mut [u8], usage: u32);
+
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&mut [u8]>, flags: u32);
+
+    unsafe fn check_framebuffer_status(&self, target: u32) -> u32;
 
     unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]);
 
@@ -297,6 +313,16 @@ pub trait Context {
         level: i32,
     );
 
+    unsafe fn framebuffer_texture_3d(
+        &self,
+        target: u32,
+        attachment: u32,
+        texture_target: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+        layer: i32,
+    );
+
     unsafe fn framebuffer_texture_layer(
         &self,
         target: u32,
@@ -318,6 +344,8 @@ pub trait Context {
 
     unsafe fn get_parameter_string(&self, parameter: u32) -> String;
 
+    unsafe fn get_uniform_location(&self, program: Self::Program, name: &str) -> Option<Self::UniformLocation>;
+
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool;
 
     unsafe fn renderbuffer_storage(
@@ -327,6 +355,17 @@ pub trait Context {
         width: i32,
         height: i32,
     );
+
+    unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32);
+
+    unsafe fn sampler_parameter_f32_slice(
+        &self,
+        sampler: Self::Sampler,
+        name: u32,
+        value: &mut [f32],
+    );
+
+    unsafe fn sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32, value: i32);
 
     unsafe fn tex_image_2d(
         &self,
@@ -350,6 +389,8 @@ pub trait Context {
         height: i32,
     );
 
+    unsafe fn uniform_1_i32(&self, location: Option<Self::UniformLocation>, x: i32);
+
     unsafe fn unmap_buffer(&self, target: u32);
 
     unsafe fn cull_face(&self, value: u32);
@@ -370,6 +411,14 @@ pub trait Context {
     unsafe fn blend_color(&self, red: f32, green: f32, blue: f32, alpha: f32);
 
     unsafe fn line_width(&self, width: f32);
+
+    unsafe fn map_buffer_range(
+        &self,
+        target: u32,
+        offset: i32,
+        length: i32,
+        access: u32,
+    ) -> *mut u8;
 
     unsafe fn polygon_offset(&self, factor: f32, units: f32);
 

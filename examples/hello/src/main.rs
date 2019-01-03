@@ -83,8 +83,8 @@ fn main() {
         );
 
         let shader_sources = [
-            (glow::ShaderType::Vertex, vertex_shader_source),
-            (glow::ShaderType::Fragment, fragment_shader_source),
+            (glow::VERTEX_SHADER, vertex_shader_source),
+            (glow::FRAGMENT_SHADER, fragment_shader_source),
         ];
 
         let mut shaders = Vec::with_capacity(shader_sources.len());
@@ -129,8 +129,8 @@ fn main() {
                 window.swap_buffers().unwrap();
             }
 
-            gl.clear(glow::ClearMask::Color);
-            gl.draw_arrays(glow::PrimitiveMode::Triangles, 0, 3);
+            gl.clear(glow::COLOR_BUFFER_BIT);
+            gl.draw_arrays(glow::TRIANGLES, 0, 3);
 
             if !*running {
                 gl.delete_program(program);

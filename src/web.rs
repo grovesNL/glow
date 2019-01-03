@@ -140,7 +140,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
+    unsafe fn create_shader(&self, shader_type: u32) -> Result<Self::Shader, String> {
         let raw_shader = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.create_shader(shader_type as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.create_shader(shader_type as u32),
@@ -228,10 +228,10 @@ impl super::Context for Context {
 
     unsafe fn get_tex_image(
         &self,
-        _target: TextureTarget,
+        _target: u32,
         _level: i32,
-        _format: TextureFormat,
-        _ty: TextureType,
+        _format: u32,
+        _ty: u32,
         _pixels: *mut std::ffi::c_void,
     ) {
         panic!("Get tex image is not supported");
@@ -345,18 +345,18 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn bind_buffer(&self, target: BufferTarget, buffer: Option<Self::Buffer>) {
+    unsafe fn bind_buffer(&self, target: u32, buffer: Option<Self::Buffer>) {
         let buffers = self.buffers.borrow();
         let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.bind_buffer(target as u32, raw_buffer),
-            RawRenderingContext::WebGl2(ref gl) => gl.bind_buffer(target as u32, raw_buffer),
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_buffer(target, raw_buffer),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_buffer(target, raw_buffer),
         }
     }
 
     unsafe fn bind_buffer_range(
         &self,
-        _target: BufferTarget,
+        _target: u32,
         _index: u32,
         _buffer: Option<Self::Buffer>,
         _offset: i32,
@@ -366,29 +366,21 @@ impl super::Context for Context {
         panic!("Bind buffer range is not supported yet");
     }
 
-    unsafe fn bind_framebuffer(
-        &self,
-        target: FramebufferTarget,
-        framebuffer: Option<Self::Framebuffer>,
-    ) {
+    unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>) {
         let framebuffers = self.framebuffers.borrow();
         let raw_framebuffer = framebuffer.map(|f| framebuffers.1.get_unchecked(f));
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.bind_framebuffer(target as u32, raw_framebuffer)
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.bind_framebuffer(target as u32, raw_framebuffer)
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_framebuffer(target, raw_framebuffer),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_framebuffer(target, raw_framebuffer),
         }
     }
 
-    unsafe fn bind_renderbuffer(&self, target: RenderbufferTarget, renderbuffer: Option<Self::Renderbuffer>) {
+    unsafe fn bind_renderbuffer(&self, target: u32, renderbuffer: Option<Self::Renderbuffer>) {
         let renderbuffers = self.renderbuffers.borrow();
         let raw_renderbuffer = renderbuffer.map(|r| renderbuffers.1.get_unchecked(r));
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.bind_renderbuffer(target as u32, raw_renderbuffer),
-            RawRenderingContext::WebGl2(ref gl) => gl.bind_renderbuffer(target as u32, raw_renderbuffer),
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_renderbuffer(target, raw_renderbuffer),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_renderbuffer(target, raw_renderbuffer),
         }
     }
 
@@ -466,82 +458,67 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn clear(&self, mask: ClearMask) {
+    unsafe fn clear(&self, mask: u32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.clear(mask.bits()),
-            RawRenderingContext::WebGl2(ref gl) => gl.clear(mask.bits()),
+            RawRenderingContext::WebGl1(ref gl) => gl.clear(mask),
+            RawRenderingContext::WebGl2(ref gl) => gl.clear(mask),
         }
     }
 
-    unsafe fn patch_parameter_i32(&self, _parameter: PatchParameterI32, _value: i32) {
+    unsafe fn patch_parameter_i32(&self, _parameter: u32, _value: i32) {
         panic!("Patch parameter is not supported");
     }
 
-    unsafe fn pixel_store_i32(&self, parameter: PixelStoreParameterI32, value: i32) {
+    unsafe fn pixel_store_i32(&self, parameter: u32, value: i32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.pixel_storei(parameter as u32, value),
-            RawRenderingContext::WebGl2(ref gl) => gl.pixel_storei(parameter as u32, value),
+            RawRenderingContext::WebGl1(ref gl) => gl.pixel_storei(parameter, value),
+            RawRenderingContext::WebGl2(ref gl) => gl.pixel_storei(parameter, value),
         }
     }
 
-    unsafe fn pixel_store_bool(&self, parameter: PixelStoreParameterBool, value: bool) {
+    unsafe fn pixel_store_bool(&self, parameter: u32, value: bool) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.pixel_storei(parameter as u32, value as i32),
-            RawRenderingContext::WebGl2(ref gl) => gl.pixel_storei(parameter as u32, value as i32),
+            RawRenderingContext::WebGl1(ref gl) => gl.pixel_storei(parameter, value as i32),
+            RawRenderingContext::WebGl2(ref gl) => gl.pixel_storei(parameter, value as i32),
         }
     }
 
-    unsafe fn clear_buffer_i32_slice(
-        &self,
-        target: FramebufferBufferTarget,
-        draw_buffer: u32,
-        values: &mut [i32],
-    ) {
+    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Clear buffer with `i32` slice is not supported")
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.clear_bufferiv_with_i32_array(target as u32, draw_buffer as i32, values)
+                gl.clear_bufferiv_with_i32_array(target, draw_buffer as i32, values)
             }
         }
     }
 
-    unsafe fn clear_buffer_u32_slice(
-        &self,
-        target: FramebufferBufferTarget,
-        draw_buffer: u32,
-        values: &mut [u32],
-    ) {
+    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &mut [u32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Clear buffer with `u32` slice is not supported")
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.clear_bufferuiv_with_u32_array(target as u32, draw_buffer as i32, values)
+                gl.clear_bufferuiv_with_u32_array(target, draw_buffer as i32, values)
             }
         }
     }
 
-    unsafe fn clear_buffer_f32_slice(
-        &self,
-        target: FramebufferBufferTarget,
-        draw_buffer: u32,
-        values: &mut [f32],
-    ) {
+    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &mut [f32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Clear buffer with `f32` slice is not supported")
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.clear_bufferfv_with_f32_array(target as u32, draw_buffer as i32, values)
+                gl.clear_bufferfv_with_f32_array(target, draw_buffer as i32, values)
             }
         }
     }
 
     unsafe fn clear_buffer_depth_stencil(
         &self,
-        target: FramebufferBufferTarget,
+        target: u32,
         draw_buffer: u32,
         depth: f32,
         stencil: i32,
@@ -551,24 +528,19 @@ impl super::Context for Context {
                 panic!("Clear buffer depth stencil is not supported")
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.clear_bufferfi(target as u32, draw_buffer as i32, depth, stencil)
+                gl.clear_bufferfi(target, draw_buffer as i32, depth, stencil)
             }
         }
     }
 
-    unsafe fn client_wait_sync(
-        &self,
-        _fence: Self::Fence,
-        _flags: ClientWaitSyncFlags,
-        _timeout: i32,
-    ) -> ClientWaitSyncStatus {
+    unsafe fn client_wait_sync(&self, _fence: Self::Fence, _flags: u32, _timeout: i32) -> u32 {
         panic!("Client wait sync is not supported")
     }
 
     unsafe fn copy_buffer_sub_data(
         &self,
-        src_target: BufferTarget,
-        dst_target: BufferTarget,
+        src_target: u32,
+        dst_target: u32,
         src_offset: i32,
         dst_offset: i32,
         size: i32,
@@ -577,11 +549,7 @@ impl super::Context for Context {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Copy buffer subdata is not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl
                 .copy_buffer_sub_data_with_i32_and_i32_and_i32(
-                    src_target as u32,
-                    dst_target as u32,
-                    src_offset,
-                    dst_offset,
-                    size,
+                    src_target, dst_target, src_offset, dst_offset, size,
                 ),
         }
     }
@@ -652,14 +620,14 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn disable(&self, parameter: EnableParameter) {
+    unsafe fn disable(&self, parameter: u32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.disable(parameter as u32),
-            RawRenderingContext::WebGl2(ref gl) => gl.disable(parameter as u32),
+            RawRenderingContext::WebGl1(ref gl) => gl.disable(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.disable(parameter),
         }
     }
 
-    unsafe fn disable_draw_buffer(&self, _parameter: EnableParameter, _draw_buffer: u32) {
+    unsafe fn disable_draw_buffer(&self, _parameter: u32, _draw_buffer: u32) {
         panic!("Draw buffer disable is not supported");
     }
 
@@ -678,20 +646,14 @@ impl super::Context for Context {
         panic!("Dispatch compute indirect is not supported");
     }
 
-    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
+    unsafe fn draw_arrays(&self, mode: u32, first: i32, count: i32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.draw_arrays(mode as u32, first, count),
             RawRenderingContext::WebGl2(ref gl) => gl.draw_arrays(mode as u32, first, count),
         }
     }
 
-    unsafe fn draw_arrays_instanced(
-        &self,
-        mode: PrimitiveMode,
-        first: i32,
-        count: i32,
-        instance_count: i32,
-    ) {
+    unsafe fn draw_arrays_instanced(&self, mode: u32, first: i32, count: i32, instance_count: i32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Draw arrays instanced is not supported") // TODO: Extension
@@ -704,7 +666,7 @@ impl super::Context for Context {
 
     unsafe fn draw_arrays_instanced_base_instance(
         &self,
-        _mode: PrimitiveMode,
+        _mode: u32,
         _first: i32,
         _count: i32,
         _instance_count: i32,
@@ -723,13 +685,7 @@ impl super::Context for Context {
         panic!("Draw buffers is not supported yet");
     }
 
-    unsafe fn draw_elements(
-        &self,
-        mode: PrimitiveMode,
-        count: i32,
-        element_type: ElementType,
-        offset: i32,
-    ) {
+    unsafe fn draw_elements(&self, mode: u32, count: i32, element_type: u32, offset: i32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.draw_elements_with_i32(mode as u32, count, element_type as u32, offset);
@@ -742,9 +698,9 @@ impl super::Context for Context {
 
     unsafe fn draw_elements_base_vertex(
         &self,
-        _mode: PrimitiveMode,
+        _mode: u32,
         _count: i32,
-        _element_type: ElementType,
+        _element_type: u32,
         _offset: i32,
         _base_vertex: i32,
     ) {
@@ -753,9 +709,9 @@ impl super::Context for Context {
 
     unsafe fn draw_elements_instanced(
         &self,
-        mode: PrimitiveMode,
+        mode: u32,
         count: i32,
-        element_type: ElementType,
+        element_type: u32,
         offset: i32,
         instance_count: i32,
     ) {
@@ -777,9 +733,9 @@ impl super::Context for Context {
 
     unsafe fn draw_elements_instanced_base_vertex(
         &self,
-        _mode: PrimitiveMode,
+        _mode: u32,
         _count: i32,
-        _element_type: ElementType,
+        _element_type: u32,
         _offset: i32,
         _instance_count: i32,
         _base_vertex: i32,
@@ -789,9 +745,9 @@ impl super::Context for Context {
 
     unsafe fn draw_elements_instanced_base_vertex_base_instance(
         &self,
-        _mode: PrimitiveMode,
+        _mode: u32,
         _count: i32,
-        _element_type: ElementType,
+        _element_type: u32,
         _offset: i32,
         _instance_count: i32,
         _base_vertex: i32,
@@ -800,14 +756,14 @@ impl super::Context for Context {
         panic!("Draw elements instanced base vertex base instance is not supported");
     }
 
-    unsafe fn enable(&self, parameter: EnableParameter) {
+    unsafe fn enable(&self, parameter: u32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.enable(parameter as u32),
-            RawRenderingContext::WebGl2(ref gl) => gl.enable(parameter as u32),
+            RawRenderingContext::WebGl1(ref gl) => gl.enable(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.enable(parameter),
         }
     }
 
-    unsafe fn enable_draw_buffer(&self, _parameter: EnableParameter, _draw_buffer: u32) {
+    unsafe fn enable_draw_buffer(&self, _parameter: u32, _draw_buffer: u32) {
         panic!("Draw buffer enable is not supported");
     }
 
@@ -827,9 +783,9 @@ impl super::Context for Context {
 
     unsafe fn framebuffer_renderbuffer(
         &self,
-        target: FramebufferTarget,
+        target: u32,
         attachment: u32,
-        renderbuffer_target: RenderbufferTarget,
+        renderbuffer_target: u32,
         renderbuffer: Option<Self::Renderbuffer>,
     ) {
         let renderbuffers = self.renderbuffers.borrow();
@@ -839,9 +795,9 @@ impl super::Context for Context {
                 panic!("Framebuffer renderbuffer is not supported");
             }
             RawRenderingContext::WebGl2(ref gl) => gl.framebuffer_renderbuffer(
-                target as u32,
+                target,
                 attachment,
-                renderbuffer_target as u32,
+                renderbuffer_target,
                 raw_renderbuffer,
             ),
         }
@@ -849,7 +805,7 @@ impl super::Context for Context {
 
     unsafe fn framebuffer_texture(
         &self,
-        _target: FramebufferTarget,
+        _target: u32,
         _attachment: u32,
         _texture: Option<Self::Texture>,
         _level: i32,
@@ -859,7 +815,7 @@ impl super::Context for Context {
 
     unsafe fn framebuffer_texture_layer(
         &self,
-        target: FramebufferTarget,
+        target: u32,
         attachment: u32,
         texture: Option<Self::Texture>,
         level: i32,
@@ -872,12 +828,12 @@ impl super::Context for Context {
                 panic!("Framebuffer texture layer is not supported")
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.framebuffer_texture_layer(target as u32, attachment, raw_texture, level, layer)
+                gl.framebuffer_texture_layer(target, attachment, raw_texture, level, layer)
             }
         }
     }
 
-    unsafe fn front_face(&self, value: FrontFace) {
+    unsafe fn front_face(&self, value: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.front_face(value as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.front_face(value as u32),
@@ -891,32 +847,60 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn get_parameter_indexed_i32(
-        &self,
-        parameter: GetParameterIndexed,
-        index: u32,
-    ) -> i32 {
+    unsafe fn get_parameter_i32(&self, parameter: u32) -> i32 {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("Get parameter indexed is not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.get_indexed_parameter(parameter as u32, index),
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
         }
         .unwrap()
         .as_f64()
         .unwrap() as i32
     }
 
+    unsafe fn get_parameter_indexed_i32(&self, parameter: u32, index: u32) -> i32 {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Get parameter indexed is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.get_indexed_parameter(parameter, index),
+        }
+        .unwrap()
+        .as_f64()
+        .unwrap() as i32
+    }
+
+    unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Get parameter indexed is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.get_indexed_parameter(parameter, index),
+        }
+        .unwrap()
+        .as_string()
+        .unwrap()
+    }
+
+    unsafe fn get_parameter_string(&self, parameter: u32) -> String {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .unwrap()
+        .as_string()
+        .unwrap()
+    }
+
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
         let fences = self.fences.borrow();
         let raw_fence = fence.map(|f| fences.1.get_unchecked(f));
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Sync is not supported")
-            },
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Sync is not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl.is_sync(raw_fence),
         }
     }
 
-    unsafe fn cull_face(&self, value: Face) {
+    unsafe fn cull_face(&self, value: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.cull_face(value as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.cull_face(value as u32),
@@ -969,7 +953,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn polygon_mode(&self, _face: PolygonFace, _mode: PolygonMode) {
+    unsafe fn polygon_mode(&self, _face: u32, _mode: u32) {
         panic!("Polygon mode is not supported");
     }
 
@@ -980,12 +964,12 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn bind_texture(&self, target: TextureTarget, texture: Option<Self::Texture>) {
+    unsafe fn bind_texture(&self, target: u32, texture: Option<Self::Texture>) {
         let textures = self.textures.borrow();
         let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.bind_texture(target.0, raw_texture),
-            RawRenderingContext::WebGl2(ref gl) => gl.bind_texture(target.0, raw_texture),
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_texture(target, raw_texture),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_texture(target, raw_texture),
         }
     }
 
@@ -1005,14 +989,10 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn fence_sync(
-        &self,
-        condition: FenceSyncCondition,
-        flags: FenceSyncFlags,
-    ) -> Result<Self::Fence, String> {
+    unsafe fn fence_sync(&self, condition: u32, flags: u32) -> Result<Self::Fence, String> {
         let raw_fence = match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Fences are not supported"), // TODO: Extension
-            RawRenderingContext::WebGl2(ref gl) => gl.fence_sync(condition as u32, flags.bits()),
+            RawRenderingContext::WebGl2(ref gl) => gl.fence_sync(condition as u32, flags),
         };
         match raw_fence {
             Some(f) => {
@@ -1024,79 +1004,51 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn tex_parameter_f32(
-        &self,
-        target: TextureTarget,
-        parameter: TextureParameter,
-        value: f32,
-    ) {
+    unsafe fn tex_parameter_f32(&self, target: u32, parameter: u32, value: f32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.tex_parameterf(target.0, parameter as u32, value)
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_parameterf(target.0, parameter as u32, value)
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.tex_parameterf(target, parameter, value),
+            RawRenderingContext::WebGl2(ref gl) => gl.tex_parameterf(target, parameter, value),
         }
     }
 
-    unsafe fn tex_parameter_i32(
-        &self,
-        target: TextureTarget,
-        parameter: TextureParameter,
-        value: i32,
-    ) {
+    unsafe fn tex_parameter_i32(&self, target: u32, parameter: u32, value: i32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.tex_parameteri(target.0, parameter as u32, value)
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_parameteri(target.0, parameter as u32, value)
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.tex_parameteri(target, parameter, value),
+            RawRenderingContext::WebGl2(ref gl) => gl.tex_parameteri(target, parameter, value),
         }
     }
 
-    unsafe fn tex_parameter_f32_slice(
-        &self,
-        _target: TextureTarget,
-        _parameter: TextureParameter,
-        _values: &[f32],
-    ) {
+    unsafe fn tex_parameter_f32_slice(&self, _target: u32, _parameter: u32, _values: &[f32]) {
         // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
         panic!("Texture parameters for `&[f32]` are not supported yet");
     }
 
-    unsafe fn tex_parameter_i32_slice(
-        &self,
-        _target: TextureTarget,
-        _parameter: TextureParameter,
-        _values: &[i32],
-    ) {
+    unsafe fn tex_parameter_i32_slice(&self, _target: u32, _parameter: u32, _values: &[i32]) {
         panic!("Texture parameters for `&[i32]` are not supported yet");
     }
 
     unsafe fn tex_sub_image_2d_u8_slice(
         &self,
-        target: TextureTarget,
+        target: u32,
         level: i32,
         x_offset: i32,
         y_offset: i32,
         width: i32,
         height: i32,
-        format: TextureFormat,
-        ty: TextureType,
+        format: u32,
+        ty: u32,
         pixels: Option<&mut [u8]>,
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_u8_array(
-                    target.0, level, x_offset, y_offset, width, height, format.0, ty.0, pixels,
+                    target, level, x_offset, y_offset, width, height, format, ty, pixels,
                 )
                 .unwrap(); // TODO: Handle return value?
             }
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_u8_array(
-                    target.0, level, x_offset, y_offset, width, height, format.0, ty.0, pixels,
+                    target, level, x_offset, y_offset, width, height, format, ty, pixels,
                 )
                 .unwrap(); // TODO: Handle return value?
             }
@@ -1105,14 +1057,14 @@ impl super::Context for Context {
 
     unsafe fn tex_sub_image_2d_pixel_buffer_offset(
         &self,
-        target: TextureTarget,
+        target: u32,
         level: i32,
         x_offset: i32,
         y_offset: i32,
         width: i32,
         height: i32,
-        format: TextureFormat,
-        ty: TextureType,
+        format: u32,
+        ty: u32,
         pixel_buffer_offset: i32,
     ) {
         match self.raw {
@@ -1121,14 +1073,14 @@ impl super::Context for Context {
             }
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_i32(
-                    target.0,
+                    target,
                     level,
                     x_offset,
                     y_offset,
                     width,
                     height,
-                    format.0,
-                    ty.0,
+                    format,
+                    ty,
                     pixel_buffer_offset,
                 )
                 .unwrap(); // TODO: Handle return value?
@@ -1136,7 +1088,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn depth_func(&self, func: Func) {
+    unsafe fn depth_func(&self, func: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.depth_func(func as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.depth_func(func as u32),
@@ -1173,28 +1125,16 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataType,
+        data_type: u32,
         normalized: bool,
         stride: i32,
         offset: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib_pointer_with_i32(
-                index,
-                size,
-                data_type.0,
-                normalized,
-                stride,
-                offset,
-            ),
-            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_pointer_with_i32(
-                index,
-                size,
-                data_type.0,
-                normalized,
-                stride,
-                offset,
-            ),
+            RawRenderingContext::WebGl1(ref gl) => gl
+                .vertex_attrib_pointer_with_i32(index, size, data_type, normalized, stride, offset),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .vertex_attrib_pointer_with_i32(index, size, data_type, normalized, stride, offset),
         }
     }
 
@@ -1202,7 +1142,7 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataType,
+        data_type: u32,
         stride: i32,
         offset: i32,
     ) {
@@ -1211,7 +1151,7 @@ impl super::Context for Context {
                 panic!("Integer vertex attrib pointer is not supported")
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.vertex_attrib_i_pointer_with_i32(index, size, data_type.0, stride, offset)
+                gl.vertex_attrib_i_pointer_with_i32(index, size, data_type, stride, offset)
             }
         }
     }
@@ -1220,7 +1160,7 @@ impl super::Context for Context {
         &self,
         _index: u32,
         _size: i32,
-        _data_type: VertexDataType,
+        _data_type: u32,
         _stride: i32,
         _offset: i32,
     ) {
@@ -1238,28 +1178,23 @@ impl super::Context for Context {
         panic!("Viewport `f32` slice is not supported");
     }
 
-    unsafe fn blend_func(&self, src: BlendFactor, dst: BlendFactor) {
+    unsafe fn blend_func(&self, src: u32, dst: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.blend_func(src as u32, dst as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.blend_func(src as u32, dst as u32),
         }
     }
 
-    unsafe fn blend_func_draw_buffer(
-        &self,
-        _draw_buffer: u32,
-        _src: BlendFactor,
-        _dst: BlendFactor,
-    ) {
+    unsafe fn blend_func_draw_buffer(&self, _draw_buffer: u32, _src: u32, _dst: u32) {
         panic!("Draw buffer blend func is not supported");
     }
 
     unsafe fn blend_func_separate(
         &self,
-        src_rgb: BlendFactor,
-        dst_rgb: BlendFactor,
-        src_alpha: BlendFactor,
-        dst_alpha: BlendFactor,
+        src_rgb: u32,
+        dst_rgb: u32,
+        src_alpha: u32,
+        dst_alpha: u32,
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.blend_func_separate(
@@ -1280,26 +1215,26 @@ impl super::Context for Context {
     unsafe fn blend_func_separate_draw_buffer(
         &self,
         _draw_buffer: u32,
-        _src_rgb: BlendFactor,
-        _dst_rgb: BlendFactor,
-        _src_alpha: BlendFactor,
-        _dst_alpha: BlendFactor,
+        _src_rgb: u32,
+        _dst_rgb: u32,
+        _src_alpha: u32,
+        _dst_alpha: u32,
     ) {
         panic!("Draw buffer blend func separate is not supported");
     }
 
-    unsafe fn blend_equation(&self, mode: BlendMode) {
+    unsafe fn blend_equation(&self, mode: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.blend_equation(mode as u32),
             RawRenderingContext::WebGl2(ref gl) => gl.blend_equation(mode as u32),
         }
     }
 
-    unsafe fn blend_equation_draw_buffer(&self, _draw_buffer: u32, _mode: BlendMode) {
+    unsafe fn blend_equation_draw_buffer(&self, _draw_buffer: u32, _mode: u32) {
         panic!("Draw buffer blend equation is not supported");
     }
 
-    unsafe fn blend_equation_separate(&self, mode_rgb: BlendMode, mode_alpha: BlendMode) {
+    unsafe fn blend_equation_separate(&self, mode_rgb: u32, mode_alpha: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.blend_equation_separate(mode_rgb as u32, mode_alpha as u32)
@@ -1313,20 +1248,20 @@ impl super::Context for Context {
     unsafe fn blend_equation_separate_draw_buffer(
         &self,
         _draw_buffer: u32,
-        _mode_rgb: BlendMode,
-        _mode_alpha: BlendMode,
+        _mode_rgb: u32,
+        _mode_alpha: u32,
     ) {
         panic!("Draw buffer blend equation separate is not supported");
     }
 
-    unsafe fn stencil_func(&self, func: Func, reference: i32, mask: u32) {
+    unsafe fn stencil_func(&self, func: u32, reference: i32, mask: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.stencil_func(func as u32, reference, mask),
             RawRenderingContext::WebGl2(ref gl) => gl.stencil_func(func as u32, reference, mask),
         }
     }
 
-    unsafe fn stencil_func_separate(&self, face: Face, func: Func, reference: i32, mask: u32) {
+    unsafe fn stencil_func_separate(&self, face: u32, func: u32, reference: i32, mask: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.stencil_func_separate(face as u32, func as u32, reference, mask)
@@ -1344,14 +1279,14 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn stencil_mask_separate(&self, face: Face, mask: u32) {
+    unsafe fn stencil_mask_separate(&self, face: u32, mask: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.stencil_mask_separate(face as u32, mask),
             RawRenderingContext::WebGl2(ref gl) => gl.stencil_mask_separate(face as u32, mask),
         }
     }
 
-    unsafe fn stencil_op(&self, stencil_fail: StencilOp, depth_fail: StencilOp, pass: StencilOp) {
+    unsafe fn stencil_op(&self, stencil_fail: u32, depth_fail: u32, pass: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.stencil_op(stencil_fail as u32, depth_fail as u32, pass as u32)
@@ -1362,13 +1297,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn stencil_op_separate(
-        &self,
-        face: Face,
-        stencil_fail: StencilOp,
-        depth_fail: StencilOp,
-        pass: StencilOp,
-    ) {
+    unsafe fn stencil_op_separate(&self, face: u32, stencil_fail: u32, depth_fail: u32, pass: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.stencil_op_separate(
                 face as u32,

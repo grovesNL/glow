@@ -59,7 +59,7 @@ impl super::Context for Context {
         Ok(name)
     }
 
-    unsafe fn create_shader(&self, shader_type: ShaderType) -> Result<Self::Shader, String> {
+    unsafe fn create_shader(&self, shader_type: u32) -> Result<Self::Shader, String> {
         let gl = &self.raw;
         Ok(gl.CreateShader(shader_type as u32))
     }
@@ -120,14 +120,14 @@ impl super::Context for Context {
 
     unsafe fn get_tex_image(
         &self,
-        target: TextureTarget,
+        target: u32,
         level: i32,
-        format: TextureFormat,
-        ty: TextureType,
+        format: u32,
+        ty: u32,
         pixels: *mut std::ffi::c_void,
     ) {
         let gl = &self.raw;
-        gl.GetTexImage(target.0, level, format.0, ty.0, pixels);
+        gl.GetTexImage(target, level, format, ty, pixels);
     }
 
     unsafe fn create_program(&self) -> Result<Self::Program, String> {
@@ -194,14 +194,14 @@ impl super::Context for Context {
         Ok(buffer)
     }
 
-    unsafe fn bind_buffer(&self, target: BufferTarget, buffer: Option<Self::Buffer>) {
+    unsafe fn bind_buffer(&self, target: u32, buffer: Option<Self::Buffer>) {
         let gl = &self.raw;
-        gl.BindBuffer(target as u32, buffer.unwrap_or(0));
+        gl.BindBuffer(target, buffer.unwrap_or(0));
     }
 
     unsafe fn bind_buffer_range(
         &self,
-        target: BufferTarget,
+        target: u32,
         index: u32,
         buffer: Option<Self::Buffer>,
         offset: i32,
@@ -209,7 +209,7 @@ impl super::Context for Context {
     ) {
         let gl = &self.raw;
         gl.BindBufferRange(
-            target as u32,
+            target,
             index,
             buffer.unwrap_or(0),
             offset as isize,
@@ -217,22 +217,14 @@ impl super::Context for Context {
         );
     }
 
-    unsafe fn bind_framebuffer(
-        &self,
-        target: FramebufferTarget,
-        framebuffer: Option<Self::Framebuffer>,
-    ) {
+    unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>) {
         let gl = &self.raw;
-        gl.BindFramebuffer(target as u32, framebuffer.unwrap_or(0));
+        gl.BindFramebuffer(target, framebuffer.unwrap_or(0));
     }
 
-    unsafe fn bind_renderbuffer(
-        &self,
-        target: RenderbufferTarget,
-        renderbuffer: Option<Self::Renderbuffer>,
-    ) {
+    unsafe fn bind_renderbuffer(&self, target: u32, renderbuffer: Option<Self::Renderbuffer>) {
         let gl = &self.raw;
-        gl.BindRenderbuffer(target as u32, renderbuffer.unwrap_or(0));
+        gl.BindRenderbuffer(target, renderbuffer.unwrap_or(0));
     }
 
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
@@ -277,89 +269,69 @@ impl super::Context for Context {
         gl.ClearStencil(stencil);
     }
 
-    unsafe fn clear(&self, mask: ClearMask) {
+    unsafe fn clear(&self, mask: u32) {
         let gl = &self.raw;
-        gl.Clear(mask.bits());
+        gl.Clear(mask);
     }
 
-    unsafe fn patch_parameter_i32(&self, parameter: PatchParameterI32, value: i32) {
+    unsafe fn patch_parameter_i32(&self, parameter: u32, value: i32) {
         let gl = &self.raw;
-        gl.PatchParameteri(parameter as u32, value);
+        gl.PatchParameteri(parameter, value);
     }
 
-    unsafe fn pixel_store_i32(&self, parameter: PixelStoreParameterI32, value: i32) {
+    unsafe fn pixel_store_i32(&self, parameter: u32, value: i32) {
         let gl = &self.raw;
-        gl.PixelStorei(parameter as u32, value);
+        gl.PixelStorei(parameter, value);
     }
 
-    unsafe fn pixel_store_bool(&self, parameter: PixelStoreParameterBool, value: bool) {
+    unsafe fn pixel_store_bool(&self, parameter: u32, value: bool) {
         let gl = &self.raw;
-        gl.PixelStorei(parameter as u32, value as i32);
+        gl.PixelStorei(parameter, value as i32);
     }
 
-    unsafe fn clear_buffer_i32_slice(
-        &self,
-        target: FramebufferBufferTarget,
-        draw_buffer: u32,
-        values: &mut [i32],
-    ) {
+    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
         let gl = &self.raw;
-        gl.ClearBufferiv(target as u32, draw_buffer as i32, values.as_ptr());
+        gl.ClearBufferiv(target, draw_buffer as i32, values.as_ptr());
     }
 
-    unsafe fn clear_buffer_u32_slice(
-        &self,
-        target: FramebufferBufferTarget,
-        draw_buffer: u32,
-        values: &mut [u32],
-    ) {
+    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &mut [u32]) {
         let gl = &self.raw;
-        gl.ClearBufferuiv(target as u32, draw_buffer as i32, values.as_ptr());
+        gl.ClearBufferuiv(target, draw_buffer as i32, values.as_ptr());
     }
 
-    unsafe fn clear_buffer_f32_slice(
-        &self,
-        target: FramebufferBufferTarget,
-        draw_buffer: u32,
-        values: &mut [f32],
-    ) {
+    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &mut [f32]) {
         let gl = &self.raw;
-        gl.ClearBufferfv(target as u32, draw_buffer as i32, values.as_ptr());
+        gl.ClearBufferfv(target, draw_buffer as i32, values.as_ptr());
     }
 
     unsafe fn clear_buffer_depth_stencil(
         &self,
-        target: FramebufferBufferTarget,
+        target: u32,
         draw_buffer: u32,
         depth: f32,
         stencil: i32,
     ) {
         let gl = &self.raw;
-        gl.ClearBufferfi(target as u32, draw_buffer as i32, depth, stencil);
+        gl.ClearBufferfi(target, draw_buffer as i32, depth, stencil);
     }
 
-    unsafe fn client_wait_sync(
-        &self,
-        fence: Self::Fence,
-        flags: ClientWaitSyncFlags,
-        timeout: i32,
-    ) -> ClientWaitSyncStatus {
+    unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: u32, timeout: i32) -> u32 {
         let gl = &self.raw;
-        ClientWaitSyncStatus::from_u32(gl.ClientWaitSync(fence, flags.bits(), timeout as u64))
+        gl.ClientWaitSync(fence, flags, timeout as u64)
     }
 
     unsafe fn copy_buffer_sub_data(
         &self,
-        src_target: BufferTarget,
-        dst_target: BufferTarget,
+        src_target: u32,
+        dst_target: u32,
         src_offset: i32,
         dst_offset: i32,
         size: i32,
     ) {
         let gl = &self.raw;
         gl.CopyBufferSubData(
-            src_target as u32,
-            dst_target as u32,
+            src_target,
+            dst_target,
             src_offset as isize,
             dst_offset as isize,
             size as isize,
@@ -396,14 +368,14 @@ impl super::Context for Context {
         gl.DeleteTextures(1, &texture);
     }
 
-    unsafe fn disable(&self, parameter: EnableParameter) {
+    unsafe fn disable(&self, parameter: u32) {
         let gl = &self.raw;
-        gl.Disable(parameter as u32);
+        gl.Disable(parameter);
     }
 
-    unsafe fn disable_draw_buffer(&self, parameter: EnableParameter, draw_buffer: u32) {
+    unsafe fn disable_draw_buffer(&self, parameter: u32, draw_buffer: u32) {
         let gl = &self.raw;
-        gl.Disablei(draw_buffer, parameter as u32);
+        gl.Disablei(draw_buffer, parameter);
     }
 
     unsafe fn disable_vertex_attrib_array(&self, index: u32) {
@@ -421,25 +393,19 @@ impl super::Context for Context {
         gl.DispatchComputeIndirect(offset as isize);
     }
 
-    unsafe fn draw_arrays(&self, mode: PrimitiveMode, first: i32, count: i32) {
+    unsafe fn draw_arrays(&self, mode: u32, first: i32, count: i32) {
         let gl = &self.raw;
         gl.DrawArrays(mode as u32, first, count);
     }
 
-    unsafe fn draw_arrays_instanced(
-        &self,
-        mode: PrimitiveMode,
-        first: i32,
-        count: i32,
-        instance_count: i32,
-    ) {
+    unsafe fn draw_arrays_instanced(&self, mode: u32, first: i32, count: i32, instance_count: i32) {
         let gl = &self.raw;
         gl.DrawArraysInstanced(mode as u32, first, count, instance_count);
     }
 
     unsafe fn draw_arrays_instanced_base_instance(
         &self,
-        mode: PrimitiveMode,
+        mode: u32,
         first: i32,
         count: i32,
         instance_count: i32,
@@ -465,13 +431,7 @@ impl super::Context for Context {
         gl.DrawBuffers(buffers.len() as i32, buffers.as_ptr());
     }
 
-    unsafe fn draw_elements(
-        &self,
-        mode: PrimitiveMode,
-        count: i32,
-        element_type: ElementType,
-        offset: i32,
-    ) {
+    unsafe fn draw_elements(&self, mode: u32, count: i32, element_type: u32, offset: i32) {
         let gl = &self.raw;
         gl.DrawElements(
             mode as u32,
@@ -483,9 +443,9 @@ impl super::Context for Context {
 
     unsafe fn draw_elements_base_vertex(
         &self,
-        mode: PrimitiveMode,
+        mode: u32,
         count: i32,
-        element_type: ElementType,
+        element_type: u32,
         offset: i32,
         base_vertex: i32,
     ) {
@@ -501,9 +461,9 @@ impl super::Context for Context {
 
     unsafe fn draw_elements_instanced(
         &self,
-        mode: PrimitiveMode,
+        mode: u32,
         count: i32,
-        element_type: ElementType,
+        element_type: u32,
         offset: i32,
         instance_count: i32,
     ) {
@@ -519,9 +479,9 @@ impl super::Context for Context {
 
     unsafe fn draw_elements_instanced_base_vertex(
         &self,
-        mode: PrimitiveMode,
+        mode: u32,
         count: i32,
-        element_type: ElementType,
+        element_type: u32,
         offset: i32,
         instance_count: i32,
         base_vertex: i32,
@@ -539,9 +499,9 @@ impl super::Context for Context {
 
     unsafe fn draw_elements_instanced_base_vertex_base_instance(
         &self,
-        mode: PrimitiveMode,
+        mode: u32,
         count: i32,
-        element_type: ElementType,
+        element_type: u32,
         offset: i32,
         instance_count: i32,
         base_vertex: i32,
@@ -559,14 +519,14 @@ impl super::Context for Context {
         );
     }
 
-    unsafe fn enable(&self, parameter: EnableParameter) {
+    unsafe fn enable(&self, parameter: u32) {
         let gl = &self.raw;
-        gl.Enable(parameter as u32);
+        gl.Enable(parameter);
     }
 
-    unsafe fn enable_draw_buffer(&self, parameter: EnableParameter, draw_buffer: u32) {
+    unsafe fn enable_draw_buffer(&self, parameter: u32, draw_buffer: u32) {
         let gl = &self.raw;
-        gl.Enablei(draw_buffer, parameter as u32);
+        gl.Enablei(draw_buffer, parameter);
     }
 
     unsafe fn enable_vertex_attrib_array(&self, index: u32) {
@@ -581,50 +541,44 @@ impl super::Context for Context {
 
     unsafe fn framebuffer_renderbuffer(
         &self,
-        target: FramebufferTarget,
+        target: u32,
         attachment: u32,
-        renderbuffer_target: RenderbufferTarget,
+        renderbuffer_target: u32,
         renderbuffer: Option<Self::Renderbuffer>,
     ) {
         let gl = &self.raw;
         gl.FramebufferRenderbuffer(
-            target as u32,
+            target,
             attachment,
-            renderbuffer_target as u32,
+            renderbuffer_target,
             renderbuffer.unwrap_or(0),
         );
     }
 
     unsafe fn framebuffer_texture(
         &self,
-        target: FramebufferTarget,
+        target: u32,
         attachment: u32,
         texture: Option<Self::Texture>,
         level: i32,
     ) {
         let gl = &self.raw;
-        gl.FramebufferTexture(target as u32, attachment, texture.unwrap_or(0), level);
+        gl.FramebufferTexture(target, attachment, texture.unwrap_or(0), level);
     }
 
     unsafe fn framebuffer_texture_layer(
         &self,
-        target: FramebufferTarget,
+        target: u32,
         attachment: u32,
         texture: Option<Self::Texture>,
         level: i32,
         layer: i32,
     ) {
         let gl = &self.raw;
-        gl.FramebufferTextureLayer(
-            target as u32,
-            attachment,
-            texture.unwrap_or(0),
-            level,
-            layer,
-        );
+        gl.FramebufferTextureLayer(target, attachment, texture.unwrap_or(0), level, layer);
     }
 
-    unsafe fn front_face(&self, value: FrontFace) {
+    unsafe fn front_face(&self, value: u32) {
         let gl = &self.raw;
         gl.FrontFace(value as u32);
     }
@@ -634,15 +588,36 @@ impl super::Context for Context {
         gl.GetError()
     }
 
-    unsafe fn get_parameter_indexed_i32(
-        &self,
-        parameter: GetParameterIndexed,
-        index: u32,
-    ) -> i32 {
+    unsafe fn get_parameter_i32(&self, parameter: u32) -> i32 {
         let gl = &self.raw;
         let mut value = 0;
-        gl.GetIntegeri_v(parameter as u32, index, &mut value);
+        gl.GetIntegerv(parameter, &mut value);
         value
+    }
+
+    unsafe fn get_parameter_indexed_i32(&self, parameter: u32, index: u32) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetIntegeri_v(parameter, index, &mut value);
+        value
+    }
+
+    unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String {
+        let gl = &self.raw;
+        let raw_ptr = gl.GetStringi(parameter, index);
+        std::ffi::CStr::from_ptr(raw_ptr as *const i8)
+            .to_str()
+            .unwrap()
+            .to_owned()
+    }
+
+    unsafe fn get_parameter_string(&self, parameter: u32) -> String {
+        let gl = &self.raw;
+        let raw_ptr = gl.GetString(parameter);
+        std::ffi::CStr::from_ptr(raw_ptr as *const i8)
+            .to_str()
+            .unwrap()
+            .to_owned()
     }
 
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
@@ -650,7 +625,7 @@ impl super::Context for Context {
         1 == gl.IsSync(fence.unwrap_or(0 as *const _))
     }
 
-    unsafe fn cull_face(&self, value: Face) {
+    unsafe fn cull_face(&self, value: u32) {
         let gl = &self.raw;
         gl.CullFace(value as u32);
     }
@@ -692,7 +667,7 @@ impl super::Context for Context {
         gl.PolygonOffset(factor, units);
     }
 
-    unsafe fn polygon_mode(&self, face: PolygonFace, mode: PolygonMode) {
+    unsafe fn polygon_mode(&self, face: u32, mode: u32) {
         let gl = &self.raw;
         gl.PolygonMode(face as u32, mode as u32);
     }
@@ -702,9 +677,9 @@ impl super::Context for Context {
         gl.Finish();
     }
 
-    unsafe fn bind_texture(&self, target: TextureTarget, texture: Option<Self::Texture>) {
+    unsafe fn bind_texture(&self, target: u32, texture: Option<Self::Texture>) {
         let gl = &self.raw;
-        gl.BindTexture(target.0, texture.unwrap_or(0));
+        gl.BindTexture(target, texture.unwrap_or(0));
     }
 
     unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>) {
@@ -717,108 +692,84 @@ impl super::Context for Context {
         gl.ActiveTexture(unit);
     }
 
-    unsafe fn fence_sync(
-        &self,
-        condition: FenceSyncCondition,
-        flags: FenceSyncFlags,
-    ) -> Result<Self::Fence, String> {
+    unsafe fn fence_sync(&self, condition: u32, flags: u32) -> Result<Self::Fence, String> {
         let gl = &self.raw;
-        Ok(gl.FenceSync(condition as u32, flags.bits()))
+        Ok(gl.FenceSync(condition as u32, flags))
     }
 
-    unsafe fn tex_parameter_f32(
-        &self,
-        target: TextureTarget,
-        parameter: TextureParameter,
-        value: f32,
-    ) {
+    unsafe fn tex_parameter_f32(&self, target: u32, parameter: u32, value: f32) {
         let gl = &self.raw;
-        gl.TexParameterf(target.0, parameter as u32, value);
+        gl.TexParameterf(target, parameter, value);
     }
 
-    unsafe fn tex_parameter_i32(
-        &self,
-        target: TextureTarget,
-        parameter: TextureParameter,
-        value: i32,
-    ) {
+    unsafe fn tex_parameter_i32(&self, target: u32, parameter: u32, value: i32) {
         let gl = &self.raw;
-        gl.TexParameteri(target.0, parameter as u32, value);
+        gl.TexParameteri(target, parameter, value);
     }
 
-    unsafe fn tex_parameter_f32_slice(
-        &self,
-        target: TextureTarget,
-        parameter: TextureParameter,
-        values: &[f32],
-    ) {
+    unsafe fn tex_parameter_f32_slice(&self, target: u32, parameter: u32, values: &[f32]) {
         let gl = &self.raw;
-        gl.TexParameterfv(target.0, parameter as u32, values.as_ptr());
+        gl.TexParameterfv(target, parameter, values.as_ptr());
     }
 
-    unsafe fn tex_parameter_i32_slice(
-        &self,
-        target: TextureTarget,
-        parameter: TextureParameter,
-        values: &[i32],
-    ) {
+    unsafe fn tex_parameter_i32_slice(&self, target: u32, parameter: u32, values: &[i32]) {
         let gl = &self.raw;
-        gl.TexParameteriv(target.0, parameter as u32, values.as_ptr());
+        gl.TexParameteriv(target, parameter, values.as_ptr());
     }
 
     unsafe fn tex_sub_image_2d_u8_slice(
         &self,
-        target: TextureTarget,
+        target: u32,
         level: i32,
         x_offset: i32,
         y_offset: i32,
         width: i32,
         height: i32,
-        format: TextureFormat,
-        ty: TextureType,
+        format: u32,
+        ty: u32,
         pixels: Option<&mut [u8]>,
     ) {
         let gl = &self.raw;
         gl.TexSubImage2D(
-            target.0,
+            target,
             level,
             x_offset,
             y_offset,
             width,
             height,
-            format.0,
-            ty.0,
+            format,
+            ty,
             pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
         );
     }
 
     unsafe fn tex_sub_image_2d_pixel_buffer_offset(
         &self,
-        target: TextureTarget,
+        target: u32,
         level: i32,
         x_offset: i32,
         y_offset: i32,
         width: i32,
         height: i32,
-        format: TextureFormat,
-        ty: TextureType,
+        format: u32,
+        ty: u32,
         pixel_buffer_offset: i32,
     ) {
         let gl = &self.raw;
         gl.TexSubImage2D(
-            target.0,
+            target,
             level,
             x_offset,
             y_offset,
             width,
             height,
-            format.0,
-            ty.0,
+            format,
+            ty,
             pixel_buffer_offset as *const std::ffi::c_void,
         );
     }
 
-    unsafe fn depth_func(&self, func: Func) {
+    unsafe fn depth_func(&self, func: u32) {
         let gl = &self.raw;
         gl.DepthFunc(func as u32);
     }
@@ -852,7 +803,7 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataType,
+        data_type: u32,
         normalized: bool,
         stride: i32,
         offset: i32,
@@ -861,7 +812,7 @@ impl super::Context for Context {
         gl.VertexAttribPointer(
             index,
             size,
-            data_type.0,
+            data_type,
             normalized as u8,
             stride,
             offset as *const std::ffi::c_void,
@@ -872,7 +823,7 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataType,
+        data_type: u32,
         stride: i32,
         offset: i32,
     ) {
@@ -880,7 +831,7 @@ impl super::Context for Context {
         gl.VertexAttribIPointer(
             index,
             size,
-            data_type.0,
+            data_type,
             stride,
             offset as *const std::ffi::c_void,
         );
@@ -890,7 +841,7 @@ impl super::Context for Context {
         &self,
         index: u32,
         size: i32,
-        data_type: VertexDataType,
+        data_type: u32,
         stride: i32,
         offset: i32,
     ) {
@@ -898,7 +849,7 @@ impl super::Context for Context {
         gl.VertexAttribLPointer(
             index,
             size,
-            data_type.0,
+            data_type,
             stride,
             offset as *const std::ffi::c_void,
         );
@@ -914,17 +865,17 @@ impl super::Context for Context {
         gl.ViewportArrayv(first, count, values.as_ptr() as *const f32);
     }
 
-    unsafe fn blend_equation(&self, mode: BlendMode) {
+    unsafe fn blend_equation(&self, mode: u32) {
         let gl = &self.raw;
         gl.BlendEquation(mode as u32);
     }
 
-    unsafe fn blend_equation_draw_buffer(&self, draw_buffer: u32, mode: BlendMode) {
+    unsafe fn blend_equation_draw_buffer(&self, draw_buffer: u32, mode: u32) {
         let gl = &self.raw;
         gl.BlendEquationi(draw_buffer, mode as u32);
     }
 
-    unsafe fn blend_equation_separate(&self, mode_rgb: BlendMode, mode_alpha: BlendMode) {
+    unsafe fn blend_equation_separate(&self, mode_rgb: u32, mode_alpha: u32) {
         let gl = &self.raw;
         gl.BlendEquationSeparate(mode_rgb as u32, mode_alpha as u32);
     }
@@ -932,29 +883,29 @@ impl super::Context for Context {
     unsafe fn blend_equation_separate_draw_buffer(
         &self,
         draw_buffer: u32,
-        mode_rgb: BlendMode,
-        mode_alpha: BlendMode,
+        mode_rgb: u32,
+        mode_alpha: u32,
     ) {
         let gl = &self.raw;
         gl.BlendEquationSeparatei(draw_buffer, mode_rgb as u32, mode_alpha as u32);
     }
 
-    unsafe fn blend_func(&self, src: BlendFactor, dst: BlendFactor) {
+    unsafe fn blend_func(&self, src: u32, dst: u32) {
         let gl = &self.raw;
         gl.BlendFunc(src as u32, dst as u32);
     }
 
-    unsafe fn blend_func_draw_buffer(&self, draw_buffer: u32, src: BlendFactor, dst: BlendFactor) {
+    unsafe fn blend_func_draw_buffer(&self, draw_buffer: u32, src: u32, dst: u32) {
         let gl = &self.raw;
         gl.BlendFunci(draw_buffer, src as u32, dst as u32);
     }
 
     unsafe fn blend_func_separate(
         &self,
-        src_rgb: BlendFactor,
-        dst_rgb: BlendFactor,
-        src_alpha: BlendFactor,
-        dst_alpha: BlendFactor,
+        src_rgb: u32,
+        dst_rgb: u32,
+        src_alpha: u32,
+        dst_alpha: u32,
     ) {
         let gl = &self.raw;
         gl.BlendFuncSeparate(
@@ -968,10 +919,10 @@ impl super::Context for Context {
     unsafe fn blend_func_separate_draw_buffer(
         &self,
         draw_buffer: u32,
-        src_rgb: BlendFactor,
-        dst_rgb: BlendFactor,
-        src_alpha: BlendFactor,
-        dst_alpha: BlendFactor,
+        src_rgb: u32,
+        dst_rgb: u32,
+        src_alpha: u32,
+        dst_alpha: u32,
     ) {
         let gl = &self.raw;
         gl.BlendFuncSeparatei(
@@ -983,12 +934,12 @@ impl super::Context for Context {
         );
     }
 
-    unsafe fn stencil_func(&self, func: Func, reference: i32, mask: u32) {
+    unsafe fn stencil_func(&self, func: u32, reference: i32, mask: u32) {
         let gl = &self.raw;
         gl.StencilFunc(func as u32, reference, mask);
     }
 
-    unsafe fn stencil_func_separate(&self, face: Face, func: Func, reference: i32, mask: u32) {
+    unsafe fn stencil_func_separate(&self, face: u32, func: u32, reference: i32, mask: u32) {
         let gl = &self.raw;
         gl.StencilFuncSeparate(face as u32, func as u32, reference, mask);
     }
@@ -998,23 +949,17 @@ impl super::Context for Context {
         gl.StencilMask(mask);
     }
 
-    unsafe fn stencil_mask_separate(&self, face: Face, mask: u32) {
+    unsafe fn stencil_mask_separate(&self, face: u32, mask: u32) {
         let gl = &self.raw;
         gl.StencilMaskSeparate(face as u32, mask);
     }
 
-    unsafe fn stencil_op(&self, stencil_fail: StencilOp, depth_fail: StencilOp, pass: StencilOp) {
+    unsafe fn stencil_op(&self, stencil_fail: u32, depth_fail: u32, pass: u32) {
         let gl = &self.raw;
         gl.StencilOp(stencil_fail as u32, depth_fail as u32, pass as u32);
     }
 
-    unsafe fn stencil_op_separate(
-        &self,
-        face: Face,
-        stencil_fail: StencilOp,
-        depth_fail: StencilOp,
-        pass: StencilOp,
-    ) {
+    unsafe fn stencil_op_separate(&self, face: u32, stencil_fail: u32, depth_fail: u32, pass: u32) {
         let gl = &self.raw;
         gl.StencilOpSeparate(
             face as u32,

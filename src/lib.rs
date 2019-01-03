@@ -344,7 +344,11 @@ pub trait Context {
 
     unsafe fn get_parameter_string(&self, parameter: u32) -> String;
 
-    unsafe fn get_uniform_location(&self, program: Self::Program, name: &str) -> Option<Self::UniformLocation>;
+    unsafe fn get_uniform_location(
+        &self,
+        program: Self::Program,
+        name: &str,
+    ) -> Option<Self::UniformLocation>;
 
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool;
 

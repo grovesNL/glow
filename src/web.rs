@@ -5,8 +5,8 @@ use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use web_sys::{
     WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlRenderbuffer,
-    WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture, WebGlUniformLocation,
-    WebGlVertexArrayObject,
+    WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
+    WebGlUniformLocation, WebGlVertexArrayObject,
 };
 
 #[derive(Debug)]
@@ -488,7 +488,12 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn bind_frag_data_location(&self, _program: Self::Program, _color_number: u32, _name: &str) {
+    unsafe fn bind_frag_data_location(
+        &self,
+        _program: Self::Program,
+        _color_number: u32,
+        _name: &str,
+    ) {
         panic!("Bind frag data location is not supported");
     }
 
@@ -967,7 +972,11 @@ impl super::Context for Context {
         .unwrap()
     }
 
-    unsafe fn get_uniform_location(&self, program: Self::Program, name: &str) -> Option<Self::UniformLocation> {
+    unsafe fn get_uniform_location(
+        &self,
+        program: Self::Program,
+        name: &str,
+    ) -> Option<Self::UniformLocation> {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         let raw_uniform = match self.raw {

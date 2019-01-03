@@ -711,8 +711,7 @@ impl super::Context for Context {
         name: &str,
     ) -> Option<Self::UniformLocation> {
         let gl = &self.raw;
-        Some(gl.GetUniformLocation(program, name.as_ptr() as *const i8)
-            as u32)
+        Some(gl.GetUniformLocation(program, name.as_ptr() as *const i8) as u32)
     }
 
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {

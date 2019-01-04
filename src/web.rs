@@ -935,7 +935,10 @@ impl super::Context for Context {
         }
         .unwrap()
         .as_f64()
-        .unwrap() as i32
+        .map(|v| v as i32)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0)
     }
 
     unsafe fn get_parameter_indexed_i32(&self, parameter: u32, index: u32) -> i32 {
@@ -947,7 +950,10 @@ impl super::Context for Context {
         }
         .unwrap()
         .as_f64()
-        .unwrap() as i32
+        .map(|v| v as i32)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0)
     }
 
     unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String {
@@ -959,7 +965,9 @@ impl super::Context for Context {
         }
         .unwrap()
         .as_string()
-        .unwrap()
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(String::from(""))
     }
 
     unsafe fn get_parameter_string(&self, parameter: u32) -> String {
@@ -969,7 +977,9 @@ impl super::Context for Context {
         }
         .unwrap()
         .as_string()
-        .unwrap()
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(String::from(""))
     }
 
     unsafe fn get_uniform_location(

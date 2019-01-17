@@ -983,6 +983,11 @@ impl super::Context for Context {
         gl.ScissorArrayv(first, count, scissors.as_ptr() as *const i32);
     }
 
+    unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32) {
+        let gl = &self.raw;
+        gl.VertexAttribDivisor(index, divisor);
+    }
+
     unsafe fn vertex_attrib_pointer_f32(
         &self,
         index: u32,

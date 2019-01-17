@@ -392,9 +392,8 @@ impl super::Context for Context {
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let raw_vertex_array = match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Vertex array objects are not supported");
+                panic!("Vertex array objects are not supported"); // TODO: Extension
             }
-            // TODO: Extension
             RawRenderingContext::WebGl2(ref gl) => gl.create_vertex_array(),
         };
 
@@ -413,9 +412,8 @@ impl super::Context for Context {
         match vertex_arrays.1.remove(vertex_array) {
             Some(ref va) => match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => {
-                    panic!("Vertex array objects are not supported");
+                    panic!("Vertex array objects are not supported"); // TODO: Extension
                 }
-                // TODO: Extension
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_vertex_array(Some(va)),
             },
             None => {}
@@ -427,9 +425,8 @@ impl super::Context for Context {
         let raw_vertex_array = vertex_array.map(|va| vertex_arrays.1.get_unchecked(va));
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Vertex array objects are not supported");
+                panic!("Vertex array objects are not supported"); // TODO: Extension
             }
-            // TODO: Extension
             RawRenderingContext::WebGl2(ref gl) => gl.bind_vertex_array(raw_vertex_array),
         }
     }
@@ -1368,6 +1365,15 @@ impl super::Context for Context {
 
     unsafe fn scissor_slice(&self, _first: u32, _count: i32, _scissors: &[[i32; 4]]) {
         panic!("Scissor slice is not supported");
+    }
+
+    unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Vertex attrib divisor is not supported"); // TODO: Extension
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_divisor(index, divisor),
+        }
     }
 
     unsafe fn vertex_attrib_pointer_f32(

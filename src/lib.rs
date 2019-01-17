@@ -484,6 +484,8 @@ pub trait Context {
 
     unsafe fn scissor_slice(&self, first: u32, count: i32, scissors: &[[i32; 4]]);
 
+    unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32);
+
     unsafe fn vertex_attrib_pointer_f32(
         &self,
         index: u32,

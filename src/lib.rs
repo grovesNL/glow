@@ -105,7 +105,7 @@ pub trait Context {
         level: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
+        pixels: Option<&[u8]>,
     );
 
     unsafe fn create_program(&self) -> Result<Self::Program, String>;
@@ -381,7 +381,7 @@ pub trait Context {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
+        pixels: Option<&[u8]>,
     );
 
     unsafe fn tex_storage_2d(
@@ -456,7 +456,7 @@ pub trait Context {
         height: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
+        pixels: Option<&[u8]>,
     );
 
     unsafe fn tex_sub_image_2d_pixel_buffer_offset(

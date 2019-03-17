@@ -237,7 +237,7 @@ impl super::Context for Context {
         _level: i32,
         _format: u32,
         _ty: u32,
-        _pixels: Option<&mut [u8]>,
+        _pixels: Option<&[u8]>,
     ) {
         panic!("Get tex image is not supported");
     }
@@ -1071,7 +1071,7 @@ impl super::Context for Context {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
+        pixels: Option<&[u8]>,
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1283,7 +1283,7 @@ impl super::Context for Context {
         height: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
+        pixels: Option<&[u8]>,
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {

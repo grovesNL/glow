@@ -125,7 +125,7 @@ impl super::Context for Context {
         level: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
+        pixels: Option<&[u8]>,
     ) {
         let gl = &self.raw;
         gl.GetTexImage(
@@ -760,7 +760,7 @@ impl super::Context for Context {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
+        pixels: Option<&[u8]>,
     ) {
         let gl = &self.raw;
         gl.TexImage2D(
@@ -911,7 +911,7 @@ impl super::Context for Context {
         height: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
+        pixels: Option<&[u8]>,
     ) {
         let gl = &self.raw;
         gl.TexSubImage2D(

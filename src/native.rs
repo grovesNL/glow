@@ -714,6 +714,15 @@ impl super::Context for Context {
         Some(gl.GetUniformLocation(program, name.as_ptr() as *const i8) as u32)
     }
 
+    unsafe fn get_attrib_location(
+        &self,
+        program: Self::Program,
+        name: &str
+    ) -> i32 {
+        let gl = &self.raw;
+        gl.GetAttribLocation(program, name.as_ptr() as *const i8) as i32
+    }
+
     unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
         let gl = &self.raw;
         1 == gl.IsSync(fence.unwrap_or(0 as *const _))
@@ -791,6 +800,96 @@ impl super::Context for Context {
     unsafe fn uniform_1_i32(&self, location: Option<Self::UniformLocation>, x: i32) {
         let gl = &self.raw;
         gl.Uniform1i(location.unwrap_or(0) as i32, x);
+    }
+
+    unsafe fn uniform_2_i32(&self, location: Option<Self::UniformLocation>, x: i32, y: i32) {
+        let gl = &self.raw;
+        gl.Uniform2i(location.unwrap_or(0) as i32, x, y);
+    }
+
+    unsafe fn uniform_3_i32(&self, location: Option<Self::UniformLocation>, x: i32, y: i32, z: i32) {
+        let gl = &self.raw;
+        gl.Uniform3i(location.unwrap_or(0) as i32, x, y, z);
+    }
+
+    unsafe fn uniform_4_i32(&self, location: Option<Self::UniformLocation>, x: i32, y: i32, z: i32, w: i32) {
+        let gl = &self.raw;
+        gl.Uniform4i(location.unwrap_or(0) as i32, x, y, z, w);
+    }
+
+    unsafe fn uniform_1_i32_v(&self, location: Option<Self::UniformLocation>, v: &mut [i32; 1]) {
+        let gl = &self.raw;
+        gl.Uniform1iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
+    }
+
+    unsafe fn uniform_2_i32_v(&self, location: Option<Self::UniformLocation>, v: &mut [i32; 2]) {
+        let gl = &self.raw;
+        gl.Uniform2iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
+    }
+
+    unsafe fn uniform_3_i32_v(&self, location: Option<Self::UniformLocation>, v: &mut [i32; 3]) {
+        let gl = &self.raw;
+        gl.Uniform3iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
+    }
+
+    unsafe fn uniform_4_i32_v(&self, location: Option<Self::UniformLocation>, v: &mut [i32; 4]) {
+        let gl = &self.raw;
+        gl.Uniform4iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
+    }
+
+    unsafe fn uniform_1_f32(&self, location: Option<Self::UniformLocation>, x: f32) {
+        let gl = &self.raw;
+        gl.Uniform1f(location.unwrap_or(0) as i32, x);
+    }
+
+    unsafe fn uniform_2_f32(&self, location: Option<Self::UniformLocation>, x: f32, y: f32) {
+        let gl = &self.raw;
+        gl.Uniform2f(location.unwrap_or(0) as i32, x, y);
+    }
+
+    unsafe fn uniform_3_f32(&self, location: Option<Self::UniformLocation>, x: f32, y: f32, z: f32) {
+        let gl = &self.raw;
+        gl.Uniform3f(location.unwrap_or(0) as i32, x, y, z);
+    }
+
+    unsafe fn uniform_4_f32(&self, location: Option<Self::UniformLocation>, x: f32, y: f32, z: f32, w: f32) {
+        let gl = &self.raw;
+        gl.Uniform4f(location.unwrap_or(0) as i32, x, y, z, w);
+    }
+
+    unsafe fn uniform_1_f32_v(&self, location: Option<Self::UniformLocation>, v: &[f32; 1]) {
+        let gl = &self.raw;
+        gl.Uniform1fv(location.unwrap_or(0) as i32, 1, v.as_ptr());
+    }
+
+    unsafe fn uniform_2_f32_v(&self, location: Option<Self::UniformLocation>, v: &[f32; 2]) {
+        let gl = &self.raw;
+        gl.Uniform2fv(location.unwrap_or(0) as i32, 1, v.as_ptr());
+    }
+
+    unsafe fn uniform_3_f32_v(&self, location: Option<Self::UniformLocation>, v: &[f32; 3]) {
+        let gl = &self.raw;
+        gl.Uniform3fv(location.unwrap_or(0) as i32, 1, v.as_ptr());
+    }
+
+    unsafe fn uniform_4_f32_v(&self, location: Option<Self::UniformLocation>, v: &[f32; 4]) {
+        let gl = &self.raw;
+        gl.Uniform4fv(location.unwrap_or(0) as i32, 1, v.as_ptr());
+    }
+
+    unsafe fn uniform_matrix_2_f32_v(&self, location: Option<Self::UniformLocation>, transpose: bool, v: &[f32; 4]) {
+        let gl = &self.raw;
+        gl.UniformMatrix2fv(location.unwrap_or(0) as i32, 1, transpose as u8, v.as_ptr());
+    }
+
+    unsafe fn uniform_matrix_3_f32_v(&self, location: Option<Self::UniformLocation>, transpose: bool, v: &[f32; 9]) {
+        let gl = &self.raw;
+        gl.UniformMatrix3fv(location.unwrap_or(0) as i32, 1, transpose as u8, v.as_ptr());
+    }
+
+    unsafe fn uniform_matrix_4_f32_v(&self, location: Option<Self::UniformLocation>, transpose: bool, v: &[f32; 16]) {
+        let gl = &self.raw;
+        gl.UniformMatrix4fv(location.unwrap_or(0) as i32, 1, transpose as u8, v.as_ptr());
     }
 
     unsafe fn unmap_buffer(&self, target: u32) {

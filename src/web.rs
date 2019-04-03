@@ -1000,6 +1000,19 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn get_attrib_location(
+        &self,
+        program: Self::Program,
+        name: &str,
+    ) -> i32 {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_attrib_location(raw_program, name),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_attrib_location(raw_program, name),
+        }
+    }
+
     unsafe fn is_sync(&self, fence: Self::Fence) -> bool {
         let fences = self.fences.borrow();
         let raw_fence = fences.1.get_unchecked(fence);
@@ -1129,6 +1142,168 @@ impl super::Context for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.uniform1i(raw_uniform_location, x),
             RawRenderingContext::WebGl2(ref gl) => gl.uniform1i(raw_uniform_location, x),
+        }
+    }
+
+    unsafe fn uniform_2_i32(&self, uniform_location: Option<Self::UniformLocation>, x: i32, y: i32) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform2i(raw_uniform_location, x, y),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform2i(raw_uniform_location, x, y),
+        }
+    }
+
+    unsafe fn uniform_3_i32(&self, uniform_location: Option<Self::UniformLocation>, x: i32, y: i32, z: i32) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform3i(raw_uniform_location, x, y, z),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform3i(raw_uniform_location, x, y, z),
+        }
+    }
+
+    unsafe fn uniform_4_i32(&self, uniform_location: Option<Self::UniformLocation>, x: i32, y: i32, z: i32, w: i32) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform3i(raw_uniform_location, x, y, z),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform3i(raw_uniform_location, x, y, z),
+        }
+    }
+
+    unsafe fn uniform_1_i32_v(&self, uniform_location: Option<Self::UniformLocation>, v: &mut [i32; 1]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform1iv_with_i32_array(raw_uniform_location, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform1iv_with_i32_array(raw_uniform_location, v),
+        }
+    }
+
+    unsafe fn uniform_2_i32_v(&self, uniform_location: Option<Self::UniformLocation>, v: &mut [i32; 2]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform2iv_with_i32_array(raw_uniform_location, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform2iv_with_i32_array(raw_uniform_location, v),
+        }
+    }
+
+    unsafe fn uniform_3_i32_v(&self, uniform_location: Option<Self::UniformLocation>, v: &mut [i32; 3]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform3iv_with_i32_array(raw_uniform_location, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform3iv_with_i32_array(raw_uniform_location, v),
+        }
+    }
+
+    unsafe fn uniform_4_i32_v(&self, uniform_location: Option<Self::UniformLocation>, v: &mut [i32; 4]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform4iv_with_i32_array(raw_uniform_location, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform4iv_with_i32_array(raw_uniform_location, v),
+        }
+    }
+
+    unsafe fn uniform_1_f32(&self, uniform_location: Option<Self::UniformLocation>, x: f32) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform1f(raw_uniform_location, x),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform1f(raw_uniform_location, x),
+        }
+    }
+
+    unsafe fn uniform_2_f32(&self, uniform_location: Option<Self::UniformLocation>, x: f32, y: f32) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform2f(raw_uniform_location, x, y),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform2f(raw_uniform_location, x, y),
+        }
+    }
+
+    unsafe fn uniform_3_f32(&self, uniform_location: Option<Self::UniformLocation>, x: f32, y: f32, z: f32) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform3f(raw_uniform_location, x, y, z),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform3f(raw_uniform_location, x, y, z),
+        }
+    }
+
+    unsafe fn uniform_4_f32(&self, uniform_location: Option<Self::UniformLocation>, x: f32, y: f32, z: f32, w: f32) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform4f(raw_uniform_location, x, y, z, w),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform4f(raw_uniform_location, x, y, z, w),
+        }
+    }
+
+    unsafe fn uniform_1_f32_v(&self, uniform_location: Option<Self::UniformLocation>, v: &[f32; 1]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform1fv_with_f32_array(raw_uniform_location, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform1fv_with_f32_array(raw_uniform_location, v),
+        }
+    }
+
+    unsafe fn uniform_2_f32_v(&self, uniform_location: Option<Self::UniformLocation>, v: &[f32; 2]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform2fv_with_f32_array(raw_uniform_location, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform2fv_with_f32_array(raw_uniform_location, v),
+        }
+    }
+
+    unsafe fn uniform_3_f32_v(&self, uniform_location: Option<Self::UniformLocation>, v: &[f32; 3]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform3fv_with_f32_array(raw_uniform_location, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform3fv_with_f32_array(raw_uniform_location, v),
+        }
+    }
+
+    unsafe fn uniform_4_f32_v(&self, uniform_location: Option<Self::UniformLocation>, v: &[f32; 4]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform4fv_with_f32_array(raw_uniform_location, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform4fv_with_f32_array(raw_uniform_location, v),
+        }
+    }
+
+    unsafe fn uniform_matrix_2_f32_v(&self, uniform_location: Option<Self::UniformLocation>, transpose: bool, v: &[f32; 4]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform_matrix2fv_with_f32_array(raw_uniform_location, transpose, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform_matrix2fv_with_f32_array(raw_uniform_location, transpose, v),
+        }
+    }
+
+    unsafe fn uniform_matrix_3_f32_v(&self, uniform_location: Option<Self::UniformLocation>, transpose: bool, v: &[f32; 9]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform_matrix3fv_with_f32_array(raw_uniform_location, transpose, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform_matrix3fv_with_f32_array(raw_uniform_location, transpose, v),
+        }
+    }
+
+    unsafe fn uniform_matrix_4_f32_v(&self, uniform_location: Option<Self::UniformLocation>, transpose: bool, v: &[f32; 16]) {
+        let uniform_locations = self.uniform_locations.borrow();
+        let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform_matrix4fv_with_f32_array(raw_uniform_location, transpose, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform_matrix4fv_with_f32_array(raw_uniform_location, transpose, v),
         }
     }
 

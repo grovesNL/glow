@@ -714,9 +714,9 @@ impl super::Context for Context {
         Some(gl.GetUniformLocation(program, name.as_ptr() as *const i8) as u32)
     }
 
-    unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
+    unsafe fn is_sync(&self, fence: Self::Fence) -> bool {
         let gl = &self.raw;
-        1 == gl.IsSync(fence.unwrap_or(0 as *const _))
+        1 == gl.IsSync(fence)
     }
 
     unsafe fn renderbuffer_storage(

@@ -350,7 +350,7 @@ pub trait Context {
         name: &str,
     ) -> Option<Self::UniformLocation>;
 
-    unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool;
+    unsafe fn is_sync(&self, fence: Self::Fence) -> bool;
 
     unsafe fn renderbuffer_storage(
         &self,

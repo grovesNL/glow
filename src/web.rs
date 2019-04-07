@@ -1013,12 +1013,12 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn is_sync(&self, fence: Option<Self::Fence>) -> bool {
+    unsafe fn is_sync(&self, fence: Self::Fence) -> bool {
         let fences = self.fences.borrow();
-        let raw_fence = fence.map(|f| fences.1.get_unchecked(f));
+        let raw_fence = fences.1.get_unchecked(fence);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Sync is not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.is_sync(raw_fence),
+            RawRenderingContext::WebGl2(ref gl) => gl.is_sync(Some(raw_fence)),
         }
     }
 

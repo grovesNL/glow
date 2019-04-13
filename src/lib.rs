@@ -169,7 +169,7 @@ pub trait Context {
 
     unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32);
 
-    unsafe fn buffer_data_u8_slice(&self, target: u32, data: &mut [u8], usage: u32);
+    unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32);
 
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&mut [u8]>, flags: u32);
 

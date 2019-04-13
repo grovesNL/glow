@@ -501,7 +501,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn buffer_data_u8_slice(&self, target: u32, data: &mut [u8], usage: u32) {
+    unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.buffer_data_with_u8_array(target, data, usage)

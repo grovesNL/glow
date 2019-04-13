@@ -311,7 +311,7 @@ impl super::Context for Context {
         gl.BufferData(target, size as isize, std::ptr::null(), usage);
     }
 
-    unsafe fn buffer_data_u8_slice(&self, target: u32, data: &mut [u8], usage: u32) {
+    unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32) {
         let gl = &self.raw;
         gl.BufferData(
             target,

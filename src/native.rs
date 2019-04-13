@@ -1,5 +1,6 @@
 use super::*;
 
+use std::ffi::CString;
 use std::sync::Arc;
 
 mod native_gl {
@@ -711,6 +712,7 @@ impl super::Context for Context {
         name: &str,
     ) -> Option<Self::UniformLocation> {
         let gl = &self.raw;
+        let name = CString::new(name).unwrap();
         Some(gl.GetUniformLocation(program, name.as_ptr() as *const i8) as u32)
     }
     
@@ -720,6 +722,7 @@ impl super::Context for Context {
         name: &str
     ) -> i32 {
         let gl = &self.raw;
+        let name = CString::new(name).unwrap();
         gl.GetAttribLocation(program, name.as_ptr() as *const i8) as i32
     }
 

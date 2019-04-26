@@ -13,7 +13,12 @@ name = "glow"
 path = "src/lib.rs"
 
 [target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
-glutin = "0.19"
+glutin = { version = "0.19", optional = true }
+sdl2 = { version = "0.32", optional = true }
+
+[features]
+default = ["glutin"]
+sdl = ["sdl2"]
 
 [target.wasm32-unknown-unknown.dependencies]
 js-sys = "0.3"

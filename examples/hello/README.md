@@ -6,6 +6,11 @@
 cargo run
 ```
 
+To use with sdl2
+```shell
+cargo run --no-default-featues --features=sdl
+```
+
 ## Web
 
 `cd` to `examples/hello` directory

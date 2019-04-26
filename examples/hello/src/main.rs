@@ -38,7 +38,7 @@ fn main() {
         };
 
         // Create a context from a glutin window on non-wasm32 targets
-        #[cfg(not(target_arch = "wasm32"))]
+        #[cfg(feature = "glutin")]
         let (window, gl, mut events_loop, render_loop, shader_version) = {
             use glutin::GlContext;
             let events_loop = glutin::EventsLoop::new();
@@ -54,6 +54,30 @@ fn main() {
             window.make_current().unwrap();
             let render_loop = glow::native::RenderLoop::from_window();
             (window, context, events_loop, render_loop, "#version 410")
+        };
+
+        // Create a context from a sdl2 window
+        #[cfg(feature = "sdl")]
+        let (window, gl, mut events_loop, render_loop, shader_version, gl_context) = {
+            use sdl2;
+            let sdl = sdl2::init().unwrap();
+            let video = sdl.video().unwrap();
+            let gl_attr = video.gl_attr();
+            gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
+            gl_attr.set_context_version(3, 0);
+
+            let window = video.window("Hello Triangle!", 1024, 769)
+                .opengl()
+                .resizable()
+                .build()
+                .unwrap();
+            let gl_context = window.gl_create_context().unwrap();
+            let context = glow::native::Context::from_loader_function(|s| {
+                video.gl_get_proc_address(s) as *const _
+            });
+            let render_loop = glow::native::RenderLoop::from_window();
+            let event_loop = sdl.event_pump().unwrap();
+            (window, context, event_loop, render_loop, "#version 410", gl_context)
         };
 
         let vertex_array = gl
@@ -117,7 +141,7 @@ fn main() {
 
         render_loop.run(move |running: &mut bool| {
             // Handle events differently between targets
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(feature = "glutin")]
             {
                 events_loop.poll_events(|event| match event {
                     glutin::Event::WindowEvent { event, .. } => match event {
@@ -127,6 +151,17 @@ fn main() {
                     _ => (),
                 });
                 window.swap_buffers().unwrap();
+            }
+
+            #[cfg(feature = "sdl")]
+            {
+                for event in events_loop.poll_iter() {
+                    match event {
+                        sdl2::event::Event::Quit {..} => *running = false,
+                        _ => {},
+                    }
+                }
+                window.gl_swap_window();
             }
 
             gl.clear(glow::COLOR_BUFFER_BIT);

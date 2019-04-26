@@ -1261,6 +1261,12 @@ impl super::Context for Context {
     }
 }
 
+#[cfg(feature = "glutin")]
+pub type WindowType = glutin::GlWindow;
+
+#[cfg(feature = "sdl")]
+pub type WindowType = sdl2::video::Window;
+
 pub struct RenderLoop;
 
 impl RenderLoop {
@@ -1270,7 +1276,7 @@ impl RenderLoop {
 }
 
 impl super::RenderLoop for RenderLoop {
-    type Window = Arc<glutin::GlWindow>;
+    type Window = Arc<WindowType>;
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
         let mut running = true;

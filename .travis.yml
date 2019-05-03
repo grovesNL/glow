@@ -3,11 +3,21 @@ rust:
   - stable
   - beta
   - nightly
+cache:
+  cargo: true
+branches:
+  only:
+    - staging
+    - trying
+    - master
+  except:
+    - staging.tmp
 matrix:
   allow_failures:
     - rust: nightly
   fast_finish: true
 script:
+  - sudo apt-get update && sudo apt-get install -qq libsdl2-dev # SDL
   - rustup target add wasm32-unknown-unknown
   - cargo build --verbose --features sdl2,glutin
   - cargo build --verbose --target wasm32-unknown-unknown

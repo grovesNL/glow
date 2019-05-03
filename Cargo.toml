@@ -17,8 +17,7 @@ glutin = { version = "0.19", optional = true }
 sdl2 = { version = "0.32", optional = true }
 
 [features]
-default = ["glutin"]
-sdl = ["sdl2"]
+default = []
 
 [target.wasm32-unknown-unknown.dependencies]
 js-sys = "0.3"

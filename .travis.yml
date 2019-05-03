@@ -9,6 +9,7 @@ matrix:
   fast_finish: true
 script:
   - rustup target add wasm32-unknown-unknown
-  - cargo build --all --verbose
-  - cargo build --all --verbose --target wasm32-unknown-unknown
-  - cargo test --all --verbose
+  - cargo build --verbose --features sdl2,glutin
+  - cargo build --verbose --target wasm32-unknown-unknown
+  - cargo test --verbose
+  - (cd examples && cargo build --features window-glutin && cargo build --features window-sdl2 && cargo build --target wasm32-unknown-unknown)

@@ -11,8 +11,9 @@ glutin = { version = "0.19", optional = true }
 sdl2 = { version = "0.32", optional = true }
 
 [features]
-default = ["glutin"]
-sdl = ["sdl2", "glow/sdl2"]
+default = []
+window-sdl2 = ["sdl2", "glow/sdl2"]
+window-glutin = ["glutin", "glow/glutin"]
 
 [target.wasm32-unknown-unknown.dependencies]
 web-sys = { version = "0.3", features=["console"] }

@@ -4,6 +4,12 @@ pub mod native;
 #[cfg(target_arch = "wasm32")]
 pub mod web;
 
+pub struct ActiveUniform {
+    pub size: i32,
+    pub utype: u32,
+    pub name: String,
+}
+
 pub trait Context {
     type Shader: Copy
         + Clone
@@ -122,6 +128,10 @@ pub trait Context {
 
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String;
 
+    unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32;
+
+    unsafe fn get_active_uniform(&self, program: Self::Program, index: u32) -> Option<ActiveUniform>;
+
     unsafe fn use_program(&self, program: Option<Self::Program>);
 
     unsafe fn create_buffer(&self) -> Result<Self::Buffer, String>;
@@ -140,6 +150,20 @@ pub trait Context {
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>);
 
     unsafe fn bind_renderbuffer(&self, target: u32, renderbuffer: Option<Self::Renderbuffer>);
+
+    unsafe fn blit_framebuffer(
+        &self,
+        src_x0: i32,
+        src_y0: i32,
+        src_x1: i32,
+        src_y1: i32,
+        dst_x0: i32,
+        dst_y0: i32,
+        dst_x1: i32,
+        dst_y1: i32,
+        mask: u32,
+        filter: u32,
+    );
 
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String>;
 

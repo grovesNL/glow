@@ -8,6 +8,7 @@ use web_sys::{
     WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
     WebGlUniformLocation, WebGlVertexArrayObject,
 };
+use js_sys::Array;
 
 #[derive(Debug)]
 enum RawRenderingContext {
@@ -325,6 +326,45 @@ impl super::Context for Context {
         .unwrap_or_else(|| String::from(""))
     }
 
+    unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32 {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_program_parameter(raw_program, WebGlRenderingContext::ACTIVE_UNIFORMS)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_program_parameter(raw_program, WebGl2RenderingContext::ACTIVE_UNIFORMS)
+            }
+        }
+        .as_f64()
+        .map(|v| v as u32)
+        .unwrap_or(0)
+    }
+
+    unsafe fn get_active_uniform(&self, program: Self::Program, index: u32) -> Option<ActiveUniform> {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_active_uniform(raw_program, index)
+                    .map(|au| ActiveUniform {
+                        size: au.size(),
+                        utype: au.type_(),
+                        name: au.name(),
+                    })
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_active_uniform(raw_program, index)
+                    .map(|au| ActiveUniform {
+                        size: au.size(),
+                        utype: au.type_(),
+                        name: au.name(),
+                    })
+            }
+        }
+    }
+
     unsafe fn use_program(&self, program: Option<Self::Program>) {
         let programs = self.programs.borrow();
         let raw_program = program.map(|p| programs.1.get_unchecked(p));
@@ -361,14 +401,22 @@ impl super::Context for Context {
 
     unsafe fn bind_buffer_range(
         &self,
-        _target: u32,
-        _index: u32,
-        _buffer: Option<Self::Buffer>,
-        _offset: i32,
-        _size: i32,
+        target: u32,
+        index: u32,
+        buffer: Option<Self::Buffer>,
+        offset: i32,
+        size: i32,
     ) {
-        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
-        panic!("Bind buffer range is not supported yet");
+        let buffers = self.buffers.borrow();
+        let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("bind_buffer_range not supported on webgl1");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.bind_buffer_range_with_i32_and_i32(target, index, raw_buffer, offset, size);
+            }
+        }
     }
 
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>) {
@@ -386,6 +434,38 @@ impl super::Context for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.bind_renderbuffer(target, raw_renderbuffer),
             RawRenderingContext::WebGl2(ref gl) => gl.bind_renderbuffer(target, raw_renderbuffer),
+        }
+    }
+
+    unsafe fn blit_framebuffer(
+        &self,
+        src_x0: i32,
+        src_y0: i32,
+        src_x1: i32,
+        src_y1: i32,
+        dst_x0: i32,
+        dst_y0: i32,
+        dst_x1: i32,
+        dst_y1: i32,
+        mask: u32,
+        filter: u32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("framebuffer blitting usupported in webgl1"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.blit_framebuffer(
+                    src_x0,
+                    src_y0,
+                    src_x1,
+                    src_y1,
+                    dst_x0,
+                    dst_y0,
+                    dst_x1,
+                    dst_y1,
+                    mask,
+                    filter,
+                );
+            }
         }
     }
 
@@ -721,14 +801,30 @@ impl super::Context for Context {
         panic!("Draw arrays instanced base instance is not supported");
     }
 
-    unsafe fn draw_buffer(&self, _draw_buffer: u32) {
-        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
-        panic!("Draw buffer is not supported yet");
+    unsafe fn draw_buffer(&self, draw_buffer: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("draw_buffer not supported on webgl1");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.draw_buffers(&Array::of1(&draw_buffer.into()));
+            }
+        }
     }
 
-    unsafe fn draw_buffers(&self, _buffers: &[u32]) {
-        // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
-        panic!("Draw buffers is not supported yet");
+    unsafe fn draw_buffers(&self, buffers: &[u32]) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("draw_buffers not supported on webgl1");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                let js_buffers = Array::new();
+                for &b in buffers {
+                    js_buffers.push(&b.into());
+                }
+                gl.draw_buffers(&js_buffers);
+            }
+        }
     }
 
     unsafe fn draw_elements(&self, mode: u32, count: i32, element_type: u32, offset: i32) {
@@ -1374,8 +1470,10 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn polygon_mode(&self, _face: u32, _mode: u32) {
-        panic!("Polygon mode is not supported");
+    unsafe fn polygon_mode(&self, _face: u32, mode: u32) {
+        if mode != FILL {
+            panic!("Polygon mode other than FILL is not supported");
+        }
     }
 
     unsafe fn finish(&self) {

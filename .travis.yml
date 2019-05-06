@@ -3,6 +3,7 @@ rust:
   - stable
   - beta
   - nightly
+dist: xenial
 cache:
   cargo: true
 branches:

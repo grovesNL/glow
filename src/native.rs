@@ -1,7 +1,6 @@
 use super::*;
 
 use std::ffi::CString;
-use std::sync::Arc;
 
 mod native_gl {
     include!(concat!(env!("OUT_DIR"), "/opengl_bindings.rs"));
@@ -715,12 +714,8 @@ impl super::Context for Context {
         let name = CString::new(name).unwrap();
         Some(gl.GetUniformLocation(program, name.as_ptr() as *const i8) as u32)
     }
-    
-    unsafe fn get_attrib_location(
-        &self,
-        program: Self::Program,
-        name: &str
-    ) -> i32 {
+
+    unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32 {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
         gl.GetAttribLocation(program, name.as_ptr() as *const i8) as i32
@@ -810,32 +805,61 @@ impl super::Context for Context {
         gl.Uniform2i(location.unwrap_or(0) as i32, x, y);
     }
 
-    unsafe fn uniform_3_i32(&self, location: Option<Self::UniformLocation>, x: i32, y: i32, z: i32) {
+    unsafe fn uniform_3_i32(
+        &self,
+        location: Option<Self::UniformLocation>,
+        x: i32,
+        y: i32,
+        z: i32,
+    ) {
         let gl = &self.raw;
         gl.Uniform3i(location.unwrap_or(0) as i32, x, y, z);
     }
 
-    unsafe fn uniform_4_i32(&self, location: Option<Self::UniformLocation>, x: i32, y: i32, z: i32, w: i32) {
+    unsafe fn uniform_4_i32(
+        &self,
+        location: Option<Self::UniformLocation>,
+        x: i32,
+        y: i32,
+        z: i32,
+        w: i32,
+    ) {
         let gl = &self.raw;
         gl.Uniform4i(location.unwrap_or(0) as i32, x, y, z, w);
     }
 
-    unsafe fn uniform_1_i32_slice(&self, location: Option<Self::UniformLocation>, v: &mut [i32; 1]) {
+    unsafe fn uniform_1_i32_slice(
+        &self,
+        location: Option<Self::UniformLocation>,
+        v: &mut [i32; 1],
+    ) {
         let gl = &self.raw;
         gl.Uniform1iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
     }
 
-    unsafe fn uniform_2_i32_slice(&self, location: Option<Self::UniformLocation>, v: &mut [i32; 2]) {
+    unsafe fn uniform_2_i32_slice(
+        &self,
+        location: Option<Self::UniformLocation>,
+        v: &mut [i32; 2],
+    ) {
         let gl = &self.raw;
         gl.Uniform2iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
     }
 
-    unsafe fn uniform_3_i32_slice(&self, location: Option<Self::UniformLocation>, v: &mut [i32; 3]) {
+    unsafe fn uniform_3_i32_slice(
+        &self,
+        location: Option<Self::UniformLocation>,
+        v: &mut [i32; 3],
+    ) {
         let gl = &self.raw;
         gl.Uniform3iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
     }
 
-    unsafe fn uniform_4_i32_slice(&self, location: Option<Self::UniformLocation>, v: &mut [i32; 4]) {
+    unsafe fn uniform_4_i32_slice(
+        &self,
+        location: Option<Self::UniformLocation>,
+        v: &mut [i32; 4],
+    ) {
         let gl = &self.raw;
         gl.Uniform4iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
     }
@@ -850,12 +874,25 @@ impl super::Context for Context {
         gl.Uniform2f(location.unwrap_or(0) as i32, x, y);
     }
 
-    unsafe fn uniform_3_f32(&self, location: Option<Self::UniformLocation>, x: f32, y: f32, z: f32) {
+    unsafe fn uniform_3_f32(
+        &self,
+        location: Option<Self::UniformLocation>,
+        x: f32,
+        y: f32,
+        z: f32,
+    ) {
         let gl = &self.raw;
         gl.Uniform3f(location.unwrap_or(0) as i32, x, y, z);
     }
 
-    unsafe fn uniform_4_f32(&self, location: Option<Self::UniformLocation>, x: f32, y: f32, z: f32, w: f32) {
+    unsafe fn uniform_4_f32(
+        &self,
+        location: Option<Self::UniformLocation>,
+        x: f32,
+        y: f32,
+        z: f32,
+        w: f32,
+    ) {
         let gl = &self.raw;
         gl.Uniform4f(location.unwrap_or(0) as i32, x, y, z, w);
     }
@@ -880,17 +917,32 @@ impl super::Context for Context {
         gl.Uniform4fv(location.unwrap_or(0) as i32, 1, v.as_ptr());
     }
 
-    unsafe fn uniform_matrix_2_f32_slice(&self, location: Option<Self::UniformLocation>, transpose: bool, v: &[f32; 4]) {
+    unsafe fn uniform_matrix_2_f32_slice(
+        &self,
+        location: Option<Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32; 4],
+    ) {
         let gl = &self.raw;
         gl.UniformMatrix2fv(location.unwrap_or(0) as i32, 1, transpose as u8, v.as_ptr());
     }
 
-    unsafe fn uniform_matrix_3_f32_slice(&self, location: Option<Self::UniformLocation>, transpose: bool, v: &[f32; 9]) {
+    unsafe fn uniform_matrix_3_f32_slice(
+        &self,
+        location: Option<Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32; 9],
+    ) {
         let gl = &self.raw;
         gl.UniformMatrix3fv(location.unwrap_or(0) as i32, 1, transpose as u8, v.as_ptr());
     }
 
-    unsafe fn uniform_matrix_4_f32_slice(&self, location: Option<Self::UniformLocation>, transpose: bool, v: &[f32; 16]) {
+    unsafe fn uniform_matrix_4_f32_slice(
+        &self,
+        location: Option<Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32; 16],
+    ) {
         let gl = &self.raw;
         gl.UniformMatrix4fv(location.unwrap_or(0) as i32, 1, transpose as u8, v.as_ptr());
     }
@@ -1261,27 +1313,46 @@ impl super::Context for Context {
     }
 }
 
+pub struct RenderLoop<W> {
+    window: W,
+}
+
 #[cfg(feature = "glutin")]
-pub type WindowType = glutin::GlWindow;
-
-#[cfg(feature = "sdl")]
-pub type WindowType = sdl2::video::Window;
-
-pub struct RenderLoop;
-
-impl RenderLoop {
-    pub fn from_window() -> Self {
-        RenderLoop
+impl RenderLoop<glutin::GlWindow> {
+    pub fn from_glutin_window(window: glutin::GlWindow) -> Self {
+        RenderLoop { window }
     }
 }
 
-impl super::RenderLoop for RenderLoop {
-    type Window = Arc<WindowType>;
+#[cfg(feature = "glutin")]
+impl super::RenderLoop for RenderLoop<glutin::GlWindow> {
+    type Window = glutin::GlWindow;
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
         let mut running = true;
         while running {
             callback(&mut running);
+            self.window.swap_buffers().unwrap();
+        }
+    }
+}
+
+#[cfg(feature = "sdl2")]
+impl RenderLoop<sdl2::video::Window> {
+    pub fn from_sdl_window(window: sdl2::video::Window) -> Self {
+        RenderLoop { window }
+    }
+}
+
+#[cfg(feature = "sdl2")]
+impl super::RenderLoop for RenderLoop<sdl2::video::Window> {
+    type Window = sdl2::video::Window;
+
+    fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
+        let mut running = true;
+        while running {
+            callback(&mut running);
+            self.window.gl_swap_window();
         }
     }
 }

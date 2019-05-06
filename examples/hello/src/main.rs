@@ -38,8 +38,8 @@ fn main() {
         };
 
         // Create a context from a glutin window on non-wasm32 targets
-        #[cfg(feature = "glutin")]
-        let (window, gl, mut events_loop, render_loop, shader_version) = {
+        #[cfg(feature = "window-glutin")]
+        let (gl, mut events_loop, render_loop, shader_version) = {
             use glutin::GlContext;
             let events_loop = glutin::EventsLoop::new();
             let window_builder = glutin::WindowBuilder::new()
@@ -52,21 +52,20 @@ fn main() {
                 window.get_proc_address(s) as *const _
             });
             window.make_current().unwrap();
-            let render_loop = glow::native::RenderLoop::from_window();
-            (window, context, events_loop, render_loop, "#version 410")
+            let render_loop = glow::native::RenderLoop::<glutin::GlWindow>::from_glutin_window(window);
+            (context, events_loop, render_loop, "#version 410")
         };
 
         // Create a context from a sdl2 window
-        #[cfg(feature = "sdl")]
-        let (window, gl, mut events_loop, render_loop, shader_version, gl_context) = {
-            use sdl2;
+        #[cfg(feature = "window-sdl2")]
+        let (gl, mut events_loop, render_loop, shader_version, _gl_context) = {
             let sdl = sdl2::init().unwrap();
             let video = sdl.video().unwrap();
             let gl_attr = video.gl_attr();
             gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
             gl_attr.set_context_version(3, 0);
 
-            let window = video.window("Hello Triangle!", 1024, 769)
+            let window = video.window("Hello triangle!", 1024, 769)
                 .opengl()
                 .resizable()
                 .build()
@@ -75,9 +74,9 @@ fn main() {
             let context = glow::native::Context::from_loader_function(|s| {
                 video.gl_get_proc_address(s) as *const _
             });
-            let render_loop = glow::native::RenderLoop::from_window();
+            let render_loop = glow::native::RenderLoop::<sdl2::video::Window>::from_sdl_window(window);
             let event_loop = sdl.event_pump().unwrap();
-            (window, context, event_loop, render_loop, "#version 410", gl_context)
+            (context, event_loop, render_loop, "#version 410", gl_context)
         };
 
         let vertex_array = gl
@@ -141,7 +140,7 @@ fn main() {
 
         render_loop.run(move |running: &mut bool| {
             // Handle events differently between targets
-            #[cfg(feature = "glutin")]
+            #[cfg(feature = "window-glutin")]
             {
                 events_loop.poll_events(|event| match event {
                     glutin::Event::WindowEvent { event, .. } => match event {
@@ -150,10 +149,9 @@ fn main() {
                     },
                     _ => (),
                 });
-                window.swap_buffers().unwrap();
             }
 
-            #[cfg(feature = "sdl")]
+            #[cfg(feature = "window-sdl2")]
             {
                 for event in events_loop.poll_iter() {
                     match event {
@@ -161,7 +159,6 @@ fn main() {
                         _ => {},
                     }
                 }
-                window.gl_swap_window();
             }
 
             gl.clear(glow::COLOR_BUFFER_BIT);

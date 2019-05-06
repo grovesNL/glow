@@ -2,13 +2,16 @@
 
 ## Native
 
+To run with glutin:
+
 ```shell
-cargo run
+cargo run --features=window-glutin
 ```
 
-To use with sdl2
+To run with sdl2:
+
 ```shell
-cargo run --no-default-featues --features=sdl
+cargo run --features=window-sdl2
 ```
 
 ## Web

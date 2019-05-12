@@ -52,7 +52,8 @@ fn main() {
                 window.get_proc_address(s) as *const _
             });
             window.make_current().unwrap();
-            let render_loop = glow::native::RenderLoop::<glutin::GlWindow>::from_glutin_window(window);
+            let render_loop =
+                glow::native::RenderLoop::<glutin::GlWindow>::from_glutin_window(window);
             (context, events_loop, render_loop, "#version 410")
         };
 
@@ -65,7 +66,8 @@ fn main() {
             gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
             gl_attr.set_context_version(3, 0);
 
-            let window = video.window("Hello triangle!", 1024, 769)
+            let window = video
+                .window("Hello triangle!", 1024, 769)
                 .opengl()
                 .resizable()
                 .build()
@@ -74,7 +76,8 @@ fn main() {
             let context = glow::native::Context::from_loader_function(|s| {
                 video.gl_get_proc_address(s) as *const _
             });
-            let render_loop = glow::native::RenderLoop::<sdl2::video::Window>::from_sdl_window(window);
+            let render_loop =
+                glow::native::RenderLoop::<sdl2::video::Window>::from_sdl_window(window);
             let event_loop = sdl.event_pump().unwrap();
             (context, event_loop, render_loop, "#version 410", gl_context)
         };
@@ -155,8 +158,8 @@ fn main() {
             {
                 for event in events_loop.poll_iter() {
                     match event {
-                        sdl2::event::Event::Quit {..} => *running = false,
-                        _ => {},
+                        sdl2::event::Event::Quit { .. } => *running = false,
+                        _ => {}
                     }
                 }
             }

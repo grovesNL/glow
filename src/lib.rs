@@ -380,6 +380,8 @@ pub trait Context {
 
     unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32;
 
+    unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32;
+
     unsafe fn is_sync(&self, fence: Self::Fence) -> bool;
 
     unsafe fn renderbuffer_storage(
@@ -414,6 +416,20 @@ pub trait Context {
         pixels: Option<&[u8]>,
     );
 
+    unsafe fn tex_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&[u8]>,
+    );
+
     unsafe fn tex_storage_2d(
         &self,
         target: u32,
@@ -421,6 +437,16 @@ pub trait Context {
         internal_format: u32,
         width: i32,
         height: i32,
+    );
+
+    unsafe fn tex_storage_3d(
+        &self,
+        target: u32,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+        depth: i32,
     );
 
     unsafe fn uniform_1_i32(&self, location: Option<Self::UniformLocation>, x: i32);

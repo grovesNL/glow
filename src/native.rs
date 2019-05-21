@@ -775,6 +775,14 @@ impl super::Context for Context {
         gl.GetAttribLocation(program, name.as_ptr() as *const i8) as i32
     }
 
+    unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32 {
+        let gl = &self.raw;
+        let mut len = 0;
+        let mut values = [UNSIGNALED as i32];
+        gl.GetSynciv(fence, SYNC_STATUS, values.len() as i32, &mut len, values.as_mut_ptr());
+        values[0] as u32
+    }
+
     unsafe fn is_sync(&self, fence: Self::Fence) -> bool {
         let gl = &self.raw;
         1 == gl.IsSync(fence)
@@ -837,6 +845,34 @@ impl super::Context for Context {
         );
     }
 
+    unsafe fn tex_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&[u8]>,
+    ) {
+        let gl = &self.raw;
+        gl.TexImage3D(
+            target,
+            level,
+            internal_format,
+            width,
+            height,
+            depth,
+            border,
+            format,
+            ty,
+            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+        );
+    }
+
     unsafe fn tex_storage_2d(
         &self,
         target: u32,
@@ -847,6 +883,19 @@ impl super::Context for Context {
     ) {
         let gl = &self.raw;
         gl.TexStorage2D(target, levels, internal_format, width, height);
+    }
+
+    unsafe fn tex_storage_3d(
+        &self,
+        target: u32,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+        depth: i32,
+    ) {
+        let gl = &self.raw;
+        gl.TexStorage3D(target, levels, internal_format, width, height, depth);
     }
 
     unsafe fn uniform_1_i32(&self, location: Option<Self::UniformLocation>, x: i32) {

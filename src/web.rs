@@ -1102,6 +1102,20 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32 {
+        let fences = self.fences.borrow();
+        let raw_fence = fences.1.get_unchecked(fence);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Sync is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_sync_parameter(raw_fence, SYNC_STATUS)
+                    .as_f64()
+                    .map(|v| v as u32)
+                    .unwrap_or(UNSIGNALED)
+            }
+        }
+    }
+
     unsafe fn is_sync(&self, fence: Self::Fence) -> bool {
         let fences = self.fences.borrow();
         let raw_fence = fences.1.get_unchecked(fence);
@@ -1209,6 +1223,42 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn tex_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&[u8]>,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                panic!("3d textures are not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_3d_with_opt_u8_array(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    depth,
+                    border,
+                    format,
+                    ty,
+                    pixels,
+                )
+                .unwrap();
+            }
+        }
+    }
+
     unsafe fn tex_storage_2d(
         &self,
         target: u32,
@@ -1221,6 +1271,23 @@ impl super::Context for Context {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Tex storage 2D is not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.tex_storage_2d(target, levels, internal_format, width, height);
+            }
+        }
+    }
+
+    unsafe fn tex_storage_3d(
+        &self,
+        target: u32,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+        depth: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Tex storage 3D is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_storage_3d(target, levels, internal_format, width, height, depth);
             }
         }
     }

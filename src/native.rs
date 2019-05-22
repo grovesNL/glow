@@ -476,7 +476,7 @@ impl super::Context for Context {
 
     unsafe fn disable_draw_buffer(&self, parameter: u32, draw_buffer: u32) {
         let gl = &self.raw;
-        gl.Disablei(draw_buffer, parameter);
+        gl.Disablei(parameter, draw_buffer);
     }
 
     unsafe fn disable_vertex_attrib_array(&self, index: u32) {

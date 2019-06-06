@@ -1,8 +1,13 @@
-# glow
-
-GL on Whatever: a set of bindings to run GL anywhere (Open GL, OpenGL ES, and WebGL) and avoid target-specific code.
-
-This is heavily work-in-progress and should be considered experimental.
+<h1 align="center">
+  glow
+</h1>
+<div align="center">
+  GL on Whatever: a set of bindings to run GL anywhere (Open GL, OpenGL ES, and WebGL) and avoid target-specific code.
+</div>
+<br />
+<div align="center">
+  <a href="https://crates.io/crates/glow"><img src="https://img.shields.io/crates/v/glow.svg?label=glow" alt="Crate"></a> <a href="https://travis-ci.org/grovesNL/glow"><img src="https://travis-ci.org/grovesNL/glow.svg?branch=master" alt="Travis Build Status" /></a>
+</div>
 
 ## License
 

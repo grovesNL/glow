@@ -119,7 +119,7 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn get_tex_image(
+    unsafe fn get_tex_image_u8_slice(
         &self,
         target: u32,
         level: i32,
@@ -134,6 +134,24 @@ impl super::Context for Context {
             format,
             ty,
             pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *mut std::ffi::c_void,
+        );
+    }
+
+    unsafe fn get_tex_image_pixel_buffer_offset(
+        &self,
+        target: u32,
+        level: i32,
+        format: u32,
+        ty: u32,
+        pixel_buffer_offset: i32,
+    ) {
+        let gl = &self.raw;
+        gl.GetTexImage(
+            target,
+            level,
+            format,
+            ty,
+            pixel_buffer_offset as *mut std::ffi::c_void,
         );
     }
 

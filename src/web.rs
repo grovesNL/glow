@@ -1661,6 +1661,15 @@ impl super::Context for Context {
         panic!("Map buffer range is not supported")
     }
 
+    unsafe fn flush_mapped_buffer_range(
+        &self,
+        _target: u32,
+        _offset: i32,
+        _length: i32,
+    ) {
+        panic!("flush mapped buffer range is not supported")
+    }
+
     unsafe fn polygon_offset(&self, factor: f32, units: f32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.polygon_offset(factor, units),

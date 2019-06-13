@@ -1121,6 +1121,16 @@ impl super::Context for Context {
         gl.MapBufferRange(target, offset as isize, length as isize, access) as *mut u8
     }
 
+    unsafe fn flush_mapped_buffer_range(
+        &self,
+        target: u32,
+        offset: i32,
+        length: i32,
+    ) {
+        let gl = &self.raw;
+        gl.FlushMappedBufferRange(target, offset as isize, length as isize)
+    }
+
     unsafe fn polygon_offset(&self, factor: f32, units: f32) {
         let gl = &self.raw;
         gl.PolygonOffset(factor, units);

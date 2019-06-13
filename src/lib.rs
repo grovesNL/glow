@@ -105,13 +105,22 @@ pub trait Context {
 
     unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String;
 
-    unsafe fn get_tex_image(
+    unsafe fn get_tex_image_u8_slice(
         &self,
         target: u32,
         level: i32,
         format: u32,
         ty: u32,
         pixels: Option<&[u8]>,
+    );
+
+    unsafe fn get_tex_image_pixel_buffer_offset(
+        &self,
+        target: u32,
+        level: i32,
+        format: u32,
+        ty: u32,
+        pixel_buffer_offset: i32,
     );
 
     unsafe fn create_program(&self) -> Result<Self::Program, String>;

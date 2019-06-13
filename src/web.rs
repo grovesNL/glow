@@ -232,13 +232,24 @@ impl super::Context for Context {
         .unwrap_or_else(|| String::from(""))
     }
 
-    unsafe fn get_tex_image(
+    unsafe fn get_tex_image_u8_slice(
         &self,
         _target: u32,
         _level: i32,
         _format: u32,
         _ty: u32,
         _pixels: Option<&[u8]>,
+    ) {
+        panic!("Get tex image is not supported");
+    }
+
+    unsafe fn get_tex_image_pixel_buffer_offset(
+        &self,
+        _target: u32,
+        _level: i32,
+        _format: u32,
+        _ty: u32,
+        _pixel_buffer_offset: i32,
     ) {
         panic!("Get tex image is not supported");
     }

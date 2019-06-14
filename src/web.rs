@@ -600,6 +600,17 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn buffer_sub_data(&self, target: u32, offset: i32, src_data: &[u8]) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.buffer_sub_data_with_i32_and_u8_array(target, offset, src_data)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.buffer_sub_data_with_i32_and_u8_array(target, offset, src_data)
+            }
+        }
+    }
+
     unsafe fn buffer_storage(
         &self,
         _target: u32,

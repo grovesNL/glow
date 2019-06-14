@@ -393,6 +393,16 @@ impl super::Context for Context {
         );
     }
 
+    unsafe fn buffer_sub_data(&self, target: u32, offset: i32, src_data: &[u8]) {
+        let gl = &self.raw;
+        gl.BufferSubData(
+            target,
+            offset as isize,
+            src_data.len() as isize,
+            src_data.as_ptr() as *const std::ffi::c_void,
+        );
+    }
+
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&mut [u8]>, flags: u32) {
         let gl = &self.raw;
         gl.BufferStorage(

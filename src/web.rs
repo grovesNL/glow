@@ -1667,7 +1667,16 @@ impl super::Context for Context {
         _offset: i32,
         _length: i32,
     ) {
-        panic!("flush mapped buffer range is not supported")
+        panic!("Flush mapped buffer range is not supported")
+    }
+
+    unsafe fn invalidate_buffer_sub_data(
+        &self,
+        _target: u32,
+        _offset: i32,
+        _length: i32,
+    ) {
+        panic!("Invalidate buffer sub data is not supported")
     }
 
     unsafe fn polygon_offset(&self, factor: f32, units: f32) {

@@ -208,7 +208,7 @@ pub trait Context {
 
     unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32);
 
-    unsafe fn buffer_sub_data(&self, target: u32, offset: i32, src_data: &[u8]);
+    unsafe fn buffer_sub_data_u8_slice(&self, target: u32, offset: i32, src_data: &[u8]);
 
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&mut [u8]>, flags: u32);
 

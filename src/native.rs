@@ -393,7 +393,7 @@ impl super::Context for Context {
         );
     }
 
-    unsafe fn buffer_sub_data(&self, target: u32, offset: i32, src_data: &[u8]) {
+    unsafe fn buffer_sub_data_u8_slice(&self, target: u32, offset: i32, src_data: &[u8]) {
         let gl = &self.raw;
         gl.BufferSubData(
             target,

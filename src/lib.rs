@@ -10,6 +10,15 @@ pub struct ActiveUniform {
     pub name: String,
 }
 
+#[derive(Debug)]
+pub struct DebugMessageLogEntry {
+    source: u32,
+    msg_type: u32,
+    id: u32,
+    severity: u32,
+    message: String,
+}
+
 pub trait Context {
     type Shader: Copy
         + Clone
@@ -84,6 +93,7 @@ pub trait Context {
         + Ord
         + PartialEq
         + PartialOrd;
+    type DebugProc;
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String>;
 
@@ -684,6 +694,50 @@ pub trait Context {
     unsafe fn stencil_op(&self, stencil_fail: u32, depth_fail: u32, pass: u32);
 
     unsafe fn stencil_op_separate(&self, face: u32, stencil_fail: u32, depth_fail: u32, pass: u32);
+
+    unsafe fn debug_message_control(
+        &self,
+        source: u32,
+        msg_type: u32,
+        severity: u32,
+        ids: Option<&[u32]>,
+        enabled: bool,
+    );
+
+    unsafe fn debug_message_insert<S>(
+        &self,
+        source: u32,
+        msg_type: u32,
+        id: u32,
+        severity: u32,
+        msg: S,
+    ) where
+        S: AsRef<str>;
+
+    unsafe fn debug_message_callback(
+        &self,
+        callback: Self::DebugProc,
+        user_data: *mut std::ffi::c_void,
+    );
+
+    unsafe fn get_debug_message_log(
+        &self,
+        count: u32,
+    ) -> Vec<DebugMessageLogEntry>;
+
+    unsafe fn get_pointerv(&self, pname: u32, params: *const *mut std::ffi::c_void);
+
+    unsafe fn push_debug_group<S>(&self, source: u32, id: u32, message: S) where S: AsRef<str>;
+
+    unsafe fn pop_debug_group(&self);
+
+    unsafe fn object_label<S>(&self, identifier: u32, name: u32, label: S) where S: AsRef<str>;
+
+    unsafe fn get_object_label(&self, identifier: u32, name: u32) -> String;
+
+    unsafe fn object_ptr_label<S>(&self, ptr: *mut std::ffi::c_void, label: S) where S: AsRef<str>;
+
+    unsafe fn get_object_ptr_label(&self, ptr: *mut std::ffi::c_void) -> String;
 }
 
 pub trait RenderLoop {
@@ -3330,6 +3384,18 @@ pub const VENDOR: u32 = 0x1F00;
 pub const VERSION: u32 = 0x1F02;
 #[allow(non_upper_case_globals)]
 pub const VERTEX_ARRAY: u32 = 0x8074;
+#[allow(non_upper_case_globals)]
+pub const VERTEX_ARRAY_POINTER: u32 = 0x808E;
+#[allow(non_upper_case_globals)]
+pub const NORMAL_ARRAY_POINTER: u32 = 0x808F;
+#[allow(non_upper_case_globals)]
+pub const COLOR_ARRAY_POINTER: u32 = 0x8090;
+#[allow(non_upper_case_globals)]
+pub const INDEX_ARRAY_POINTER: u32 = 0x8091;
+#[allow(non_upper_case_globals)]
+pub const TEXTURE_COORD_ARRAY_POINTER: u32 = 0x8092;
+#[allow(non_upper_case_globals)]
+pub const EDGE_FLAG_ARRAY_POINTER: u32 = 0x8093;
 #[allow(non_upper_case_globals)]
 pub const VERTEX_ARRAY_BINDING: u32 = 0x85B5;
 #[allow(non_upper_case_globals)]

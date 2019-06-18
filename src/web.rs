@@ -611,6 +611,15 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn get_buffer_sub_data(&self, target: u32, offset: i32, dst_data: &mut [u8]) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("get_buffer_sub_data not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_buffer_sub_data_with_i32_and_u8_array(target, offset, dst_data)
+            }
+        }
+    }
+
     unsafe fn buffer_storage(
         &self,
         _target: u32,

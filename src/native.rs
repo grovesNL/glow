@@ -6,8 +6,13 @@ mod native_gl {
     include!(concat!(env!("OUT_DIR"), "/opengl_bindings.rs"));
 }
 
+struct Constants {
+    max_label_length: i32,
+}
+
 pub struct Context {
     raw: native_gl::Gl,
+    constants: Constants,
 }
 
 impl Context {
@@ -16,7 +21,16 @@ impl Context {
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {
         let raw = native_gl::Gl::load_with(loader_function);
-        Context { raw }
+        let constants = Constants {
+            max_label_length: {
+                let mut val = 0;
+                unsafe {
+                    raw.GetIntegerv(MAX_LABEL_LENGTH, &mut val);
+                }
+                val
+            },
+        };
+        Context { raw, constants }
     }
 }
 
@@ -38,7 +52,6 @@ impl super::Context for Context {
     type Framebuffer = native_gl::types::GLuint;
     type Renderbuffer = native_gl::types::GLuint;
     type UniformLocation = native_gl::types::GLuint;
-    type DebugProc = native_gl::types::GLDEBUGPROC;
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {
         let gl = &self.raw;
@@ -780,7 +793,13 @@ impl super::Context for Context {
         let gl = &self.raw;
         let mut len = 0;
         let mut values = [UNSIGNALED as i32];
-        gl.GetSynciv(fence, SYNC_STATUS, values.len() as i32, &mut len, values.as_mut_ptr());
+        gl.GetSynciv(
+            fence,
+            SYNC_STATUS,
+            values.len() as i32,
+            &mut len,
+            values.as_mut_ptr(),
+        );
         values[0] as u32
     }
 
@@ -1421,18 +1440,22 @@ impl super::Context for Context {
         source: u32,
         msg_type: u32,
         severity: u32,
-        ids: Option<&[u32]>,
+        ids: &[u32],
         enabled: bool,
     ) {
         let gl = &self.raw;
-        let (count, ids_ptr) = ids
-            .map(|i| (i.len(), i.as_ptr()))
-            .unwrap_or((0, std::ptr::null()));
+
+        let ids_ptr = if ids.is_empty() {
+            std::ptr::null()
+        } else {
+            ids.as_ptr()
+        };
+
         gl.DebugMessageControl(
             source,
             msg_type,
             severity,
-            count as i32,
+            ids.len() as i32,
             ids_ptr,
             enabled as u8,
         );
@@ -1446,28 +1469,30 @@ impl super::Context for Context {
         severity: u32,
         msg: S,
     ) where
-        S: AsRef<str>
+        S: AsRef<str>,
     {
         let gl = &self.raw;
-        let message = CString::new(msg.as_ref()).unwrap();
-        let length = message.to_bytes().len();
+        let message = msg.as_ref().as_bytes();
+        let length = message.len() as i32;
         gl.DebugMessageInsert(
             source,
             msg_type,
             id,
             severity,
-            length as i32,
-            message.as_ptr(),
+            length,
+            message.as_ptr() as *const i8,
         );
     }
 
-    unsafe fn debug_message_callback(
-        &self,
-        callback: Self::DebugProc,
-        user_data: *mut std::ffi::c_void,
-    ) {
+    unsafe fn debug_message_callback<F>(&self, mut callback: F)
+    where
+        F: FnMut(u32, u32, u32, u32, &str)
+    {
         let gl = &self.raw;
-        gl.DebugMessageCallback(callback, user_data);
+        gl.DebugMessageCallback(
+            raw_debug_message_callback::<F>,
+            &mut callback as *mut _ as *mut std::ffi::c_void
+        );
     }
 
     unsafe fn get_debug_message_log(&self, count: u32) -> Vec<DebugMessageLogEntry> {
@@ -1491,7 +1516,6 @@ impl super::Context for Context {
             lengths.as_mut_ptr(),
             message_log.as_mut_ptr(),
         ) as usize;
-        println!("{} messages received", received);
 
         sources.set_len(received);
         types.set_len(received);
@@ -1503,7 +1527,8 @@ impl super::Context for Context {
         let mut entries = Vec::new();
         let mut offset = 0;
         for i in 0..received {
-            let message = std::ffi::CStr::from_ptr(message_log[offset..].as_ptr()).to_string_lossy();
+            let message =
+                std::ffi::CStr::from_ptr(message_log[offset..].as_ptr()).to_string_lossy();
             offset += lengths[i] as usize;
             entries.push(DebugMessageLogEntry {
                 source: sources[i],
@@ -1517,15 +1542,14 @@ impl super::Context for Context {
         entries
     }
 
-    unsafe fn get_pointerv(&self, pname: u32, params: *const *mut std::ffi::c_void) {
+    unsafe fn push_debug_group<S>(&self, source: u32, id: u32, message: S)
+    where
+        S: AsRef<str>,
+    {
         let gl = &self.raw;
-        gl.GetPointerv(pname, params);
-    }
-
-    unsafe fn push_debug_group<S>(&self, source: u32, id: u32, message: S) where S: AsRef<str> {
-        let gl = &self.raw;
-        let msg = CString::new(message.as_ref()).unwrap();
-        gl.PushDebugGroup(source, id, msg.to_bytes().len() as i32, msg.as_ptr());
+        let msg = message.as_ref().as_bytes();
+        let length = msg.len() as i32;
+        gl.PushDebugGroup(source, id, length, msg.as_ptr() as *const i8);
     }
 
     unsafe fn pop_debug_group(&self) {
@@ -1533,20 +1557,33 @@ impl super::Context for Context {
         gl.PopDebugGroup();
     }
 
-    unsafe fn object_label<S>(&self, identifier: u32, name: u32, label: S) where S: AsRef<str> {
+    unsafe fn object_label<S>(&self, identifier: u32, name: u32, label: Option<S>)
+    where
+        S: AsRef<str>,
+    {
         let gl = &self.raw;
-        let lbl = CString::new(label.as_ref()).unwrap();
 
-        gl.ObjectLabel(identifier, name, lbl.to_bytes().len() as i32, lbl.as_ptr());
+        match label {
+            Some(l) => {
+                let lbl = l.as_ref().as_bytes();
+                let length = lbl.len() as i32;
+                gl.ObjectLabel(identifier, name, length, lbl.as_ptr() as *const i8);
+            }
+            None => gl.ObjectLabel(identifier, name, 0, std::ptr::null()),
+        }
     }
 
     unsafe fn get_object_label(&self, identifier: u32, name: u32) -> String {
         let gl = &self.raw;
-        let mut max_len = 0;
-        gl.GetIntegerv(MAX_LABEL_LENGTH, &mut max_len);
         let mut len = 0;
-        let mut label_buf = Vec::with_capacity(max_len as usize);
-        gl.GetObjectLabel(identifier, name, max_len, &mut len, label_buf.as_mut_ptr());
+        let mut label_buf = Vec::with_capacity(self.constants.max_label_length as usize);
+        gl.GetObjectLabel(
+            identifier,
+            name,
+            self.constants.max_label_length,
+            &mut len,
+            label_buf.as_mut_ptr(),
+        );
         label_buf.set_len(len as usize);
         std::ffi::CStr::from_ptr(label_buf.as_ptr())
             .to_str()
@@ -1554,24 +1591,61 @@ impl super::Context for Context {
             .to_owned()
     }
 
-    unsafe fn object_ptr_label<S>(&self, ptr: *mut std::ffi::c_void, label: S) where S: AsRef<str> {
+    unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, label: Option<S>)
+    where
+        S: AsRef<str>,
+    {
         let gl = &self.raw;
-        let lbl = CString::new(label.as_ref()).unwrap();
-        gl.ObjectPtrLabel(ptr, lbl.to_bytes().len() as i32, lbl.as_ptr());
+
+        match label {
+            Some(l) => {
+                let lbl = l.as_ref().as_bytes();
+                let length = lbl.len() as i32;
+                gl.ObjectPtrLabel(
+                    sync as *mut std::ffi::c_void,
+                    length,
+                    lbl.as_ptr() as *const i8
+                );
+            }
+            None => gl.ObjectPtrLabel(sync as *mut std::ffi::c_void, 0, std::ptr::null()),
+        }
     }
 
-    unsafe fn get_object_ptr_label(&self, ptr: *mut std::ffi::c_void) -> String {
+    unsafe fn get_object_ptr_label(&self, sync: Self::Fence) -> String {
         let gl = &self.raw;
-        let mut max_len = 0;
-        gl.GetIntegerv(MAX_LABEL_LENGTH, &mut max_len);
         let mut len = 0;
-        let mut label_buf = Vec::with_capacity(max_len as usize);
-        gl.GetObjectPtrLabel(ptr, max_len, &mut len, label_buf.as_mut_ptr());
+        let mut label_buf = Vec::with_capacity(self.constants.max_label_length as usize);
+        gl.GetObjectPtrLabel(
+            sync as *mut std::ffi::c_void,
+            self.constants.max_label_length,
+            &mut len,
+            label_buf.as_mut_ptr(),
+        );
         label_buf.set_len(len as usize);
         std::ffi::CStr::from_ptr(label_buf.as_ptr())
             .to_str()
             .unwrap()
             .to_owned()
+    }
+}
+
+extern "system" fn raw_debug_message_callback<F>(
+    source: u32,
+    gltype: u32,
+    id: u32,
+    severity: u32,
+    length: i32,
+    message: *const i8,
+    user_param: *mut std::ffi::c_void,
+)
+where
+    F: FnMut(u32, u32, u32, u32, &str)
+{
+    unsafe {
+        let callback: &mut F = &mut *(user_param as *mut _);
+        let slice = std::slice::from_raw_parts(message as *const u8, length as usize);
+        let msg = std::str::from_utf8(slice).unwrap();
+        (callback)(source, gltype, id, severity, msg);
     }
 }
 

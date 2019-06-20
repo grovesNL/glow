@@ -97,7 +97,6 @@ impl super::Context for Context {
     type Framebuffer = WebFramebufferKey;
     type Renderbuffer = WebRenderbufferKey;
     type UniformLocation = WebUniformLocationKey;
-    type DebugProc = ();
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {
         let raw_framebuffer = match self.raw {
@@ -2035,7 +2034,7 @@ impl super::Context for Context {
         _source: u32,
         _msg_type: u32,
         _severity: u32,
-        _ids: Option<&[u32]>,
+        _ids: &[u32],
         _enabled: bool,
     ) {
         panic!("WebGL does not support the KHR_debug extension.")
@@ -2054,11 +2053,10 @@ impl super::Context for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn debug_message_callback(
-        &self,
-        _callback: Self::DebugProc,
-        _user_data: *mut std::ffi::c_void,
-    ) {
+    unsafe fn debug_message_callback<F>(&self, _callback: F)
+    where
+        F: FnMut(u32, u32, u32, u32, &str)
+    {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
@@ -2085,7 +2083,10 @@ impl super::Context for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn object_label<S>(&self, _identifier: u32, _name: u32, _label: S) where S: AsRef<str> {
+    unsafe fn object_label<S>(&self, _identifier: u32, _name: u32, _label: Option<S>)
+    where
+        S: AsRef<str>
+    {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
@@ -2093,17 +2094,13 @@ impl super::Context for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn object_ptr_label<S>(
-        &self,
-        _ptr: *mut std::ffi::c_void,
-        _label: S
-    ) where
+    unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, _label: S) where
         S: AsRef<str>
     {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn get_object_ptr_label(&self, _ptr: *mut std::ffi::c_void) -> String {
+    unsafe fn get_object_ptr_label(&self, sync: Self::Fence) -> String {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 }

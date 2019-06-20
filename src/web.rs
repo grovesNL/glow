@@ -2064,10 +2064,6 @@ impl super::Context for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn get_pointerv(&self, _pname: u32, _params: *const *mut std::ffi::c_void) {
-        panic!("WebGL does not support the KHR_debug extension.")
-    }
-
     unsafe fn push_debug_group<S>(
         &self,
         _source: u32,
@@ -2094,7 +2090,7 @@ impl super::Context for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, _label: S) where
+    unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, _label: Option<S>) where
         S: AsRef<str>
     {
         panic!("WebGL does not support the KHR_debug extension.")

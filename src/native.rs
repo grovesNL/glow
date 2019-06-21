@@ -804,7 +804,12 @@ impl super::Context for Context {
     ) -> Option<Self::UniformLocation> {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        Some(gl.GetUniformLocation(program, name.as_ptr() as *const i8) as u32)
+        let uniform_location = gl.GetUniformLocation(program, name.as_ptr() as *const i8);
+        if uniform_location < 0 {
+            None
+        } else {
+            Some(uniform_location as u32)
+        }
     }
 
     unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32 {

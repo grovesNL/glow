@@ -620,6 +620,36 @@ pub trait Context {
         pixel_buffer_offset: i32,
     );
 
+    unsafe fn tex_sub_image_3d_u8_slice(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&[u8]>,
+    );
+
+    unsafe fn tex_sub_image_3d_pixel_buffer_offset(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixel_buffer_offset: i32,
+    );
+
     unsafe fn depth_func(&self, func: u32);
 
     unsafe fn depth_range_f32(&self, near: f32, far: f32);

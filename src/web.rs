@@ -1843,6 +1843,80 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn tex_sub_image_3d_u8_slice(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&[u8]>,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Sub image 3D is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_3d_with_opt_u8_array(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    z_offset,
+                    width,
+                    height,
+                    depth,
+                    format,
+                    ty,
+                    pixels,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
+    unsafe fn tex_sub_image_3d_pixel_buffer_offset(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixel_buffer_offset: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Sub image 3D pixel buffer offset is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_3d_with_i32(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    z_offset,
+                    width,
+                    height,
+                    depth,
+                    format,
+                    ty,
+                    pixel_buffer_offset,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
     unsafe fn depth_func(&self, func: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.depth_func(func as u32),

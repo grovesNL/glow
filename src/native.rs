@@ -1268,6 +1268,66 @@ impl super::Context for Context {
         );
     }
 
+    unsafe fn tex_sub_image_3d_u8_slice(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&[u8]>,
+    ) {
+        let gl = &self.raw;
+        gl.TexSubImage3D(
+            target,
+            level,
+            x_offset,
+            y_offset,
+            z_offset,
+            width,
+            height,
+            depth,
+            format,
+            ty,
+            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn tex_sub_image_3d_pixel_buffer_offset(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixel_buffer_offset: i32,
+    ) {
+        let gl = &self.raw;
+        gl.TexSubImage3D(
+            target,
+            level,
+            x_offset,
+            y_offset,
+            z_offset,
+            width,
+            height,
+            depth,
+            format,
+            ty,
+            pixel_buffer_offset as *const std::ffi::c_void,
+        );
+    }
+
     unsafe fn depth_func(&self, func: u32) {
         let gl = &self.raw;
         gl.DepthFunc(func as u32);

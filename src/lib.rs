@@ -10,6 +10,15 @@ pub struct ActiveUniform {
     pub name: String,
 }
 
+#[derive(Debug)]
+pub struct DebugMessageLogEntry {
+    source: u32,
+    msg_type: u32,
+    id: u32,
+    severity: u32,
+    message: String,
+}
+
 pub trait Context {
     type Shader: Copy
         + Clone
@@ -711,6 +720,49 @@ pub trait Context {
     unsafe fn stencil_op(&self, stencil_fail: u32, depth_fail: u32, pass: u32);
 
     unsafe fn stencil_op_separate(&self, face: u32, stencil_fail: u32, depth_fail: u32, pass: u32);
+
+    unsafe fn debug_message_control(
+        &self,
+        source: u32,
+        msg_type: u32,
+        severity: u32,
+        ids: &[u32],
+        enabled: bool,
+    );
+
+    unsafe fn debug_message_insert<S>(
+        &self,
+        source: u32,
+        msg_type: u32,
+        id: u32,
+        severity: u32,
+        msg: S,
+    ) where
+        S: AsRef<str>;
+
+    unsafe fn debug_message_callback<F>(&self, callback: F)
+    where
+        F: FnMut(u32, u32, u32, u32, &str);
+
+    unsafe fn get_debug_message_log(&self, count: u32) -> Vec<DebugMessageLogEntry>;
+
+    unsafe fn push_debug_group<S>(&self, source: u32, id: u32, message: S)
+    where
+        S: AsRef<str>;
+
+    unsafe fn pop_debug_group(&self);
+
+    unsafe fn object_label<S>(&self, identifier: u32, name: u32, label: Option<S>)
+    where
+        S: AsRef<str>;
+
+    unsafe fn get_object_label(&self, identifier: u32, name: u32) -> String;
+
+    unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, label: Option<S>)
+    where
+        S: AsRef<str>;
+
+    unsafe fn get_object_ptr_label(&self, sync: Self::Fence) -> String;
 }
 
 pub trait RenderLoop {

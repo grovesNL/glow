@@ -2077,6 +2077,77 @@ impl super::Context for Context {
             ),
         }
     }
+
+    unsafe fn debug_message_control(
+        &self,
+        _source: u32,
+        _msg_type: u32,
+        _severity: u32,
+        _ids: &[u32],
+        _enabled: bool,
+    ) {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
+
+    unsafe fn debug_message_insert<S>(
+        &self,
+        _source: u32,
+        _msg_type: u32,
+        _id: u32,
+        _severity: u32,
+        _msg: S,
+    ) where
+        S: AsRef<str>
+    {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
+
+    unsafe fn debug_message_callback<F>(&self, _callback: F)
+    where
+        F: FnMut(u32, u32, u32, u32, &str)
+    {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
+
+    unsafe fn get_debug_message_log(&self, _count: u32) -> Vec<DebugMessageLogEntry> {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
+
+    unsafe fn push_debug_group<S>(
+        &self,
+        _source: u32,
+        _id: u32,
+        _message: S
+    ) where
+        S: AsRef<str>
+    {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
+
+    unsafe fn pop_debug_group(&self) {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
+
+    unsafe fn object_label<S>(&self, _identifier: u32, _name: u32, _label: Option<S>)
+    where
+        S: AsRef<str>
+    {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
+
+    unsafe fn get_object_label(&self, _identifier: u32, _name: u32) -> String {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
+
+    unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, _label: Option<S>) where
+        S: AsRef<str>
+    {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
+
+    unsafe fn get_object_ptr_label(&self, sync: Self::Fence) -> String {
+        panic!("WebGL does not support the KHR_debug extension.")
+    }
 }
 
 pub struct RenderLoop;

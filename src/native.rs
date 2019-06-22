@@ -818,7 +818,12 @@ impl super::Context for Context {
     ) -> Option<Self::UniformLocation> {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        Some(gl.GetUniformLocation(program, name.as_ptr() as *const i8) as u32)
+        let uniform_location = gl.GetUniformLocation(program, name.as_ptr() as *const i8);
+        if uniform_location < 0 {
+            None
+        } else {
+            Some(uniform_location as u32)
+        }
     }
 
     unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32 {
@@ -1282,6 +1287,66 @@ impl super::Context for Context {
             y_offset,
             width,
             height,
+            format,
+            ty,
+            pixel_buffer_offset as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn tex_sub_image_3d_u8_slice(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&[u8]>,
+    ) {
+        let gl = &self.raw;
+        gl.TexSubImage3D(
+            target,
+            level,
+            x_offset,
+            y_offset,
+            z_offset,
+            width,
+            height,
+            depth,
+            format,
+            ty,
+            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn tex_sub_image_3d_pixel_buffer_offset(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixel_buffer_offset: i32,
+    ) {
+        let gl = &self.raw;
+        gl.TexSubImage3D(
+            target,
+            level,
+            x_offset,
+            y_offset,
+            z_offset,
+            width,
+            height,
+            depth,
             format,
             ty,
             pixel_buffer_offset as *const std::ffi::c_void,

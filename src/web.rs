@@ -1133,6 +1133,15 @@ impl super::Context for Context {
         }
     }
 
+    unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_attrib_location(raw_program, index, name),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_attrib_location(raw_program, index, name),
+        }
+    }
+
     unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32 {
         let fences = self.fences.borrow();
         let raw_fence = fences.1.get_unchecked(fence);

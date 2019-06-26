@@ -832,6 +832,12 @@ impl super::Context for Context {
         gl.GetAttribLocation(program, name.as_ptr() as *const i8) as i32
     }
 
+    unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {
+        let gl = &self.raw;
+        let name = CString::new(name).unwrap();
+        gl.BindAttribLocation(program, index, name.as_ptr() as *const i8);
+    }
+
     unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32 {
         let gl = &self.raw;
         let mut len = 0;

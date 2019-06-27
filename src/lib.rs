@@ -402,6 +402,8 @@ pub trait Context {
 
     unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32;
 
+    unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str);
+
     unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32;
 
     unsafe fn is_sync(&self, fence: Self::Fence) -> bool;

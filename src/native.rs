@@ -389,7 +389,7 @@ impl super::Context for Context {
         name: &str,
     ) {
         let gl = &self.raw;
-        gl.BindFragDataLocation(program, color_number, name.as_ptr() as *const i8);
+        gl.BindFragDataLocation(program, color_number, name.as_ptr() as *const native_gl::types::GLchar);
     }
 
     unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32) {
@@ -796,7 +796,7 @@ impl super::Context for Context {
     unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String {
         let gl = &self.raw;
         let raw_ptr = gl.GetStringi(parameter, index);
-        std::ffi::CStr::from_ptr(raw_ptr as *const i8)
+        std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::types::GLchar)
             .to_str()
             .unwrap()
             .to_owned()
@@ -805,7 +805,7 @@ impl super::Context for Context {
     unsafe fn get_parameter_string(&self, parameter: u32) -> String {
         let gl = &self.raw;
         let raw_ptr = gl.GetString(parameter);
-        std::ffi::CStr::from_ptr(raw_ptr as *const i8)
+        std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::types::GLchar)
             .to_str()
             .unwrap()
             .to_owned()
@@ -818,7 +818,7 @@ impl super::Context for Context {
     ) -> Option<Self::UniformLocation> {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        let uniform_location = gl.GetUniformLocation(program, name.as_ptr() as *const i8);
+        let uniform_location = gl.GetUniformLocation(program, name.as_ptr() as *const native_gl::types::GLchar);
         if uniform_location < 0 {
             None
         } else {
@@ -829,13 +829,13 @@ impl super::Context for Context {
     unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32 {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        gl.GetAttribLocation(program, name.as_ptr() as *const i8) as i32
+        gl.GetAttribLocation(program, name.as_ptr() as *const native_gl::types::GLchar) as i32
     }
 
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        gl.BindAttribLocation(program, index, name.as_ptr() as *const i8);
+        gl.BindAttribLocation(program, index, name.as_ptr() as *const native_gl::types::GLchar);
     }
 
     unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32 {
@@ -1609,7 +1609,7 @@ impl super::Context for Context {
             id,
             severity,
             length,
-            message.as_ptr() as *const i8,
+            message.as_ptr() as *const native_gl::types::GLchar,
         );
     }
 
@@ -1678,7 +1678,7 @@ impl super::Context for Context {
         let gl = &self.raw;
         let msg = message.as_ref().as_bytes();
         let length = msg.len() as i32;
-        gl.PushDebugGroup(source, id, length, msg.as_ptr() as *const i8);
+        gl.PushDebugGroup(source, id, length, msg.as_ptr() as *const native_gl::types::GLchar);
     }
 
     unsafe fn pop_debug_group(&self) {
@@ -1696,7 +1696,7 @@ impl super::Context for Context {
             Some(l) => {
                 let lbl = l.as_ref().as_bytes();
                 let length = lbl.len() as i32;
-                gl.ObjectLabel(identifier, name, length, lbl.as_ptr() as *const i8);
+                gl.ObjectLabel(identifier, name, length, lbl.as_ptr() as *const native_gl::types::GLchar);
             }
             None => gl.ObjectLabel(identifier, name, 0, std::ptr::null()),
         }
@@ -1733,7 +1733,7 @@ impl super::Context for Context {
                 gl.ObjectPtrLabel(
                     sync as *mut std::ffi::c_void,
                     length,
-                    lbl.as_ptr() as *const i8
+                    lbl.as_ptr() as *const native_gl::types::GLchar
                 );
             }
             None => gl.ObjectPtrLabel(sync as *mut std::ffi::c_void, 0, std::ptr::null()),
@@ -1764,7 +1764,7 @@ extern "system" fn raw_debug_message_callback<F>(
     id: u32,
     severity: u32,
     length: i32,
-    message: *const i8,
+    message: *const native_gl::types::GLchar,
     user_param: *mut std::ffi::c_void,
 )
 where

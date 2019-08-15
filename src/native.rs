@@ -1,17 +1,20 @@
 use super::*;
 
+use std::collections::HashSet;
 use std::ffi::CString;
 
 mod native_gl {
     include!(concat!(env!("OUT_DIR"), "/opengl_bindings.rs"));
 }
 
+#[derive(Default)]
 struct Constants {
     max_label_length: i32,
 }
 
 pub struct Context {
     raw: native_gl::Gl,
+    extensions: HashSet<String>,
     constants: Constants,
 }
 
@@ -20,17 +23,35 @@ impl Context {
     where
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {
+        use crate::Context as _;
+
         let raw = native_gl::Gl::load_with(loader_function);
-        let constants = Constants {
-            max_label_length: {
-                let mut val = 0;
-                unsafe {
-                    raw.GetIntegerv(MAX_LABEL_LENGTH, &mut val);
-                }
-                val
-            },
+
+        // Setup extensions and constants after the context has been built
+        let mut context = Self {
+            raw,
+            extensions: HashSet::new(),
+            constants: Constants::default(),
         };
-        Context { raw, constants }
+
+        // Use core-only functions to populate extension list
+        // TODO: Use a fallback for versions < 3.0
+        let num_extensions = unsafe { context.get_parameter_i32(NUM_EXTENSIONS) };
+        for i in 0..num_extensions {
+            let extension_name =
+                unsafe { context.get_parameter_indexed_string(EXTENSIONS, i as u32) };
+            context.extensions.insert(extension_name);
+        }
+
+        // After the extensions are known, we can populate constants (including
+        // constants that depend on extensions being enabled)
+        context.constants.max_label_length = if context.extensions.contains("GL_KHR_debug") {
+            unsafe { context.get_parameter_i32(MAX_LABEL_LENGTH) }
+        } else {
+            0
+        };
+
+        context
     }
 }
 
@@ -389,7 +410,11 @@ impl super::Context for Context {
         name: &str,
     ) {
         let gl = &self.raw;
-        gl.BindFragDataLocation(program, color_number, name.as_ptr() as *const native_gl::types::GLchar);
+        gl.BindFragDataLocation(
+            program,
+            color_number,
+            name.as_ptr() as *const native_gl::types::GLchar,
+        );
     }
 
     unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32) {
@@ -818,7 +843,8 @@ impl super::Context for Context {
     ) -> Option<Self::UniformLocation> {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        let uniform_location = gl.GetUniformLocation(program, name.as_ptr() as *const native_gl::types::GLchar);
+        let uniform_location =
+            gl.GetUniformLocation(program, name.as_ptr() as *const native_gl::types::GLchar);
         if uniform_location < 0 {
             None
         } else {
@@ -835,7 +861,11 @@ impl super::Context for Context {
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        gl.BindAttribLocation(program, index, name.as_ptr() as *const native_gl::types::GLchar);
+        gl.BindAttribLocation(
+            program,
+            index,
+            name.as_ptr() as *const native_gl::types::GLchar,
+        );
     }
 
     unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32 {
@@ -1172,22 +1202,12 @@ impl super::Context for Context {
         gl.MapBufferRange(target, offset as isize, length as isize, access) as *mut u8
     }
 
-    unsafe fn flush_mapped_buffer_range(
-        &self,
-        target: u32,
-        offset: i32,
-        length: i32,
-    ) {
+    unsafe fn flush_mapped_buffer_range(&self, target: u32, offset: i32, length: i32) {
         let gl = &self.raw;
         gl.FlushMappedBufferRange(target, offset as isize, length as isize)
     }
 
-    unsafe fn invalidate_buffer_sub_data(
-        &self,
-        target: u32,
-        offset: i32,
-        length: i32,
-    ) {
+    unsafe fn invalidate_buffer_sub_data(&self, target: u32, offset: i32, length: i32) {
         let gl = &self.raw;
         gl.InvalidateBufferSubData(target, offset as isize, length as isize)
     }
@@ -1615,12 +1635,12 @@ impl super::Context for Context {
 
     unsafe fn debug_message_callback<F>(&self, mut callback: F)
     where
-        F: FnMut(u32, u32, u32, u32, &str)
+        F: FnMut(u32, u32, u32, u32, &str),
     {
         let gl = &self.raw;
         gl.DebugMessageCallback(
             raw_debug_message_callback::<F>,
-            &mut callback as *mut _ as *mut std::ffi::c_void
+            &mut callback as *mut _ as *mut std::ffi::c_void,
         );
     }
 
@@ -1678,7 +1698,12 @@ impl super::Context for Context {
         let gl = &self.raw;
         let msg = message.as_ref().as_bytes();
         let length = msg.len() as i32;
-        gl.PushDebugGroup(source, id, length, msg.as_ptr() as *const native_gl::types::GLchar);
+        gl.PushDebugGroup(
+            source,
+            id,
+            length,
+            msg.as_ptr() as *const native_gl::types::GLchar,
+        );
     }
 
     unsafe fn pop_debug_group(&self) {
@@ -1696,7 +1721,12 @@ impl super::Context for Context {
             Some(l) => {
                 let lbl = l.as_ref().as_bytes();
                 let length = lbl.len() as i32;
-                gl.ObjectLabel(identifier, name, length, lbl.as_ptr() as *const native_gl::types::GLchar);
+                gl.ObjectLabel(
+                    identifier,
+                    name,
+                    length,
+                    lbl.as_ptr() as *const native_gl::types::GLchar,
+                );
             }
             None => gl.ObjectLabel(identifier, name, 0, std::ptr::null()),
         }
@@ -1733,7 +1763,7 @@ impl super::Context for Context {
                 gl.ObjectPtrLabel(
                     sync as *mut std::ffi::c_void,
                     length,
-                    lbl.as_ptr() as *const native_gl::types::GLchar
+                    lbl.as_ptr() as *const native_gl::types::GLchar,
                 );
             }
             None => gl.ObjectPtrLabel(sync as *mut std::ffi::c_void, 0, std::ptr::null()),
@@ -1766,17 +1796,14 @@ extern "system" fn raw_debug_message_callback<F>(
     length: i32,
     message: *const native_gl::types::GLchar,
     user_param: *mut std::ffi::c_void,
-)
-where
-    F: FnMut(u32, u32, u32, u32, &str)
+) where
+    F: FnMut(u32, u32, u32, u32, &str),
 {
-    match std::panic::catch_unwind(move || {
-        unsafe {
-            let callback: &mut F = &mut *(user_param as *mut _);
-            let slice = std::slice::from_raw_parts(message as *const u8, length as usize);
-            let msg = std::str::from_utf8(slice).unwrap();
-            (callback)(source, gltype, id, severity, msg);
-        }
+    match std::panic::catch_unwind(move || unsafe {
+        let callback: &mut F = &mut *(user_param as *mut _);
+        let slice = std::slice::from_raw_parts(message as *const u8, length as usize);
+        let msg = std::str::from_utf8(slice).unwrap();
+        (callback)(source, gltype, id, severity, msg);
     }) {
         Ok(_) => (),
         Err(_) => (),

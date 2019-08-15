@@ -1,6 +1,6 @@
 [package]
 name = "glow"
-version = "0.2.3"
+version = "0.3.0-alpha1"
 description = "GL on Whatever: a set of bindings to run GL anywhere (Open GL, OpenGL ES, and WebGL) and avoid target-specific code."
 authors = ["Joshua Groves <josh@joshgroves.com>"]
 homepage = "https://github.com/grovesNL/glow.git"
@@ -14,7 +14,7 @@ name = "glow"
 path = "src/lib.rs"
 
 [target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
-glutin = { version = "0.19", optional = true }
+glutin = { version = "0.22.0-alpha1", optional = true }
 sdl2 = { version = "0.32", optional = true }
 
 [features]

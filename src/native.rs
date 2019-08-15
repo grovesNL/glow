@@ -1816,6 +1816,7 @@ where
     };
 }
 
+#[cfg(any(feature = "glutin", feature = "sdl2"))]
 pub struct RenderLoop<W> {
     window: W,
 }

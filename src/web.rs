@@ -2256,6 +2256,14 @@ impl super::Context for Context {
             }
         }
     }
+
+    unsafe fn get_shader_storage_block_index(&self, _program: Self::Program, _name: &str) -> Option<u32> {
+        panic!("Shader Storage Buffers are not supported by webgl")
+    }
+
+    unsafe fn shader_storage_block_binding(&self, _program: Self::Program, _index: u32, binding: u32) {
+        panic!("Shader Storage Buffers are not supported by webgl")
+    }
 }
 
 pub struct RenderLoop;

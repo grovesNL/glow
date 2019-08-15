@@ -45,7 +45,7 @@ impl Context {
 
         // After the extensions are known, we can populate constants (including
         // constants that depend on extensions being enabled)
-        context.constants.max_label_length = if context.extensions.contains("GL_KHR_debug") {
+        context.constants.max_label_length = if context.supports_debug() {
             unsafe { context.get_parameter_i32(MAX_LABEL_LENGTH) }
         } else {
             0
@@ -73,6 +73,10 @@ impl super::Context for Context {
     type Framebuffer = native_gl::types::GLuint;
     type Renderbuffer = native_gl::types::GLuint;
     type UniformLocation = native_gl::types::GLuint;
+
+    fn supports_debug(&self) -> bool {
+        self.extensions.contains("GL_KHR_debug")
+    }
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {
         let gl = &self.raw;

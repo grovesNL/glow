@@ -94,6 +94,8 @@ pub trait Context {
         + PartialEq
         + PartialOrd;
 
+    fn supports_debug(&self) -> bool;
+
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String>;
 
     unsafe fn create_renderbuffer(&self) -> Result<Self::Renderbuffer, String>;

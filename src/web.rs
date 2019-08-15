@@ -98,6 +98,10 @@ impl super::Context for Context {
     type Renderbuffer = WebRenderbufferKey;
     type UniformLocation = WebUniformLocationKey;
 
+    fn supports_debug(&self) -> bool {
+        false
+    }
+
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {
         let raw_framebuffer = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.create_framebuffer(),

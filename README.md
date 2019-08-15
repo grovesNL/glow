@@ -6,7 +6,9 @@
 </div>
 <br />
 <div align="center">
-  <a href="https://crates.io/crates/glow"><img src="https://img.shields.io/crates/v/glow.svg?label=glow" alt="Crate"></a> <a href="https://travis-ci.org/grovesNL/glow"><img src="https://travis-ci.org/grovesNL/glow.svg?branch=master" alt="Travis Build Status" /></a>
+  <a href="https://crates.io/crates/glow"><img src="https://img.shields.io/crates/v/glow.svg?label=glow" alt="crates.io"></a>
+  <a href="https://docs.rs/glow"><img src="https://docs.rs/glow/badge.svg" alt="docs.rs"></a>
+  <a href="https://travis-ci.org/grovesNL/glow"><img src="https://travis-ci.org/grovesNL/glow.svg?branch=master" alt="Travis Build Status" /></a>
 </div>
 
 ## License

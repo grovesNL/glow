@@ -1819,8 +1819,8 @@ pub struct RenderLoop<W> {
 }
 
 #[cfg(feature = "glutin")]
-impl<T: glutin::ContextCurrentState> RenderLoop<glutin::WindowedContext<T>> {
-    pub fn from_glutin_window(window: glutin::WindowedContext<T>) -> Self {
+impl RenderLoop<glutin::WindowedContext<glutin::PossiblyCurrent>> {
+    pub fn from_glutin_window(window: glutin::WindowedContext<glutin::PossiblyCurrent>) -> Self {
         RenderLoop { window }
     }
 }

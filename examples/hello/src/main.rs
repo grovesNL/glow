@@ -1,4 +1,7 @@
-use glow::{self, Context, RenderLoop};
+use glow::{self, Context};
+
+#[cfg(not(feature = "window-glutin"))]
+use glow::RenderLoop;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -39,22 +42,20 @@ fn main() {
 
         // Create a context from a glutin window on non-wasm32 targets
         #[cfg(feature = "window-glutin")]
-        let (gl, mut events_loop, render_loop, shader_version) = {
-            use glutin::GlContext;
-            let events_loop = glutin::EventsLoop::new();
-            let window_builder = glutin::WindowBuilder::new()
+        let (gl, mut event_loop, windowed_context, shader_version) = {
+            let el = glutin::event_loop::EventLoop::new();
+            let wb = glutin::window::WindowBuilder::new()
                 .with_title("Hello triangle!")
-                .with_dimensions(glutin::dpi::LogicalSize::new(1024.0, 768.0));
-            let context_builder = glutin::ContextBuilder::new().with_vsync(true);
-            let window =
-                glutin::GlWindow::new(window_builder, context_builder, &events_loop).unwrap();
-            window.make_current().unwrap();
+                .with_inner_size(glutin::dpi::LogicalSize::new(1024.0, 768.0));
+            let windowed_context = glutin::ContextBuilder::new()
+                .with_vsync(true)
+                .build_windowed(wb, &el)
+                .unwrap();
+            let windowed_context = windowed_context.make_current().unwrap();
             let context = glow::native::Context::from_loader_function(|s| {
-                window.get_proc_address(s) as *const _
+                windowed_context.get_proc_address(s) as *const _
             });
-            let render_loop =
-                glow::native::RenderLoop::<glutin::GlWindow>::from_glutin_window(window);
-            (context, events_loop, render_loop, "#version 410")
+            (context, el, windowed_context, "#version 410")
         };
 
         // Create a context from a sdl2 window
@@ -141,19 +142,51 @@ fn main() {
         gl.use_program(Some(program));
         gl.clear_color(0.1, 0.2, 0.3, 1.0);
 
-        render_loop.run(move |running: &mut bool| {
-            // Handle events differently between targets
-            #[cfg(feature = "window-glutin")]
-            {
-                events_loop.poll_events(|event| match event {
-                    glutin::Event::WindowEvent { event, .. } => match event {
-                        glutin::WindowEvent::CloseRequested => *running = false,
+        // We handle events very differently between targets
+
+        #[cfg(feature = "window-glutin")]
+        {
+            use glutin::event::{Event, WindowEvent};
+            use glutin::event_loop::{ControlFlow, EventLoop};
+
+            event_loop.run(move |event, _, control_flow| {
+                *control_flow = ControlFlow::Wait;
+                match event {
+                    Event::LoopDestroyed => {
+                        println!("Event::LoopDestroyed!");
+                        return;
+                    }
+                    Event::EventsCleared => {
+                        println!("EventsCleared");
+                      windowed_context.window().request_redraw();
+                    }
+                    Event::WindowEvent { ref event, .. } => match event {
+                        WindowEvent::Resized(logical_size) => {
+                            println!("WindowEvent::Resized: {:?}", logical_size);
+                            let dpi_factor = windowed_context.window().hidpi_factor();
+                            windowed_context.resize(logical_size.to_physical(dpi_factor));
+                        }
+                        WindowEvent::RedrawRequested => {
+                            println!("WindowEvent::RedrawRequested");
+                            gl.clear(glow::COLOR_BUFFER_BIT);
+                            gl.draw_arrays(glow::TRIANGLES, 0, 3);
+                            windowed_context.swap_buffers().unwrap();
+                        }
+                        WindowEvent::CloseRequested => {
+                            println!("WindowEvent::CloseRequested");
+                            gl.delete_program(program);
+                            gl.delete_vertex_array(vertex_array);
+                            *control_flow = ControlFlow::Exit
+                        }
                         _ => (),
                     },
                     _ => (),
-                });
-            }
+                }
+            });
+        }
 
+        #[cfg(not(feature = "window-glutin"))]
+        render_loop.run(move |running: &mut bool| {
             #[cfg(feature = "window-sdl2")]
             {
                 for event in events_loop.poll_iter() {

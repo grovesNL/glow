@@ -797,6 +797,14 @@ pub trait Context {
         S: AsRef<str>;
 
     unsafe fn get_object_ptr_label(&self, sync: Self::Fence) -> String;
+
+    unsafe fn get_uniform_block_index(&self, program: Self::Program, name: &str) -> Option<u32>;
+
+    unsafe fn uniform_block_binding(&self, program: Self::Program, index: u32, binding: u32);
+
+    unsafe fn get_shader_storage_block_index(&self, program: Self::Program, name: &str) -> Option<u32>;
+
+    unsafe fn shader_storage_block_binding(&self, program: Self::Program, index: u32, binding: u32);
 }
 
 pub trait RenderLoop {

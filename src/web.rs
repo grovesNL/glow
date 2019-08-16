@@ -2235,6 +2235,39 @@ impl super::Context for Context {
     unsafe fn get_object_ptr_label(&self, sync: Self::Fence) -> String {
         panic!("WebGL does not support the KHR_debug extension.")
     }
+
+    unsafe fn get_uniform_block_index(&self, program: Self::Program, name: &str) -> Option<u32> {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        let index = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_uniform_block_index(raw_program, name),
+        };
+        if index == INVALID_INDEX {
+            None
+        } else {
+            Some(index)
+        }
+    }
+
+    unsafe fn uniform_block_binding(&self, program: Self::Program, index: u32, binding: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform buffer bindings are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                let programs = self.programs.borrow();
+                let raw_program = programs.1.get_unchecked(program);
+                gl.uniform_block_binding(raw_program, index, binding);
+            }
+        }
+    }
+
+    unsafe fn get_shader_storage_block_index(&self, _program: Self::Program, _name: &str) -> Option<u32> {
+        panic!("Shader Storage Buffers are not supported by webgl")
+    }
+
+    unsafe fn shader_storage_block_binding(&self, _program: Self::Program, _index: u32, binding: u32) {
+        panic!("Shader Storage Buffers are not supported by webgl")
+    }
 }
 
 pub struct RenderLoop;

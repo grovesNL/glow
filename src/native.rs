@@ -1819,15 +1819,15 @@ pub struct RenderLoop<W> {
 }
 
 #[cfg(feature = "glutin")]
-impl RenderLoop<glutin::GlWindow> {
-    pub fn from_glutin_window(window: glutin::GlWindow) -> Self {
+impl<T: glutin::ContextCurrentState> RenderLoop<glutin::WindowedContext<T>> {
+    pub fn from_glutin_window(window: glutin::WindowedContext<T>) -> Self {
         RenderLoop { window }
     }
 }
 
 #[cfg(feature = "glutin")]
-impl super::RenderLoop for RenderLoop<glutin::GlWindow> {
-    type Window = glutin::GlWindow;
+impl super::RenderLoop for RenderLoop<glutin::WindowedContext<glutin::PossiblyCurrent>> {
+    type Window = glutin::WindowedContext<glutin::PossiblyCurrent>;
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
         let mut running = true;

@@ -42,7 +42,7 @@ fn main() {
 
         // Create a context from a glutin window on non-wasm32 targets
         #[cfg(feature = "window-glutin")]
-        let (gl, mut event_loop, windowed_context, shader_version) = {
+        let (gl, event_loop, windowed_context, shader_version) = {
             let el = glutin::event_loop::EventLoop::new();
             let wb = glutin::window::WindowBuilder::new()
                 .with_title("Hello triangle!")
@@ -147,7 +147,7 @@ fn main() {
         #[cfg(feature = "window-glutin")]
         {
             use glutin::event::{Event, WindowEvent};
-            use glutin::event_loop::{ControlFlow, EventLoop};
+            use glutin::event_loop::ControlFlow;
 
             event_loop.run(move |event, _, control_flow| {
                 *control_flow = ControlFlow::Wait;

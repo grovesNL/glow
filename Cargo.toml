@@ -48,7 +48,7 @@ features = [
 ]
 
 [build-dependencies]
-gl_generator = "0.9"
+gl_generator = "0.13"
 
 [workspace]
 members = [

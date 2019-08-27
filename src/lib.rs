@@ -1,8 +1,12 @@
 #[cfg(not(target_arch = "wasm32"))]
-pub mod native;
+mod native;
+#[cfg(not(target_arch = "wasm32"))]
+pub use native::*;
 
 #[cfg(target_arch = "wasm32")]
-pub mod web;
+mod web;
+#[cfg(target_arch = "wasm32")]
+pub use web::*;
 
 pub struct ActiveUniform {
     pub size: i32,

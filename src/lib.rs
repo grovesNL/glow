@@ -1,3 +1,7 @@
+#![allow(non_upper_case_globals)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::trivially_copy_pass_by_ref)]
+#![allow(clippy::unreadable_literal)]
 
 use core::fmt::Debug;
 use core::hash::Hash;

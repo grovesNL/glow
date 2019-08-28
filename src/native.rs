@@ -1834,15 +1834,13 @@ extern "system" fn raw_debug_message_callback<F>(
 ) where
     F: FnMut(u32, u32, u32, u32, &str),
 {
-    match std::panic::catch_unwind(move || unsafe {
+    std::panic::catch_unwind(move || unsafe {
         let callback: &mut F = &mut *(user_param as *mut _);
         let slice = std::slice::from_raw_parts(message as *const u8, length as usize);
         let msg = std::str::from_utf8(slice).unwrap();
         (callback)(source, gltype, id, severity, msg);
-    }) {
-        Ok(_) => (),
-        Err(_) => (),
-    };
+    })
+    .ok();
 }
 
 #[cfg(any(feature = "glutin", feature = "sdl2"))]

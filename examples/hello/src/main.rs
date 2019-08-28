@@ -71,11 +71,9 @@ fn main() {
                 .build()
                 .unwrap();
             let gl_context = window.gl_create_context().unwrap();
-            let context = glow::Context::from_loader_function(|s| {
-                video.gl_get_proc_address(s) as *const _
-            });
-            let render_loop =
-                glow::RenderLoop::<sdl2::video::Window>::from_sdl_window(window);
+            let context =
+                glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _);
+            let render_loop = glow::RenderLoop::<sdl2::video::Window>::from_sdl_window(window);
             let event_loop = sdl.event_pump().unwrap();
             (context, event_loop, render_loop, "#version 410", gl_context)
         };

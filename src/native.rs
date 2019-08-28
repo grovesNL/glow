@@ -1805,7 +1805,11 @@ impl HasContext for Context {
         gl.UniformBlockBinding(program, index, binding);
     }
 
-    unsafe fn get_shader_storage_block_index(&self, program: Self::Program, name: &str) -> Option<u32> {
+    unsafe fn get_shader_storage_block_index(
+        &self,
+        program: Self::Program,
+        name: &str,
+    ) -> Option<u32> {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
         let index = gl.GetProgramResourceIndex(program, SHADER_STORAGE_BLOCK, name.as_ptr());
@@ -1816,10 +1820,14 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn shader_storage_block_binding(&self, program: Self::Program, index: u32, binding: u32) {
+    unsafe fn shader_storage_block_binding(
+        &self,
+        program: Self::Program,
+        index: u32,
+        binding: u32,
+    ) {
         let gl = &self.raw;
         gl.ShaderStorageBlockBinding(program, index, binding);
-
     }
 }
 

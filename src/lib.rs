@@ -39,30 +39,9 @@ pub trait HasContext {
     type Texture: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Sampler: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Fence: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
-    type Framebuffer: Copy
-        + Clone
-        + Debug
-        + Eq
-        + Hash
-        + Ord
-        + PartialEq
-        + PartialOrd;
-    type Renderbuffer: Copy
-        + Clone
-        + Debug
-        + Eq
-        + Hash
-        + Ord
-        + PartialEq
-        + PartialOrd;
-    type UniformLocation: Copy
-        + Clone
-        + Debug
-        + Eq
-        + Hash
-        + Ord
-        + PartialEq
-        + PartialOrd;
+    type Framebuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type Renderbuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type UniformLocation: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
 
     fn supports_debug(&self) -> bool;
 
@@ -541,19 +520,9 @@ pub trait HasContext {
         access: u32,
     ) -> *mut u8;
 
-    unsafe fn flush_mapped_buffer_range(
-        &self,
-        target: u32,
-        offset: i32,
-        length: i32,
-    );
+    unsafe fn flush_mapped_buffer_range(&self, target: u32, offset: i32, length: i32);
 
-    unsafe fn invalidate_buffer_sub_data(
-        &self,
-        target: u32,
-        offset: i32,
-        length: i32,
-    );
+    unsafe fn invalidate_buffer_sub_data(&self, target: u32, offset: i32, length: i32);
 
     unsafe fn polygon_offset(&self, factor: f32, units: f32);
 
@@ -772,7 +741,11 @@ pub trait HasContext {
 
     unsafe fn uniform_block_binding(&self, program: Self::Program, index: u32, binding: u32);
 
-    unsafe fn get_shader_storage_block_index(&self, program: Self::Program, name: &str) -> Option<u32>;
+    unsafe fn get_shader_storage_block_index(
+        &self,
+        program: Self::Program,
+        name: &str,
+    ) -> Option<u32>;
 
     unsafe fn shader_storage_block_binding(&self, program: Self::Program, index: u32, binding: u32);
 }
@@ -782,7 +755,6 @@ pub trait HasRenderLoop {
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, callback: F);
 }
-
 
 pub const ACTIVE_ATOMIC_COUNTER_BUFFERS: u32 = 0x92D9;
 

@@ -23,8 +23,6 @@ impl Context {
     where
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {
-        use crate::Context as _;
-
         let raw = native_gl::Gl::load_with(loader_function);
 
         // Setup extensions and constants after the context has been built
@@ -62,7 +60,7 @@ impl std::fmt::Debug for Context {
     }
 }
 
-impl super::Context for Context {
+impl HasContext for Context {
     type Shader = native_gl::types::GLuint;
     type Program = native_gl::types::GLuint;
     type Buffer = native_gl::types::GLuint;
@@ -1860,7 +1858,7 @@ impl RenderLoop<glutin::WindowedContext<glutin::PossiblyCurrent>> {
 }
 
 #[cfg(feature = "glutin")]
-impl super::RenderLoop for RenderLoop<glutin::WindowedContext<glutin::PossiblyCurrent>> {
+impl HasRenderLoop for RenderLoop<glutin::WindowedContext<glutin::PossiblyCurrent>> {
     type Window = glutin::WindowedContext<glutin::PossiblyCurrent>;
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
@@ -1880,7 +1878,7 @@ impl RenderLoop<sdl2::video::Window> {
 }
 
 #[cfg(feature = "sdl2")]
-impl super::RenderLoop for RenderLoop<sdl2::video::Window> {
+impl HasRenderLoop for RenderLoop<sdl2::video::Window> {
     type Window = sdl2::video::Window;
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {

@@ -27,55 +27,13 @@ pub struct DebugMessageLogEntry {
     message: String,
 }
 
-pub trait Context {
-    type Shader: Copy
-        + Clone
-        + Debug
-        + Eq
-        + Hash
-        + Ord
-        + PartialEq
-        + PartialOrd;
-    type Program: Copy
-        + Clone
-        + Debug
-        + Eq
-        + Hash
-        + Ord
-        + PartialEq
-        + PartialOrd;
-    type Buffer: Copy
-        + Clone
-        + Debug
-        + Eq
-        + Hash
-        + Ord
-        + PartialEq
-        + PartialOrd;
-    type VertexArray: Copy
-        + Clone
-        + Debug
-        + Eq
-        + Hash
-        + Ord
-        + PartialEq
-        + PartialOrd;
-    type Texture: Copy
-        + Clone
-        + Debug
-        + Eq
-        + Hash
-        + Ord
-        + PartialEq
-        + PartialOrd;
-    type Sampler: Copy
-        + Clone
-        + Debug
-        + Eq
-        + Hash
-        + Ord
-        + PartialEq
-        + PartialOrd;
+pub trait HasContext {
+    type Shader: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type Program: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type Buffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type VertexArray: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type Texture: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type Sampler: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Fence: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Framebuffer: Copy
         + Clone
@@ -815,7 +773,7 @@ pub trait Context {
     unsafe fn shader_storage_block_binding(&self, program: Self::Program, index: u32, binding: u32);
 }
 
-pub trait RenderLoop {
+pub trait HasRenderLoop {
     type Window;
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, callback: F);

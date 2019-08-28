@@ -43,7 +43,7 @@ pub struct Context {
 
 impl Context {
     pub fn from_webgl1_context(context: WebGlRenderingContext) -> Self {
-        Context {
+        Self {
             raw: RawRenderingContext::WebGl1(context),
             shaders: tracked_resource(),
             programs: tracked_resource(),
@@ -59,7 +59,7 @@ impl Context {
     }
 
     pub fn from_webgl2_context(context: WebGl2RenderingContext) -> Self {
-        Context {
+        Self {
             raw: RawRenderingContext::WebGl2(context),
             shaders: tracked_resource(),
             programs: tracked_resource(),
@@ -86,7 +86,7 @@ new_key_type! { pub struct WebFramebufferKey; }
 new_key_type! { pub struct WebRenderbufferKey; }
 new_key_type! { pub struct WebUniformLocationKey; }
 
-impl super::Context for Context {
+impl HasContext for Context {
     type Shader = WebShaderKey;
     type Program = WebProgramKey;
     type Buffer = WebBufferKey;
@@ -2278,11 +2278,11 @@ impl RenderLoop {
     }
 }
 
-impl super::RenderLoop for RenderLoop {
+impl HasRenderLoop for RenderLoop {
     type Window = ();
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
-        fn request_animation_frame(f: &Closure<FnMut()>) {
+        fn request_animation_frame(f: &Closure<dyn FnMut()>) {
             use wasm_bindgen::JsCast;
             web_sys::window()
                 .unwrap()
@@ -2300,7 +2300,7 @@ impl super::RenderLoop for RenderLoop {
                 return;
             }
             request_animation_frame(f.borrow().as_ref().unwrap());
-        }) as Box<FnMut()>));
+        }) as Box<dyn FnMut()>));
 
         request_animation_frame(g.borrow().as_ref().unwrap());
     }

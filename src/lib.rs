@@ -1,3 +1,7 @@
+
+use core::fmt::Debug;
+use core::hash::Hash;
+
 #[cfg(not(target_arch = "wasm32"))]
 mod native;
 #[cfg(not(target_arch = "wasm32"))]
@@ -26,74 +30,74 @@ pub struct DebugMessageLogEntry {
 pub trait Context {
     type Shader: Copy
         + Clone
-        + std::fmt::Debug
+        + Debug
         + Eq
-        + std::hash::Hash
+        + Hash
         + Ord
         + PartialEq
         + PartialOrd;
     type Program: Copy
         + Clone
-        + std::fmt::Debug
+        + Debug
         + Eq
-        + std::hash::Hash
+        + Hash
         + Ord
         + PartialEq
         + PartialOrd;
     type Buffer: Copy
         + Clone
-        + std::fmt::Debug
+        + Debug
         + Eq
-        + std::hash::Hash
+        + Hash
         + Ord
         + PartialEq
         + PartialOrd;
     type VertexArray: Copy
         + Clone
-        + std::fmt::Debug
+        + Debug
         + Eq
-        + std::hash::Hash
+        + Hash
         + Ord
         + PartialEq
         + PartialOrd;
     type Texture: Copy
         + Clone
-        + std::fmt::Debug
+        + Debug
         + Eq
-        + std::hash::Hash
+        + Hash
         + Ord
         + PartialEq
         + PartialOrd;
     type Sampler: Copy
         + Clone
-        + std::fmt::Debug
+        + Debug
         + Eq
-        + std::hash::Hash
+        + Hash
         + Ord
         + PartialEq
         + PartialOrd;
-    type Fence: Copy + Clone + std::fmt::Debug + Eq + std::hash::Hash + Ord + PartialEq + PartialOrd;
+    type Fence: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Framebuffer: Copy
         + Clone
-        + std::fmt::Debug
+        + Debug
         + Eq
-        + std::hash::Hash
+        + Hash
         + Ord
         + PartialEq
         + PartialOrd;
     type Renderbuffer: Copy
         + Clone
-        + std::fmt::Debug
+        + Debug
         + Eq
-        + std::hash::Hash
+        + Hash
         + Ord
         + PartialEq
         + PartialOrd;
     type UniformLocation: Copy
         + Clone
-        + std::fmt::Debug
+        + Debug
         + Eq
-        + std::hash::Hash
+        + Hash
         + Ord
         + PartialEq
         + PartialOrd;

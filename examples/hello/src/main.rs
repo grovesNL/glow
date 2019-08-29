@@ -1,7 +1,4 @@
-use glow::{self, Context};
-
-#[cfg(not(feature = "window-glutin"))]
-use glow::RenderLoop;
+use glow::*;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -33,16 +30,16 @@ fn main() {
                 .unwrap();
             (
                 (),
-                glow::web::Context::from_webgl2_context(webgl2_context),
+                glow::Context::from_webgl2_context(webgl2_context),
                 (),
-                glow::web::RenderLoop::from_request_animation_frame(),
+                glow::RenderLoop::from_request_animation_frame(),
                 "#version 300 es",
             )
         };
 
         // Create a context from a glutin window on non-wasm32 targets
         #[cfg(feature = "window-glutin")]
-        let (gl, mut event_loop, windowed_context, shader_version) = {
+        let (gl, event_loop, windowed_context, shader_version) = {
             let el = glutin::event_loop::EventLoop::new();
             let wb = glutin::window::WindowBuilder::new()
                 .with_title("Hello triangle!")
@@ -52,7 +49,7 @@ fn main() {
                 .build_windowed(wb, &el)
                 .unwrap();
             let windowed_context = windowed_context.make_current().unwrap();
-            let context = glow::native::Context::from_loader_function(|s| {
+            let context = glow::Context::from_loader_function(|s| {
                 windowed_context.get_proc_address(s) as *const _
             });
             (context, el, windowed_context, "#version 410")
@@ -74,11 +71,9 @@ fn main() {
                 .build()
                 .unwrap();
             let gl_context = window.gl_create_context().unwrap();
-            let context = glow::native::Context::from_loader_function(|s| {
-                video.gl_get_proc_address(s) as *const _
-            });
-            let render_loop =
-                glow::native::RenderLoop::<sdl2::video::Window>::from_sdl_window(window);
+            let context =
+                glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _);
+            let render_loop = glow::RenderLoop::<sdl2::video::Window>::from_sdl_window(window);
             let event_loop = sdl.event_pump().unwrap();
             (context, event_loop, render_loop, "#version 410", gl_context)
         };
@@ -147,7 +142,7 @@ fn main() {
         #[cfg(feature = "window-glutin")]
         {
             use glutin::event::{Event, WindowEvent};
-            use glutin::event_loop::{ControlFlow, EventLoop};
+            use glutin::event_loop::ControlFlow;
 
             event_loop.run(move |event, _, control_flow| {
                 *control_flow = ControlFlow::Wait;
@@ -158,7 +153,7 @@ fn main() {
                     }
                     Event::EventsCleared => {
                         println!("EventsCleared");
-                      windowed_context.window().request_redraw();
+                        windowed_context.window().request_redraw();
                     }
                     Event::WindowEvent { ref event, .. } => match event {
                         WindowEvent::Resized(logical_size) => {

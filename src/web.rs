@@ -43,7 +43,7 @@ pub struct Context {
 
 impl Context {
     pub fn from_webgl1_context(context: WebGlRenderingContext) -> Self {
-        Context {
+        Self {
             raw: RawRenderingContext::WebGl1(context),
             shaders: tracked_resource(),
             programs: tracked_resource(),
@@ -59,7 +59,7 @@ impl Context {
     }
 
     pub fn from_webgl2_context(context: WebGl2RenderingContext) -> Self {
-        Context {
+        Self {
             raw: RawRenderingContext::WebGl2(context),
             shaders: tracked_resource(),
             programs: tracked_resource(),
@@ -86,7 +86,7 @@ new_key_type! { pub struct WebFramebufferKey; }
 new_key_type! { pub struct WebRenderbufferKey; }
 new_key_type! { pub struct WebUniformLocationKey; }
 
-impl super::Context for Context {
+impl HasContext for Context {
     type Shader = WebShaderKey;
     type Program = WebProgramKey;
     type Buffer = WebBufferKey;
@@ -1141,8 +1141,12 @@ impl super::Context for Context {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.bind_attrib_location(raw_program, index, name),
-            RawRenderingContext::WebGl2(ref gl) => gl.bind_attrib_location(raw_program, index, name),
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.bind_attrib_location(raw_program, index, name)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.bind_attrib_location(raw_program, index, name)
+            }
         }
     }
 
@@ -1151,12 +1155,11 @@ impl super::Context for Context {
         let raw_fence = fences.1.get_unchecked(fence);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Sync is not supported"),
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.get_sync_parameter(raw_fence, SYNC_STATUS)
-                    .as_f64()
-                    .map(|v| v as u32)
-                    .unwrap_or(UNSIGNALED)
-            }
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .get_sync_parameter(raw_fence, SYNC_STATUS)
+                .as_f64()
+                .map(|v| v as u32)
+                .unwrap_or(UNSIGNALED),
         }
     }
 
@@ -1281,9 +1284,7 @@ impl super::Context for Context {
         pixels: Option<&[u8]>,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                panic!("3d textures are not supported")
-            }
+            RawRenderingContext::WebGl1(ref gl) => panic!("3d textures are not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
                 // TODO: Handle return value?
                 gl.tex_image_3d_with_opt_u8_array(
@@ -1694,21 +1695,11 @@ impl super::Context for Context {
         panic!("Map buffer range is not supported")
     }
 
-    unsafe fn flush_mapped_buffer_range(
-        &self,
-        _target: u32,
-        _offset: i32,
-        _length: i32,
-    ) {
+    unsafe fn flush_mapped_buffer_range(&self, _target: u32, _offset: i32, _length: i32) {
         panic!("Flush mapped buffer range is not supported")
     }
 
-    unsafe fn invalidate_buffer_sub_data(
-        &self,
-        _target: u32,
-        _offset: i32,
-        _length: i32,
-    ) {
+    unsafe fn invalidate_buffer_sub_data(&self, _target: u32, _offset: i32, _length: i32) {
         panic!("Invalidate buffer sub data is not supported")
     }
 
@@ -1871,21 +1862,10 @@ impl super::Context for Context {
         pixels: Option<&[u8]>,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Sub image 3D is not supported")
-            }
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Sub image 3D is not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.tex_sub_image_3d_with_opt_u8_array(
-                    target,
-                    level,
-                    x_offset,
-                    y_offset,
-                    z_offset,
-                    width,
-                    height,
-                    depth,
-                    format,
-                    ty,
+                    target, level, x_offset, y_offset, z_offset, width, height, depth, format, ty,
                     pixels,
                 )
                 .unwrap(); // TODO: Handle return value?
@@ -2184,14 +2164,14 @@ impl super::Context for Context {
         _severity: u32,
         _msg: S,
     ) where
-        S: AsRef<str>
+        S: AsRef<str>,
     {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
     unsafe fn debug_message_callback<F>(&self, _callback: F)
     where
-        F: FnMut(u32, u32, u32, u32, &str)
+        F: FnMut(u32, u32, u32, u32, &str),
     {
         panic!("WebGL does not support the KHR_debug extension.")
     }
@@ -2200,13 +2180,9 @@ impl super::Context for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn push_debug_group<S>(
-        &self,
-        _source: u32,
-        _id: u32,
-        _message: S
-    ) where
-        S: AsRef<str>
+    unsafe fn push_debug_group<S>(&self, _source: u32, _id: u32, _message: S)
+    where
+        S: AsRef<str>,
     {
         panic!("WebGL does not support the KHR_debug extension.")
     }
@@ -2217,7 +2193,7 @@ impl super::Context for Context {
 
     unsafe fn object_label<S>(&self, _identifier: u32, _name: u32, _label: Option<S>)
     where
-        S: AsRef<str>
+        S: AsRef<str>,
     {
         panic!("WebGL does not support the KHR_debug extension.")
     }
@@ -2226,8 +2202,9 @@ impl super::Context for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, _label: Option<S>) where
-        S: AsRef<str>
+    unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, _label: Option<S>)
+    where
+        S: AsRef<str>,
     {
         panic!("WebGL does not support the KHR_debug extension.")
     }
@@ -2252,7 +2229,9 @@ impl super::Context for Context {
 
     unsafe fn uniform_block_binding(&self, program: Self::Program, index: u32, binding: u32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform buffer bindings are not supported"),
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Uniform buffer bindings are not supported")
+            }
             RawRenderingContext::WebGl2(ref gl) => {
                 let programs = self.programs.borrow();
                 let raw_program = programs.1.get_unchecked(program);
@@ -2261,11 +2240,20 @@ impl super::Context for Context {
         }
     }
 
-    unsafe fn get_shader_storage_block_index(&self, _program: Self::Program, _name: &str) -> Option<u32> {
+    unsafe fn get_shader_storage_block_index(
+        &self,
+        _program: Self::Program,
+        _name: &str,
+    ) -> Option<u32> {
         panic!("Shader Storage Buffers are not supported by webgl")
     }
 
-    unsafe fn shader_storage_block_binding(&self, _program: Self::Program, _index: u32, binding: u32) {
+    unsafe fn shader_storage_block_binding(
+        &self,
+        _program: Self::Program,
+        _index: u32,
+        binding: u32,
+    ) {
         panic!("Shader Storage Buffers are not supported by webgl")
     }
 }
@@ -2278,11 +2266,11 @@ impl RenderLoop {
     }
 }
 
-impl super::RenderLoop for RenderLoop {
+impl HasRenderLoop for RenderLoop {
     type Window = ();
 
     fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
-        fn request_animation_frame(f: &Closure<FnMut()>) {
+        fn request_animation_frame(f: &Closure<dyn FnMut()>) {
             use wasm_bindgen::JsCast;
             web_sys::window()
                 .unwrap()
@@ -2300,7 +2288,7 @@ impl super::RenderLoop for RenderLoop {
                 return;
             }
             request_animation_frame(f.borrow().as_ref().unwrap());
-        }) as Box<FnMut()>));
+        }) as Box<dyn FnMut()>));
 
         request_animation_frame(g.borrow().as_ref().unwrap());
     }

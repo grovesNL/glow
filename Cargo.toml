@@ -1,6 +1,6 @@
 [package]
 name = "glow"
-version = "0.3.0-alpha1"
+version = "0.3.0-alpha2"
 description = "GL on Whatever: a set of bindings to run GL anywhere (Open GL, OpenGL ES, and WebGL) and avoid target-specific code."
 authors = ["Joshua Groves <josh@joshgroves.com>"]
 homepage = "https://github.com/grovesNL/glow.git"
@@ -48,7 +48,7 @@ features = [
 ]
 
 [build-dependencies]
-gl_generator = "0.9"
+gl_generator = "0.13"
 
 [workspace]
 members = [

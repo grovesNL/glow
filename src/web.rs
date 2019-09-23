@@ -596,10 +596,12 @@ impl HasContext for Context {
     unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
-                gl.buffer_data_with_u8_array(target, data, usage)
+                let array = js_sys::Uint8Array::view(&data);
+                gl.buffer_data_with_array_buffer_view(target, &array, usage);
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.buffer_data_with_u8_array(target, data, usage)
+                let array = js_sys::Uint8Array::view(&data);
+                gl.buffer_data_with_array_buffer_view(target, &array, usage);
             }
         }
     }

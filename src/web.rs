@@ -596,10 +596,12 @@ impl HasContext for Context {
     unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
-                gl.buffer_data_with_u8_array(target, data, usage)
+                let array = js_sys::Uint8Array::view(data);
+                gl.buffer_data_with_array_buffer_view(target, &array, usage);
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.buffer_data_with_u8_array(target, data, usage)
+                let array = js_sys::Uint8Array::view(data);
+                gl.buffer_data_with_array_buffer_view(target, &array, usage);
             }
         }
     }
@@ -607,10 +609,12 @@ impl HasContext for Context {
     unsafe fn buffer_sub_data_u8_slice(&self, target: u32, offset: i32, src_data: &[u8]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
-                gl.buffer_sub_data_with_i32_and_u8_array(target, offset, src_data)
+                let array = js_sys::Uint8Array::view(src_data);
+                gl.buffer_sub_data_with_i32_and_array_buffer_view(target, offset, &array);
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.buffer_sub_data_with_i32_and_u8_array(target, offset, src_data)
+                let array = js_sys::Uint8Array::view(src_data);
+                gl.buffer_sub_data_with_i32_and_array_buffer_view(target, offset, &array);
             }
         }
     }
@@ -619,7 +623,8 @@ impl HasContext for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("get_buffer_sub_data not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.get_buffer_sub_data_with_i32_and_u8_array(target, offset, dst_data)
+                let array = js_sys::Uint8Array::view(dst_data);
+                gl.get_buffer_sub_data_with_i32_and_array_buffer_view(target, offset, &array);
             }
         }
     }

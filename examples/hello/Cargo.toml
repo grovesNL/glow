@@ -4,17 +4,21 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
-glow = { path = "../../" }
+glow = { path = "../../", default-features=false }
 
 [target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
 glutin = { version = "0.22.0-alpha3", optional = true }
 sdl2 = { version = "0.32", optional = true }
 
 [features]
-default = []
+default = ["web-sys"]
+web-sys = ["web_sys", "wasm-bindgen", "glow/web-sys"]
+stdweb = ["std_web", "webgl_stdweb", "glow/stdweb"]
 window-sdl2 = ["sdl2", "glow/sdl2"]
 window-glutin = ["glutin", "glow/glutin"]
 
-[target.wasm32-unknown-unknown.dependencies]
-web-sys = { version = "0.3", features=["console"] }
-wasm-bindgen = "0.2"
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+web_sys = { version = "0.3", package = "web-sys", features=["console"], optional = true }
+wasm-bindgen = { version = "0.2", optional = true }
+std_web  = { version = "0.4.18", package = "stdweb", optional = true }
+webgl_stdweb = { version = "0.3", optional = true }

@@ -1,9 +1,18 @@
 use glow::*;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(target_arch = "wasm32", feature = "web-sys"))]
 use wasm_bindgen::prelude::*;
 
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
+#[cfg(all(target_arch = "wasm32", feature = "stdweb"))]
+use std_web::{
+    traits::*,
+    unstable::TryInto,
+    web::{document, html_element::*},
+};
+#[cfg(all(target_arch = "wasm32", feature = "stdweb"))]
+use webgl_stdweb::WebGL2RenderingContext;
+
+#[cfg_attr(all(target_arch = "wasm32", feature = "web-sys"), wasm_bindgen(start))]
 pub fn wasm_main() {
     main();
 }
@@ -11,7 +20,7 @@ pub fn wasm_main() {
 fn main() {
     unsafe {
         // Create a context from a WebGL2 context on wasm32 targets
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(all(target_arch = "wasm32", feature = "web-sys"))]
         let (_window, gl, _events_loop, render_loop, shader_version) = {
             use wasm_bindgen::JsCast;
             let canvas = web_sys::window()
@@ -27,6 +36,31 @@ fn main() {
                 .unwrap()
                 .unwrap()
                 .dyn_into::<web_sys::WebGl2RenderingContext>()
+                .unwrap();
+            (
+                (),
+                glow::Context::from_webgl2_context(webgl2_context),
+                (),
+                glow::RenderLoop::from_request_animation_frame(),
+                "#version 300 es",
+            )
+        };
+
+        #[cfg(all(target_arch = "wasm32", feature = "stdweb"))]
+        let (_window, gl, _events_loop, render_loop, shader_version) = {
+            let canvas: CanvasElement = document()
+                .create_element("canvas")
+                .unwrap()
+                .try_into()
+                .unwrap();
+            document()
+                .body()
+                .unwrap()
+                .append_child(&canvas);
+            canvas.set_width(640);
+            canvas.set_height(480);
+            let webgl2_context: WebGL2RenderingContext = canvas
+                .get_context()
                 .unwrap();
             (
                 (),

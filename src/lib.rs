@@ -30,6 +30,12 @@ pub struct ActiveUniform {
     pub name: String,
 }
 
+pub struct ActiveAttribute {
+    pub size: i32,
+    pub atype: u32,
+    pub name: String,
+}
+
 #[derive(Debug)]
 pub struct DebugMessageLogEntry {
     source: u32,
@@ -362,6 +368,14 @@ pub trait HasContext {
     unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32;
 
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str);
+
+    unsafe fn get_active_attributes(&self, program: Self::Program) -> u32;
+
+    unsafe fn get_active_attrib(
+        &self,
+        program: Self::Program,
+        index: u32,
+    ) -> Option<ActiveAttribute>;
 
     unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32;
 

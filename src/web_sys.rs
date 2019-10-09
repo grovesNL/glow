@@ -1171,7 +1171,7 @@ impl HasContext for Context {
         .unwrap_or(0)
     }
 
-    unsafe fn get_active_attrib(
+    unsafe fn get_active_attribute(
         &self,
         program: Self::Program,
         index: u32,

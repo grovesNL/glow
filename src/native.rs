@@ -877,7 +877,7 @@ impl HasContext for Context {
         count as u32
     }
 
-    unsafe fn get_active_attrib(
+    unsafe fn get_active_attribute(
         &self,
         program: Self::Program,
         index: u32,

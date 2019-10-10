@@ -1144,6 +1144,49 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_active_attributes(&self, program: Self::Program) -> u32 {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGL1(ref gl) => {
+                gl.get_program_parameter(raw_program, WebGLRenderingContext::ACTIVE_ATTRIBUTES)
+            }
+            RawRenderingContext::WebGL2(ref gl) => {
+                gl.get_program_parameter(raw_program, WebGL2RenderingContext::ACTIVE_ATTRIBUTES)
+            }
+        }
+        .try_into()
+        .map(|v: f64| v as u32)
+        .unwrap_or(0)
+    }
+
+    unsafe fn get_active_attribute(
+        &self,
+        program: Self::Program,
+        index: u32,
+    ) -> Option<ActiveAttribute> {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGL1(ref gl) => {
+                gl.get_active_attrib(raw_program, index)
+                    .map(|au| ActiveAttribute {
+                        size: au.size(),
+                        atype: au.type_(),
+                        name: au.name(),
+                    })
+            }
+            RawRenderingContext::WebGL2(ref gl) => {
+                gl.get_active_attrib(raw_program, index)
+                    .map(|au| ActiveAttribute {
+                        size: au.size(),
+                        atype: au.type_(),
+                        name: au.name(),
+                    })
+            }
+        }
+    }
+
     unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32 {
         let fences = self.fences.borrow();
         let raw_fence = fences.1.get_unchecked(fence);

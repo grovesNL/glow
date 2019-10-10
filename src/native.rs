@@ -870,6 +870,45 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn get_active_attributes(&self, program: Self::Program) -> u32 {
+        let gl = &self.raw;
+        let mut count = 0;
+        gl.GetProgramiv(program, ACTIVE_ATTRIBUTES, &mut count);
+        count as u32
+    }
+
+    unsafe fn get_active_attribute(
+        &self,
+        program: Self::Program,
+        index: u32,
+    ) -> Option<ActiveAttribute> {
+        let gl = &self.raw;
+        let mut attribute_max_size = 0;
+        gl.GetProgramiv(
+            program,
+            ACTIVE_ATTRIBUTE_MAX_LENGTH,
+            &mut attribute_max_size,
+        );
+        let mut name = String::with_capacity(attribute_max_size as usize);
+        name.extend(std::iter::repeat('\0').take(attribute_max_size as usize));
+        let mut length = 0;
+        let mut size = 0;
+        let mut atype = 0;
+        gl.GetActiveAttrib(
+            program,
+            index,
+            attribute_max_size,
+            &mut length,
+            &mut size,
+            &mut atype,
+            name.as_ptr() as *mut native_gl::types::GLchar,
+        );
+
+        name.truncate(length as usize);
+
+        Some(ActiveAttribute { name, size, atype })
+    }
+
     unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32 {
         let gl = &self.raw;
         let mut len = 0;

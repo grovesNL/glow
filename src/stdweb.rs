@@ -7,13 +7,53 @@ use std_web::unstable::TryInto;
 use webgl_stdweb::{
     WebGL2RenderingContext, WebGLBuffer, WebGLFramebuffer, WebGLProgram, WebGLRenderbuffer,
     WebGLRenderingContext, WebGLSampler, WebGLShader, WebGLSync, WebGLTexture,
-    WebGLUniformLocation, WebGLVertexArrayObject,
+    WebGLUniformLocation, WebGLVertexArrayObject, WebGLVertexArrayObjectOES,
 };
 
 #[derive(Debug)]
 enum RawRenderingContext {
     WebGL1(WebGLRenderingContext),
     WebGL2(WebGL2RenderingContext),
+}
+
+#[derive(Debug)]
+struct Extensions {
+    pub angle_instanced_arrays: Option<webgl_stdweb::ANGLE_instanced_arrays>,
+    pub ext_blend_minmax: Option<webgl_stdweb::EXT_blend_minmax>,
+    pub ext_color_buffer_float: Option<webgl_stdweb::EXT_color_buffer_float>,
+    pub ext_color_buffer_half_float: Option<webgl_stdweb::EXT_color_buffer_half_float>,
+    pub ext_disjoint_timer_query: Option<webgl_stdweb::EXT_disjoint_timer_query>,
+    pub ext_disjoint_timer_query_webgl2: Option<webgl_stdweb::EXT_disjoint_timer_query_webgl2>,
+    pub ext_float_blend: Option<webgl_stdweb::EXT_float_blend>,
+    pub ext_frag_depth: Option<webgl_stdweb::EXT_frag_depth>,
+    pub ext_srgb: Option<webgl_stdweb::EXT_sRGB>,
+    pub ext_shader_texture_lod: Option<webgl_stdweb::EXT_shader_texture_lod>,
+    pub ext_texture_compression_bptc: Option<webgl_stdweb::EXT_texture_compression_bptc>,
+    pub ext_texture_compression_rgtc: Option<webgl_stdweb::EXT_texture_compression_rgtc>,
+    pub ext_texture_filter_anisotropic: Option<webgl_stdweb::EXT_texture_filter_anisotropic>,
+    pub khr_parallel_shader_compile: Option<webgl_stdweb::KHR_parallel_shader_compile>,
+    pub oes_element_index_uint: Option<webgl_stdweb::OES_element_index_uint>,
+    pub oes_fbo_render_mipmap: Option<webgl_stdweb::OES_fbo_render_mipmap>,
+    pub oes_standard_derivatives: Option<webgl_stdweb::OES_standard_derivatives>,
+    pub oes_texture_float: Option<webgl_stdweb::OES_texture_float>,
+    pub oes_texture_float_linear: Option<webgl_stdweb::OES_texture_float_linear>,
+    pub oes_texture_half_float: Option<webgl_stdweb::OES_texture_half_float>,
+    pub oes_texture_half_float_linear: Option<webgl_stdweb::OES_texture_half_float_linear>,
+    pub oes_vertex_array_object: Option<webgl_stdweb::OES_vertex_array_object>,
+    pub webgl_color_buffer_float: Option<webgl_stdweb::WEBGL_color_buffer_float>,
+    pub webgl_compressed_texture_astc: Option<webgl_stdweb::WEBGL_compressed_texture_astc>,
+    pub webgl_compressed_texture_etc: Option<webgl_stdweb::WEBGL_compressed_texture_etc>,
+    pub webgl_compressed_texture_etc1: Option<webgl_stdweb::WEBGL_compressed_texture_etc1>,
+    pub webgl_compressed_texture_pvrtc: Option<webgl_stdweb::WEBGL_compressed_texture_pvrtc>,
+    pub webgl_compressed_texture_s3tc: Option<webgl_stdweb::WEBGL_compressed_texture_s3tc>,
+    pub webgl_compressed_texture_s3tc_srgb: Option<webgl_stdweb::WEBGL_compressed_texture_s3tc_srgb>,
+    pub webgl_debug_renderer_info: Option<webgl_stdweb::WEBGL_debug_renderer_info>,
+    pub webgl_debug_shaders: Option<webgl_stdweb::WEBGL_debug_shaders>,
+    pub webgl_depth_texture: Option<webgl_stdweb::WEBGL_depth_texture>,
+    pub webgl_draw_buffers: Option<webgl_stdweb::WEBGL_draw_buffers>,
+    pub webgl_lose_context: Option<webgl_stdweb::WEBGL_lose_context>,
+    pub webgl_multiview: Option<webgl_stdweb::WEBGL_multiview>,
+    pub webgl_security_sensitive_resources: Option<webgl_stdweb::WEBGL_security_sensitive_resources>,
 }
 
 // Workaround for stable Rust
@@ -29,10 +69,12 @@ fn tracked_resource<K: slotmap::Key, V>() -> TrackedResource<K, V> {
 #[derive(Debug)]
 pub struct Context {
     raw: RawRenderingContext,
+    extensions: Extensions,
     shaders: TrackedResource<WebShaderKey, WebGLShader>,
     programs: TrackedResource<WebProgramKey, WebGLProgram>,
     buffers: TrackedResource<WebBufferKey, WebGLBuffer>,
     vertex_arrays: TrackedResource<WebVertexArrayKey, WebGLVertexArrayObject>,
+    vertex_arrays_oes: TrackedResource<WebVertexArrayKey, WebGLVertexArrayObjectOES>,
     textures: TrackedResource<WebTextureKey, WebGLTexture>,
     samplers: TrackedResource<WebSamplerKey, WebGLSampler>,
     fences: TrackedResource<WebFenceKey, WebGLSync>,
@@ -43,12 +85,52 @@ pub struct Context {
 
 impl Context {
     pub fn from_webgl1_context(context: WebGLRenderingContext) -> Self {
+        let extensions = Extensions {
+            angle_instanced_arrays: context.get_extension::<webgl_stdweb::ANGLE_instanced_arrays>(),
+            ext_blend_minmax: context.get_extension::<webgl_stdweb::EXT_blend_minmax>(),
+            ext_color_buffer_float: context.get_extension::<webgl_stdweb::EXT_color_buffer_float>(),
+            ext_color_buffer_half_float: context.get_extension::<webgl_stdweb::EXT_color_buffer_half_float>(),
+            ext_disjoint_timer_query: context.get_extension::<webgl_stdweb::EXT_disjoint_timer_query>(),
+            ext_disjoint_timer_query_webgl2: context.get_extension::<webgl_stdweb::EXT_disjoint_timer_query_webgl2>(),
+            ext_float_blend: context.get_extension::<webgl_stdweb::EXT_float_blend>(),
+            ext_frag_depth: context.get_extension::<webgl_stdweb::EXT_frag_depth>(),
+            ext_srgb: context.get_extension::<webgl_stdweb::EXT_sRGB>(),
+            ext_shader_texture_lod: context.get_extension::<webgl_stdweb::EXT_shader_texture_lod>(),
+            ext_texture_compression_bptc: context.get_extension::<webgl_stdweb::EXT_texture_compression_bptc>(),
+            ext_texture_compression_rgtc: context.get_extension::<webgl_stdweb::EXT_texture_compression_rgtc>(),
+            ext_texture_filter_anisotropic: context.get_extension::<webgl_stdweb::EXT_texture_filter_anisotropic>(),
+            khr_parallel_shader_compile: context.get_extension::<webgl_stdweb::KHR_parallel_shader_compile>(),
+            oes_element_index_uint: context.get_extension::<webgl_stdweb::OES_element_index_uint>(),
+            oes_fbo_render_mipmap: context.get_extension::<webgl_stdweb::OES_fbo_render_mipmap>(),
+            oes_standard_derivatives: context.get_extension::<webgl_stdweb::OES_standard_derivatives>(),
+            oes_texture_float: context.get_extension::<webgl_stdweb::OES_texture_float>(),
+            oes_texture_float_linear: context.get_extension::<webgl_stdweb::OES_texture_float_linear>(),
+            oes_texture_half_float: context.get_extension::<webgl_stdweb::OES_texture_half_float>(),
+            oes_texture_half_float_linear: context.get_extension::<webgl_stdweb::OES_texture_half_float_linear>(),
+            oes_vertex_array_object: context.get_extension::<webgl_stdweb::OES_vertex_array_object>(),
+            webgl_color_buffer_float: context.get_extension::<webgl_stdweb::WEBGL_color_buffer_float>(),
+            webgl_compressed_texture_astc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_astc>(),
+            webgl_compressed_texture_etc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc>(),
+            webgl_compressed_texture_etc1: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc1>(),
+            webgl_compressed_texture_pvrtc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_pvrtc>(),
+            webgl_compressed_texture_s3tc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc>(),
+            webgl_compressed_texture_s3tc_srgb: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc_srgb>(),
+            webgl_debug_renderer_info: context.get_extension::<webgl_stdweb::WEBGL_debug_renderer_info>(),
+            webgl_debug_shaders: context.get_extension::<webgl_stdweb::WEBGL_debug_shaders>(),
+            webgl_depth_texture: context.get_extension::<webgl_stdweb::WEBGL_depth_texture>(),
+            webgl_draw_buffers: context.get_extension::<webgl_stdweb::WEBGL_draw_buffers>(),
+            webgl_lose_context: context.get_extension::<webgl_stdweb::WEBGL_lose_context>(),
+            webgl_multiview: context.get_extension::<webgl_stdweb::WEBGL_multiview>(),
+            webgl_security_sensitive_resources: context.get_extension::<webgl_stdweb::WEBGL_security_sensitive_resources>(),
+        };
         Self {
             raw: RawRenderingContext::WebGL1(context),
+            extensions,
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),
             vertex_arrays: tracked_resource(),
+            vertex_arrays_oes: tracked_resource(),
             textures: tracked_resource(),
             samplers: tracked_resource(),
             fences: tracked_resource(),
@@ -59,12 +141,52 @@ impl Context {
     }
 
     pub fn from_webgl2_context(context: WebGL2RenderingContext) -> Self {
+        let extensions = Extensions {
+            angle_instanced_arrays: context.get_extension::<webgl_stdweb::ANGLE_instanced_arrays>(),
+            ext_blend_minmax: context.get_extension::<webgl_stdweb::EXT_blend_minmax>(),
+            ext_color_buffer_float: context.get_extension::<webgl_stdweb::EXT_color_buffer_float>(),
+            ext_color_buffer_half_float: context.get_extension::<webgl_stdweb::EXT_color_buffer_half_float>(),
+            ext_disjoint_timer_query: context.get_extension::<webgl_stdweb::EXT_disjoint_timer_query>(),
+            ext_disjoint_timer_query_webgl2: context.get_extension::<webgl_stdweb::EXT_disjoint_timer_query_webgl2>(),
+            ext_float_blend: context.get_extension::<webgl_stdweb::EXT_float_blend>(),
+            ext_frag_depth: context.get_extension::<webgl_stdweb::EXT_frag_depth>(),
+            ext_srgb: context.get_extension::<webgl_stdweb::EXT_sRGB>(),
+            ext_shader_texture_lod: context.get_extension::<webgl_stdweb::EXT_shader_texture_lod>(),
+            ext_texture_compression_bptc: context.get_extension::<webgl_stdweb::EXT_texture_compression_bptc>(),
+            ext_texture_compression_rgtc: context.get_extension::<webgl_stdweb::EXT_texture_compression_rgtc>(),
+            ext_texture_filter_anisotropic: context.get_extension::<webgl_stdweb::EXT_texture_filter_anisotropic>(),
+            khr_parallel_shader_compile: context.get_extension::<webgl_stdweb::KHR_parallel_shader_compile>(),
+            oes_element_index_uint: context.get_extension::<webgl_stdweb::OES_element_index_uint>(),
+            oes_fbo_render_mipmap: context.get_extension::<webgl_stdweb::OES_fbo_render_mipmap>(),
+            oes_standard_derivatives: context.get_extension::<webgl_stdweb::OES_standard_derivatives>(),
+            oes_texture_float: context.get_extension::<webgl_stdweb::OES_texture_float>(),
+            oes_texture_float_linear: context.get_extension::<webgl_stdweb::OES_texture_float_linear>(),
+            oes_texture_half_float: context.get_extension::<webgl_stdweb::OES_texture_half_float>(),
+            oes_texture_half_float_linear: context.get_extension::<webgl_stdweb::OES_texture_half_float_linear>(),
+            oes_vertex_array_object: context.get_extension::<webgl_stdweb::OES_vertex_array_object>(),
+            webgl_color_buffer_float: context.get_extension::<webgl_stdweb::WEBGL_color_buffer_float>(),
+            webgl_compressed_texture_astc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_astc>(),
+            webgl_compressed_texture_etc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc>(),
+            webgl_compressed_texture_etc1: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc1>(),
+            webgl_compressed_texture_pvrtc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_pvrtc>(),
+            webgl_compressed_texture_s3tc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc>(),
+            webgl_compressed_texture_s3tc_srgb: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc_srgb>(),
+            webgl_debug_renderer_info: context.get_extension::<webgl_stdweb::WEBGL_debug_renderer_info>(),
+            webgl_debug_shaders: context.get_extension::<webgl_stdweb::WEBGL_debug_shaders>(),
+            webgl_depth_texture: context.get_extension::<webgl_stdweb::WEBGL_depth_texture>(),
+            webgl_draw_buffers: context.get_extension::<webgl_stdweb::WEBGL_draw_buffers>(),
+            webgl_lose_context: context.get_extension::<webgl_stdweb::WEBGL_lose_context>(),
+            webgl_multiview: context.get_extension::<webgl_stdweb::WEBGL_multiview>(),
+            webgl_security_sensitive_resources: context.get_extension::<webgl_stdweb::WEBGL_security_sensitive_resources>(),
+        };
         Self {
             raw: RawRenderingContext::WebGL2(context),
+            extensions,
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),
             vertex_arrays: tracked_resource(),
+            vertex_arrays_oes: tracked_resource(),
             textures: tracked_resource(),
             samplers: tracked_resource(),
             fences: tracked_resource(),
@@ -482,44 +604,70 @@ impl HasContext for Context {
     }
 
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
-        let raw_vertex_array = match self.raw {
+        match self.raw {
             RawRenderingContext::WebGL1(ref _gl) => {
-                panic!("Vertex array objects are not supported"); // TODO: Extension
-            }
-            RawRenderingContext::WebGL2(ref gl) => gl.create_vertex_array(),
-        };
-
-        match raw_vertex_array {
-            Some(va) => {
-                let key = self.vertex_arrays.borrow_mut().0.insert(());
-                self.vertex_arrays.borrow_mut().1.insert(key, va);
-                Ok(key)
-            }
-            None => Err(String::from("Unable to create vertex array object")),
+                match &self.extensions.oes_vertex_array_object {
+                    Some(extension) => {
+                        match extension.create_vertex_array_oes() {
+                            Some(va) => {
+                                let key = self.vertex_arrays_oes.borrow_mut().0.insert(());
+                                self.vertex_arrays_oes.borrow_mut().1.insert(key, va);
+                                Ok(key)
+                            }
+                            None => Err(String::from("Unable to create vertex array object")),
+                        }
+                    },
+                    None => panic!("Vertex array objects are not supported"),
+                }
+            },
+            RawRenderingContext::WebGL2(ref gl) => {
+                match gl.create_vertex_array() {
+                    Some(va) => {
+                        let key = self.vertex_arrays.borrow_mut().0.insert(());
+                        self.vertex_arrays.borrow_mut().1.insert(key, va);
+                        Ok(key)
+                    }
+                    None => Err(String::from("Unable to create vertex array object")),
+                }
+            },
         }
     }
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
-        let mut vertex_arrays = self.vertex_arrays.borrow_mut();
-        match vertex_arrays.1.remove(vertex_array) {
-            Some(ref va) => match self.raw {
-                RawRenderingContext::WebGL1(ref _gl) => {
-                    panic!("Vertex array objects are not supported"); // TODO: Extension
+        match self.raw {
+            RawRenderingContext::WebGL1(ref _gl) => {
+                match &self.extensions.oes_vertex_array_object {
+                    Some(extension) => {
+                        let mut vertex_arrays_oes = self.vertex_arrays_oes.borrow_mut();
+                        extension.delete_vertex_array_oes(vertex_arrays_oes.1.remove(vertex_array).as_ref())
+                    },
+                    None => panic!("Vertex array objects are not supported"),
                 }
-                RawRenderingContext::WebGL2(ref gl) => gl.delete_vertex_array(Some(va)),
             },
-            None => {}
+            RawRenderingContext::WebGL2(ref gl) => {
+                let mut vertex_arrays = self.vertex_arrays.borrow_mut();
+                gl.delete_vertex_array(vertex_arrays.1.remove(vertex_array).as_ref());
+            }
         }
     }
 
     unsafe fn bind_vertex_array(&self, vertex_array: Option<Self::VertexArray>) {
-        let vertex_arrays = self.vertex_arrays.borrow();
-        let raw_vertex_array = vertex_array.map(|va| vertex_arrays.1.get_unchecked(va));
         match self.raw {
             RawRenderingContext::WebGL1(ref _gl) => {
-                panic!("Vertex array objects are not supported"); // TODO: Extension
+                match &self.extensions.oes_vertex_array_object {
+                    Some(extension) => {
+                        let vertex_arrays_oes = self.vertex_arrays_oes.borrow();
+                        let raw_vertex_array_oes = vertex_array.map(|va| vertex_arrays_oes.1.get_unchecked(va));
+                        extension.bind_vertex_array_oes(raw_vertex_array_oes);
+                    },
+                    None => panic!("Vertex array objects are not supported"),
+                }
+            },
+            RawRenderingContext::WebGL2(ref gl) => {
+                let vertex_arrays = self.vertex_arrays.borrow();
+                let raw_vertex_array = vertex_array.map(|va| vertex_arrays.1.get_unchecked(va));
+                gl.bind_vertex_array(raw_vertex_array);
             }
-            RawRenderingContext::WebGL2(ref gl) => gl.bind_vertex_array(raw_vertex_array),
         }
     }
 
@@ -816,7 +964,10 @@ impl HasContext for Context {
     unsafe fn draw_arrays_instanced(&self, mode: u32, first: i32, count: i32, instance_count: i32) {
         match self.raw {
             RawRenderingContext::WebGL1(ref _gl) => {
-                panic!("Draw arrays instanced is not supported") // TODO: Extension
+                match &self.extensions.angle_instanced_arrays {
+                    Some(extension) => extension.draw_arrays_instanced_angle(mode as u32, first, count, instance_count),
+                    None => panic!("Draw arrays instanced is not supported"),
+                }
             }
             RawRenderingContext::WebGL2(ref gl) => {
                 gl.draw_arrays_instanced(mode as u32, first, count, instance_count)
@@ -889,7 +1040,16 @@ impl HasContext for Context {
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref _gl) => {
-                panic!("Draw elements instanced is not supported") // TODO: Extension
+                match &self.extensions.angle_instanced_arrays {
+                    None => panic!("Draw elements instanced is not supported"),
+                    Some(extension) => extension.draw_elements_instanced_angle(
+                        mode as u32,
+                        count,
+                        element_type as u32,
+                        offset as i64,
+                        instance_count
+                    ),
+                }
             }
             RawRenderingContext::WebGL2(ref gl) => {
                 gl.draw_elements_instanced(
@@ -1781,7 +1941,7 @@ impl HasContext for Context {
 
     unsafe fn fence_sync(&self, condition: u32, flags: u32) -> Result<Self::Fence, String> {
         let raw_fence = match self.raw {
-            RawRenderingContext::WebGL1(ref _gl) => panic!("Fences are not supported"), // TODO: Extension
+            RawRenderingContext::WebGL1(ref _gl) => panic!("Fences are not supported"),
             RawRenderingContext::WebGL2(ref gl) => gl.fence_sync(condition as u32, flags),
         };
         match raw_fence {
@@ -1972,7 +2132,10 @@ impl HasContext for Context {
     unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32) {
         match self.raw {
             RawRenderingContext::WebGL1(ref _gl) => {
-                panic!("Vertex attrib divisor is not supported"); // TODO: Extension
+                match &self.extensions.angle_instanced_arrays {
+                    None => panic!("Vertex attrib divisor is not supported"),
+                    Some(extension) => extension.vertex_attrib_divisor_angle(index, divisor),
+                }
             }
             RawRenderingContext::WebGL2(ref gl) => gl.vertex_attrib_divisor(index, divisor),
         }

@@ -146,9 +146,10 @@ macro_rules! build_extensions {
 
 impl Context {
     pub fn from_webgl1_context(context: WebGlRenderingContext) -> Self {
+        let extensions = build_extensions!(context, WebGlRenderingContext);
         Self {
             raw: RawRenderingContext::WebGl1(context),
-            extensions: build_extensions!(context, WebGlRenderingContext),
+            extensions,
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),
@@ -163,9 +164,10 @@ impl Context {
     }
 
     pub fn from_webgl2_context(context: WebGl2RenderingContext) -> Self {
+        let extensions = build_extensions!(context, WebGl2RenderingContext);
         Self {
             raw: RawRenderingContext::WebGl2(context),
-            extensions: build_extensions!(context, WebGl2RenderingContext),
+            extensions,
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),

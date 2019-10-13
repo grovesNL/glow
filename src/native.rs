@@ -1074,7 +1074,7 @@ impl HasContext for Context {
     unsafe fn uniform_1_i32_slice(
         &self,
         location: Option<Self::UniformLocation>,
-        v: &mut [i32; 1],
+        v: &[i32; 1],
     ) {
         let gl = &self.raw;
         gl.Uniform1iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
@@ -1083,7 +1083,7 @@ impl HasContext for Context {
     unsafe fn uniform_2_i32_slice(
         &self,
         location: Option<Self::UniformLocation>,
-        v: &mut [i32; 2],
+        v: &[i32; 2],
     ) {
         let gl = &self.raw;
         gl.Uniform2iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
@@ -1092,7 +1092,7 @@ impl HasContext for Context {
     unsafe fn uniform_3_i32_slice(
         &self,
         location: Option<Self::UniformLocation>,
-        v: &mut [i32; 3],
+        v: &[i32; 3],
     ) {
         let gl = &self.raw;
         gl.Uniform3iv(location.unwrap_or(0) as i32, 1, v.as_ptr());
@@ -1101,7 +1101,7 @@ impl HasContext for Context {
     unsafe fn uniform_4_i32_slice(
         &self,
         location: Option<Self::UniformLocation>,
-        v: &mut [i32; 4],
+        v: &[i32; 4],
     ) {
         let gl = &self.raw;
         gl.Uniform4iv(location.unwrap_or(0) as i32, 1, v.as_ptr());

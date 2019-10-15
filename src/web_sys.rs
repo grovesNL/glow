@@ -1564,7 +1564,7 @@ impl HasContext for Context {
     unsafe fn uniform_1_i32_slice(
         &self,
         uniform_location: Option<Self::UniformLocation>,
-        v: &mut [i32; 1],
+        v: &[i32; 1],
     ) {
         let uniform_locations = self.uniform_locations.borrow();
         let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
@@ -1581,7 +1581,7 @@ impl HasContext for Context {
     unsafe fn uniform_2_i32_slice(
         &self,
         uniform_location: Option<Self::UniformLocation>,
-        v: &mut [i32; 2],
+        v: &[i32; 2],
     ) {
         let uniform_locations = self.uniform_locations.borrow();
         let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
@@ -1598,7 +1598,7 @@ impl HasContext for Context {
     unsafe fn uniform_3_i32_slice(
         &self,
         uniform_location: Option<Self::UniformLocation>,
-        v: &mut [i32; 3],
+        v: &[i32; 3],
     ) {
         let uniform_locations = self.uniform_locations.borrow();
         let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));
@@ -1615,7 +1615,7 @@ impl HasContext for Context {
     unsafe fn uniform_4_i32_slice(
         &self,
         uniform_location: Option<Self::UniformLocation>,
-        v: &mut [i32; 4],
+        v: &[i32; 4],
     ) {
         let uniform_locations = self.uniform_locations.borrow();
         let raw_uniform_location = uniform_location.map(|u| uniform_locations.1.get_unchecked(u));

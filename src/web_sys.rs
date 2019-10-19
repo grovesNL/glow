@@ -1394,6 +1394,17 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn generate_mipmap(&self, target: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.generate_mipmap(target);
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.generate_mipmap(target);
+            }
+        }
+    }
+
     unsafe fn tex_image_2d(
         &self,
         target: u32,

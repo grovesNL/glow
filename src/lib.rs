@@ -400,6 +400,8 @@ pub trait HasContext {
 
     unsafe fn sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32, value: i32);
 
+    unsafe fn generate_mipmap(&self, target: u32);
+
     unsafe fn tex_image_2d(
         &self,
         target: u32,

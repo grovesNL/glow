@@ -959,6 +959,11 @@ impl HasContext for Context {
         gl.SamplerParameteri(sampler, name, value);
     }
 
+    unsafe fn generate_mipmap(&self, target: u32) {
+        let gl = &self.raw;
+        gl.GenerateMipmap(target);
+    }
+
     unsafe fn tex_image_2d(
         &self,
         target: u32,

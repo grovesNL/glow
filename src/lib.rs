@@ -1848,6 +1848,10 @@ pub const LOW_FLOAT: u32 = 0x8DF0;
 
 pub const LOW_INT: u32 = 0x8DF3;
 
+pub const LUMINANCE : u32 = 0x1909;
+
+pub const LUMINANCE_ALPHA : u32 = 0x190A;
+
 pub const MAJOR_VERSION: u32 = 0x821B;
 
 pub const MANUAL_GENERATE_MIPMAP: u32 = 0x8294;

@@ -365,7 +365,7 @@ pub trait HasContext {
         name: &str,
     ) -> Option<Self::UniformLocation>;
 
-    unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32;
+    unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> Option<u32>;
 
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str);
 

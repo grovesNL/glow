@@ -55,7 +55,7 @@ pub trait HasContext {
     type Fence: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Framebuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Renderbuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
-    type UniformLocation: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type UniformLocation: Clone + Debug;
 
     fn supports_debug(&self) -> bool;
 

@@ -854,10 +854,15 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32 {
+    unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> Option<u32> {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        gl.GetAttribLocation(program, name.as_ptr() as *const native_gl::types::GLchar) as i32
+        let attrib_location = gl.GetAttribLocation(program, name.as_ptr() as *const native_gl::types::GLchar);
+        if attrib_location < 0 {
+            None
+        } else {
+            Some(attrib_location as u32)
+        }
     }
 
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {

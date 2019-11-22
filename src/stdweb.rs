@@ -1282,12 +1282,17 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> i32 {
+    unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> Option<u32> {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
-        match self.raw {
+        let attrib_location = match self.raw {
             RawRenderingContext::WebGL1(ref gl) => gl.get_attrib_location(raw_program, name),
             RawRenderingContext::WebGL2(ref gl) => gl.get_attrib_location(raw_program, name),
+        };
+        if attrib_location < 0 {
+            None
+        } else {
+            Some(attrib_location as u32)
         }
     }
 

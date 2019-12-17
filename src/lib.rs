@@ -772,6 +772,8 @@ pub trait HasContext {
     ) -> Option<u32>;
 
     unsafe fn shader_storage_block_binding(&self, program: Self::Program, index: u32, binding: u32);
+
+    unsafe fn read_pixels(&self, x: i32, y: i32, width: i32, height: i32, format: u32, gltype: u32, data: &mut [u8]);
 }
 
 pub trait HasRenderLoop {

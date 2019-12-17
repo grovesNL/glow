@@ -1878,6 +1878,20 @@ impl HasContext for Context {
         let gl = &self.raw;
         gl.ShaderStorageBlockBinding(program, index, binding);
     }
+
+    unsafe fn read_pixels(
+        &self,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        gltype: u32,
+        data: &mut [u8]
+    ) {
+        let gl = &self.raw;
+        gl.ReadPixels(x, y, width, height, format, gltype, data.as_mut_ptr() as *mut std::ffi::c_void);
+    }
 }
 
 extern "system" fn raw_debug_message_callback<F>(

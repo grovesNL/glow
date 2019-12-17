@@ -2411,6 +2411,22 @@ impl HasContext for Context {
     ) {
         panic!("Shader Storage Buffers are not supported by webgl")
     }
+
+    unsafe fn read_pixels(
+        &self,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        gltype: u32,
+        data: &mut [u8]
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGL1(ref gl) => gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8])),
+            RawRenderingContext::WebGL2(ref gl) => gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8])),
+        }
+    }
 }
 
 pub struct RenderLoop;

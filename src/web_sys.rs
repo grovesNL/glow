@@ -2457,8 +2457,12 @@ impl HasContext for Context {
         data: &mut [u8]
     ) {
         match self.raw {
-            RawRenderingContext::WebGL1(ref gl) => gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8])),
-            RawRenderingContext::WebGL2(ref gl) => gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8])),
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.read_pixels_with_opt_u8_array(x, y, width, height, format, gltype, Some(data)).unwrap()
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.read_pixels_with_opt_u8_array(x, y, width, height, format, gltype, Some(data)).unwrap()
+            }
         }
     }
 }

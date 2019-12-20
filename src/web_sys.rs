@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::{
     WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlRenderbuffer,
     WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
-    WebGlUniformLocation, WebGlVertexArrayObject,
+    WebGlUniformLocation, WebGlVertexArrayObject, HtmlImageElement,
 };
 
 #[derive(Debug)]
@@ -177,6 +177,44 @@ impl Context {
             renderbuffers: tracked_resource(),
         }
     }
+
+    pub unsafe fn tex_image_2d_with_html_image(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        format: u32,
+        ty: u32,
+        image: &HtmlImageElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_u32_and_u32_and_image(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    image,
+                )
+                .unwrap();
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_u32_and_u32_and_html_image_element(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    image,
+                )
+                .unwrap();
+            }
+        }
+    }
+
 }
 
 new_key_type! { pub struct WebShaderKey; }

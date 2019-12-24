@@ -1532,262 +1532,262 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn uniform_1_i32(&self, uniform_location: Option<Self::UniformLocation>, x: i32) {
+    unsafe fn uniform_1_i32(&self, uniform_location: Option<&Self::UniformLocation>, x: i32) {
         match self.raw {
-            RawRenderingContext::WebGL1(ref gl) => gl.uniform1i(uniform_location.as_ref(), x),
-            RawRenderingContext::WebGL2(ref gl) => gl.uniform1i(uniform_location.as_ref(), x),
+            RawRenderingContext::WebGL1(ref gl) => gl.uniform1i(uniform_location, x),
+            RawRenderingContext::WebGL2(ref gl) => gl.uniform1i(uniform_location, x),
         }
     }
 
     unsafe fn uniform_2_i32(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         x: i32,
         y: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGL1(ref gl) => gl.uniform2i(uniform_location.as_ref(), x, y),
-            RawRenderingContext::WebGL2(ref gl) => gl.uniform2i(uniform_location.as_ref(), x, y),
+            RawRenderingContext::WebGL1(ref gl) => gl.uniform2i(uniform_location, x, y),
+            RawRenderingContext::WebGL2(ref gl) => gl.uniform2i(uniform_location, x, y),
         }
     }
 
     unsafe fn uniform_3_i32(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         x: i32,
         y: i32,
         z: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGL1(ref gl) => gl.uniform3i(uniform_location.as_ref(), x, y, z),
-            RawRenderingContext::WebGL2(ref gl) => gl.uniform3i(uniform_location.as_ref(), x, y, z),
+            RawRenderingContext::WebGL1(ref gl) => gl.uniform3i(uniform_location, x, y, z),
+            RawRenderingContext::WebGL2(ref gl) => gl.uniform3i(uniform_location, x, y, z),
         }
     }
 
     unsafe fn uniform_4_i32(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         x: i32,
         y: i32,
         z: i32,
         w: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGL1(ref gl) => gl.uniform4i(uniform_location.as_ref(), x, y, z, w),
-            RawRenderingContext::WebGL2(ref gl) => gl.uniform4i(uniform_location.as_ref(), x, y, z, w),
+            RawRenderingContext::WebGL1(ref gl) => gl.uniform4i(uniform_location, x, y, z, w),
+            RawRenderingContext::WebGL2(ref gl) => gl.uniform4i(uniform_location, x, y, z, w),
         }
     }
 
     unsafe fn uniform_1_i32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         v: &[i32; 1],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform1iv(uniform_location.as_ref(), &v[..])
+                gl.uniform1iv(uniform_location, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform1iv_1(uniform_location.as_ref(), &v[..])
+                gl.uniform1iv_1(uniform_location, &v[..])
             }
         }
     }
 
     unsafe fn uniform_2_i32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         v: &[i32; 2],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform2iv(uniform_location.as_ref(), &v[..])
+                gl.uniform2iv(uniform_location, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform2iv_1(uniform_location.as_ref(), &v[..])
+                gl.uniform2iv_1(uniform_location, &v[..])
             }
         }
     }
 
     unsafe fn uniform_3_i32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         v: &[i32; 3],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform3iv(uniform_location.as_ref(), &v[..])
+                gl.uniform3iv(uniform_location, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform3iv_1(uniform_location.as_ref(), &v[..])
+                gl.uniform3iv_1(uniform_location, &v[..])
             }
         }
     }
 
     unsafe fn uniform_4_i32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         v: &[i32; 4],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform4iv(uniform_location.as_ref(), &v[..])
+                gl.uniform4iv(uniform_location, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform4iv_1(uniform_location.as_ref(), &v[..])
+                gl.uniform4iv_1(uniform_location, &v[..])
             }
         }
     }
 
-    unsafe fn uniform_1_f32(&self, uniform_location: Option<Self::UniformLocation>, x: f32) {
+    unsafe fn uniform_1_f32(&self, uniform_location: Option<&Self::UniformLocation>, x: f32) {
         match self.raw {
-            RawRenderingContext::WebGL1(ref gl) => gl.uniform1f(uniform_location.as_ref(), x),
-            RawRenderingContext::WebGL2(ref gl) => gl.uniform1f(uniform_location.as_ref(), x),
+            RawRenderingContext::WebGL1(ref gl) => gl.uniform1f(uniform_location, x),
+            RawRenderingContext::WebGL2(ref gl) => gl.uniform1f(uniform_location, x),
         }
     }
 
     unsafe fn uniform_2_f32(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         x: f32,
         y: f32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGL1(ref gl) => gl.uniform2f(uniform_location.as_ref(), x, y),
-            RawRenderingContext::WebGL2(ref gl) => gl.uniform2f(uniform_location.as_ref(), x, y),
+            RawRenderingContext::WebGL1(ref gl) => gl.uniform2f(uniform_location, x, y),
+            RawRenderingContext::WebGL2(ref gl) => gl.uniform2f(uniform_location, x, y),
         }
     }
 
     unsafe fn uniform_3_f32(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         x: f32,
         y: f32,
         z: f32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGL1(ref gl) => gl.uniform3f(uniform_location.as_ref(), x, y, z),
-            RawRenderingContext::WebGL2(ref gl) => gl.uniform3f(uniform_location.as_ref(), x, y, z),
+            RawRenderingContext::WebGL1(ref gl) => gl.uniform3f(uniform_location, x, y, z),
+            RawRenderingContext::WebGL2(ref gl) => gl.uniform3f(uniform_location, x, y, z),
         }
     }
 
     unsafe fn uniform_4_f32(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         x: f32,
         y: f32,
         z: f32,
         w: f32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGL1(ref gl) => gl.uniform4f(uniform_location.as_ref(), x, y, z, w),
-            RawRenderingContext::WebGL2(ref gl) => gl.uniform4f(uniform_location.as_ref(), x, y, z, w),
+            RawRenderingContext::WebGL1(ref gl) => gl.uniform4f(uniform_location, x, y, z, w),
+            RawRenderingContext::WebGL2(ref gl) => gl.uniform4f(uniform_location, x, y, z, w),
         }
     }
 
     unsafe fn uniform_1_f32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         v: &[f32; 1],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform1fv(uniform_location.as_ref(), &v[..])
+                gl.uniform1fv(uniform_location, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform1fv_1(uniform_location.as_ref(), &v[..])
+                gl.uniform1fv_1(uniform_location, &v[..])
             }
         }
     }
 
     unsafe fn uniform_2_f32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         v: &[f32; 2],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform2fv(uniform_location.as_ref(), &v[..])
+                gl.uniform2fv(uniform_location, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform2fv_1(uniform_location.as_ref(), &v[..])
+                gl.uniform2fv_1(uniform_location, &v[..])
             }
         }
     }
 
     unsafe fn uniform_3_f32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         v: &[f32; 3],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform3fv(uniform_location.as_ref(), &v[..])
+                gl.uniform3fv(uniform_location, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform3fv_1(uniform_location.as_ref(), &v[..])
+                gl.uniform3fv_1(uniform_location, &v[..])
             }
         }
     }
 
     unsafe fn uniform_4_f32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         v: &[f32; 4],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform4fv(uniform_location.as_ref(), &v[..])
+                gl.uniform4fv(uniform_location, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform4fv_1(uniform_location.as_ref(), &v[..])
+                gl.uniform4fv_1(uniform_location, &v[..])
             }
         }
     }
 
     unsafe fn uniform_matrix_2_f32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         transpose: bool,
         v: &[f32; 4],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform_matrix2fv(uniform_location.as_ref(), transpose, &v[..])
+                gl.uniform_matrix2fv(uniform_location, transpose, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform_matrix2fv_1(uniform_location.as_ref(), transpose, &v[..])
+                gl.uniform_matrix2fv_1(uniform_location, transpose, &v[..])
             }
         }
     }
 
     unsafe fn uniform_matrix_3_f32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         transpose: bool,
         v: &[f32; 9],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform_matrix3fv(uniform_location.as_ref(), transpose, &v[..])
+                gl.uniform_matrix3fv(uniform_location, transpose, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform_matrix3fv_1(uniform_location.as_ref(), transpose, &v[..])
+                gl.uniform_matrix3fv_1(uniform_location, transpose, &v[..])
             }
         }
     }
 
     unsafe fn uniform_matrix_4_f32_slice(
         &self,
-        uniform_location: Option<Self::UniformLocation>,
+        uniform_location: Option<&Self::UniformLocation>,
         transpose: bool,
         v: &[f32; 16],
     ) {
         match self.raw {
             RawRenderingContext::WebGL1(ref gl) => {
-                gl.uniform_matrix4fv(uniform_location.as_ref(), transpose, &v[..])
+                gl.uniform_matrix4fv(uniform_location, transpose, &v[..])
             }
             RawRenderingContext::WebGL2(ref gl) => {
-                gl.uniform_matrix4fv_1(uniform_location.as_ref(), transpose, &v[..])
+                gl.uniform_matrix4fv_1(uniform_location, transpose, &v[..])
             }
         }
     }

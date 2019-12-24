@@ -41,6 +41,7 @@ features = [
   "Document",
   "Element",
   "HtmlCanvasElement",
+  "HtmlImageElement",
   "WebGlActiveInfo",
   "WebGlBuffer",
   "WebGlFramebuffer",

@@ -185,21 +185,21 @@ fn main() {
                         println!("Event::LoopDestroyed!");
                         return;
                     }
-                    Event::EventsCleared => {
-                        println!("EventsCleared");
+                    Event::MainEventsCleared => {
+                        println!("MainEventsCleared");
                         windowed_context.window().request_redraw();
+                    }
+                    Event::RedrawRequested(_window_id) => {
+                        println!("Event::RedrawRequested");
+                        gl.clear(glow::COLOR_BUFFER_BIT);
+                        gl.draw_arrays(glow::TRIANGLES, 0, 3);
+                        windowed_context.swap_buffers().unwrap();
                     }
                     Event::WindowEvent { ref event, .. } => match event {
                         WindowEvent::Resized(logical_size) => {
                             println!("WindowEvent::Resized: {:?}", logical_size);
                             let dpi_factor = windowed_context.window().hidpi_factor();
                             windowed_context.resize(logical_size.to_physical(dpi_factor));
-                        }
-                        WindowEvent::RedrawRequested => {
-                            println!("WindowEvent::RedrawRequested");
-                            gl.clear(glow::COLOR_BUFFER_BIT);
-                            gl.draw_arrays(glow::TRIANGLES, 0, 3);
-                            windowed_context.swap_buffers().unwrap();
                         }
                         WindowEvent::CloseRequested => {
                             println!("WindowEvent::CloseRequested");

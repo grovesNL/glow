@@ -5,7 +5,7 @@ use std::cell::RefCell;
 use std_web::web::{window, TypedArray};
 use std_web::unstable::TryInto;
 use webgl_stdweb::{
-    WebGl2RenderingContext, WebGLBuffer, WebGLFramebuffer, WebGLProgram, WebGLRenderbuffer,
+    WebGL2RenderingContext, WebGLBuffer, WebGLFramebuffer, WebGLProgram, WebGLRenderbuffer,
     WebGLRenderingContext, WebGLSampler, WebGLShader, WebGLSync, WebGLTexture,
     WebGLUniformLocation, WebGLVertexArrayObject, WebGLVertexArrayObjectOES,
 };
@@ -13,7 +13,7 @@ use webgl_stdweb::{
 #[derive(Debug)]
 enum RawRenderingContext {
     WebGl1(WebGLRenderingContext),
-    WebGl2(WebGl2RenderingContext),
+    WebGl2(WebGL2RenderingContext),
 }
 
 #[derive(Debug)]
@@ -138,7 +138,7 @@ impl Context {
         }
     }
 
-    pub fn from_webgl2_context(context: WebGl2RenderingContext) -> Self {
+    pub fn from_webgl2_context(context: WebGL2RenderingContext) -> Self {
         let extensions = Extensions {
             angle_instanced_arrays: context.get_extension::<webgl_stdweb::ANGLE_instanced_arrays>(),
             ext_blend_minmax: context.get_extension::<webgl_stdweb::EXT_blend_minmax>(),
@@ -467,7 +467,7 @@ impl HasContext for Context {
                 gl.get_program_parameter(raw_program, WebGLRenderingContext::ACTIVE_UNIFORMS)
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.get_program_parameter(raw_program, WebGl2RenderingContext::ACTIVE_UNIFORMS)
+                gl.get_program_parameter(raw_program, WebGL2RenderingContext::ACTIVE_UNIFORMS)
             }
         }
         .try_into()
@@ -1305,7 +1305,7 @@ impl HasContext for Context {
                 gl.get_program_parameter(raw_program, WebGLRenderingContext::ACTIVE_ATTRIBUTES)
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.get_program_parameter(raw_program, WebGl2RenderingContext::ACTIVE_ATTRIBUTES)
+                gl.get_program_parameter(raw_program, WebGL2RenderingContext::ACTIVE_ATTRIBUTES)
             }
         }
         .try_into()

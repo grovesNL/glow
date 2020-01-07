@@ -1879,6 +1879,11 @@ impl HasContext for Context {
         gl.ShaderStorageBlockBinding(program, index, binding);
     }
 
+    unsafe fn read_buffer(&self, src: u32) {
+        let gl = &self.raw;
+        gl.ReadBuffer(src);
+    }
+
     unsafe fn read_pixels(
         &self,
         x: i32,

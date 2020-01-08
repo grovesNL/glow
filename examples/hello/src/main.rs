@@ -53,15 +53,10 @@ fn main() {
                 .unwrap()
                 .try_into()
                 .unwrap();
-            document()
-                .body()
-                .unwrap()
-                .append_child(&canvas);
+            document().body().unwrap().append_child(&canvas);
             canvas.set_width(640);
             canvas.set_height(480);
-            let webgl2_context: WebGL2RenderingContext = canvas
-                .get_context()
-                .unwrap();
+            let webgl2_context: WebGL2RenderingContext = canvas.get_context().unwrap();
             (
                 (),
                 glow::Context::from_webgl2_context(webgl2_context),
@@ -171,7 +166,7 @@ fn main() {
         gl.use_program(Some(program));
         gl.clear_color(0.1, 0.2, 0.3, 1.0);
 
-        // We handle events very differently between targets
+        // We handle events differently between targets
 
         #[cfg(feature = "window-glutin")]
         {
@@ -182,27 +177,21 @@ fn main() {
                 *control_flow = ControlFlow::Wait;
                 match event {
                     Event::LoopDestroyed => {
-                        println!("Event::LoopDestroyed!");
                         return;
                     }
                     Event::MainEventsCleared => {
-                        println!("MainEventsCleared");
                         windowed_context.window().request_redraw();
                     }
-                    Event::RedrawRequested(_window_id) => {
-                        println!("Event::RedrawRequested");
+                    Event::RedrawRequested(_) => {
                         gl.clear(glow::COLOR_BUFFER_BIT);
                         gl.draw_arrays(glow::TRIANGLES, 0, 3);
                         windowed_context.swap_buffers().unwrap();
                     }
                     Event::WindowEvent { ref event, .. } => match event {
-                        WindowEvent::Resized(logical_size) => {
-                            println!("WindowEvent::Resized: {:?}", logical_size);
-                            let dpi_factor = windowed_context.window().hidpi_factor();
-                            windowed_context.resize(logical_size.to_physical(dpi_factor));
+                        WindowEvent::Resized(physical_size) => {
+                            windowed_context.resize(*physical_size);
                         }
                         WindowEvent::CloseRequested => {
-                            println!("WindowEvent::CloseRequested");
                             gl.delete_program(program);
                             gl.delete_vertex_array(vertex_array);
                             *control_flow = ControlFlow::Exit

@@ -5,8 +5,6 @@ rust:
   - beta
   - nightly
 dist: xenial
-cache:
-  cargo: true
 branches:
   only:
     - staging

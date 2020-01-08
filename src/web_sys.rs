@@ -5,9 +5,9 @@ use slotmap::{new_key_type, SecondaryMap, SlotMap};
 use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use web_sys::{
-    WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlRenderbuffer,
-    WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
-    WebGlUniformLocation, WebGlVertexArrayObject, HtmlImageElement,
+    HtmlImageElement, WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram,
+    WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
+    WebGlUniformLocation, WebGlVertexArrayObject,
 };
 
 #[derive(Debug)]
@@ -82,65 +82,157 @@ pub struct Context {
 
 // bindgen's gl context don't share an interface so a macro is used to deduplicate a bunch of code here
 macro_rules! build_extensions {
-    ($context:ident, $context_type:ty) => {
+    ($context:ident, $context_type:ty) => {{
+        fn get_extension<T>(context: &$context_type, name: &str) -> Option<T>
+        where
+            T: wasm_bindgen::JsCast,
         {
-            fn get_extension<T>(context: &$context_type, name: &str) -> Option<T>
-            where
-                T: wasm_bindgen::JsCast,
-            {
-                use wasm_bindgen::JsCast;
-                // `unchecked_into` is used here because WebGL extensions aren't actually JS classes
-                // these objects are duck-type representations of the actual Rust classes
-                // https://github.com/rustwasm/wasm-bindgen/pull/1449
-                context
-                    .get_extension(name).ok()
-                    .and_then(|maybe_ext| maybe_ext.map(|ext| ext.unchecked_into::<T>()))
-            }
-
-            fn get_extension_no_object(context: &$context_type, name: &str) -> Option<()> {
-                context.get_extension(name).ok()
-                    .and_then(|maybe_ext| maybe_ext.map(|_| ()))
-            }
-
-            Extensions {
-                angle_instanced_arrays: get_extension::<web_sys::AngleInstancedArrays>(&$context, "ANGLE_instanced_arrays"),
-                ext_blend_minmax: get_extension::<web_sys::ExtBlendMinmax>(&$context, "EXT_blend_minmax"),
-                ext_color_buffer_float: get_extension::<web_sys::ExtColorBufferFloat>(&$context, "EXT_color_buffer_float"),
-                ext_color_buffer_half_float: get_extension::<web_sys::ExtColorBufferHalfFloat>(&$context, "EXT_color_buffer_half_float"),
-                ext_disjoint_timer_query: get_extension::<web_sys::ExtDisjointTimerQuery>(&$context, "EXT_disjoint_timer_query"),
-                ext_disjoint_timer_query_webgl2: get_extension_no_object(&$context, "EXT_disjoint_timer_query_webgl2"),
-                ext_float_blend: get_extension_no_object(&$context, "EXT_float_blend"),
-                ext_frag_depth: get_extension::<web_sys::ExtFragDepth>(&$context, "EXT_frag_depth"),
-                ext_shader_texture_lod: get_extension::<web_sys::ExtShaderTextureLod>(&$context, "EXT_shader_texture_lod"),
-                ext_srgb: get_extension::<web_sys::ExtSRgb>(&$context, "EXT_sRGB"),
-                ext_texture_compression_bptc: get_extension_no_object(&$context, "EXT_texture_compression_bptc"),
-                ext_texture_compression_rgtc: get_extension_no_object(&$context, "EXT_texture_compression_rgtc"),
-                ext_texture_filter_anisotropic: get_extension::<web_sys::ExtTextureFilterAnisotropic>(&$context, "EXT_texture_filter_anisotropic"),
-                khr_parallel_shader_compile: get_extension_no_object(&$context, "KHR_parallel_shader_compile"),
-                oes_element_index_uint: get_extension::<web_sys::OesElementIndexUint>(&$context, "OES_element_index_uint"),
-                oes_fbo_render_mipmap: get_extension_no_object(&$context, "OES_fbo_render_mipmap"),
-                oes_standard_derivatives: get_extension::<web_sys::OesStandardDerivatives>(&$context, "OES_standard_derivatives"),
-                oes_texture_float: get_extension::<web_sys::OesTextureFloat>(&$context, "OES_texture_float"),
-                oes_texture_float_linear: get_extension::<web_sys::OesTextureFloatLinear>(&$context, "OES_texture_float_linear"),
-                oes_texture_half_float: get_extension::<web_sys::OesTextureHalfFloat>(&$context, "OES_texture_half_float"),
-                oes_texture_half_float_linear: get_extension::<web_sys::OesTextureHalfFloatLinear>(&$context, "OES_texture_half_float_linear"),
-                oes_vertex_array_object: get_extension::<web_sys::OesVertexArrayObject>(&$context, "OES_vertex_array_object"),
-                ovr_multiview2: get_extension_no_object(&$context, "OVR_multiview2"),
-                webgl_color_buffer_float: get_extension::<web_sys::WebglColorBufferFloat>(&$context, "WEBGL_color_buffer_float"),
-                webgl_compressed_texture_astc: get_extension::<web_sys::WebglCompressedTextureAstc>(&$context, "WEBGL_compressed_texture_astc"),
-                webgl_compressed_texture_etc: get_extension::<web_sys::WebglCompressedTextureEtc>(&$context, "WEBGL_compressed_texture_etc"),
-                webgl_compressed_texture_etc1: get_extension::<web_sys::WebglCompressedTextureEtc1>(&$context, "WEBGL_compressed_texture_etc1"),
-                webgl_compressed_texture_pvrtc: get_extension::<web_sys::WebglCompressedTexturePvrtc>(&$context, "WEBGL_compressed_texture_pvrtc"),
-                webgl_compressed_texture_s3tc: get_extension::<web_sys::WebglCompressedTextureS3tc>(&$context, "WEBGL_compressed_texture_s3tc"),
-                webgl_compressed_texture_s3tc_srgb: get_extension::<web_sys::WebglCompressedTextureS3tcSrgb>(&$context, "WEBGL_compressed_texture_s3tc_srgb"),
-                webgl_debug_renderer_info: get_extension::<web_sys::WebglDebugRendererInfo>(&$context, "WEBGL_debug_renderer_info"),
-                webgl_debug_shaders: get_extension::<web_sys::WebglDebugShaders>(&$context, "WEBGL_debug_shaders"),
-                webgl_depth_texture: get_extension::<web_sys::WebglDepthTexture>(&$context, "WEBGL_depth_texture"),
-                webgl_draw_buffers: get_extension::<web_sys::WebglDrawBuffers>(&$context, "WEBGL_draw_buffers"),
-                webgl_lose_context: get_extension::<web_sys::WebglLoseContext>(&$context, "WEBGL_lose_context"),
-            }
+            use wasm_bindgen::JsCast;
+            // `unchecked_into` is used here because WebGL extensions aren't actually JS classes
+            // these objects are duck-type representations of the actual Rust classes
+            // https://github.com/rustwasm/wasm-bindgen/pull/1449
+            context
+                .get_extension(name)
+                .ok()
+                .and_then(|maybe_ext| maybe_ext.map(|ext| ext.unchecked_into::<T>()))
         }
-    }
+
+        fn get_extension_no_object(context: &$context_type, name: &str) -> Option<()> {
+            context
+                .get_extension(name)
+                .ok()
+                .and_then(|maybe_ext| maybe_ext.map(|_| ()))
+        }
+
+        Extensions {
+            angle_instanced_arrays: get_extension::<web_sys::AngleInstancedArrays>(
+                &$context,
+                "ANGLE_instanced_arrays",
+            ),
+            ext_blend_minmax: get_extension::<web_sys::ExtBlendMinmax>(
+                &$context,
+                "EXT_blend_minmax",
+            ),
+            ext_color_buffer_float: get_extension::<web_sys::ExtColorBufferFloat>(
+                &$context,
+                "EXT_color_buffer_float",
+            ),
+            ext_color_buffer_half_float: get_extension::<web_sys::ExtColorBufferHalfFloat>(
+                &$context,
+                "EXT_color_buffer_half_float",
+            ),
+            ext_disjoint_timer_query: get_extension::<web_sys::ExtDisjointTimerQuery>(
+                &$context,
+                "EXT_disjoint_timer_query",
+            ),
+            ext_disjoint_timer_query_webgl2: get_extension_no_object(
+                &$context,
+                "EXT_disjoint_timer_query_webgl2",
+            ),
+            ext_float_blend: get_extension_no_object(&$context, "EXT_float_blend"),
+            ext_frag_depth: get_extension::<web_sys::ExtFragDepth>(&$context, "EXT_frag_depth"),
+            ext_shader_texture_lod: get_extension::<web_sys::ExtShaderTextureLod>(
+                &$context,
+                "EXT_shader_texture_lod",
+            ),
+            ext_srgb: get_extension::<web_sys::ExtSRgb>(&$context, "EXT_sRGB"),
+            ext_texture_compression_bptc: get_extension_no_object(
+                &$context,
+                "EXT_texture_compression_bptc",
+            ),
+            ext_texture_compression_rgtc: get_extension_no_object(
+                &$context,
+                "EXT_texture_compression_rgtc",
+            ),
+            ext_texture_filter_anisotropic: get_extension::<web_sys::ExtTextureFilterAnisotropic>(
+                &$context,
+                "EXT_texture_filter_anisotropic",
+            ),
+            khr_parallel_shader_compile: get_extension_no_object(
+                &$context,
+                "KHR_parallel_shader_compile",
+            ),
+            oes_element_index_uint: get_extension::<web_sys::OesElementIndexUint>(
+                &$context,
+                "OES_element_index_uint",
+            ),
+            oes_fbo_render_mipmap: get_extension_no_object(&$context, "OES_fbo_render_mipmap"),
+            oes_standard_derivatives: get_extension::<web_sys::OesStandardDerivatives>(
+                &$context,
+                "OES_standard_derivatives",
+            ),
+            oes_texture_float: get_extension::<web_sys::OesTextureFloat>(
+                &$context,
+                "OES_texture_float",
+            ),
+            oes_texture_float_linear: get_extension::<web_sys::OesTextureFloatLinear>(
+                &$context,
+                "OES_texture_float_linear",
+            ),
+            oes_texture_half_float: get_extension::<web_sys::OesTextureHalfFloat>(
+                &$context,
+                "OES_texture_half_float",
+            ),
+            oes_texture_half_float_linear: get_extension::<web_sys::OesTextureHalfFloatLinear>(
+                &$context,
+                "OES_texture_half_float_linear",
+            ),
+            oes_vertex_array_object: get_extension::<web_sys::OesVertexArrayObject>(
+                &$context,
+                "OES_vertex_array_object",
+            ),
+            ovr_multiview2: get_extension_no_object(&$context, "OVR_multiview2"),
+            webgl_color_buffer_float: get_extension::<web_sys::WebglColorBufferFloat>(
+                &$context,
+                "WEBGL_color_buffer_float",
+            ),
+            webgl_compressed_texture_astc: get_extension::<web_sys::WebglCompressedTextureAstc>(
+                &$context,
+                "WEBGL_compressed_texture_astc",
+            ),
+            webgl_compressed_texture_etc: get_extension::<web_sys::WebglCompressedTextureEtc>(
+                &$context,
+                "WEBGL_compressed_texture_etc",
+            ),
+            webgl_compressed_texture_etc1: get_extension::<web_sys::WebglCompressedTextureEtc1>(
+                &$context,
+                "WEBGL_compressed_texture_etc1",
+            ),
+            webgl_compressed_texture_pvrtc: get_extension::<web_sys::WebglCompressedTexturePvrtc>(
+                &$context,
+                "WEBGL_compressed_texture_pvrtc",
+            ),
+            webgl_compressed_texture_s3tc: get_extension::<web_sys::WebglCompressedTextureS3tc>(
+                &$context,
+                "WEBGL_compressed_texture_s3tc",
+            ),
+            webgl_compressed_texture_s3tc_srgb: get_extension::<
+                web_sys::WebglCompressedTextureS3tcSrgb,
+            >(
+                &$context, "WEBGL_compressed_texture_s3tc_srgb"
+            ),
+            webgl_debug_renderer_info: get_extension::<web_sys::WebglDebugRendererInfo>(
+                &$context,
+                "WEBGL_debug_renderer_info",
+            ),
+            webgl_debug_shaders: get_extension::<web_sys::WebglDebugShaders>(
+                &$context,
+                "WEBGL_debug_shaders",
+            ),
+            webgl_depth_texture: get_extension::<web_sys::WebglDepthTexture>(
+                &$context,
+                "WEBGL_depth_texture",
+            ),
+            webgl_draw_buffers: get_extension::<web_sys::WebglDrawBuffers>(
+                &$context,
+                "WEBGL_draw_buffers",
+            ),
+            webgl_lose_context: get_extension::<web_sys::WebglLoseContext>(
+                &$context,
+                "WEBGL_lose_context",
+            ),
+        }
+    }};
 }
 
 impl Context {
@@ -214,7 +306,6 @@ impl Context {
             }
         }
     }
-
 }
 
 new_key_type! { pub struct WebShaderKey; }
@@ -968,12 +1059,12 @@ impl HasContext for Context {
 
     unsafe fn draw_arrays_instanced(&self, mode: u32, first: i32, count: i32, instance_count: i32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                match &self.extensions.angle_instanced_arrays {
-                    Some(extension) => extension.draw_arrays_instanced_angle(mode as u32, first, count, instance_count),
-                    None => panic!("Draw arrays instanced is not supported"),
+            RawRenderingContext::WebGl1(ref _gl) => match &self.extensions.angle_instanced_arrays {
+                Some(extension) => {
+                    extension.draw_arrays_instanced_angle(mode as u32, first, count, instance_count)
                 }
-            }
+                None => panic!("Draw arrays instanced is not supported"),
+            },
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.draw_arrays_instanced(mode as u32, first, count, instance_count)
             }
@@ -1048,12 +1139,16 @@ impl HasContext for Context {
         instance_count: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                match &self.extensions.angle_instanced_arrays {
-                    None => panic!("Draw elements instanced is not supported"),
-                    Some(extension) => extension.draw_elements_instanced_angle_with_i32(mode as u32, count, element_type as u32, offset, instance_count),
-                }
-            }
+            RawRenderingContext::WebGl1(ref _gl) => match &self.extensions.angle_instanced_arrays {
+                None => panic!("Draw elements instanced is not supported"),
+                Some(extension) => extension.draw_elements_instanced_angle_with_i32(
+                    mode as u32,
+                    count,
+                    element_type as u32,
+                    offset,
+                    instance_count,
+                ),
+            },
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.draw_elements_instanced_with_i32(
                     mode as u32,
@@ -1496,7 +1591,7 @@ impl HasContext for Context {
         pixels: Option<&[u8]>,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => panic!("3d textures are not supported"),
+            RawRenderingContext::WebGl1(ref _gl) => panic!("3d textures are not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
                 // TODO: Handle return value?
                 gl.tex_image_3d_with_opt_u8_array(
@@ -2119,12 +2214,10 @@ impl HasContext for Context {
 
     unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                match &self.extensions.angle_instanced_arrays {
-                    None => panic!("Vertex attrib divisor is not supported"),
-                    Some(extension) => extension.vertex_attrib_divisor_angle(index, divisor),
-                }
-            }
+            RawRenderingContext::WebGl1(ref _gl) => match &self.extensions.angle_instanced_arrays {
+                None => panic!("Vertex attrib divisor is not supported"),
+                Some(extension) => extension.vertex_attrib_divisor_angle(index, divisor),
+            },
             RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_divisor(index, divisor),
         }
     }
@@ -2379,14 +2472,14 @@ impl HasContext for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, _label: Option<S>)
+    unsafe fn object_ptr_label<S>(&self, _sync: Self::Fence, _label: Option<S>)
     where
         S: AsRef<str>,
     {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn get_object_ptr_label(&self, sync: Self::Fence) -> String {
+    unsafe fn get_object_ptr_label(&self, _sync: Self::Fence) -> String {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
@@ -2394,7 +2487,7 @@ impl HasContext for Context {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         let index = match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform blocks are not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl.get_uniform_block_index(raw_program, name),
         };
         if index == INVALID_INDEX {
@@ -2429,7 +2522,7 @@ impl HasContext for Context {
         &self,
         _program: Self::Program,
         _index: u32,
-        binding: u32,
+        _binding: u32,
     ) {
         panic!("Shader Storage Buffers are not supported by webgl")
     }
@@ -2442,15 +2535,15 @@ impl HasContext for Context {
         height: i32,
         format: u32,
         gltype: u32,
-        data: &mut [u8]
+        data: &mut [u8],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.read_pixels_with_opt_u8_array(x, y, width, height, format, gltype, Some(data)).unwrap()
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.read_pixels_with_opt_u8_array(x, y, width, height, format, gltype, Some(data)).unwrap()
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl
+                .read_pixels_with_opt_u8_array(x, y, width, height, format, gltype, Some(data))
+                .unwrap(),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .read_pixels_with_opt_u8_array(x, y, width, height, format, gltype, Some(data))
+                .unwrap(),
         }
     }
 }

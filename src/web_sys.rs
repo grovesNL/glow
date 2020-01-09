@@ -2527,6 +2527,13 @@ impl HasContext for Context {
         panic!("Shader Storage Buffers are not supported by webgl")
     }
 
+    unsafe fn read_buffer(&self, src: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(..) => panic!("read_buffer is not supported by WebGL1"),
+            RawRenderingContext::WebGl2(ref gl) => gl.read_buffer(src),
+        }
+    }
+
     unsafe fn read_pixels(
         &self,
         x: i32,

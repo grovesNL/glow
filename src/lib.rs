@@ -297,6 +297,8 @@ pub trait HasContext {
 
     unsafe fn enable(&self, parameter: u32);
 
+    unsafe fn is_enabled(&self, parameter: u32) -> bool;
+
     unsafe fn enable_draw_buffer(&self, parameter: u32, draw_buffer: u32);
 
     unsafe fn enable_vertex_attrib_array(&self, index: u32);

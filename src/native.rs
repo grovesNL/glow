@@ -704,6 +704,11 @@ impl HasContext for Context {
         gl.Enable(parameter);
     }
 
+    unsafe fn is_enabled(&self, parameter: u32) -> bool {
+        let gl = &self.raw;
+        gl.IsEnabled(parameter) != 0
+    }
+
     unsafe fn enable_draw_buffer(&self, parameter: u32, draw_buffer: u32) {
         let gl = &self.raw;
         gl.Enablei(parameter, draw_buffer);

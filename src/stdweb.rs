@@ -1091,6 +1091,13 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn is_enabled(&self, parameter: u32) -> bool  {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.is_enabled(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.is_enabled(parameter),
+        }
+    }
+
     unsafe fn enable_draw_buffer(&self, _parameter: u32, _draw_buffer: u32) {
         panic!("Draw buffer enable is not supported");
     }

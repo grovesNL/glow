@@ -1216,8 +1216,8 @@ impl HasContext for Context {
 
     unsafe fn get_buffer_parameter_i32(&self, target: u32, parameter: u32) -> i32 {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.get_buffer_parameter(parameter),
-            RawRenderingContext::WebGl2(ref gl) => gl.get_buffer_parameter(parameter),
+            RawRenderingContext::WebGl1(ref gl) => gl.get_buffer_parameter(target, parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_buffer_parameter(target, parameter),
         }
         .try_into()
         .map(|v: f64| v as i32)

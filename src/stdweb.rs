@@ -536,6 +536,15 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn bind_buffer_base(&self, target: u32, index:u32, buffer: Option<Self::Buffer>) {
+        let buffers = self.buffers.borrow();
+        let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("bind_buffer_base not supported on webgl1"),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_buffer_base(target, index, raw_buffer),
+        }
+    }
+
     unsafe fn bind_buffer_range(
         &self,
         target: u32,

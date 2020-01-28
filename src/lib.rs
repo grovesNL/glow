@@ -125,6 +125,8 @@ pub trait HasContext {
 
     unsafe fn bind_buffer(&self, target: u32, buffer: Option<Self::Buffer>);
 
+    unsafe fn bind_buffer_base(&self, target: u32, index: u32, buffer: Option<Self::Buffer>);
+
     unsafe fn bind_buffer_range(
         &self,
         target: u32,

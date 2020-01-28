@@ -296,6 +296,11 @@ impl HasContext for Context {
         gl.BindBuffer(target, buffer.unwrap_or(0));
     }
 
+    unsafe fn bind_buffer_base(&self, target: u32, index: u32, buffer: Option<Self::Buffer>) {
+        let gl = &self.raw;
+        gl.BindBufferBase(target, index, buffer.unwrap_or(0));
+    }
+
     unsafe fn bind_buffer_range(
         &self,
         target: u32,

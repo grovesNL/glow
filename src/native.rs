@@ -963,6 +963,18 @@ impl HasContext for Context {
         gl.RenderbufferStorage(target, internal_format, width, height);
     }
 
+    unsafe fn renderbuffer_storage_multisample(
+        &self,
+        target: u32,
+        samples: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    ) {
+        let gl = &self.raw;
+        gl.RenderbufferStorageMultisample(target, samples, internal_format, width, height);
+    }
+
     unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32) {
         let gl = &self.raw;
         gl.SamplerParameterf(sampler, name, value);

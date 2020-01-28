@@ -395,6 +395,15 @@ pub trait HasContext {
         height: i32,
     );
 
+    unsafe fn renderbuffer_storage_multisample(
+        &self,
+        target: u32,
+        samples: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    );
+
     unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32);
 
     unsafe fn sampler_parameter_f32_slice(

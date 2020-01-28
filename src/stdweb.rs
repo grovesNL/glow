@@ -1410,6 +1410,24 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn renderbuffer_storage_multisample(
+        &self,
+        target: u32,
+        samples: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                panic!("Renderbuffer storage multisample is not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.renderbuffer_storage_multisample(target, samples, internal_format, width, height);
+            }
+        }
+    }
+
     unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32) {
         let samplers = self.samplers.borrow();
         let raw_sampler = samplers.1.get_unchecked(sampler);

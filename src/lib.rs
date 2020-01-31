@@ -24,6 +24,17 @@ compile_error!("Please enable one of web-sys or stdweb to work on web");
 #[cfg(target_arch = "wasm32")]
 pub use web::*;
 
+pub type Shader = <Context as HasContext>::Shader;
+pub type Program = <Context as HasContext>::Program;
+pub type Buffer = <Context as HasContext>::Buffer;
+pub type VertexArray = <Context as HasContext>::VertexArray;
+pub type Texture = <Context as HasContext>::Texture;
+pub type Sampler = <Context as HasContext>::Sampler;
+pub type Fence = <Context as HasContext>::Fence;
+pub type Framebuffer = <Context as HasContext>::Framebuffer;
+pub type Renderbuffer = <Context as HasContext>::Renderbuffer;
+pub type UniformLocation = <Context as HasContext>::UniformLocation;
+
 pub struct ActiveUniform {
     pub size: i32,
     pub utype: u32,

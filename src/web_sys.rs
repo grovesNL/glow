@@ -5,9 +5,9 @@ use slotmap::{new_key_type, SecondaryMap, SlotMap};
 use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use web_sys::{
-    HtmlImageElement, WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram,
-    WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
-    WebGlUniformLocation, WebGlVertexArrayObject,
+    HtmlImageElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer,
+    WebGlProgram, WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync,
+    WebGlTexture, WebGlUniformLocation, WebGlVertexArrayObject,
 };
 
 #[derive(Debug)]
@@ -301,6 +301,43 @@ impl Context {
                     format,
                     ty,
                     image,
+                )
+                .unwrap();
+            }
+        }
+    }
+
+    pub unsafe fn tex_image_2d_with_image_bitmap(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        format: u32,
+        ty: u32,
+        pixels: &ImageBitmap,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_u32_and_u32_and_image_bitmap(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    pixels,
+                )
+                .unwrap();
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_u32_and_u32_and_image_bitmap(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    pixels,
                 )
                 .unwrap();
             }

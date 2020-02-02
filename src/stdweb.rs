@@ -1428,7 +1428,7 @@ impl HasContext for Context {
         height: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
+            RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Renderbuffer storage multisample is not supported");
             }
             RawRenderingContext::WebGl2(ref gl) => {
@@ -1639,7 +1639,7 @@ impl HasContext for Context {
     unsafe fn uniform_1_i32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
-        v: &[i32; 1],
+        v: &[i32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1654,7 +1654,7 @@ impl HasContext for Context {
     unsafe fn uniform_2_i32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
-        v: &[i32; 2],
+        v: &[i32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1669,7 +1669,7 @@ impl HasContext for Context {
     unsafe fn uniform_3_i32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
-        v: &[i32; 3],
+        v: &[i32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1684,7 +1684,7 @@ impl HasContext for Context {
     unsafe fn uniform_4_i32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
-        v: &[i32; 4],
+        v: &[i32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1745,7 +1745,7 @@ impl HasContext for Context {
     unsafe fn uniform_1_f32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
-        v: &[f32; 1],
+        v: &[f32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1760,7 +1760,7 @@ impl HasContext for Context {
     unsafe fn uniform_2_f32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
-        v: &[f32; 2],
+        v: &[f32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1775,7 +1775,7 @@ impl HasContext for Context {
     unsafe fn uniform_3_f32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
-        v: &[f32; 3],
+        v: &[f32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1790,7 +1790,7 @@ impl HasContext for Context {
     unsafe fn uniform_4_f32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
-        v: &[f32; 4],
+        v: &[f32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1806,7 +1806,7 @@ impl HasContext for Context {
         &self,
         uniform_location: Option<&Self::UniformLocation>,
         transpose: bool,
-        v: &[f32; 4],
+        v: &[f32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1822,7 +1822,7 @@ impl HasContext for Context {
         &self,
         uniform_location: Option<&Self::UniformLocation>,
         transpose: bool,
-        v: &[f32; 9],
+        v: &[f32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1838,7 +1838,7 @@ impl HasContext for Context {
         &self,
         uniform_location: Option<&Self::UniformLocation>,
         transpose: bool,
-        v: &[f32; 16],
+        v: &[f32],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {

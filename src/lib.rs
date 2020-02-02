@@ -491,13 +491,13 @@ pub trait HasContext {
         w: i32,
     );
 
-    unsafe fn uniform_1_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32; 1]);
+    unsafe fn uniform_1_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]);
 
-    unsafe fn uniform_2_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32; 2]);
+    unsafe fn uniform_2_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]);
 
-    unsafe fn uniform_3_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32; 3]);
+    unsafe fn uniform_3_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]);
 
-    unsafe fn uniform_4_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32; 4]);
+    unsafe fn uniform_4_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]);
 
     unsafe fn uniform_1_f32(&self, location: Option<&Self::UniformLocation>, x: f32);
 
@@ -514,33 +514,33 @@ pub trait HasContext {
         w: f32,
     );
 
-    unsafe fn uniform_1_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32; 1]);
+    unsafe fn uniform_1_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]);
 
-    unsafe fn uniform_2_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32; 2]);
+    unsafe fn uniform_2_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]);
 
-    unsafe fn uniform_3_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32; 3]);
+    unsafe fn uniform_3_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]);
 
-    unsafe fn uniform_4_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32; 4]);
+    unsafe fn uniform_4_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]);
 
     unsafe fn uniform_matrix_2_f32_slice(
         &self,
         location: Option<&Self::UniformLocation>,
         transpose: bool,
-        v: &[f32; 4],
+        v: &[f32],
     );
 
     unsafe fn uniform_matrix_3_f32_slice(
         &self,
         location: Option<&Self::UniformLocation>,
         transpose: bool,
-        v: &[f32; 9],
+        v: &[f32],
     );
 
     unsafe fn uniform_matrix_4_f32_slice(
         &self,
         location: Option<&Self::UniformLocation>,
         transpose: bool,
-        v: &[f32; 16],
+        v: &[f32],
     );
 
     unsafe fn unmap_buffer(&self, target: u32);

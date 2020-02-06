@@ -1696,6 +1696,66 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn uniform_1_i32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[i32; 1],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform1iv(uniform_location, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform1iv_1(uniform_location, &v[..])
+            }
+        }
+    }
+
+    unsafe fn uniform_2_i32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[i32; 2],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform2iv(uniform_location, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform2iv_1(uniform_location, &v[..])
+            }
+        }
+    }
+
+    unsafe fn uniform_3_i32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[i32; 3],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform3iv(uniform_location, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform3iv_1(uniform_location, &v[..])
+            }
+        }
+    }
+
+    unsafe fn uniform_4_i32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[i32; 4],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform4iv(uniform_location, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform4iv_1(uniform_location, &v[..])
+            }
+        }
+    }
+
     unsafe fn uniform_1_f32(&self, uniform_location: Option<&Self::UniformLocation>, x: f32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.uniform1f(uniform_location, x),
@@ -1802,6 +1862,66 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn uniform_1_f32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[f32; 1],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform1fv(uniform_location, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform1fv_1(uniform_location, &v[..])
+            }
+        }
+    }
+
+    unsafe fn uniform_2_f32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[f32; 2],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform2fv(uniform_location, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform2fv_1(uniform_location, &v[..])
+            }
+        }
+    }
+
+    unsafe fn uniform_3_f32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[f32; 3],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform3fv(uniform_location, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform3fv_1(uniform_location, &v[..])
+            }
+        }
+    }
+
+    unsafe fn uniform_4_f32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[f32; 4],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform4fv(uniform_location, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform4fv_1(uniform_location, &v[..])
+            }
+        }
+    }
+
     unsafe fn uniform_matrix_2_f32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
@@ -1839,6 +1959,54 @@ impl HasContext for Context {
         uniform_location: Option<&Self::UniformLocation>,
         transpose: bool,
         v: &[f32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform_matrix4fv(uniform_location, transpose, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform_matrix4fv_1(uniform_location, transpose, &v[..])
+            }
+        }
+    }
+
+    unsafe fn uniform_matrix_2_f32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32; 4],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform_matrix2fv(uniform_location, transpose, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform_matrix2fv_1(uniform_location, transpose, &v[..])
+            }
+        }
+    }
+
+    unsafe fn uniform_matrix_3_f32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32; 9],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.uniform_matrix3fv(uniform_location, transpose, &v[..])
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform_matrix3fv_1(uniform_location, transpose, &v[..])
+            }
+        }
+    }
+
+    unsafe fn uniform_matrix_4_f32_sized_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32; 16],
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {

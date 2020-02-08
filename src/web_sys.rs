@@ -1638,10 +1638,21 @@ impl HasContext for Context {
         ty: u32,
         pixels: Option<&[u8]>,
     ) {
+        let pixels = pixels.map(|bytes| -> js_sys::Object {
+            match ty {
+                FLOAT => {
+                    let (_, data, _) = bytes.align_to::<f32>();
+                    js_sys::Float32Array::view(data).into()
+                },
+                _ => js_sys::Uint8Array::view(bytes).into()
+            }
+        });
+
+
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 // TODO: Handle return value?
-                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
                     target,
                     level,
                     internal_format,
@@ -1650,13 +1661,13 @@ impl HasContext for Context {
                     border,
                     format,
                     ty,
-                    pixels,
+                    pixels.as_ref(),
                 )
                 .unwrap();
             }
             RawRenderingContext::WebGl2(ref gl) => {
                 // TODO: Handle return value?
-                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
                     target,
                     level,
                     internal_format,
@@ -1665,7 +1676,7 @@ impl HasContext for Context {
                     border,
                     format,
                     ty,
-                    pixels,
+                    pixels.as_ref(),
                 )
                 .unwrap();
             }

@@ -1495,33 +1495,101 @@ impl HasContext for Context {
         ty: u32,
         pixels: Option<&[u8]>,
     ) {
-        match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.tex_image2_d(
-                    target,
-                    level,
-                    internal_format,
-                    width,
-                    height,
-                    border,
-                    format,
-                    ty,
-                    pixels,
-                )
+        use std::mem::size_of;
+        use std::slice::from_raw_parts;
+
+        macro_rules! apply_tex_image2_d {
+            ($pixels: ident) => {
+                match self.raw {
+                    RawRenderingContext::WebGl1(ref gl) => {
+                        gl.tex_image2_d(
+                            target,
+                            level,
+                            internal_format,
+                            width,
+                            height,
+                            border,
+                            format,
+                            ty,
+                            $pixels
+                        )
+                    }
+                    RawRenderingContext::WebGl2(ref gl) => {
+                        gl.tex_image2_d(
+                            target,
+                            level,
+                            internal_format,
+                            width,
+                            height,
+                            border,
+                            format,
+                            ty,
+                            $pixels
+                        )
+                    }
+                }
             }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_image2_d(
-                    target,
-                    level,
-                    internal_format,
-                    width,
-                    height,
-                    border,
-                    format,
-                    ty,
-                    pixels,
-                )
-            }
+        }
+
+        match ty {
+            BYTE => {
+                let pixels = pixels.map(|bytes| from_raw_parts(
+                    bytes.as_ptr() as *const i8,
+                    bytes.len() / size_of::<i8>(),
+                ));
+                apply_tex_image2_d!(pixels)
+            },
+
+            SHORT => {
+                let pixels = pixels.map(|bytes| from_raw_parts(
+                    bytes.as_ptr() as *const i16,
+                    bytes.len() / size_of::<i16>(),
+                ));
+                apply_tex_image2_d!(pixels)
+            },
+
+            UNSIGNED_SHORT |
+            UNSIGNED_SHORT_5_6_5 |
+            UNSIGNED_SHORT_5_5_5_1 |
+            UNSIGNED_SHORT_4_4_4_4 |
+            HALF_FLOAT => {
+                let pixels = pixels.map(|bytes| from_raw_parts(
+                    bytes.as_ptr() as *const u16,
+                    bytes.len() / size_of::<u16>(),
+                ));
+                apply_tex_image2_d!(pixels)
+            },
+
+            INT => {
+                let pixels = pixels.map(|bytes| from_raw_parts(
+                    bytes.as_ptr() as *const i32,
+                    bytes.len() / size_of::<i32>(),
+                ));
+                apply_tex_image2_d!(pixels)
+            },
+
+            UNSIGNED_INT |
+            UNSIGNED_INT_5_9_9_9_REV |
+            UNSIGNED_INT_2_10_10_10_REV |
+            UNSIGNED_INT_10F_11F_11F_REV |
+            UNSIGNED_INT_24_8 => {
+                let pixels = pixels.map(|bytes| from_raw_parts(
+                    bytes.as_ptr() as *const u32,
+                    bytes.len() / size_of::<u32>(),
+                ));
+                apply_tex_image2_d!(pixels)
+            },
+
+            FLOAT => {
+                let pixels = pixels.map(|bytes| from_raw_parts(
+                    bytes.as_ptr() as *const f32,
+                    bytes.len() / size_of::<f32>(),
+                ));
+                apply_tex_image2_d!(pixels)
+            },
+
+            UNSIGNED_BYTE |
+            _ => apply_tex_image2_d!(pixels)
         }
     }
 

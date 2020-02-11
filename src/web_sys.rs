@@ -1638,10 +1638,76 @@ impl HasContext for Context {
         ty: u32,
         pixels: Option<&[u8]>,
     ) {
+        let pixels = pixels.map(|bytes| -> js_sys::Object {
+            use std::mem::size_of;
+            use std::slice::from_raw_parts;
+
+            match ty {
+                BYTE => {
+                    let data = from_raw_parts(
+                        bytes.as_ptr() as *const i8,
+                        bytes.len() / size_of::<i8>(),
+                    );
+                    js_sys::Int8Array::view(data).into()
+                },
+
+                SHORT => {
+                    let data = from_raw_parts(
+                        bytes.as_ptr() as *const i16,
+                        bytes.len() / size_of::<i16>(),
+                    );
+                    js_sys::Int16Array::view(data).into()
+                },
+
+                UNSIGNED_SHORT |
+                UNSIGNED_SHORT_5_6_5 |
+                UNSIGNED_SHORT_5_5_5_1 |
+                UNSIGNED_SHORT_4_4_4_4 |
+                HALF_FLOAT => {
+                    let data = from_raw_parts(
+                        bytes.as_ptr() as *const u16,
+                        bytes.len() / size_of::<u16>(),
+                    );
+                    js_sys::Uint16Array::view(data).into()
+                },
+
+                INT => {
+                    let data = from_raw_parts(
+                        bytes.as_ptr() as *const i32,
+                        bytes.len() / size_of::<i32>(),
+                    );
+                    js_sys::Int32Array::view(data).into()
+                },
+
+                UNSIGNED_INT |
+                UNSIGNED_INT_5_9_9_9_REV |
+                UNSIGNED_INT_2_10_10_10_REV |
+                UNSIGNED_INT_10F_11F_11F_REV |
+                UNSIGNED_INT_24_8 => {
+                    let data = from_raw_parts(
+                        bytes.as_ptr() as *const u32,
+                        bytes.len() / size_of::<u32>(),
+                    );
+                    js_sys::Uint32Array::view(data).into()
+                },
+
+                FLOAT => {
+                    let data = from_raw_parts(
+                        bytes.as_ptr() as *const f32,
+                        bytes.len() / size_of::<f32>(),
+                    );
+                    js_sys::Float32Array::view(data).into()
+                },
+
+                UNSIGNED_BYTE |
+                _ => js_sys::Uint8Array::view(bytes).into()
+            }
+        });
+
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 // TODO: Handle return value?
-                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
                     target,
                     level,
                     internal_format,
@@ -1650,13 +1716,13 @@ impl HasContext for Context {
                     border,
                     format,
                     ty,
-                    pixels,
+                    pixels.as_ref(),
                 )
                 .unwrap();
             }
             RawRenderingContext::WebGl2(ref gl) => {
                 // TODO: Handle return value?
-                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
                     target,
                     level,
                     internal_format,
@@ -1665,7 +1731,7 @@ impl HasContext for Context {
                     border,
                     format,
                     ty,
-                    pixels,
+                    pixels.as_ref(),
                 )
                 .unwrap();
             }

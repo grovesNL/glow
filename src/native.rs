@@ -1086,12 +1086,16 @@ impl HasContext for Context {
 
     unsafe fn uniform_1_i32(&self, location: Option<&Self::UniformLocation>, x: i32) {
         let gl = &self.raw;
-        gl.Uniform1i(*location.unwrap_or(&0) as i32, x);
+        if let Some(loc) = location {
+            gl.Uniform1i(*loc as i32, x);
+        }
     }
 
     unsafe fn uniform_2_i32(&self, location: Option<&Self::UniformLocation>, x: i32, y: i32) {
         let gl = &self.raw;
-        gl.Uniform2i(*location.unwrap_or(&0) as i32, x, y);
+        if let Some(loc) = location {
+            gl.Uniform2i(*loc as i32, x, y);
+        }
     }
 
     unsafe fn uniform_3_i32(
@@ -1102,7 +1106,9 @@ impl HasContext for Context {
         z: i32,
     ) {
         let gl = &self.raw;
-        gl.Uniform3i(*location.unwrap_or(&0) as i32, x, y, z);
+        if let Some(loc) = location {
+            gl.Uniform3i(*loc as i32, x, y, z);
+        }
     }
 
     unsafe fn uniform_4_i32(
@@ -1114,7 +1120,9 @@ impl HasContext for Context {
         w: i32,
     ) {
         let gl = &self.raw;
-        gl.Uniform4i(*location.unwrap_or(&0) as i32, x, y, z, w);
+        if let Some(loc) = location {
+            gl.Uniform4i(*loc as i32, x, y, z, w);
+        }
     }
 
     unsafe fn uniform_1_i32_slice(
@@ -1123,7 +1131,9 @@ impl HasContext for Context {
         v: &[i32],
     ) {
         let gl = &self.raw;
-        gl.Uniform1iv(*location.unwrap_or(&0) as i32, v.len() as i32, v.as_ptr());
+        if let Some(loc) = location {
+            gl.Uniform1iv(*loc as i32, v.len() as i32, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_2_i32_slice(
@@ -1132,7 +1142,9 @@ impl HasContext for Context {
         v: &[i32],
     ) {
         let gl = &self.raw;
-        gl.Uniform2iv(*location.unwrap_or(&0) as i32, v.len() as i32 / 2, v.as_ptr());
+        if let Some(loc) = location {
+            gl.Uniform2iv(*loc as i32, v.len() as i32 / 2, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_3_i32_slice(
@@ -1141,7 +1153,9 @@ impl HasContext for Context {
         v: &[i32],
     ) {
         let gl = &self.raw;
-        gl.Uniform3iv(*location.unwrap_or(&0) as i32, v.len() as i32 / 3, v.as_ptr());
+        if let Some(loc) = location {
+            gl.Uniform3iv(*loc as i32, v.len() as i32 / 3, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_4_i32_slice(
@@ -1150,17 +1164,23 @@ impl HasContext for Context {
         v: &[i32],
     ) {
         let gl = &self.raw;
-        gl.Uniform4iv(*location.unwrap_or(&0) as i32, v.len() as i32 / 4, v.as_ptr());
+        if let Some(loc) = location {
+            gl.Uniform4iv(*loc as i32, v.len() as i32 / 4, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_1_f32(&self, location: Option<&Self::UniformLocation>, x: f32) {
         let gl = &self.raw;
-        gl.Uniform1f(*location.unwrap_or(&0) as i32, x);
+        if let Some(loc) = location {
+            gl.Uniform1f(*loc as i32, x);
+        }
     }
 
     unsafe fn uniform_2_f32(&self, location: Option<&Self::UniformLocation>, x: f32, y: f32) {
         let gl = &self.raw;
-        gl.Uniform2f(*location.unwrap_or(&0) as i32, x, y);
+        if let Some(loc) = location {
+            gl.Uniform2f(*loc as i32, x, y);
+        }
     }
 
     unsafe fn uniform_3_f32(
@@ -1171,7 +1191,9 @@ impl HasContext for Context {
         z: f32,
     ) {
         let gl = &self.raw;
-        gl.Uniform3f(*location.unwrap_or(&0) as i32, x, y, z);
+        if let Some(loc) = location {
+            gl.Uniform3f(*loc as i32, x, y, z);
+        }
     }
 
     unsafe fn uniform_4_f32(
@@ -1183,27 +1205,37 @@ impl HasContext for Context {
         w: f32,
     ) {
         let gl = &self.raw;
-        gl.Uniform4f(*location.unwrap_or(&0) as i32, x, y, z, w);
+        if let Some(loc) = location {
+            gl.Uniform4f(*loc as i32, x, y, z, w);
+        }
     }
 
     unsafe fn uniform_1_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]) {
         let gl = &self.raw;
-        gl.Uniform1fv(*location.unwrap_or(&0) as i32, v.len() as i32, v.as_ptr());
+        if let Some(loc) = location {
+            gl.Uniform1fv(*loc as i32, v.len() as i32, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_2_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]) {
         let gl = &self.raw;
-        gl.Uniform2fv(*location.unwrap_or(&0) as i32, v.len() as i32 / 2, v.as_ptr());
+        if let Some(loc) = location {
+            gl.Uniform2fv(*loc as i32, v.len() as i32 / 2, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_3_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]) {
         let gl = &self.raw;
-        gl.Uniform3fv(*location.unwrap_or(&0) as i32, v.len() as i32 / 3, v.as_ptr());
+        if let Some(loc) = location {
+            gl.Uniform3fv(*loc as i32, v.len() as i32 / 3, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_4_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]) {
         let gl = &self.raw;
-        gl.Uniform4fv(*location.unwrap_or(&0) as i32, v.len() as i32 / 4, v.as_ptr());
+        if let Some(loc) = location {
+            gl.Uniform4fv(*loc as i32, v.len() as i32 / 4, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_matrix_2_f32_slice(
@@ -1213,7 +1245,9 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         let gl = &self.raw;
-        gl.UniformMatrix2fv(*location.unwrap_or(&0) as i32, v.len() as i32 / 4, transpose as u8, v.as_ptr());
+        if let Some(loc) = location {
+            gl.UniformMatrix2fv(*loc as i32, v.len() as i32 / 4, transpose as u8, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_matrix_3_f32_slice(
@@ -1223,7 +1257,9 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         let gl = &self.raw;
-        gl.UniformMatrix3fv(*location.unwrap_or(&0) as i32, v.len() as i32 / 9, transpose as u8, v.as_ptr());
+        if let Some(loc) = location {
+            gl.UniformMatrix3fv(*loc as i32, v.len() as i32 / 9, transpose as u8, v.as_ptr());
+        }
     }
 
     unsafe fn uniform_matrix_4_f32_slice(
@@ -1233,7 +1269,9 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         let gl = &self.raw;
-        gl.UniformMatrix4fv(*location.unwrap_or(&0) as i32, v.len() as i32 / 16, transpose as u8, v.as_ptr());
+        if let Some(loc) = location {
+            gl.UniformMatrix4fv(*loc as i32, v.len() as i32 / 16, transpose as u8, v.as_ptr());
+        }
     }
 
     unsafe fn unmap_buffer(&self, target: u32) {

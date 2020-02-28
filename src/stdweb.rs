@@ -2560,6 +2560,40 @@ impl HasContext for Context {
             RawRenderingContext::WebGl2(ref gl) => gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8])),
         }
     }
+
+    unsafe fn get_uniform_i32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [i32]) {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_uniform(&raw_program, location),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_uniform(&raw_program, location),
+        };
+        if let Some(value_reference) = value.as_reference() {
+            if let Ok(value) = TryInto::<std_web::web::TypedArray<i32>>::try_into(value_reference) {
+                let value: Vec<_> = value.into();
+                v.copy_from_slice(&value);
+            }
+        } else if let Ok(value) = TryInto::<i32>::try_into(value) {
+            v[0] = value;
+        }
+    }
+
+    unsafe fn get_uniform_f32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [f32]) {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_uniform(&raw_program, location),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_uniform(&raw_program, location),
+        };
+        if let Some(value_reference) = value.as_reference() {
+            if let Ok(value) = TryInto::<std_web::web::TypedArray<f32>>::try_into(value_reference) {
+                let value: Vec<_> = value.into();
+                v.copy_from_slice(&value);
+            }
+        } else if let Ok(value) = TryInto::<f64>::try_into(value) {
+            v[0] = value as f32;
+        }
+    }
 }
 
 pub struct RenderLoop;

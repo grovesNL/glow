@@ -1084,6 +1084,16 @@ impl HasContext for Context {
         gl.TexStorage3D(target, levels, internal_format, width, height, depth);
     }
 
+    unsafe fn get_uniform_i32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [i32]) {
+        let gl = &self.raw;
+        gl.GetUniformiv(program as u32, *location as i32, v.as_mut_ptr() as *mut i32)
+    }
+
+    unsafe fn get_uniform_f32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [f32]) {
+        let gl = &self.raw;
+        gl.GetUniformfv(program as u32, *location as i32, v.as_mut_ptr() as *mut f32)
+    }
+
     unsafe fn uniform_1_i32(&self, location: Option<&Self::UniformLocation>, x: i32) {
         let gl = &self.raw;
         if let Some(loc) = location {

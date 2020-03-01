@@ -1764,6 +1764,112 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn uniform_1_u32(&self, uniform_location: Option<&Self::UniformLocation>, x: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Unsigned uniforms are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform1ui(uniform_location, x),
+        }
+    }
+
+    unsafe fn uniform_2_u32(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Unsigned uniforms are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform2ui(uniform_location, x, y),
+        }
+    }
+
+    unsafe fn uniform_3_u32(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Unsigned uniforms are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform3ui(uniform_location, x, y, z),
+        }
+    }
+
+    unsafe fn uniform_4_u32(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+        w: u32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Unsigned uniforms are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform4ui(uniform_location, x, y, z, w),
+        }
+    }
+
+    unsafe fn uniform_1_u32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Unsigned uniforms are not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform1uiv(uniform_location, &v[..], 0, v.len() as u32)
+            }
+        }
+    }
+
+    unsafe fn uniform_2_u32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Unsigned uniforms are not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform2uiv(uniform_location, &v[..], 0, v.len() as u32)
+            }
+        }
+    }
+
+    unsafe fn uniform_3_u32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Unsigned uniforms are not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform3uiv(uniform_location, &v[..], 0, v.len() as u32)
+            }
+        }
+    }
+
+    unsafe fn uniform_4_u32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Unsigned uniforms are not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform4uiv(uniform_location, &v[..], 0, v.len() as u32)
+            }
+        }
+    }
+
     unsafe fn uniform_1_f32(&self, uniform_location: Option<&Self::UniformLocation>, x: f32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.uniform1f(uniform_location, x),

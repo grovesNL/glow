@@ -1169,6 +1169,91 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn uniform_1_u32(&self, location: Option<&Self::UniformLocation>, x: u32) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.Uniform1ui(*loc as i32, x);
+        }
+    }
+
+    unsafe fn uniform_2_u32(&self, location: Option<&Self::UniformLocation>, x: u32, y: u32) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.Uniform2ui(*loc as i32, x, y);
+        }
+    }
+
+    unsafe fn uniform_3_u32(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.Uniform3ui(*loc as i32, x, y, z);
+        }
+    }
+
+    unsafe fn uniform_4_u32(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+        w: u32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.Uniform4ui(*loc as i32, x, y, z, w);
+        }
+    }
+
+    unsafe fn uniform_1_u32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.Uniform1uiv(*loc as i32, v.len() as i32, v.as_ptr());
+        }
+    }
+
+    unsafe fn uniform_2_u32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.Uniform2uiv(*loc as i32, v.len() as i32 / 2, v.as_ptr());
+        }
+    }
+
+    unsafe fn uniform_3_u32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.Uniform3uiv(*loc as i32, v.len() as i32 / 3, v.as_ptr());
+        }
+    }
+
+    unsafe fn uniform_4_u32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.Uniform4uiv(*loc as i32, v.len() as i32 / 4, v.as_ptr());
+        }
+    }
+
     unsafe fn uniform_1_f32(&self, location: Option<&Self::UniformLocation>, x: f32) {
         let gl = &self.raw;
         if let Some(loc) = location {

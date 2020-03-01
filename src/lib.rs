@@ -499,6 +499,29 @@ pub trait HasContext {
 
     unsafe fn uniform_4_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]);
 
+    unsafe fn uniform_1_u32(&self, location: Option<&Self::UniformLocation>, x: u32);
+
+    unsafe fn uniform_2_u32(&self, location: Option<&Self::UniformLocation>, x: u32, y: u32);
+
+    unsafe fn uniform_3_u32(&self, location: Option<&Self::UniformLocation>, x: u32, y: u32, z: u32);
+
+    unsafe fn uniform_4_u32(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+        w: u32,
+    );
+
+    unsafe fn uniform_1_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]);
+
+    unsafe fn uniform_2_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]);
+
+    unsafe fn uniform_3_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]);
+
+    unsafe fn uniform_4_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]);
+
     unsafe fn uniform_1_f32(&self, location: Option<&Self::UniformLocation>, x: f32);
 
     unsafe fn uniform_2_f32(&self, location: Option<&Self::UniformLocation>, x: f32, y: f32);

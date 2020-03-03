@@ -476,6 +476,10 @@ pub trait HasContext {
         depth: i32,
     );
 
+    unsafe fn get_uniform_i32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [i32]);
+
+    unsafe fn get_uniform_f32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [f32]);
+
     unsafe fn uniform_1_i32(&self, location: Option<&Self::UniformLocation>, x: i32);
 
     unsafe fn uniform_2_i32(&self, location: Option<&Self::UniformLocation>, x: i32, y: i32);

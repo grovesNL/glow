@@ -2820,6 +2820,36 @@ impl HasContext for Context {
                 .unwrap(),
         }
     }
+
+    unsafe fn get_uniform_i32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [i32]) {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_uniform(&raw_program, location),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_uniform(&raw_program, location),
+        };
+        use wasm_bindgen::JsCast;
+        if let Some(value) = value.as_f64() {
+            v[0] = value as i32;
+        } else if let Some(values) = value.dyn_ref::<js_sys::Int32Array>() {
+            values.copy_to(v)
+        }
+    }
+
+    unsafe fn get_uniform_f32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [f32]) {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_uniform(&raw_program, location),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_uniform(&raw_program, location),
+        };
+        use wasm_bindgen::JsCast;
+        if let Some(value) = value.as_f64() {
+            v[0] = value as f32;
+        } else if let Some(values) = value.dyn_ref::<js_sys::Float32Array>() {
+            values.copy_to(v)
+        }
+    }
 }
 
 pub struct RenderLoop;

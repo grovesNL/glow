@@ -33,6 +33,7 @@ pub type Sampler = <Context as HasContext>::Sampler;
 pub type Fence = <Context as HasContext>::Fence;
 pub type Framebuffer = <Context as HasContext>::Framebuffer;
 pub type Renderbuffer = <Context as HasContext>::Renderbuffer;
+pub type Query = <Context as HasContext>::Query;
 pub type UniformLocation = <Context as HasContext>::UniformLocation;
 
 pub struct ActiveUniform {
@@ -66,11 +67,14 @@ pub trait HasContext {
     type Fence: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Framebuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Renderbuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type Query: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type UniformLocation: Clone + Debug;
 
     fn supports_debug(&self) -> bool;
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String>;
+
+    unsafe fn create_query(&self) -> Result<Self::Query, String>;
 
     unsafe fn create_renderbuffer(&self) -> Result<Self::Renderbuffer, String>;
 
@@ -231,6 +235,8 @@ pub trait HasContext {
     unsafe fn delete_buffer(&self, buffer: Self::Buffer);
 
     unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer);
+
+    unsafe fn delete_query(&self, query: Self::Query);
 
     unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer);
 
@@ -831,6 +837,12 @@ pub trait HasContext {
     unsafe fn read_buffer(&self, src: u32);
 
     unsafe fn read_pixels(&self, x: i32, y: i32, width: i32, height: i32, format: u32, gltype: u32, data: &mut [u8]);
+
+    unsafe fn begin_query(&self, target: u32, query: Self::Query);
+
+    unsafe fn end_query(&self, target: u32);
+
+    unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32;
 }
 
 pub trait HasRenderLoop {

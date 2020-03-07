@@ -70,6 +70,7 @@ impl HasContext for Context {
     type Fence = native_gl::types::GLsync;
     type Framebuffer = native_gl::types::GLuint;
     type Renderbuffer = native_gl::types::GLuint;
+    type Query = native_gl::types::GLuint;
     type UniformLocation = native_gl::types::GLuint;
 
     fn supports_debug(&self) -> bool {
@@ -80,6 +81,13 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenFramebuffers(1, &mut name);
+        Ok(name)
+    }
+
+    unsafe fn create_query(&self) -> Result<Self::Query, String> {
+        let gl = &self.raw;
+        let mut name = 0;
+        gl.GenQueries(1, &mut name);
         Ok(name)
     }
 
@@ -531,6 +539,11 @@ impl HasContext for Context {
     unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer) {
         let gl = &self.raw;
         gl.DeleteFramebuffers(1, &framebuffer);
+    }
+
+    unsafe fn delete_query(&self, query: Self::Query) {
+        let gl = &self.raw;
+        gl.DeleteQueries(1, &query);
     }
 
     unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer) {
@@ -2065,6 +2078,23 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         gl.ReadPixels(x, y, width, height, format, gltype, data.as_mut_ptr() as *mut std::ffi::c_void);
+    }
+
+    unsafe fn begin_query(&self, target: u32, query: Self::Query) {
+        let gl = &self.raw;
+        gl.BeginQuery(target, query);
+    }
+
+    unsafe fn end_query(&self, target: u32) {
+        let gl = &self.raw;
+        gl.EndQuery(target);
+    }
+
+    unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetQueryObjectuiv(query, parameter, &mut value);
+        value
     }
 }
 

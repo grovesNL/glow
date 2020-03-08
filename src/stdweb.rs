@@ -8,6 +8,7 @@ use webgl_stdweb::{
     WebGL2RenderingContext, WebGLBuffer, WebGLFramebuffer, WebGLProgram, WebGLRenderbuffer,
     WebGLRenderingContext, WebGLSampler, WebGLShader, WebGLSync, WebGLTexture,
     WebGLUniformLocation, WebGLVertexArrayObject, WebGLVertexArrayObjectOES,
+    WebGLQuery,
 };
 
 #[derive(Debug)]
@@ -80,6 +81,7 @@ pub struct Context {
     fences: TrackedResource<WebFenceKey, WebGLSync>,
     framebuffers: TrackedResource<WebFramebufferKey, WebGLFramebuffer>,
     renderbuffers: TrackedResource<WebRenderbufferKey, WebGLRenderbuffer>,
+    queries: TrackedResource<WebQueryKey, WebGLQuery>,
 }
 
 impl Context {
@@ -135,6 +137,7 @@ impl Context {
             fences: tracked_resource(),
             framebuffers: tracked_resource(),
             renderbuffers: tracked_resource(),
+            queries: tracked_resource(),
         }
     }
 
@@ -190,6 +193,7 @@ impl Context {
             fences: tracked_resource(),
             framebuffers: tracked_resource(),
             renderbuffers: tracked_resource(),
+            queries: tracked_resource(),
         }
     }
 }
@@ -203,6 +207,7 @@ new_key_type! { pub struct WebSamplerKey; }
 new_key_type! { pub struct WebFenceKey; }
 new_key_type! { pub struct WebFramebufferKey; }
 new_key_type! { pub struct WebRenderbufferKey; }
+new_key_type! { pub struct WebQueryKey; }
 
 impl HasContext for Context {
     type Shader = WebShaderKey;
@@ -214,6 +219,7 @@ impl HasContext for Context {
     type Fence = WebFenceKey;
     type Framebuffer = WebFramebufferKey;
     type Renderbuffer = WebRenderbufferKey;
+    type Query = WebQueryKey;
     type UniformLocation = WebGLUniformLocation;
 
     fn supports_debug(&self) -> bool {
@@ -233,6 +239,22 @@ impl HasContext for Context {
                 Ok(key)
             }
             None => Err(String::from("Unable to create framebuffer object")),
+        }
+    }
+
+    unsafe fn create_query(&self) -> Result<Self::Query, String> {
+        let raw_query = match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => { return Err(String::from("Query objects are not supported")); },
+            RawRenderingContext::WebGl2(ref gl) => gl.create_query(),
+        };
+
+        match raw_query {
+            Some(s) => {
+                let key = self.queries.borrow_mut().0.insert(());
+                self.queries.borrow_mut().1.insert(key, s);
+                Ok(key)
+            }
+            None => Err(String::from("Unable to create query object")),
         }
     }
 
@@ -884,6 +906,17 @@ impl HasContext for Context {
             Some(ref f) => match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_framebuffer(Some(f)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_framebuffer(Some(f)),
+            },
+            None => {}
+        }
+    }
+
+    unsafe fn delete_query(&self, query: Self::Query) {
+        let mut queries = self.queries.borrow_mut();
+        match queries.1.remove(query) {
+            Some(ref r) => match self.raw {
+                RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_query(Some(r)),
             },
             None => {}
         }
@@ -2698,6 +2731,34 @@ impl HasContext for Context {
             }
         } else if let Ok(value) = TryInto::<f64>::try_into(value) {
             v[0] = value as f32;
+        }
+    }
+
+    unsafe fn begin_query(&self, target: u32, query: Self::Query) {
+        let queries = self.queries.borrow();
+        let raw_query = queries.1.get_unchecked(query);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.begin_query(target, raw_query),
+        }
+    }
+
+    unsafe fn end_query(&self, target: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.end_query(target),
+        }
+    }
+
+    unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32 {
+        let queries = self.queries.borrow();
+        let raw_query = queries.1.get_unchecked(query);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_query_parameter(raw_query, parameter)
+                .try_into()
+                .map(|v: f64| v as u32)
+                .unwrap_or(0),
         }
     }
 }

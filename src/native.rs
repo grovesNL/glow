@@ -1018,6 +1018,30 @@ impl HasContext for Context {
         gl.GenerateMipmap(target);
     }
 
+    unsafe fn tex_image_1d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&[u8]>,
+    ) {
+        let gl = &self.raw;
+        gl.TexImage1D(
+            target,
+            level,
+            internal_format,
+            width,
+            border,
+            format,
+            ty,
+            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+        );
+    }
+
     unsafe fn tex_image_2d(
         &self,
         target: u32,
@@ -1070,6 +1094,17 @@ impl HasContext for Context {
             ty,
             pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
         );
+    }
+
+    unsafe fn tex_storage_1d(
+        &self,
+        target: u32,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+    ) {
+        let gl = &self.raw;
+        gl.TexStorage1D(target, levels, internal_format, width);
     }
 
     unsafe fn tex_storage_2d(

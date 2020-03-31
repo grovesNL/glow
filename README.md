@@ -12,6 +12,19 @@
   <a href="https://travis-ci.org/grovesNL/glow"><img src="https://travis-ci.org/grovesNL/glow.svg?branch=master" alt="Travis Build Status" /></a>
 </div>
 
+## Build commands
+
+```sh
+# native
+cargo build
+
+# web-sys
+cargo build --target="wasm32-unknown-unknown"
+
+# stdweb (requires cargo-web installed)
+cargo web build --no-default-features --features stdweb
+```
+
 ## License
 
 This project is licensed under either of [Apache License, Version

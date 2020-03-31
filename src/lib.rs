@@ -609,6 +609,8 @@ pub trait HasContext {
 
     unsafe fn invalidate_buffer_sub_data(&self, target: u32, offset: i32, length: i32);
 
+    unsafe fn invalidate_framebuffer(&self, target: u32, attachments: &[u32]);
+
     unsafe fn polygon_offset(&self, factor: f32, units: f32);
 
     unsafe fn polygon_mode(&self, face: u32, mode: u32);

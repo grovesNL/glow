@@ -2125,6 +2125,17 @@ impl HasContext for Context {
         panic!("Invalidate buffer sub data is not supported")
     }
 
+    unsafe fn invalidate_framebuffer(&self, target: u32, attachments: &[u32]) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Invalidate framebuffer is not supported");
+            },
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.invalidate_framebuffer(target, attachments);
+            },
+        }
+    }
+
     unsafe fn polygon_offset(&self, factor: f32, units: f32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.polygon_offset(factor, units),

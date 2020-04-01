@@ -1658,6 +1658,20 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn tex_image_1d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        pixels: Option<&[u8]>,
+    ) {
+        panic!("Tex image 1D is not supported");
+    }
+
     unsafe fn tex_image_2d(
         &self,
         target: u32,
@@ -1802,6 +1816,16 @@ impl HasContext for Context {
                 .unwrap();
             }
         }
+    }
+
+    unsafe fn tex_storage_1d(
+        &self,
+        target: u32,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+    ) {
+        panic!("Tex storage 1D is not supported");
     }
 
     unsafe fn tex_storage_2d(

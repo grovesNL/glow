@@ -6,8 +6,8 @@ use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use web_sys::{
     HtmlImageElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer,
-    WebGlProgram, WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync,
-    WebGlTexture, WebGlUniformLocation, WebGlVertexArrayObject, WebGlQuery,
+    WebGlProgram, WebGlQuery, WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader,
+    WebGlSync, WebGlTexture, WebGlUniformLocation, WebGlVertexArrayObject,
 };
 
 #[derive(Debug)]
@@ -394,7 +394,9 @@ impl HasContext for Context {
 
     unsafe fn create_query(&self) -> Result<Self::Query, String> {
         let raw_query = match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => { return Err(String::from("Query objects are not supported")); },
+            RawRenderingContext::WebGl1(ref _gl) => {
+                return Err(String::from("Query objects are not supported"));
+            }
             RawRenderingContext::WebGl2(ref gl) => gl.create_query(),
         };
 
@@ -712,7 +714,9 @@ impl HasContext for Context {
         let buffers = self.buffers.borrow();
         let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("bind_buffer_base not supported on webgl1"),
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("bind_buffer_base not supported on webgl1")
+            }
             RawRenderingContext::WebGl2(ref gl) => gl.bind_buffer_base(target, index, raw_buffer),
         }
     }
@@ -1271,7 +1275,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn is_enabled(&self, parameter: u32) -> bool  {
+    unsafe fn is_enabled(&self, parameter: u32) -> bool {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.is_enabled(parameter),
             RawRenderingContext::WebGl2(ref gl) => gl.is_enabled(parameter),
@@ -1607,7 +1611,13 @@ impl HasContext for Context {
                 panic!("Renderbuffer storage multisample is not supported");
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.renderbuffer_storage_multisample(target, samples, internal_format, width, height);
+                gl.renderbuffer_storage_multisample(
+                    target,
+                    samples,
+                    internal_format,
+                    width,
+                    height,
+                );
             }
         }
     }
@@ -1690,12 +1700,10 @@ impl HasContext for Context {
 
             match ty {
                 BYTE => {
-                    let data = from_raw_parts(
-                        bytes.as_ptr() as *const i8,
-                        bytes.len() / size_of::<i8>(),
-                    );
+                    let data =
+                        from_raw_parts(bytes.as_ptr() as *const i8, bytes.len() / size_of::<i8>());
                     js_sys::Int8Array::view(data).into()
-                },
+                }
 
                 SHORT => {
                     let data = from_raw_parts(
@@ -1703,19 +1711,19 @@ impl HasContext for Context {
                         bytes.len() / size_of::<i16>(),
                     );
                     js_sys::Int16Array::view(data).into()
-                },
+                }
 
-                UNSIGNED_SHORT |
-                UNSIGNED_SHORT_5_6_5 |
-                UNSIGNED_SHORT_5_5_5_1 |
-                UNSIGNED_SHORT_4_4_4_4 |
-                HALF_FLOAT => {
+                UNSIGNED_SHORT
+                | UNSIGNED_SHORT_5_6_5
+                | UNSIGNED_SHORT_5_5_5_1
+                | UNSIGNED_SHORT_4_4_4_4
+                | HALF_FLOAT => {
                     let data = from_raw_parts(
                         bytes.as_ptr() as *const u16,
                         bytes.len() / size_of::<u16>(),
                     );
                     js_sys::Uint16Array::view(data).into()
-                },
+                }
 
                 INT => {
                     let data = from_raw_parts(
@@ -1723,19 +1731,19 @@ impl HasContext for Context {
                         bytes.len() / size_of::<i32>(),
                     );
                     js_sys::Int32Array::view(data).into()
-                },
+                }
 
-                UNSIGNED_INT |
-                UNSIGNED_INT_5_9_9_9_REV |
-                UNSIGNED_INT_2_10_10_10_REV |
-                UNSIGNED_INT_10F_11F_11F_REV |
-                UNSIGNED_INT_24_8 => {
+                UNSIGNED_INT
+                | UNSIGNED_INT_5_9_9_9_REV
+                | UNSIGNED_INT_2_10_10_10_REV
+                | UNSIGNED_INT_10F_11F_11F_REV
+                | UNSIGNED_INT_24_8 => {
                     let data = from_raw_parts(
                         bytes.as_ptr() as *const u32,
                         bytes.len() / size_of::<u32>(),
                     );
                     js_sys::Uint32Array::view(data).into()
-                },
+                }
 
                 FLOAT => {
                     let data = from_raw_parts(
@@ -1743,10 +1751,9 @@ impl HasContext for Context {
                         bytes.len() / size_of::<f32>(),
                     );
                     js_sys::Float32Array::view(data).into()
-                },
+                }
 
-                UNSIGNED_BYTE |
-                _ => js_sys::Uint8Array::view(bytes).into()
+                UNSIGNED_BYTE | _ => js_sys::Uint8Array::view(bytes).into(),
             }
         });
 
@@ -1818,13 +1825,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn tex_storage_1d(
-        &self,
-        target: u32,
-        levels: i32,
-        internal_format: u32,
-        width: i32,
-    ) {
+    unsafe fn tex_storage_1d(&self, target: u32, levels: i32, internal_format: u32, width: i32) {
         panic!("Tex storage 1D is not supported");
     }
 
@@ -2299,14 +2300,14 @@ impl HasContext for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Invalidate framebuffer is not supported");
-            },
+            }
             RawRenderingContext::WebGl2(ref gl) => {
                 let js_attachments = Array::new();
                 for &a in attachments {
                     js_attachments.push(&a.into());
                 }
                 gl.invalidate_framebuffer(target, &js_attachments).unwrap();
-            },
+            }
         }
     }
 
@@ -2892,7 +2893,12 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn get_uniform_i32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [i32]) {
+    unsafe fn get_uniform_i32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [i32],
+    ) {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         let value = match self.raw {
@@ -2907,7 +2913,12 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn get_uniform_f32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [f32]) {
+    unsafe fn get_uniform_f32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [f32],
+    ) {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         let value = match self.raw {
@@ -2943,7 +2954,8 @@ impl HasContext for Context {
         let raw_query = queries.1.get_unchecked(query);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.get_query_parameter(raw_query, parameter)
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .get_query_parameter(raw_query, parameter)
                 .as_f64()
                 .map(|v| v as u32)
                 .unwrap_or(0),

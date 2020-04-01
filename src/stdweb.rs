@@ -2,13 +2,12 @@ use super::*;
 
 use slotmap::{new_key_type, SecondaryMap, SlotMap};
 use std::cell::RefCell;
-use std_web::web::{window, TypedArray};
 use std_web::unstable::TryInto;
+use std_web::web::{window, TypedArray};
 use webgl_stdweb::{
-    WebGL2RenderingContext, WebGLBuffer, WebGLFramebuffer, WebGLProgram, WebGLRenderbuffer,
-    WebGLRenderingContext, WebGLSampler, WebGLShader, WebGLSync, WebGLTexture,
+    WebGL2RenderingContext, WebGLBuffer, WebGLFramebuffer, WebGLProgram, WebGLQuery,
+    WebGLRenderbuffer, WebGLRenderingContext, WebGLSampler, WebGLShader, WebGLSync, WebGLTexture,
     WebGLUniformLocation, WebGLVertexArrayObject, WebGLVertexArrayObjectOES,
-    WebGLQuery,
 };
 
 #[derive(Debug)]
@@ -47,14 +46,16 @@ struct Extensions {
     pub webgl_compressed_texture_etc1: Option<webgl_stdweb::WEBGL_compressed_texture_etc1>,
     pub webgl_compressed_texture_pvrtc: Option<webgl_stdweb::WEBGL_compressed_texture_pvrtc>,
     pub webgl_compressed_texture_s3tc: Option<webgl_stdweb::WEBGL_compressed_texture_s3tc>,
-    pub webgl_compressed_texture_s3tc_srgb: Option<webgl_stdweb::WEBGL_compressed_texture_s3tc_srgb>,
+    pub webgl_compressed_texture_s3tc_srgb:
+        Option<webgl_stdweb::WEBGL_compressed_texture_s3tc_srgb>,
     pub webgl_debug_renderer_info: Option<webgl_stdweb::WEBGL_debug_renderer_info>,
     pub webgl_debug_shaders: Option<webgl_stdweb::WEBGL_debug_shaders>,
     pub webgl_depth_texture: Option<webgl_stdweb::WEBGL_depth_texture>,
     pub webgl_draw_buffers: Option<webgl_stdweb::WEBGL_draw_buffers>,
     pub webgl_lose_context: Option<webgl_stdweb::WEBGL_lose_context>,
     pub webgl_multiview: Option<webgl_stdweb::WEBGL_multiview>,
-    pub webgl_security_sensitive_resources: Option<webgl_stdweb::WEBGL_security_sensitive_resources>,
+    pub webgl_security_sensitive_resources:
+        Option<webgl_stdweb::WEBGL_security_sensitive_resources>,
 }
 
 // Workaround for stable Rust
@@ -90,39 +91,61 @@ impl Context {
             angle_instanced_arrays: context.get_extension::<webgl_stdweb::ANGLE_instanced_arrays>(),
             ext_blend_minmax: context.get_extension::<webgl_stdweb::EXT_blend_minmax>(),
             ext_color_buffer_float: context.get_extension::<webgl_stdweb::EXT_color_buffer_float>(),
-            ext_color_buffer_half_float: context.get_extension::<webgl_stdweb::EXT_color_buffer_half_float>(),
-            ext_disjoint_timer_query: context.get_extension::<webgl_stdweb::EXT_disjoint_timer_query>(),
-            ext_disjoint_timer_query_webgl2: context.get_extension::<webgl_stdweb::EXT_disjoint_timer_query_webgl2>(),
+            ext_color_buffer_half_float: context
+                .get_extension::<webgl_stdweb::EXT_color_buffer_half_float>(),
+            ext_disjoint_timer_query: context
+                .get_extension::<webgl_stdweb::EXT_disjoint_timer_query>(),
+            ext_disjoint_timer_query_webgl2: context
+                .get_extension::<webgl_stdweb::EXT_disjoint_timer_query_webgl2>(),
             ext_float_blend: context.get_extension::<webgl_stdweb::EXT_float_blend>(),
             ext_frag_depth: context.get_extension::<webgl_stdweb::EXT_frag_depth>(),
             ext_srgb: context.get_extension::<webgl_stdweb::EXT_sRGB>(),
             ext_shader_texture_lod: context.get_extension::<webgl_stdweb::EXT_shader_texture_lod>(),
-            ext_texture_compression_bptc: context.get_extension::<webgl_stdweb::EXT_texture_compression_bptc>(),
-            ext_texture_compression_rgtc: context.get_extension::<webgl_stdweb::EXT_texture_compression_rgtc>(),
-            ext_texture_filter_anisotropic: context.get_extension::<webgl_stdweb::EXT_texture_filter_anisotropic>(),
-            khr_parallel_shader_compile: context.get_extension::<webgl_stdweb::KHR_parallel_shader_compile>(),
+            ext_texture_compression_bptc: context
+                .get_extension::<webgl_stdweb::EXT_texture_compression_bptc>(),
+            ext_texture_compression_rgtc: context
+                .get_extension::<webgl_stdweb::EXT_texture_compression_rgtc>(),
+            ext_texture_filter_anisotropic: context
+                .get_extension::<webgl_stdweb::EXT_texture_filter_anisotropic>(),
+            khr_parallel_shader_compile: context
+                .get_extension::<webgl_stdweb::KHR_parallel_shader_compile>(),
             oes_element_index_uint: context.get_extension::<webgl_stdweb::OES_element_index_uint>(),
             oes_fbo_render_mipmap: context.get_extension::<webgl_stdweb::OES_fbo_render_mipmap>(),
-            oes_standard_derivatives: context.get_extension::<webgl_stdweb::OES_standard_derivatives>(),
+            oes_standard_derivatives: context
+                .get_extension::<webgl_stdweb::OES_standard_derivatives>(),
             oes_texture_float: context.get_extension::<webgl_stdweb::OES_texture_float>(),
-            oes_texture_float_linear: context.get_extension::<webgl_stdweb::OES_texture_float_linear>(),
+            oes_texture_float_linear: context
+                .get_extension::<webgl_stdweb::OES_texture_float_linear>(),
             oes_texture_half_float: context.get_extension::<webgl_stdweb::OES_texture_half_float>(),
-            oes_texture_half_float_linear: context.get_extension::<webgl_stdweb::OES_texture_half_float_linear>(),
-            oes_vertex_array_object: context.get_extension::<webgl_stdweb::OES_vertex_array_object>(),
-            webgl_color_buffer_float: context.get_extension::<webgl_stdweb::WEBGL_color_buffer_float>(),
-            webgl_compressed_texture_astc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_astc>(),
-            webgl_compressed_texture_etc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc>(),
-            webgl_compressed_texture_etc1: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc1>(),
-            webgl_compressed_texture_pvrtc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_pvrtc>(),
-            webgl_compressed_texture_s3tc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc>(),
-            webgl_compressed_texture_s3tc_srgb: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc_srgb>(),
-            webgl_debug_renderer_info: context.get_extension::<webgl_stdweb::WEBGL_debug_renderer_info>(),
+            oes_texture_half_float_linear: context
+                .get_extension::<webgl_stdweb::OES_texture_half_float_linear>(),
+            oes_vertex_array_object: context
+                .get_extension::<webgl_stdweb::OES_vertex_array_object>(),
+            webgl_color_buffer_float: context
+                .get_extension::<webgl_stdweb::WEBGL_color_buffer_float>(),
+            webgl_compressed_texture_astc: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_astc>(),
+            webgl_compressed_texture_etc: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc>(),
+            webgl_compressed_texture_etc1: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc1>(),
+            webgl_compressed_texture_pvrtc: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_pvrtc>(),
+            webgl_compressed_texture_s3tc: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc>(),
+            webgl_compressed_texture_s3tc_srgb: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc_srgb>(
+            ),
+            webgl_debug_renderer_info: context
+                .get_extension::<webgl_stdweb::WEBGL_debug_renderer_info>(),
             webgl_debug_shaders: context.get_extension::<webgl_stdweb::WEBGL_debug_shaders>(),
             webgl_depth_texture: context.get_extension::<webgl_stdweb::WEBGL_depth_texture>(),
             webgl_draw_buffers: context.get_extension::<webgl_stdweb::WEBGL_draw_buffers>(),
             webgl_lose_context: context.get_extension::<webgl_stdweb::WEBGL_lose_context>(),
             webgl_multiview: context.get_extension::<webgl_stdweb::WEBGL_multiview>(),
-            webgl_security_sensitive_resources: context.get_extension::<webgl_stdweb::WEBGL_security_sensitive_resources>(),
+            webgl_security_sensitive_resources: context
+                .get_extension::<webgl_stdweb::WEBGL_security_sensitive_resources>(
+            ),
         };
         Self {
             raw: RawRenderingContext::WebGl1(context),
@@ -146,39 +169,61 @@ impl Context {
             angle_instanced_arrays: context.get_extension::<webgl_stdweb::ANGLE_instanced_arrays>(),
             ext_blend_minmax: context.get_extension::<webgl_stdweb::EXT_blend_minmax>(),
             ext_color_buffer_float: context.get_extension::<webgl_stdweb::EXT_color_buffer_float>(),
-            ext_color_buffer_half_float: context.get_extension::<webgl_stdweb::EXT_color_buffer_half_float>(),
-            ext_disjoint_timer_query: context.get_extension::<webgl_stdweb::EXT_disjoint_timer_query>(),
-            ext_disjoint_timer_query_webgl2: context.get_extension::<webgl_stdweb::EXT_disjoint_timer_query_webgl2>(),
+            ext_color_buffer_half_float: context
+                .get_extension::<webgl_stdweb::EXT_color_buffer_half_float>(),
+            ext_disjoint_timer_query: context
+                .get_extension::<webgl_stdweb::EXT_disjoint_timer_query>(),
+            ext_disjoint_timer_query_webgl2: context
+                .get_extension::<webgl_stdweb::EXT_disjoint_timer_query_webgl2>(),
             ext_float_blend: context.get_extension::<webgl_stdweb::EXT_float_blend>(),
             ext_frag_depth: context.get_extension::<webgl_stdweb::EXT_frag_depth>(),
             ext_srgb: context.get_extension::<webgl_stdweb::EXT_sRGB>(),
             ext_shader_texture_lod: context.get_extension::<webgl_stdweb::EXT_shader_texture_lod>(),
-            ext_texture_compression_bptc: context.get_extension::<webgl_stdweb::EXT_texture_compression_bptc>(),
-            ext_texture_compression_rgtc: context.get_extension::<webgl_stdweb::EXT_texture_compression_rgtc>(),
-            ext_texture_filter_anisotropic: context.get_extension::<webgl_stdweb::EXT_texture_filter_anisotropic>(),
-            khr_parallel_shader_compile: context.get_extension::<webgl_stdweb::KHR_parallel_shader_compile>(),
+            ext_texture_compression_bptc: context
+                .get_extension::<webgl_stdweb::EXT_texture_compression_bptc>(),
+            ext_texture_compression_rgtc: context
+                .get_extension::<webgl_stdweb::EXT_texture_compression_rgtc>(),
+            ext_texture_filter_anisotropic: context
+                .get_extension::<webgl_stdweb::EXT_texture_filter_anisotropic>(),
+            khr_parallel_shader_compile: context
+                .get_extension::<webgl_stdweb::KHR_parallel_shader_compile>(),
             oes_element_index_uint: context.get_extension::<webgl_stdweb::OES_element_index_uint>(),
             oes_fbo_render_mipmap: context.get_extension::<webgl_stdweb::OES_fbo_render_mipmap>(),
-            oes_standard_derivatives: context.get_extension::<webgl_stdweb::OES_standard_derivatives>(),
+            oes_standard_derivatives: context
+                .get_extension::<webgl_stdweb::OES_standard_derivatives>(),
             oes_texture_float: context.get_extension::<webgl_stdweb::OES_texture_float>(),
-            oes_texture_float_linear: context.get_extension::<webgl_stdweb::OES_texture_float_linear>(),
+            oes_texture_float_linear: context
+                .get_extension::<webgl_stdweb::OES_texture_float_linear>(),
             oes_texture_half_float: context.get_extension::<webgl_stdweb::OES_texture_half_float>(),
-            oes_texture_half_float_linear: context.get_extension::<webgl_stdweb::OES_texture_half_float_linear>(),
-            oes_vertex_array_object: context.get_extension::<webgl_stdweb::OES_vertex_array_object>(),
-            webgl_color_buffer_float: context.get_extension::<webgl_stdweb::WEBGL_color_buffer_float>(),
-            webgl_compressed_texture_astc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_astc>(),
-            webgl_compressed_texture_etc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc>(),
-            webgl_compressed_texture_etc1: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc1>(),
-            webgl_compressed_texture_pvrtc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_pvrtc>(),
-            webgl_compressed_texture_s3tc: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc>(),
-            webgl_compressed_texture_s3tc_srgb: context.get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc_srgb>(),
-            webgl_debug_renderer_info: context.get_extension::<webgl_stdweb::WEBGL_debug_renderer_info>(),
+            oes_texture_half_float_linear: context
+                .get_extension::<webgl_stdweb::OES_texture_half_float_linear>(),
+            oes_vertex_array_object: context
+                .get_extension::<webgl_stdweb::OES_vertex_array_object>(),
+            webgl_color_buffer_float: context
+                .get_extension::<webgl_stdweb::WEBGL_color_buffer_float>(),
+            webgl_compressed_texture_astc: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_astc>(),
+            webgl_compressed_texture_etc: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc>(),
+            webgl_compressed_texture_etc1: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_etc1>(),
+            webgl_compressed_texture_pvrtc: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_pvrtc>(),
+            webgl_compressed_texture_s3tc: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc>(),
+            webgl_compressed_texture_s3tc_srgb: context
+                .get_extension::<webgl_stdweb::WEBGL_compressed_texture_s3tc_srgb>(
+            ),
+            webgl_debug_renderer_info: context
+                .get_extension::<webgl_stdweb::WEBGL_debug_renderer_info>(),
             webgl_debug_shaders: context.get_extension::<webgl_stdweb::WEBGL_debug_shaders>(),
             webgl_depth_texture: context.get_extension::<webgl_stdweb::WEBGL_depth_texture>(),
             webgl_draw_buffers: context.get_extension::<webgl_stdweb::WEBGL_draw_buffers>(),
             webgl_lose_context: context.get_extension::<webgl_stdweb::WEBGL_lose_context>(),
             webgl_multiview: context.get_extension::<webgl_stdweb::WEBGL_multiview>(),
-            webgl_security_sensitive_resources: context.get_extension::<webgl_stdweb::WEBGL_security_sensitive_resources>(),
+            webgl_security_sensitive_resources: context
+                .get_extension::<webgl_stdweb::WEBGL_security_sensitive_resources>(
+            ),
         };
         Self {
             raw: RawRenderingContext::WebGl2(context),
@@ -244,7 +289,9 @@ impl HasContext for Context {
 
     unsafe fn create_query(&self) -> Result<Self::Query, String> {
         let raw_query = match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => { return Err(String::from("Query objects are not supported")); },
+            RawRenderingContext::WebGl1(ref _gl) => {
+                return Err(String::from("Query objects are not supported"));
+            }
             RawRenderingContext::WebGl2(ref gl) => gl.create_query(),
         };
 
@@ -558,11 +605,13 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn bind_buffer_base(&self, target: u32, index:u32, buffer: Option<Self::Buffer>) {
+    unsafe fn bind_buffer_base(&self, target: u32, index: u32, buffer: Option<Self::Buffer>) {
         let buffers = self.buffers.borrow();
         let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("bind_buffer_base not supported on webgl1"),
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("bind_buffer_base not supported on webgl1")
+            }
             RawRenderingContext::WebGl2(ref gl) => gl.bind_buffer_base(target, index, raw_buffer),
         }
     }
@@ -634,28 +683,24 @@ impl HasContext for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 match &self.extensions.oes_vertex_array_object {
-                    Some(extension) => {
-                        match extension.create_vertex_array_oes() {
-                            Some(va) => {
-                                let key = self.vertex_arrays_oes.borrow_mut().0.insert(());
-                                self.vertex_arrays_oes.borrow_mut().1.insert(key, va);
-                                Ok(key)
-                            }
-                            None => Err(String::from("Unable to create vertex array object")),
+                    Some(extension) => match extension.create_vertex_array_oes() {
+                        Some(va) => {
+                            let key = self.vertex_arrays_oes.borrow_mut().0.insert(());
+                            self.vertex_arrays_oes.borrow_mut().1.insert(key, va);
+                            Ok(key)
                         }
+                        None => Err(String::from("Unable to create vertex array object")),
                     },
                     None => panic!("Vertex array objects are not supported"),
                 }
-            },
-            RawRenderingContext::WebGl2(ref gl) => {
-                match gl.create_vertex_array() {
-                    Some(va) => {
-                        let key = self.vertex_arrays.borrow_mut().0.insert(());
-                        self.vertex_arrays.borrow_mut().1.insert(key, va);
-                        Ok(key)
-                    }
-                    None => Err(String::from("Unable to create vertex array object")),
+            }
+            RawRenderingContext::WebGl2(ref gl) => match gl.create_vertex_array() {
+                Some(va) => {
+                    let key = self.vertex_arrays.borrow_mut().0.insert(());
+                    self.vertex_arrays.borrow_mut().1.insert(key, va);
+                    Ok(key)
                 }
+                None => Err(String::from("Unable to create vertex array object")),
             },
         }
     }
@@ -666,11 +711,13 @@ impl HasContext for Context {
                 match &self.extensions.oes_vertex_array_object {
                     Some(extension) => {
                         let mut vertex_arrays_oes = self.vertex_arrays_oes.borrow_mut();
-                        extension.delete_vertex_array_oes(vertex_arrays_oes.1.remove(vertex_array).as_ref())
-                    },
+                        extension.delete_vertex_array_oes(
+                            vertex_arrays_oes.1.remove(vertex_array).as_ref(),
+                        )
+                    }
                     None => panic!("Vertex array objects are not supported"),
                 }
-            },
+            }
             RawRenderingContext::WebGl2(ref gl) => {
                 let mut vertex_arrays = self.vertex_arrays.borrow_mut();
                 gl.delete_vertex_array(vertex_arrays.1.remove(vertex_array).as_ref());
@@ -684,12 +731,13 @@ impl HasContext for Context {
                 match &self.extensions.oes_vertex_array_object {
                     Some(extension) => {
                         let vertex_arrays_oes = self.vertex_arrays_oes.borrow();
-                        let raw_vertex_array_oes = vertex_array.map(|va| vertex_arrays_oes.1.get_unchecked(va));
+                        let raw_vertex_array_oes =
+                            vertex_array.map(|va| vertex_arrays_oes.1.get_unchecked(va));
                         extension.bind_vertex_array_oes(raw_vertex_array_oes);
-                    },
+                    }
                     None => panic!("Vertex array objects are not supported"),
                 }
-            },
+            }
             RawRenderingContext::WebGl2(ref gl) => {
                 let vertex_arrays = self.vertex_arrays.borrow();
                 let raw_vertex_array = vertex_array.map(|va| vertex_arrays.1.get_unchecked(va));
@@ -795,9 +843,13 @@ impl HasContext for Context {
     unsafe fn get_buffer_sub_data(&self, target: u32, offset: i32, dst_data: &mut [u8]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("get_buffer_sub_data not supported"),
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.get_buffer_sub_data(target, offset as i64, dst_data as &[u8], 0, dst_data.len() as u32)
-            }
+            RawRenderingContext::WebGl2(ref gl) => gl.get_buffer_sub_data(
+                target,
+                offset as i64,
+                dst_data as &[u8],
+                0,
+                dst_data.len() as u32,
+            ),
         }
     }
 
@@ -882,10 +934,13 @@ impl HasContext for Context {
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Copy buffer subdata is not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl
-                .copy_buffer_sub_data(
-                    src_target, dst_target, src_offset as i64, dst_offset as i64, size as i64,
-                ),
+            RawRenderingContext::WebGl2(ref gl) => gl.copy_buffer_sub_data(
+                src_target,
+                dst_target,
+                src_offset as i64,
+                dst_offset as i64,
+                size as i64,
+            ),
         }
     }
 
@@ -1001,12 +1056,12 @@ impl HasContext for Context {
 
     unsafe fn draw_arrays_instanced(&self, mode: u32, first: i32, count: i32, instance_count: i32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                match &self.extensions.angle_instanced_arrays {
-                    Some(extension) => extension.draw_arrays_instanced_angle(mode as u32, first, count, instance_count),
-                    None => panic!("Draw arrays instanced is not supported"),
+            RawRenderingContext::WebGl1(ref _gl) => match &self.extensions.angle_instanced_arrays {
+                Some(extension) => {
+                    extension.draw_arrays_instanced_angle(mode as u32, first, count, instance_count)
                 }
-            }
+                None => panic!("Draw arrays instanced is not supported"),
+            },
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.draw_arrays_instanced(mode as u32, first, count, instance_count)
             }
@@ -1077,18 +1132,16 @@ impl HasContext for Context {
         instance_count: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                match &self.extensions.angle_instanced_arrays {
-                    None => panic!("Draw elements instanced is not supported"),
-                    Some(extension) => extension.draw_elements_instanced_angle(
-                        mode as u32,
-                        count,
-                        element_type as u32,
-                        offset as i64,
-                        instance_count
-                    ),
-                }
-            }
+            RawRenderingContext::WebGl1(ref _gl) => match &self.extensions.angle_instanced_arrays {
+                None => panic!("Draw elements instanced is not supported"),
+                Some(extension) => extension.draw_elements_instanced_angle(
+                    mode as u32,
+                    count,
+                    element_type as u32,
+                    offset as i64,
+                    instance_count,
+                ),
+            },
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.draw_elements_instanced(
                     mode as u32,
@@ -1133,7 +1186,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn is_enabled(&self, parameter: u32) -> bool  {
+    unsafe fn is_enabled(&self, parameter: u32) -> bool {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.is_enabled(parameter),
             RawRenderingContext::WebGl2(ref gl) => gl.is_enabled(parameter),
@@ -1465,7 +1518,13 @@ impl HasContext for Context {
                 panic!("Renderbuffer storage multisample is not supported");
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.renderbuffer_storage_multisample(target, samples, internal_format, width, height);
+                gl.renderbuffer_storage_multisample(
+                    target,
+                    samples,
+                    internal_format,
+                    width,
+                    height,
+                );
             }
         }
     }
@@ -1548,95 +1607,84 @@ impl HasContext for Context {
         macro_rules! apply_tex_image2_d {
             ($pixels: ident) => {
                 match self.raw {
-                    RawRenderingContext::WebGl1(ref gl) => {
-                        gl.tex_image2_d(
-                            target,
-                            level,
-                            internal_format,
-                            width,
-                            height,
-                            border,
-                            format,
-                            ty,
-                            $pixels
-                        )
-                    }
-                    RawRenderingContext::WebGl2(ref gl) => {
-                        gl.tex_image2_d(
-                            target,
-                            level,
-                            internal_format,
-                            width,
-                            height,
-                            border,
-                            format,
-                            ty,
-                            $pixels
-                        )
-                    }
+                    RawRenderingContext::WebGl1(ref gl) => gl.tex_image2_d(
+                        target,
+                        level,
+                        internal_format,
+                        width,
+                        height,
+                        border,
+                        format,
+                        ty,
+                        $pixels,
+                    ),
+                    RawRenderingContext::WebGl2(ref gl) => gl.tex_image2_d(
+                        target,
+                        level,
+                        internal_format,
+                        width,
+                        height,
+                        border,
+                        format,
+                        ty,
+                        $pixels,
+                    ),
                 }
-            }
+            };
         }
 
         match ty {
             BYTE => {
-                let pixels = pixels.map(|bytes| from_raw_parts(
-                    bytes.as_ptr() as *const i8,
-                    bytes.len() / size_of::<i8>(),
-                ));
+                let pixels = pixels.map(|bytes| {
+                    from_raw_parts(bytes.as_ptr() as *const i8, bytes.len() / size_of::<i8>())
+                });
                 apply_tex_image2_d!(pixels)
-            },
+            }
 
             SHORT => {
-                let pixels = pixels.map(|bytes| from_raw_parts(
-                    bytes.as_ptr() as *const i16,
-                    bytes.len() / size_of::<i16>(),
-                ));
+                let pixels = pixels.map(|bytes| {
+                    from_raw_parts(bytes.as_ptr() as *const i16, bytes.len() / size_of::<i16>())
+                });
                 apply_tex_image2_d!(pixels)
-            },
+            }
 
-            UNSIGNED_SHORT |
-            UNSIGNED_SHORT_5_6_5 |
-            UNSIGNED_SHORT_5_5_5_1 |
-            UNSIGNED_SHORT_4_4_4_4 |
-            HALF_FLOAT => {
-                let pixels = pixels.map(|bytes| from_raw_parts(
-                    bytes.as_ptr() as *const u16,
-                    bytes.len() / size_of::<u16>(),
-                ));
+            UNSIGNED_SHORT
+            | UNSIGNED_SHORT_5_6_5
+            | UNSIGNED_SHORT_5_5_5_1
+            | UNSIGNED_SHORT_4_4_4_4
+            | HALF_FLOAT => {
+                let pixels = pixels.map(|bytes| {
+                    from_raw_parts(bytes.as_ptr() as *const u16, bytes.len() / size_of::<u16>())
+                });
                 apply_tex_image2_d!(pixels)
-            },
+            }
 
             INT => {
-                let pixels = pixels.map(|bytes| from_raw_parts(
-                    bytes.as_ptr() as *const i32,
-                    bytes.len() / size_of::<i32>(),
-                ));
+                let pixels = pixels.map(|bytes| {
+                    from_raw_parts(bytes.as_ptr() as *const i32, bytes.len() / size_of::<i32>())
+                });
                 apply_tex_image2_d!(pixels)
-            },
+            }
 
-            UNSIGNED_INT |
-            UNSIGNED_INT_5_9_9_9_REV |
-            UNSIGNED_INT_2_10_10_10_REV |
-            UNSIGNED_INT_10F_11F_11F_REV |
-            UNSIGNED_INT_24_8 => {
-                let pixels = pixels.map(|bytes| from_raw_parts(
-                    bytes.as_ptr() as *const u32,
-                    bytes.len() / size_of::<u32>(),
-                ));
+            UNSIGNED_INT
+            | UNSIGNED_INT_5_9_9_9_REV
+            | UNSIGNED_INT_2_10_10_10_REV
+            | UNSIGNED_INT_10F_11F_11F_REV
+            | UNSIGNED_INT_24_8 => {
+                let pixels = pixels.map(|bytes| {
+                    from_raw_parts(bytes.as_ptr() as *const u32, bytes.len() / size_of::<u32>())
+                });
                 apply_tex_image2_d!(pixels)
-            },
+            }
 
             FLOAT => {
-                let pixels = pixels.map(|bytes| from_raw_parts(
-                    bytes.as_ptr() as *const f32,
-                    bytes.len() / size_of::<f32>(),
-                ));
+                let pixels = pixels.map(|bytes| {
+                    from_raw_parts(bytes.as_ptr() as *const f32, bytes.len() / size_of::<f32>())
+                });
                 apply_tex_image2_d!(pixels)
-            },
+            }
 
-            UNSIGNED_BYTE |
-            _ => apply_tex_image2_d!(pixels)
+            UNSIGNED_BYTE | _ => apply_tex_image2_d!(pixels),
         }
     }
 
@@ -1655,30 +1703,22 @@ impl HasContext for Context {
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("3d textures are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_image3_d_1(
-                    target,
-                    level,
-                    internal_format,
-                    width,
-                    height,
-                    depth,
-                    border,
-                    format,
-                    ty,
-                    pixels,
-                )
-            }
+            RawRenderingContext::WebGl2(ref gl) => gl.tex_image3_d_1(
+                target,
+                level,
+                internal_format,
+                width,
+                height,
+                depth,
+                border,
+                format,
+                ty,
+                pixels,
+            ),
         }
     }
 
-    unsafe fn tex_storage_1d(
-        &self,
-        target: u32,
-        levels: i32,
-        internal_format: u32,
-        width: i32,
-    ) {
+    unsafe fn tex_storage_1d(&self, target: u32, levels: i32, internal_format: u32, width: i32) {
         panic!("Tex storage 1D is not supported");
     }
 
@@ -1767,12 +1807,8 @@ impl HasContext for Context {
         v: &[i32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.uniform1iv(uniform_location, &v[..])
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.uniform1iv_1(uniform_location, &v[..])
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform1iv(uniform_location, &v[..]),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform1iv_1(uniform_location, &v[..]),
         }
     }
 
@@ -1782,12 +1818,8 @@ impl HasContext for Context {
         v: &[i32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.uniform2iv(uniform_location, &v[..])
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.uniform2iv_1(uniform_location, &v[..])
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform2iv(uniform_location, &v[..]),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform2iv_1(uniform_location, &v[..]),
         }
     }
 
@@ -1797,12 +1829,8 @@ impl HasContext for Context {
         v: &[i32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.uniform3iv(uniform_location, &v[..])
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.uniform3iv_1(uniform_location, &v[..])
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform3iv(uniform_location, &v[..]),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform3iv_1(uniform_location, &v[..]),
         }
     }
 
@@ -1812,12 +1840,8 @@ impl HasContext for Context {
         v: &[i32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.uniform4iv(uniform_location, &v[..])
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.uniform4iv_1(uniform_location, &v[..])
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform4iv(uniform_location, &v[..]),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform4iv_1(uniform_location, &v[..]),
         }
     }
 
@@ -1979,12 +2003,8 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.uniform1fv(uniform_location, &v[..])
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.uniform1fv_1(uniform_location, &v[..])
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform1fv(uniform_location, &v[..]),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform1fv_1(uniform_location, &v[..]),
         }
     }
 
@@ -1994,12 +2014,8 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.uniform2fv(uniform_location, &v[..])
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.uniform2fv_1(uniform_location, &v[..])
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform2fv(uniform_location, &v[..]),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform2fv_1(uniform_location, &v[..]),
         }
     }
 
@@ -2009,12 +2025,8 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.uniform3fv(uniform_location, &v[..])
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.uniform3fv_1(uniform_location, &v[..])
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform3fv(uniform_location, &v[..]),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform3fv_1(uniform_location, &v[..]),
         }
     }
 
@@ -2024,12 +2036,8 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.uniform4fv(uniform_location, &v[..])
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.uniform4fv_1(uniform_location, &v[..])
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.uniform4fv(uniform_location, &v[..]),
+            RawRenderingContext::WebGl2(ref gl) => gl.uniform4fv_1(uniform_location, &v[..]),
         }
     }
 
@@ -2153,10 +2161,10 @@ impl HasContext for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Invalidate framebuffer is not supported");
-            },
+            }
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.invalidate_framebuffer(target, attachments);
-            },
+            }
         }
     }
 
@@ -2256,16 +2264,12 @@ impl HasContext for Context {
         pixels: Option<&[u8]>,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
-                gl.tex_sub_image2_d(
-                    target, level, x_offset, y_offset, width, height, format, ty, pixels,
-                )
-            }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_sub_image2_d_3(
-                    target, level, x_offset, y_offset, width, height, format, ty, pixels,
-                )
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.tex_sub_image2_d(
+                target, level, x_offset, y_offset, width, height, format, ty, pixels,
+            ),
+            RawRenderingContext::WebGl2(ref gl) => gl.tex_sub_image2_d_3(
+                target, level, x_offset, y_offset, width, height, format, ty, pixels,
+            ),
         }
     }
 
@@ -2285,19 +2289,17 @@ impl HasContext for Context {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Sub image 2D pixel buffer offset is not supported")
             }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_sub_image2_d_2(
-                    target,
-                    level,
-                    x_offset,
-                    y_offset,
-                    width,
-                    height,
-                    format,
-                    ty,
-                    pixel_buffer_offset as i64,
-                )
-            }
+            RawRenderingContext::WebGl2(ref gl) => gl.tex_sub_image2_d_2(
+                target,
+                level,
+                x_offset,
+                y_offset,
+                width,
+                height,
+                format,
+                ty,
+                pixel_buffer_offset as i64,
+            ),
         }
     }
 
@@ -2317,12 +2319,10 @@ impl HasContext for Context {
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Sub image 3D is not supported"),
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_sub_image3_d_1(
-                    target, level, x_offset, y_offset, z_offset, width, height, depth, format, ty,
-                    pixels,
-                )
-            }
+            RawRenderingContext::WebGl2(ref gl) => gl.tex_sub_image3_d_1(
+                target, level, x_offset, y_offset, z_offset, width, height, depth, format, ty,
+                pixels,
+            ),
         }
     }
 
@@ -2344,21 +2344,19 @@ impl HasContext for Context {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Sub image 3D pixel buffer offset is not supported")
             }
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.tex_sub_image3_d(
-                    target,
-                    level,
-                    x_offset,
-                    y_offset,
-                    z_offset,
-                    width,
-                    height,
-                    depth,
-                    format,
-                    ty,
-                    pixel_buffer_offset as i64,
-                )
-            }
+            RawRenderingContext::WebGl2(ref gl) => gl.tex_sub_image3_d(
+                target,
+                level,
+                x_offset,
+                y_offset,
+                z_offset,
+                width,
+                height,
+                depth,
+                format,
+                ty,
+                pixel_buffer_offset as i64,
+            ),
         }
     }
 
@@ -2397,12 +2395,10 @@ impl HasContext for Context {
 
     unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                match &self.extensions.angle_instanced_arrays {
-                    None => panic!("Vertex attrib divisor is not supported"),
-                    Some(extension) => extension.vertex_attrib_divisor_angle(index, divisor),
-                }
-            }
+            RawRenderingContext::WebGl1(ref _gl) => match &self.extensions.angle_instanced_arrays {
+                None => panic!("Vertex attrib divisor is not supported"),
+                Some(extension) => extension.vertex_attrib_divisor_angle(index, divisor),
+            },
             RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_divisor(index, divisor),
         }
     }
@@ -2417,10 +2413,12 @@ impl HasContext for Context {
         offset: i32,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl
-                .vertex_attrib_pointer(index, size, data_type, normalized, stride, offset as i64),
-            RawRenderingContext::WebGl2(ref gl) => gl
-                .vertex_attrib_pointer(index, size, data_type, normalized, stride, offset as i64),
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.vertex_attrib_pointer(index, size, data_type, normalized, stride, offset as i64)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.vertex_attrib_pointer(index, size, data_type, normalized, stride, offset as i64)
+            }
         }
     }
 
@@ -2727,15 +2725,24 @@ impl HasContext for Context {
         height: i32,
         format: u32,
         gltype: u32,
-        data: &mut [u8]
+        data: &mut [u8],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8])),
-            RawRenderingContext::WebGl2(ref gl) => gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8])),
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8]))
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8]))
+            }
         }
     }
 
-    unsafe fn get_uniform_i32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [i32]) {
+    unsafe fn get_uniform_i32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [i32],
+    ) {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         let value = match self.raw {
@@ -2752,7 +2759,12 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn get_uniform_f32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [f32]) {
+    unsafe fn get_uniform_f32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [f32],
+    ) {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         let value = match self.raw {
@@ -2790,7 +2802,8 @@ impl HasContext for Context {
         let raw_query = queries.1.get_unchecked(query);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.get_query_parameter(raw_query, parameter)
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .get_query_parameter(raw_query, parameter)
                 .try_into()
                 .map(|v: f64| v as u32)
                 .unwrap_or(0),

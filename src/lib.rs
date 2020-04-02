@@ -19,7 +19,10 @@ mod web;
 mod web;
 #[cfg(all(feature = "web-sys", feature = "stdweb"))]
 compile_error!("Please enable only one of the web_sys and stdweb features");
-#[cfg(all(target_arch = "wasm32", not(any(feature = "web-sys", feature = "stdweb"))))]
+#[cfg(all(
+    target_arch = "wasm32",
+    not(any(feature = "web-sys", feature = "stdweb"))
+))]
 compile_error!("Please enable one of web-sys or stdweb to work on web");
 #[cfg(target_arch = "wasm32")]
 pub use web::*;
@@ -475,13 +478,7 @@ pub trait HasContext {
         pixels: Option<&[u8]>,
     );
 
-    unsafe fn tex_storage_1d(
-        &self,
-        target: u32,
-        levels: i32,
-        internal_format: u32,
-        width: i32,
-    );
+    unsafe fn tex_storage_1d(&self, target: u32, levels: i32, internal_format: u32, width: i32);
 
     unsafe fn tex_storage_2d(
         &self,
@@ -502,15 +499,31 @@ pub trait HasContext {
         depth: i32,
     );
 
-    unsafe fn get_uniform_i32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [i32]);
+    unsafe fn get_uniform_i32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [i32],
+    );
 
-    unsafe fn get_uniform_f32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [f32]);
+    unsafe fn get_uniform_f32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [f32],
+    );
 
     unsafe fn uniform_1_i32(&self, location: Option<&Self::UniformLocation>, x: i32);
 
     unsafe fn uniform_2_i32(&self, location: Option<&Self::UniformLocation>, x: i32, y: i32);
 
-    unsafe fn uniform_3_i32(&self, location: Option<&Self::UniformLocation>, x: i32, y: i32, z: i32);
+    unsafe fn uniform_3_i32(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        x: i32,
+        y: i32,
+        z: i32,
+    );
 
     unsafe fn uniform_4_i32(
         &self,
@@ -533,7 +546,13 @@ pub trait HasContext {
 
     unsafe fn uniform_2_u32(&self, location: Option<&Self::UniformLocation>, x: u32, y: u32);
 
-    unsafe fn uniform_3_u32(&self, location: Option<&Self::UniformLocation>, x: u32, y: u32, z: u32);
+    unsafe fn uniform_3_u32(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+    );
 
     unsafe fn uniform_4_u32(
         &self,
@@ -556,7 +575,13 @@ pub trait HasContext {
 
     unsafe fn uniform_2_f32(&self, location: Option<&Self::UniformLocation>, x: f32, y: f32);
 
-    unsafe fn uniform_3_f32(&self, location: Option<&Self::UniformLocation>, x: f32, y: f32, z: f32);
+    unsafe fn uniform_3_f32(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        x: f32,
+        y: f32,
+        z: f32,
+    );
 
     unsafe fn uniform_4_f32(
         &self,
@@ -858,7 +883,16 @@ pub trait HasContext {
 
     unsafe fn read_buffer(&self, src: u32);
 
-    unsafe fn read_pixels(&self, x: i32, y: i32, width: i32, height: i32, format: u32, gltype: u32, data: &mut [u8]);
+    unsafe fn read_pixels(
+        &self,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        gltype: u32,
+        data: &mut [u8],
+    );
 
     unsafe fn begin_query(&self, target: u32, query: Self::Query);
 
@@ -1941,9 +1975,9 @@ pub const LOW_FLOAT: u32 = 0x8DF0;
 
 pub const LOW_INT: u32 = 0x8DF3;
 
-pub const LUMINANCE : u32 = 0x1909;
+pub const LUMINANCE: u32 = 0x1909;
 
-pub const LUMINANCE_ALPHA : u32 = 0x190A;
+pub const LUMINANCE_ALPHA: u32 = 0x190A;
 
 pub const MAJOR_VERSION: u32 = 0x821B;
 

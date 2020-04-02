@@ -894,7 +894,8 @@ impl HasContext for Context {
     unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> Option<u32> {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        let attrib_location = gl.GetAttribLocation(program, name.as_ptr() as *const native_gl::types::GLchar);
+        let attrib_location =
+            gl.GetAttribLocation(program, name.as_ptr() as *const native_gl::types::GLchar);
         if attrib_location < 0 {
             None
         } else {
@@ -1096,13 +1097,7 @@ impl HasContext for Context {
         );
     }
 
-    unsafe fn tex_storage_1d(
-        &self,
-        target: u32,
-        levels: i32,
-        internal_format: u32,
-        width: i32,
-    ) {
+    unsafe fn tex_storage_1d(&self, target: u32, levels: i32, internal_format: u32, width: i32) {
         let gl = &self.raw;
         gl.TexStorage1D(target, levels, internal_format, width);
     }
@@ -1132,12 +1127,22 @@ impl HasContext for Context {
         gl.TexStorage3D(target, levels, internal_format, width, height, depth);
     }
 
-    unsafe fn get_uniform_i32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [i32]) {
+    unsafe fn get_uniform_i32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [i32],
+    ) {
         let gl = &self.raw;
         gl.GetUniformiv(program as u32, *location as i32, v.as_mut_ptr() as *mut i32)
     }
 
-    unsafe fn get_uniform_f32(&self, program: Self::Program, location: &Self::UniformLocation, v: &mut [f32]) {
+    unsafe fn get_uniform_f32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [f32],
+    ) {
         let gl = &self.raw;
         gl.GetUniformfv(program as u32, *location as i32, v.as_mut_ptr() as *mut f32)
     }
@@ -1183,44 +1188,28 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn uniform_1_i32_slice(
-        &self,
-        location: Option<&Self::UniformLocation>,
-        v: &[i32],
-    ) {
+    unsafe fn uniform_1_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
             gl.Uniform1iv(*loc as i32, v.len() as i32, v.as_ptr());
         }
     }
 
-    unsafe fn uniform_2_i32_slice(
-        &self,
-        location: Option<&Self::UniformLocation>,
-        v: &[i32],
-    ) {
+    unsafe fn uniform_2_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
             gl.Uniform2iv(*loc as i32, v.len() as i32 / 2, v.as_ptr());
         }
     }
 
-    unsafe fn uniform_3_i32_slice(
-        &self,
-        location: Option<&Self::UniformLocation>,
-        v: &[i32],
-    ) {
+    unsafe fn uniform_3_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
             gl.Uniform3iv(*loc as i32, v.len() as i32 / 3, v.as_ptr());
         }
     }
 
-    unsafe fn uniform_4_i32_slice(
-        &self,
-        location: Option<&Self::UniformLocation>,
-        v: &[i32],
-    ) {
+    unsafe fn uniform_4_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
             gl.Uniform4iv(*loc as i32, v.len() as i32 / 4, v.as_ptr());
@@ -1268,44 +1257,28 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn uniform_1_u32_slice(
-        &self,
-        location: Option<&Self::UniformLocation>,
-        v: &[u32],
-    ) {
+    unsafe fn uniform_1_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
             gl.Uniform1uiv(*loc as i32, v.len() as i32, v.as_ptr());
         }
     }
 
-    unsafe fn uniform_2_u32_slice(
-        &self,
-        location: Option<&Self::UniformLocation>,
-        v: &[u32],
-    ) {
+    unsafe fn uniform_2_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
             gl.Uniform2uiv(*loc as i32, v.len() as i32 / 2, v.as_ptr());
         }
     }
 
-    unsafe fn uniform_3_u32_slice(
-        &self,
-        location: Option<&Self::UniformLocation>,
-        v: &[u32],
-    ) {
+    unsafe fn uniform_3_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
             gl.Uniform3uiv(*loc as i32, v.len() as i32 / 3, v.as_ptr());
         }
     }
 
-    unsafe fn uniform_4_u32_slice(
-        &self,
-        location: Option<&Self::UniformLocation>,
-        v: &[u32],
-    ) {
+    unsafe fn uniform_4_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
             gl.Uniform4uiv(*loc as i32, v.len() as i32 / 4, v.as_ptr());
@@ -1413,7 +1386,12 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.UniformMatrix4fv(*loc as i32, v.len() as i32 / 16, transpose as u8, v.as_ptr());
+            gl.UniformMatrix4fv(
+                *loc as i32,
+                v.len() as i32 / 16,
+                transpose as u8,
+                v.as_ptr(),
+            );
         }
     }
 
@@ -2114,10 +2092,18 @@ impl HasContext for Context {
         height: i32,
         format: u32,
         gltype: u32,
-        data: &mut [u8]
+        data: &mut [u8],
     ) {
         let gl = &self.raw;
-        gl.ReadPixels(x, y, width, height, format, gltype, data.as_mut_ptr() as *mut std::ffi::c_void);
+        gl.ReadPixels(
+            x,
+            y,
+            width,
+            height,
+            format,
+            gltype,
+            data.as_mut_ptr() as *mut std::ffi::c_void,
+        );
     }
 
     unsafe fn begin_query(&self, target: u32, query: Self::Query) {

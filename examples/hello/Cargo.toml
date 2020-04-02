@@ -7,8 +7,8 @@ edition = "2018"
 glow = { path = "../../", default-features=false }
 
 [target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
-glutin = { version = "0.22.0", optional = true }
-sdl2 = { version = "0.32", optional = true }
+glutin = { version = "0.24", optional = true }
+sdl2 = { version = "0.33", optional = true }
 
 [features]
 default = ["web-sys"]
@@ -20,5 +20,5 @@ window-glutin = ["glutin", "glow/glutin"]
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 web_sys = { version = "0.3", package = "web-sys", features=["console"], optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
-std_web  = { version = "0.4.18", package = "stdweb", optional = true }
+std_web  = { version = "0.4", package = "stdweb", optional = true }
 webgl_stdweb = { version = "0.3", optional = true }

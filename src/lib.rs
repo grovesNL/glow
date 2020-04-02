@@ -2,6 +2,8 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(clippy::unreadable_literal)]
+#![allow(clippy::missing_safety_doc)]
+#![allow(clippy::pedantic)] // For anyone using pedantic and a source dep, this is needed
 
 use core::fmt::Debug;
 use core::hash::Hash;

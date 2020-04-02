@@ -4,6 +4,7 @@ use std::collections::HashSet;
 use std::ffi::CString;
 
 mod native_gl {
+    #![allow(clippy::all, clippy::pedantic)]
     include!(concat!(env!("OUT_DIR"), "/opengl_bindings.rs"));
 }
 
@@ -1912,7 +1913,7 @@ impl HasContext for Context {
     {
         let gl = &self.raw;
         gl.DebugMessageCallback(
-            raw_debug_message_callback::<F>,
+            Some(raw_debug_message_callback::<F>),
             &mut callback as *mut _ as *mut std::ffi::c_void,
         );
     }

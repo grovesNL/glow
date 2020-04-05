@@ -17,6 +17,13 @@ matrix:
     - rust: nightly
   fast_finish: true
 script:
+  - |
+    if [[ $TRAVIS_RUST_VERSION == *stable* ]]
+    then
+      rustup component add rustfmt
+      cargo fmt --version
+      cargo fmt -- --check || (echo "Please reformat your code with 'cargo fmt' (version $(cargo fmt --version))"; false)
+    fi
   - sudo apt-get -qq update && sudo apt-get -qq install libsdl2-dev # SDL
   - rustup target add wasm32-unknown-unknown
   - cargo install -f cargo-web

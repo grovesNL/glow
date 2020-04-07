@@ -40,6 +40,7 @@ pub type Framebuffer = <Context as HasContext>::Framebuffer;
 pub type Renderbuffer = <Context as HasContext>::Renderbuffer;
 pub type Query = <Context as HasContext>::Query;
 pub type UniformLocation = <Context as HasContext>::UniformLocation;
+pub type TransformFeedback = <Context as HasContext>::TransformFeedback;
 
 pub struct ActiveUniform {
     pub size: i32,
@@ -73,6 +74,7 @@ pub trait HasContext {
     type Framebuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Renderbuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Query: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type TransformFeedback: Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type UniformLocation: Clone + Debug;
 
     fn supports_debug(&self) -> bool;
@@ -900,7 +902,25 @@ pub trait HasContext {
 
     unsafe fn end_query(&self, target: u32);
 
+    unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback);
+
+    unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String>;
+
     unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32;
+
+    unsafe fn bind_transform_feedback(&self, target: u32, transform_feedback: Option<Self::TransformFeedback>);
+
+    unsafe fn begin_transform_feedback(&self, primitive_mode: u32);
+
+    unsafe fn end_transform_feedback(&self);
+
+    unsafe fn pause_transform_feedback(&self);
+
+    unsafe fn resume_transform_feedback(&self);
+
+    unsafe fn transform_feedback_varyings(&self, program: Self::Program, varyings: &[&str], buffer_mode: u32);
+
+    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<(i32, u32, String)>;
 }
 
 pub trait HasRenderLoop {

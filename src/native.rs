@@ -2164,10 +2164,19 @@ impl HasContext for Context {
 
     unsafe fn transform_feedback_varyings(&self, program: Self::Program, varyings: &[&str], buffer_mode: u32) {
         let gl = &self.raw;
+
+        let strings: Vec<CString> = varyings
+            .iter()
+            .copied()
+            .map(CString::new)
+            .collect::<Result<_, _>>()
+            .unwrap();
+        let varyings: Vec<_> = strings.iter().map(|c_str| c_str.as_ptr()).collect();
+
         gl.TransformFeedbackVaryings(
             program,
             varyings.len() as i32,
-            varyings.as_ptr() as *const *const native_gl::types::GLchar,
+            varyings.as_ptr(),
             buffer_mode,
         );
     }
@@ -2175,20 +2184,25 @@ impl HasContext for Context {
     unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<(i32, u32, String)> {
         let gl = &self.raw;
 
-        let buf_size: i32 = 256;
+        const buf_size: usize = 256;
+        const bytes: [u8; buf_size] = [0; buf_size];
+
         let size: i32 = 0;
         let ty: u32 = 0;
-        let mut name = String::with_capacity(buf_size as usize);
+        let c_name = CString::new(bytes.to_vec()).unwrap();
+        let c_name_buf = c_name.into_raw();
 
         gl.GetTransformFeedbackVarying(
             program,
             index,
-            buf_size,
+            buf_size as i32,
             std::ptr::null_mut(),
             size as *mut i32,
             ty as *mut u32,
-            name.as_mut_ptr() as *mut i8
+            c_name_buf
         );
+
+        let name = CString::from_raw(c_name_buf).into_string().unwrap();
 
         Some((size, ty, name))
     }

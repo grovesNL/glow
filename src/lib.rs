@@ -74,7 +74,7 @@ pub trait HasContext {
     type Framebuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Renderbuffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Query: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
-    type TransformFeedback: Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
+    type TransformFeedback: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type UniformLocation: Clone + Debug;
 
     fn supports_debug(&self) -> bool;
@@ -902,11 +902,11 @@ pub trait HasContext {
 
     unsafe fn end_query(&self, target: u32);
 
+    unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32;
+
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback);
 
     unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String>;
-
-    unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32;
 
     unsafe fn bind_transform_feedback(&self, target: u32, transform_feedback: Option<Self::TransformFeedback>);
 

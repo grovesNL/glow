@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::{
     HtmlImageElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer,
     WebGlProgram, WebGlQuery, WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader,
-    WebGlSync, WebGlTexture, WebGlUniformLocation, WebGlVertexArrayObject,
+    WebGlSync, WebGlTexture, WebGlUniformLocation, WebGlVertexArrayObject, WebGlTransformFeedback
 };
 
 #[derive(Debug)]
@@ -79,6 +79,7 @@ pub struct Context {
     framebuffers: TrackedResource<WebFramebufferKey, WebGlFramebuffer>,
     renderbuffers: TrackedResource<WebRenderbufferKey, WebGlRenderbuffer>,
     queries: TrackedResource<WebQueryKey, WebGlQuery>,
+    transform_feedbacks: TrackedResource<WebTransformFeedbackKey, WebGlTransformFeedback>,
 }
 
 // bindgen's gl context don't share an interface so a macro is used to deduplicate a bunch of code here
@@ -252,6 +253,7 @@ impl Context {
             framebuffers: tracked_resource(),
             renderbuffers: tracked_resource(),
             queries: tracked_resource(),
+            transform_feedbacks: tracked_resource(),
         }
     }
 
@@ -270,6 +272,7 @@ impl Context {
             framebuffers: tracked_resource(),
             renderbuffers: tracked_resource(),
             queries: tracked_resource(),
+            transform_feedbacks: tracked_resource(),
         }
     }
 
@@ -358,6 +361,7 @@ new_key_type! { pub struct WebFenceKey; }
 new_key_type! { pub struct WebFramebufferKey; }
 new_key_type! { pub struct WebRenderbufferKey; }
 new_key_type! { pub struct WebQueryKey; }
+new_key_type! { pub struct WebTransformFeedbackKey; }
 
 impl HasContext for Context {
     type Shader = WebShaderKey;
@@ -371,6 +375,7 @@ impl HasContext for Context {
     type Renderbuffer = WebRenderbufferKey;
     type Query = WebQueryKey;
     type UniformLocation = WebGlUniformLocation;
+    type TransformFeedback = WebTransformFeedbackKey;
 
     fn supports_debug(&self) -> bool {
         false
@@ -1670,14 +1675,14 @@ impl HasContext for Context {
 
     unsafe fn tex_image_1d(
         &self,
-        target: u32,
-        level: i32,
-        internal_format: i32,
-        width: i32,
-        border: i32,
-        format: u32,
-        ty: u32,
-        pixels: Option<&[u8]>,
+        _target: u32,
+        _level: i32,
+        _internal_format: i32,
+        _width: i32,
+        _border: i32,
+        _format: u32,
+        _ty: u32,
+        _pixels: Option<&[u8]>,
     ) {
         panic!("Tex image 1D is not supported");
     }
@@ -1825,7 +1830,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn tex_storage_1d(&self, target: u32, levels: i32, internal_format: u32, width: i32) {
+    unsafe fn tex_storage_1d(&self, _target: u32, _levels: i32, _internal_format: u32, _width: i32) {
         panic!("Tex storage 1D is not supported");
     }
 
@@ -2959,6 +2964,101 @@ impl HasContext for Context {
                 .as_f64()
                 .map(|v| v as u32)
                 .unwrap_or(0),
+        }
+    }
+
+    unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String> {
+        let raw_transform_feedback = match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.create_transform_feedback(),
+        };
+
+        match raw_transform_feedback {
+            Some(t) => {
+                let key = self.transform_feedbacks.borrow_mut().0.insert(());
+                self.transform_feedbacks.borrow_mut().1.insert(key, t);
+                Ok(key)
+            }
+            None => Err(String::from("Unable to create TransformFeedback object")),
+        }
+    }
+
+    unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback) {
+        let mut transform_feedbacks = self.transform_feedbacks.borrow_mut();
+        match transform_feedbacks.1.remove(transform_feedback) {
+            Some(ref t) => match self.raw {
+                RawRenderingContext::WebGl1(ref _gl) =>  panic!("TransformFeedback objects are not supported"),
+                RawRenderingContext::WebGl2(ref gl) => gl.delete_transform_feedback(Some(t)),
+            },
+            None => {}
+        }
+    }
+
+    unsafe fn bind_transform_feedback(&self, target: u32, transform_feedback: Option<Self::TransformFeedback>) {
+        let transform_feedbacks = self.transform_feedbacks.borrow();
+        let raw_transform_feedback = transform_feedback.map(|tf| transform_feedbacks.1.get_unchecked(tf));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_transform_feedback(target, raw_transform_feedback)
+        }
+    }
+
+    unsafe fn begin_transform_feedback(&self, primitive_mode: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.begin_transform_feedback(primitive_mode)
+        }
+    }
+
+    unsafe fn end_transform_feedback(&self) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.end_transform_feedback()
+        }
+    }
+
+    unsafe fn pause_transform_feedback(&self) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.pause_transform_feedback()
+        }
+    }
+
+    unsafe fn resume_transform_feedback(&self) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.resume_transform_feedback()
+        }
+    }
+
+    unsafe fn transform_feedback_varyings(&self, program: Self::Program, varyings: &[&str], buffer_mode: u32) {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                let js_varyings = Array::new();
+                for &v in varyings {
+                    js_varyings.push(&v.into());
+                }
+                gl.transform_feedback_varyings(raw_program, &js_varyings, buffer_mode);
+            }
+        }
+    }
+
+    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<ActiveTransformFeedback> {
+        let programs = self.programs.borrow();
+        let raw_program = programs.1.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_transform_feedback_varying(raw_program, index)
+                    .map(|info| ActiveTransformFeedback {
+                        size: info.size(),
+                        tftype: info.type_(),
+                        name: info.name(),
+                    })
+            }
         }
     }
 }

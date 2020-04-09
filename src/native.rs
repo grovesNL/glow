@@ -73,6 +73,7 @@ impl HasContext for Context {
     type Renderbuffer = native_gl::types::GLuint;
     type Query = native_gl::types::GLuint;
     type UniformLocation = native_gl::types::GLuint;
+    type TransformFeedback = native_gl::types::GLuint;
 
     fn supports_debug(&self) -> bool {
         self.extensions.contains("GL_KHR_debug")
@@ -2122,6 +2123,88 @@ impl HasContext for Context {
         let mut value = 0;
         gl.GetQueryObjectuiv(query, parameter, &mut value);
         value
+    }
+
+    unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String> {
+        let gl = &self.raw;
+        let mut name = 0;
+        gl.GenTransformFeedbacks(1, &mut name);
+        Ok(name)
+    }
+
+    unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback) {
+        let gl = &self.raw;
+        gl.DeleteTransformFeedbacks(1, &transform_feedback);
+    }
+
+    unsafe fn bind_transform_feedback(&self, target: u32, transform_feedback: Option<Self::TransformFeedback>) {
+        let gl = &self.raw;
+        gl.BindTransformFeedback(target, transform_feedback.unwrap_or(0));
+    }
+
+    unsafe fn begin_transform_feedback(&self, primitive_mode: u32) {
+        let gl = &self.raw;
+        gl.BeginTransformFeedback(primitive_mode);
+    }
+
+    unsafe fn end_transform_feedback(&self) {
+        let gl = &self.raw;
+        gl.EndTransformFeedback();
+    }
+
+    unsafe fn pause_transform_feedback(&self) {
+        let gl = &self.raw;
+        gl.PauseTransformFeedback();
+    }
+
+    unsafe fn resume_transform_feedback(&self) {
+        let gl = &self.raw;
+        gl.ResumeTransformFeedback();
+    }
+
+    unsafe fn transform_feedback_varyings(&self, program: Self::Program, varyings: &[&str], buffer_mode: u32) {
+        let gl = &self.raw;
+
+        let strings: Vec<CString> = varyings
+            .iter()
+            .copied()
+            .map(CString::new)
+            .collect::<Result<_, _>>()
+            .unwrap();
+        let varyings: Vec<_> = strings.iter().map(|c_str| c_str.as_ptr()).collect();
+
+        gl.TransformFeedbackVaryings(
+            program,
+            varyings.len() as i32,
+            varyings.as_ptr(),
+            buffer_mode,
+        );
+    }
+
+    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<ActiveTransformFeedback> {
+        let gl = &self.raw;
+
+        const buf_size: usize = 256;
+        const bytes: [u8; buf_size] = [0; buf_size];
+
+        let size: i32 = 0;
+        let tftype: u32 = 0;
+        let c_name = CString::new(bytes.to_vec()).unwrap();
+        let c_name_buf = c_name.into_raw();
+
+        gl.GetTransformFeedbackVarying(
+            program,
+            index,
+            buf_size as i32,
+            std::ptr::null_mut(),
+            size as *mut i32,
+            tftype as *mut u32,
+            c_name_buf
+        );
+
+        let name = CString::from_raw(c_name_buf).into_string().unwrap();
+
+        Some(ActiveTransformFeedback { size, tftype, name })
     }
 }
 

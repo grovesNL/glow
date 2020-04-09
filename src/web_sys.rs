@@ -3046,14 +3046,18 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<(i32, u32, String)> {
+    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<ActiveTransformFeedback> {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.get_transform_feedback_varying(raw_program, index)
-                    .map(|info| (info.size(), info.type_(), info.name()))
+                    .map(|info| ActiveTransformFeedback {
+                        size: info.size(),
+                        tftype: info.type_(),
+                        name: info.name(),
+                    })
             }
         }
     }

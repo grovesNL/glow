@@ -54,6 +54,12 @@ pub struct ActiveAttribute {
     pub name: String,
 }
 
+pub struct ActiveTransformFeedback {
+    pub size: i32,
+    pub tftype: u32,
+    pub name: String,
+}
+
 #[derive(Debug)]
 pub struct DebugMessageLogEntry {
     source: u32,
@@ -920,7 +926,7 @@ pub trait HasContext {
 
     unsafe fn transform_feedback_varyings(&self, program: Self::Program, varyings: &[&str], buffer_mode: u32);
 
-    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<(i32, u32, String)>;
+    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<ActiveTransformFeedback>;
 }
 
 pub trait HasRenderLoop {

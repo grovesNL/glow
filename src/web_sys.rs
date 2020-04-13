@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::{
     HtmlImageElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer,
     WebGlProgram, WebGlQuery, WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader,
-    WebGlSync, WebGlTexture, WebGlUniformLocation, WebGlVertexArrayObject, WebGlTransformFeedback
+    WebGlSync, WebGlTexture, WebGlTransformFeedback, WebGlUniformLocation, WebGlVertexArrayObject,
 };
 
 #[derive(Debug)]
@@ -481,12 +481,11 @@ impl HasContext for Context {
 
     unsafe fn delete_shader(&self, shader: Self::Shader) {
         let mut shaders = self.shaders.borrow_mut();
-        match shaders.1.remove(shader) {
-            Some(ref s) => match self.raw {
+        if let Some(ref s) = shaders.1.remove(shader) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_shader(Some(s)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_shader(Some(s)),
-            },
-            None => {}
+            }
         }
     }
 
@@ -573,12 +572,11 @@ impl HasContext for Context {
 
     unsafe fn delete_program(&self, program: Self::Program) {
         let mut programs = self.programs.borrow_mut();
-        match programs.1.remove(program) {
-            Some(ref p) => match self.raw {
+        if let Some(ref p) = programs.1.remove(program) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_program(Some(p)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_program(Some(p)),
-            },
-            None => {}
+            }
         }
     }
 
@@ -812,8 +810,8 @@ impl HasContext for Context {
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
         let mut vertex_arrays = self.vertex_arrays.borrow_mut();
-        match vertex_arrays.1.remove(vertex_array) {
-            Some(ref va) => match self.raw {
+        if let Some(ref va) = vertex_arrays.1.remove(vertex_array) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => {
                     match &self.extensions.oes_vertex_array_object {
                         Some(extension) => extension.delete_vertex_array_oes(Some(va)),
@@ -821,8 +819,7 @@ impl HasContext for Context {
                     }
                 }
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_vertex_array(Some(va)),
-            },
-            None => {}
+            }
         }
     }
 
@@ -1036,78 +1033,71 @@ impl HasContext for Context {
 
     unsafe fn delete_buffer(&self, buffer: Self::Buffer) {
         let mut buffers = self.buffers.borrow_mut();
-        match buffers.1.remove(buffer) {
-            Some(ref b) => match self.raw {
+        if let Some(ref b) = buffers.1.remove(buffer) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_buffer(Some(b)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_buffer(Some(b)),
-            },
-            None => {}
+            }
         }
     }
 
     unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer) {
         let mut framebuffers = self.framebuffers.borrow_mut();
-        match framebuffers.1.remove(framebuffer) {
-            Some(ref f) => match self.raw {
+        if let Some(ref f) = framebuffers.1.remove(framebuffer) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_framebuffer(Some(f)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_framebuffer(Some(f)),
-            },
-            None => {}
+            }
         }
     }
 
     unsafe fn delete_query(&self, query: Self::Query) {
         let mut queries = self.queries.borrow_mut();
-        match queries.1.remove(query) {
-            Some(ref r) => match self.raw {
+        if let Some(ref r) = queries.1.remove(query) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_query(Some(r)),
-            },
-            None => {}
+            }
         }
     }
 
     unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer) {
         let mut renderbuffers = self.renderbuffers.borrow_mut();
-        match renderbuffers.1.remove(renderbuffer) {
-            Some(ref r) => match self.raw {
+        if let Some(ref r) = renderbuffers.1.remove(renderbuffer) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_renderbuffer(Some(r)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_renderbuffer(Some(r)),
-            },
-            None => {}
+            }
         }
     }
 
     unsafe fn delete_sampler(&self, sampler: Self::Sampler) {
         let mut samplers = self.samplers.borrow_mut();
-        match samplers.1.remove(sampler) {
-            Some(ref s) => match self.raw {
+        if let Some(ref s) = samplers.1.remove(sampler) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => panic!("Samplers are not supported"),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_sampler(Some(s)),
-            },
-            None => {}
+            }
         }
     }
 
     unsafe fn delete_sync(&self, fence: Self::Fence) {
         let mut fences = self.fences.borrow_mut();
-        match fences.1.remove(fence) {
-            Some(ref f) => match self.raw {
+        if let Some(ref f) = fences.1.remove(fence) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => panic!("Fences are not supported"),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_sync(Some(f)),
-            },
-            None => {}
+            }
         }
     }
 
     unsafe fn delete_texture(&self, texture: Self::Texture) {
         let mut textures = self.textures.borrow_mut();
-        match textures.1.remove(texture) {
-            Some(ref t) => match self.raw {
+        if let Some(ref t) = textures.1.remove(texture) {
+            match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_texture(Some(t)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_texture(Some(t)),
-            },
-            None => {}
+            }
         }
     }
 
@@ -1466,7 +1456,7 @@ impl HasContext for Context {
         .as_string()
         // Errors will be caught by the browser or through `get_error`
         // so return a default instead
-        .unwrap_or(String::from(""))
+        .unwrap_or_else(|| String::from(""))
     }
 
     unsafe fn get_parameter_string(&self, parameter: u32) -> String {
@@ -1478,7 +1468,7 @@ impl HasContext for Context {
         .as_string()
         // Errors will be caught by the browser or through `get_error`
         // so return a default instead
-        .unwrap_or(String::from(""))
+        .unwrap_or_else(|| String::from(""))
     }
 
     unsafe fn get_uniform_location(
@@ -1711,6 +1701,7 @@ impl HasContext for Context {
                 }
 
                 SHORT => {
+                    #[allow(clippy::cast_ptr_alignment)]
                     let data = from_raw_parts(
                         bytes.as_ptr() as *const i16,
                         bytes.len() / size_of::<i16>(),
@@ -1723,6 +1714,7 @@ impl HasContext for Context {
                 | UNSIGNED_SHORT_5_5_5_1
                 | UNSIGNED_SHORT_4_4_4_4
                 | HALF_FLOAT => {
+                    #[allow(clippy::cast_ptr_alignment)]
                     let data = from_raw_parts(
                         bytes.as_ptr() as *const u16,
                         bytes.len() / size_of::<u16>(),
@@ -1731,6 +1723,7 @@ impl HasContext for Context {
                 }
 
                 INT => {
+                    #[allow(clippy::cast_ptr_alignment)]
                     let data = from_raw_parts(
                         bytes.as_ptr() as *const i32,
                         bytes.len() / size_of::<i32>(),
@@ -1743,6 +1736,7 @@ impl HasContext for Context {
                 | UNSIGNED_INT_2_10_10_10_REV
                 | UNSIGNED_INT_10F_11F_11F_REV
                 | UNSIGNED_INT_24_8 => {
+                    #[allow(clippy::cast_ptr_alignment)]
                     let data = from_raw_parts(
                         bytes.as_ptr() as *const u32,
                         bytes.len() / size_of::<u32>(),
@@ -1751,6 +1745,7 @@ impl HasContext for Context {
                 }
 
                 FLOAT => {
+                    #[allow(clippy::cast_ptr_alignment)]
                     let data = from_raw_parts(
                         bytes.as_ptr() as *const f32,
                         bytes.len() / size_of::<f32>(),
@@ -1830,7 +1825,13 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn tex_storage_1d(&self, _target: u32, _levels: i32, _internal_format: u32, _width: i32) {
+    unsafe fn tex_storage_1d(
+        &self,
+        _target: u32,
+        _levels: i32,
+        _internal_format: u32,
+        _width: i32,
+    ) {
         panic!("Tex storage 1D is not supported");
     }
 
@@ -2969,7 +2970,9 @@ impl HasContext for Context {
 
     unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String> {
         let raw_transform_feedback = match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("TransformFeedback objects are not supported")
+            }
             RawRenderingContext::WebGl2(ref gl) => gl.create_transform_feedback(),
         };
 
@@ -2985,57 +2988,82 @@ impl HasContext for Context {
 
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback) {
         let mut transform_feedbacks = self.transform_feedbacks.borrow_mut();
-        match transform_feedbacks.1.remove(transform_feedback) {
-            Some(ref t) => match self.raw {
-                RawRenderingContext::WebGl1(ref _gl) =>  panic!("TransformFeedback objects are not supported"),
+        if let Some(ref t) = transform_feedbacks.1.remove(transform_feedback) {
+            match self.raw {
+                RawRenderingContext::WebGl1(ref _gl) => {
+                    panic!("TransformFeedback objects are not supported")
+                }
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_transform_feedback(Some(t)),
-            },
-            None => {}
+            }
         }
     }
 
-    unsafe fn bind_transform_feedback(&self, target: u32, transform_feedback: Option<Self::TransformFeedback>) {
+    unsafe fn bind_transform_feedback(
+        &self,
+        target: u32,
+        transform_feedback: Option<Self::TransformFeedback>,
+    ) {
         let transform_feedbacks = self.transform_feedbacks.borrow();
-        let raw_transform_feedback = transform_feedback.map(|tf| transform_feedbacks.1.get_unchecked(tf));
+        let raw_transform_feedback =
+            transform_feedback.map(|tf| transform_feedbacks.1.get_unchecked(tf));
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.bind_transform_feedback(target, raw_transform_feedback)
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("TransformFeedback objects are not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.bind_transform_feedback(target, raw_transform_feedback)
+            }
         }
     }
 
     unsafe fn begin_transform_feedback(&self, primitive_mode: u32) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.begin_transform_feedback(primitive_mode)
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("TransformFeedback objects are not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.begin_transform_feedback(primitive_mode),
         }
     }
 
     unsafe fn end_transform_feedback(&self) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.end_transform_feedback()
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("TransformFeedback objects are not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.end_transform_feedback(),
         }
     }
 
     unsafe fn pause_transform_feedback(&self) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.pause_transform_feedback()
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("TransformFeedback objects are not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.pause_transform_feedback(),
         }
     }
 
     unsafe fn resume_transform_feedback(&self) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.resume_transform_feedback()
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("TransformFeedback objects are not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.resume_transform_feedback(),
         }
     }
 
-    unsafe fn transform_feedback_varyings(&self, program: Self::Program, varyings: &[&str], buffer_mode: u32) {
+    unsafe fn transform_feedback_varyings(
+        &self,
+        program: Self::Program,
+        varyings: &[&str],
+        buffer_mode: u32,
+    ) {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("TransformFeedback objects are not supported")
+            }
             RawRenderingContext::WebGl2(ref gl) => {
                 let js_varyings = Array::new();
                 for &v in varyings {
@@ -3046,19 +3074,24 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<ActiveTransformFeedback> {
+    unsafe fn get_transform_feedback_varying(
+        &self,
+        program: Self::Program,
+        index: u32,
+    ) -> Option<ActiveTransformFeedback> {
         let programs = self.programs.borrow();
         let raw_program = programs.1.get_unchecked(program);
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("TransformFeedback objects are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => {
-                gl.get_transform_feedback_varying(raw_program, index)
-                    .map(|info| ActiveTransformFeedback {
-                        size: info.size(),
-                        tftype: info.type_(),
-                        name: info.name(),
-                    })
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("TransformFeedback objects are not supported")
             }
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .get_transform_feedback_varying(raw_program, index)
+                .map(|info| ActiveTransformFeedback {
+                    size: info.size(),
+                    tftype: info.type_(),
+                    name: info.name(),
+                }),
         }
     }
 }

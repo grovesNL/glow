@@ -2137,7 +2137,11 @@ impl HasContext for Context {
         gl.DeleteTransformFeedbacks(1, &transform_feedback);
     }
 
-    unsafe fn bind_transform_feedback(&self, target: u32, transform_feedback: Option<Self::TransformFeedback>) {
+    unsafe fn bind_transform_feedback(
+        &self,
+        target: u32,
+        transform_feedback: Option<Self::TransformFeedback>,
+    ) {
         let gl = &self.raw;
         gl.BindTransformFeedback(target, transform_feedback.unwrap_or(0));
     }
@@ -2162,7 +2166,12 @@ impl HasContext for Context {
         gl.ResumeTransformFeedback();
     }
 
-    unsafe fn transform_feedback_varyings(&self, program: Self::Program, varyings: &[&str], buffer_mode: u32) {
+    unsafe fn transform_feedback_varyings(
+        &self,
+        program: Self::Program,
+        varyings: &[&str],
+        buffer_mode: u32,
+    ) {
         let gl = &self.raw;
 
         let strings: Vec<CString> = varyings
@@ -2181,7 +2190,11 @@ impl HasContext for Context {
         );
     }
 
-    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<ActiveTransformFeedback> {
+    unsafe fn get_transform_feedback_varying(
+        &self,
+        program: Self::Program,
+        index: u32,
+    ) -> Option<ActiveTransformFeedback> {
         let gl = &self.raw;
 
         const buf_size: usize = 256;
@@ -2199,7 +2212,7 @@ impl HasContext for Context {
             std::ptr::null_mut(),
             size as *mut i32,
             tftype as *mut u32,
-            c_name_buf
+            c_name_buf,
         );
 
         let name = CString::from_raw(c_name_buf).into_string().unwrap();

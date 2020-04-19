@@ -914,7 +914,11 @@ pub trait HasContext {
 
     unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String>;
 
-    unsafe fn bind_transform_feedback(&self, target: u32, transform_feedback: Option<Self::TransformFeedback>);
+    unsafe fn bind_transform_feedback(
+        &self,
+        target: u32,
+        transform_feedback: Option<Self::TransformFeedback>,
+    );
 
     unsafe fn begin_transform_feedback(&self, primitive_mode: u32);
 
@@ -924,9 +928,18 @@ pub trait HasContext {
 
     unsafe fn resume_transform_feedback(&self);
 
-    unsafe fn transform_feedback_varyings(&self, program: Self::Program, varyings: &[&str], buffer_mode: u32);
+    unsafe fn transform_feedback_varyings(
+        &self,
+        program: Self::Program,
+        varyings: &[&str],
+        buffer_mode: u32,
+    );
 
-    unsafe fn get_transform_feedback_varying(&self, program: Self::Program, index: u32) -> Option<ActiveTransformFeedback>;
+    unsafe fn get_transform_feedback_varying(
+        &self,
+        program: Self::Program,
+        index: u32,
+    ) -> Option<ActiveTransformFeedback>;
 }
 
 pub trait HasRenderLoop {

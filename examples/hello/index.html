@@ -5,10 +5,10 @@
   <body>
     <canvas id="canvas" width="640" height="480"></canvas>
     <script src="./hello.js"></script>
-    <script>
-      window.addEventListener("load", async () => {
-        await wasm_bindgen("./hello_bg.wasm");
-      });
+    <script type="module">
+      import init from "./hello.js";
+
+      init();
     </script>
   </body>
 </html>

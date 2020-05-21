@@ -1,21 +1,14 @@
 use glow::*;
 
-#[cfg(all(target_arch = "wasm32", feature = "web-sys"))]
-use wasm_bindgen::prelude::*;
-
 #[cfg(all(target_arch = "wasm32", feature = "stdweb"))]
 use std_web::{
     traits::*,
     unstable::TryInto,
     web::{document, html_element::*},
 };
+
 #[cfg(all(target_arch = "wasm32", feature = "stdweb"))]
 use webgl_stdweb::WebGL2RenderingContext;
-
-#[cfg_attr(all(target_arch = "wasm32", feature = "web-sys"), wasm_bindgen(start))]
-pub fn wasm_main() {
-    main();
-}
 
 fn main() {
     unsafe {

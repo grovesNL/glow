@@ -21,9 +21,9 @@ cargo run --features=window-sdl2
 To run with web-sys:
 
 ```shell
-cargo +nightly build --target wasm32-unknown-unknown
+cargo build --target wasm32-unknown-unknown
 mkdir -p generated
-wasm-bindgen ../../target/wasm32-unknown-unknown/debug/hello.wasm --out-dir generated --no-modules
+wasm-bindgen ../../target/wasm32-unknown-unknown/debug/hello.wasm --out-dir generated --target web
 cp index.html generated
 ```
 

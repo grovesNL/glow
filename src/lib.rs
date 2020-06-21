@@ -113,7 +113,7 @@ pub trait HasContext {
         level: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: Option<&mut [u8]>,
     );
 
     unsafe fn get_tex_image_pixel_buffer_offset(
@@ -216,7 +216,7 @@ pub trait HasContext {
 
     unsafe fn get_buffer_sub_data(&self, target: u32, offset: i32, dst_data: &mut [u8]);
 
-    unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&mut [u8]>, flags: u32);
+    unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&[u8]>, flags: u32);
 
     unsafe fn check_framebuffer_status(&self, target: u32) -> u32;
 

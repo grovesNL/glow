@@ -172,7 +172,7 @@ impl HasContext for Context {
         level: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: Option<&mut [u8]>,
     ) {
         let gl = &self.raw;
         gl.GetTexImage(
@@ -180,7 +180,9 @@ impl HasContext for Context {
             level,
             format,
             ty,
-            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *mut std::ffi::c_void,
+            pixels
+                .map(|p| p.as_mut_ptr())
+                .unwrap_or(std::ptr::null_mut()) as *mut std::ffi::c_void,
         );
     }
 
@@ -469,7 +471,7 @@ impl HasContext for Context {
         );
     }
 
-    unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&mut [u8]>, flags: u32) {
+    unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&[u8]>, flags: u32) {
         let gl = &self.raw;
         gl.BufferStorage(
             target,

@@ -538,7 +538,7 @@ impl HasContext for Context {
         _level: i32,
         _format: u32,
         _ty: u32,
-        _pixels: Option<&[u8]>,
+        _pixels: Option<&mut [u8]>,
     ) {
         panic!("Get tex image is not supported");
     }
@@ -943,13 +943,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn buffer_storage(
-        &self,
-        _target: u32,
-        _size: i32,
-        _data: Option<&mut [u8]>,
-        _flags: u32,
-    ) {
+    unsafe fn buffer_storage(&self, _target: u32, _size: i32, _data: Option<&[u8]>, _flags: u32) {
         panic!("Buffer storage is not supported");
     }
 

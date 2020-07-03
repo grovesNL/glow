@@ -69,6 +69,16 @@ pub struct DebugMessageLogEntry {
     message: String,
 }
 
+pub enum PixelPackData<'a> {
+    BufferOffset(u32),
+    Slice(&'a mut [u8]),
+}
+
+pub enum PixelUnpackData<'a> {
+    BufferOffset(u32),
+    Slice(&'a [u8]),
+}
+
 pub trait HasContext {
     type Shader: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Program: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
@@ -107,22 +117,13 @@ pub trait HasContext {
 
     unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String;
 
-    unsafe fn get_tex_image_u8_slice(
+    unsafe fn get_tex_image(
         &self,
         target: u32,
         level: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
-    );
-
-    unsafe fn get_tex_image_pixel_buffer_offset(
-        &self,
-        target: u32,
-        level: i32,
-        format: u32,
-        ty: u32,
-        pixel_buffer_offset: i32,
+        pixels: PixelPackData,
     );
 
     unsafe fn create_program(&self) -> Result<Self::Program, String>;
@@ -688,7 +689,7 @@ pub trait HasContext {
 
     unsafe fn tex_parameter_i32_slice(&self, target: u32, parameter: u32, values: &[i32]);
 
-    unsafe fn tex_sub_image_2d_u8_slice(
+    unsafe fn tex_sub_image_2d(
         &self,
         target: u32,
         level: i32,
@@ -698,23 +699,10 @@ pub trait HasContext {
         height: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     );
 
-    unsafe fn tex_sub_image_2d_pixel_buffer_offset(
-        &self,
-        target: u32,
-        level: i32,
-        x_offset: i32,
-        y_offset: i32,
-        width: i32,
-        height: i32,
-        format: u32,
-        ty: u32,
-        pixel_buffer_offset: i32,
-    );
-
-    unsafe fn tex_sub_image_3d_u8_slice(
+    unsafe fn tex_sub_image_3d(
         &self,
         target: u32,
         level: i32,
@@ -726,22 +714,7 @@ pub trait HasContext {
         depth: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
-    );
-
-    unsafe fn tex_sub_image_3d_pixel_buffer_offset(
-        &self,
-        target: u32,
-        level: i32,
-        x_offset: i32,
-        y_offset: i32,
-        z_offset: i32,
-        width: i32,
-        height: i32,
-        depth: i32,
-        format: u32,
-        ty: u32,
-        pixel_buffer_offset: i32,
+        pixels: PixelUnpackData,
     );
 
     unsafe fn depth_func(&self, func: u32);
@@ -901,7 +874,7 @@ pub trait HasContext {
         height: i32,
         format: u32,
         gltype: u32,
-        data: &mut [u8],
+        pixels: PixelPackData,
     );
 
     unsafe fn begin_query(&self, target: u32, query: Self::Query);

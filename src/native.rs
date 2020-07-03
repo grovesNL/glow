@@ -166,13 +166,13 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn get_tex_image_u8_slice(
+    unsafe fn get_tex_image(
         &self,
         target: u32,
         level: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&mut [u8]>,
+        pixels: PixelPackData,
     ) {
         let gl = &self.raw;
         gl.GetTexImage(
@@ -180,27 +180,10 @@ impl HasContext for Context {
             level,
             format,
             ty,
-            pixels
-                .map(|p| p.as_mut_ptr())
-                .unwrap_or(std::ptr::null_mut()) as *mut std::ffi::c_void,
-        );
-    }
-
-    unsafe fn get_tex_image_pixel_buffer_offset(
-        &self,
-        target: u32,
-        level: i32,
-        format: u32,
-        ty: u32,
-        pixel_buffer_offset: i32,
-    ) {
-        let gl = &self.raw;
-        gl.GetTexImage(
-            target,
-            level,
-            format,
-            ty,
-            pixel_buffer_offset as *mut std::ffi::c_void,
+            match pixels {
+                PixelPackData::BufferOffset(offset) => offset as *mut std::ffi::c_void,
+                PixelPackData::Slice(data) => data.as_mut_ptr() as *mut std::ffi::c_void,
+            },
         );
     }
 
@@ -1522,7 +1505,7 @@ impl HasContext for Context {
         gl.TexParameteriv(target, parameter, values.as_ptr());
     }
 
-    unsafe fn tex_sub_image_2d_u8_slice(
+    unsafe fn tex_sub_image_2d(
         &self,
         target: u32,
         level: i32,
@@ -1532,7 +1515,7 @@ impl HasContext for Context {
         height: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     ) {
         let gl = &self.raw;
         gl.TexSubImage2D(
@@ -1544,37 +1527,14 @@ impl HasContext for Context {
             height,
             format,
             ty,
-            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+            match pixels {
+                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
+                PixelUnpackData::Slice(data) => data.as_ptr() as *const std::ffi::c_void,
+            },
         );
     }
 
-    unsafe fn tex_sub_image_2d_pixel_buffer_offset(
-        &self,
-        target: u32,
-        level: i32,
-        x_offset: i32,
-        y_offset: i32,
-        width: i32,
-        height: i32,
-        format: u32,
-        ty: u32,
-        pixel_buffer_offset: i32,
-    ) {
-        let gl = &self.raw;
-        gl.TexSubImage2D(
-            target,
-            level,
-            x_offset,
-            y_offset,
-            width,
-            height,
-            format,
-            ty,
-            pixel_buffer_offset as *const std::ffi::c_void,
-        );
-    }
-
-    unsafe fn tex_sub_image_3d_u8_slice(
+    unsafe fn tex_sub_image_3d(
         &self,
         target: u32,
         level: i32,
@@ -1586,7 +1546,7 @@ impl HasContext for Context {
         depth: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     ) {
         let gl = &self.raw;
         gl.TexSubImage3D(
@@ -1600,37 +1560,10 @@ impl HasContext for Context {
             depth,
             format,
             ty,
-            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
-        );
-    }
-
-    unsafe fn tex_sub_image_3d_pixel_buffer_offset(
-        &self,
-        target: u32,
-        level: i32,
-        x_offset: i32,
-        y_offset: i32,
-        z_offset: i32,
-        width: i32,
-        height: i32,
-        depth: i32,
-        format: u32,
-        ty: u32,
-        pixel_buffer_offset: i32,
-    ) {
-        let gl = &self.raw;
-        gl.TexSubImage3D(
-            target,
-            level,
-            x_offset,
-            y_offset,
-            z_offset,
-            width,
-            height,
-            depth,
-            format,
-            ty,
-            pixel_buffer_offset as *const std::ffi::c_void,
+            match pixels {
+                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
+                PixelUnpackData::Slice(data) => data.as_ptr() as *const std::ffi::c_void,
+            },
         );
     }
 
@@ -2096,7 +2029,7 @@ impl HasContext for Context {
         height: i32,
         format: u32,
         gltype: u32,
-        data: &mut [u8],
+        pixels: PixelPackData,
     ) {
         let gl = &self.raw;
         gl.ReadPixels(
@@ -2106,7 +2039,10 @@ impl HasContext for Context {
             height,
             format,
             gltype,
-            data.as_mut_ptr() as *mut std::ffi::c_void,
+            match pixels {
+                PixelPackData::BufferOffset(offset) => offset as *mut std::ffi::c_void,
+                PixelPackData::Slice(data) => data.as_mut_ptr() as *mut std::ffi::c_void,
+            },
         );
     }
 

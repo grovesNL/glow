@@ -428,24 +428,13 @@ impl HasContext for Context {
         .unwrap_or_else(|| String::from(""))
     }
 
-    unsafe fn get_tex_image_u8_slice(
+    unsafe fn get_tex_image(
         &self,
         _target: u32,
         _level: i32,
         _format: u32,
         _ty: u32,
-        _pixels: Option<&mut [u8]>,
-    ) {
-        panic!("Get tex image is not supported");
-    }
-
-    unsafe fn get_tex_image_pixel_buffer_offset(
-        &self,
-        _target: u32,
-        _level: i32,
-        _format: u32,
-        _ty: u32,
-        _pixel_buffer_offset: i32,
+        _pixels: PixelPackData,
     ) {
         panic!("Get tex image is not supported");
     }
@@ -2248,7 +2237,7 @@ impl HasContext for Context {
         panic!("Texture parameters for `&[i32]` are not supported yet");
     }
 
-    unsafe fn tex_sub_image_2d_u8_slice(
+    unsafe fn tex_sub_image_2d(
         &self,
         target: u32,
         level: i32,
@@ -2258,49 +2247,53 @@ impl HasContext for Context {
         height: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl.tex_sub_image2_d(
-                target, level, x_offset, y_offset, width, height, format, ty, pixels,
-            ),
-            RawRenderingContext::WebGl2(ref gl) => gl.tex_sub_image2_d_3(
-                target, level, x_offset, y_offset, width, height, format, ty, pixels,
-            ),
+            RawRenderingContext::WebGl1(ref gl) => match pixels {
+                PixelUnpackData::BufferOffset(_) => {
+                    panic!("Sub image 2D pixel buffer offset is not supported")
+                }
+                PixelUnpackData::Slice(slice) => gl.tex_sub_image2_d(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    width,
+                    height,
+                    format,
+                    ty,
+                    Some(slice),
+                ),
+            },
+            RawRenderingContext::WebGl2(ref gl) => match pixels {
+                PixelUnpackData::BufferOffset(offset) => gl.tex_sub_image2_d_2(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    width,
+                    height,
+                    format,
+                    ty,
+                    offset as i64,
+                ),
+                PixelUnpackData::Slice(slice) => gl.tex_sub_image2_d_3(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    width,
+                    height,
+                    format,
+                    ty,
+                    Some(slice),
+                ),
+            },
         }
     }
 
-    unsafe fn tex_sub_image_2d_pixel_buffer_offset(
-        &self,
-        target: u32,
-        level: i32,
-        x_offset: i32,
-        y_offset: i32,
-        width: i32,
-        height: i32,
-        format: u32,
-        ty: u32,
-        pixel_buffer_offset: i32,
-    ) {
-        match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Sub image 2D pixel buffer offset is not supported")
-            }
-            RawRenderingContext::WebGl2(ref gl) => gl.tex_sub_image2_d_2(
-                target,
-                level,
-                x_offset,
-                y_offset,
-                width,
-                height,
-                format,
-                ty,
-                pixel_buffer_offset as i64,
-            ),
-        }
-    }
-
-    unsafe fn tex_sub_image_3d_u8_slice(
+    unsafe fn tex_sub_image_3d(
         &self,
         target: u32,
         level: i32,
@@ -2312,48 +2305,31 @@ impl HasContext for Context {
         depth: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
-    ) {
-        match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => panic!("Sub image 3D is not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl.tex_sub_image3_d_1(
-                target, level, x_offset, y_offset, z_offset, width, height, depth, format, ty,
-                pixels,
-            ),
-        }
-    }
-
-    unsafe fn tex_sub_image_3d_pixel_buffer_offset(
-        &self,
-        target: u32,
-        level: i32,
-        x_offset: i32,
-        y_offset: i32,
-        z_offset: i32,
-        width: i32,
-        height: i32,
-        depth: i32,
-        format: u32,
-        ty: u32,
-        pixel_buffer_offset: i32,
+        pixels: PixelUnpackData,
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Sub image 3D pixel buffer offset is not supported")
+                panic!("Sub image 3D is not supported");
             }
-            RawRenderingContext::WebGl2(ref gl) => gl.tex_sub_image3_d(
-                target,
-                level,
-                x_offset,
-                y_offset,
-                z_offset,
-                width,
-                height,
-                depth,
-                format,
-                ty,
-                pixel_buffer_offset as i64,
-            ),
+            RawRenderingContext::WebGl2(ref gl) => match pixels {
+                PixelUnpackData::BufferOffset(offset) => gl.tex_sub_image3_d(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    z_offset,
+                    width,
+                    height,
+                    depth,
+                    format,
+                    ty,
+                    offset as i64,
+                ),
+                PixelUnpackData::Slice(slice) => gl.tex_sub_image3_d_1(
+                    target, level, x_offset, y_offset, z_offset, width, height, depth, format, ty,
+                    slice,
+                ),
+            },
         }
     }
 
@@ -2722,14 +2698,22 @@ impl HasContext for Context {
         height: i32,
         format: u32,
         gltype: u32,
-        data: &mut [u8],
+        pixels: PixelPackData,
     ) {
+        let data = match pixels {
+            PixelPackData::BufferOffset(_) => {
+                panic!("Read pixels into buffer offset is not supported")
+            }
+            // This is likely UB: passing an immutable slice to the Web. See
+            // https://github.com/brendanzab/gl-rs/issues/525
+            PixelPackData::Slice(slice) => Some(&*slice),
+        };
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
-                gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8]))
+                gl.read_pixels(x, y, width, height, format, gltype, data)
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                gl.read_pixels(x, y, width, height, format, gltype, Some(data as &[u8]))
+                gl.read_pixels(x, y, width, height, format, gltype, data)
             }
         }
     }

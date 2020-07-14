@@ -1,7 +1,7 @@
 [package]
 name = "glow"
-version = "0.5.0"
-description = "GL on Whatever: a set of bindings to run GL anywhere (Open GL, OpenGL ES, and WebGL) and avoid target-specific code."
+version = "0.6.0-alpha.0"
+description = "GL on Whatever: a set of bindings to run GL (Open GL, OpenGL ES, and WebGL) anywhere, and avoid target-specific code."
 authors = [
   "Joshua Groves <josh@joshgroves.com>",
   "Dzmitry Malyshau <kvarkus@gmail.com",
@@ -9,7 +9,6 @@ authors = [
 homepage = "https://github.com/grovesNL/glow.git"
 repository = "https://github.com/grovesNL/glow"
 license = "MIT OR Apache-2.0"
-build = "build.rs"
 edition = "2018"
 
 [lib]
@@ -22,6 +21,7 @@ web-sys = ["web_sys", "js-sys", "wasm-bindgen"]
 stdweb = ["std_web", "webgl_stdweb"]
 
 [target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
+gl46 = { version = "0.0.0", features = ["struct_loader"] }
 glutin = { version = "0.24", optional = true }
 sdl2 = { version = "0.33", optional = true }
 
@@ -92,9 +92,6 @@ features = [
   "WebglDrawBuffers",
   "WebglLoseContext",
 ]
-
-[build-dependencies]
-gl_generator = "0.14"
 
 [workspace]
 members = [

@@ -21,11 +21,10 @@ impl Context {
     where
         F: FnMut(&str) -> *const std::os::raw::c_void + 'static,
     {
-        let mut c_string_loader = |p: *const std::os::raw::c_char| {
-          let c_str = unsafe { std::ffi::CStr::from_ptr(p) };
-          loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
-        };
-        let raw = native_gl::GlFns::load_with(&mut c_string_loader);
+        let raw = native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
+            let c_str = unsafe { std::ffi::CStr::from_ptr(p) };
+            loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
+        });
 
         // Setup extensions and constants after the context has been built
         let mut context = Self {
@@ -893,11 +892,7 @@ impl HasContext for Context {
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        gl.BindAttribLocation(
-            program,
-            index,
-            name.as_ptr() as *const native_gl::GLchar,
-        );
+        gl.BindAttribLocation(program, index, name.as_ptr() as *const native_gl::GLchar);
     }
 
     unsafe fn get_active_attributes(&self, program: Self::Program) -> u32 {
@@ -1886,12 +1881,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         let msg = message.as_ref().as_bytes();
         let length = msg.len() as i32;
-        gl.PushDebugGroup(
-            source,
-            id,
-            length,
-            msg.as_ptr() as *const native_gl::GLchar,
-        );
+        gl.PushDebugGroup(source, id, length, msg.as_ptr() as *const native_gl::GLchar);
     }
 
     unsafe fn pop_debug_group(&self) {

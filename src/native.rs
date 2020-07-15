@@ -19,7 +19,7 @@ pub struct Context {
 impl Context {
     pub fn from_loader_function<F>(mut loader_function: F) -> Self
     where
-        F: FnMut(&str) -> *const std::os::raw::c_void + 'static,
+        F: FnMut(&str) -> *const std::os::raw::c_void,
     {
         let raw = native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
             let c_str = unsafe { std::ffi::CStr::from_ptr(p) };

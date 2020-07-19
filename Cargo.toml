@@ -21,7 +21,7 @@ web-sys = ["web_sys", "js-sys", "wasm-bindgen"]
 stdweb = ["std_web", "webgl_stdweb"]
 
 [target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
-gl46 = { version = "0.0.1", features = ["struct_loader"] }
+gl46 = { version = "0.0.2", features = ["struct_loader"] }
 glutin = { version = "0.24", optional = true }
 sdl2 = { version = "0.33", optional = true }
 

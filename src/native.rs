@@ -3,10 +3,7 @@ use super::*;
 use std::collections::HashSet;
 use std::ffi::CString;
 
-mod native_gl {
-    #![allow(clippy::all, clippy::pedantic)]
-    include!(concat!(env!("OUT_DIR"), "/opengl_bindings.rs"));
-}
+use gl46 as native_gl;
 
 #[derive(Default)]
 struct Constants {
@@ -14,17 +11,20 @@ struct Constants {
 }
 
 pub struct Context {
-    raw: native_gl::Gl,
+    raw: native_gl::GlFns,
     extensions: HashSet<String>,
     constants: Constants,
 }
 
 impl Context {
-    pub fn from_loader_function<F>(loader_function: F) -> Self
+    pub fn from_loader_function<F>(mut loader_function: F) -> Self
     where
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {
-        let raw = native_gl::Gl::load_with(loader_function);
+        let raw = native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
+            let c_str = unsafe { std::ffi::CStr::from_ptr(p) };
+            loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
+        });
 
         // Setup extensions and constants after the context has been built
         let mut context = Self {
@@ -56,24 +56,23 @@ impl Context {
 
 impl std::fmt::Debug for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        // TODO
-        write!(f, "TODO")
+        write!(f, "Native_GL_Context")
     }
 }
 
 impl HasContext for Context {
-    type Shader = native_gl::types::GLuint;
-    type Program = native_gl::types::GLuint;
-    type Buffer = native_gl::types::GLuint;
-    type VertexArray = native_gl::types::GLuint;
-    type Texture = native_gl::types::GLuint;
-    type Sampler = native_gl::types::GLuint;
-    type Fence = native_gl::types::GLsync;
-    type Framebuffer = native_gl::types::GLuint;
-    type Renderbuffer = native_gl::types::GLuint;
-    type Query = native_gl::types::GLuint;
-    type UniformLocation = native_gl::types::GLuint;
-    type TransformFeedback = native_gl::types::GLuint;
+    type Shader = native_gl::GLuint;
+    type Program = native_gl::GLuint;
+    type Buffer = native_gl::GLuint;
+    type VertexArray = native_gl::GLuint;
+    type Texture = native_gl::GLuint;
+    type Sampler = native_gl::GLuint;
+    type Fence = native_gl::GLsync;
+    type Framebuffer = native_gl::GLuint;
+    type Renderbuffer = native_gl::GLuint;
+    type Query = native_gl::GLuint;
+    type UniformLocation = native_gl::GLuint;
+    type TransformFeedback = native_gl::GLuint;
 
     fn supports_debug(&self) -> bool {
         self.extensions.contains("GL_KHR_debug")
@@ -129,8 +128,8 @@ impl HasContext for Context {
         gl.ShaderSource(
             shader,
             1,
-            &(source.as_ptr() as *const native_gl::types::GLchar),
-            &(source.len() as native_gl::types::GLint),
+            &(source.as_ptr() as *const native_gl::GLchar),
+            &(source.len() as native_gl::GLint),
         );
     }
 
@@ -157,7 +156,7 @@ impl HasContext for Context {
                 shader,
                 length,
                 &mut length,
-                (&log[..]).as_ptr() as *mut native_gl::types::GLchar,
+                (&log[..]).as_ptr() as *mut native_gl::GLchar,
             );
             log.truncate(length as usize);
             log
@@ -230,7 +229,7 @@ impl HasContext for Context {
                 program,
                 length,
                 &mut length,
-                (&log[..]).as_ptr() as *mut native_gl::types::GLchar,
+                (&log[..]).as_ptr() as *mut native_gl::GLchar,
             );
             log.truncate(length as usize);
             log
@@ -267,7 +266,7 @@ impl HasContext for Context {
             &mut length,
             &mut size,
             &mut utype,
-            name.as_ptr() as *mut native_gl::types::GLchar,
+            name.as_ptr() as *mut native_gl::GLchar,
         );
         name.truncate(length as usize);
 
@@ -415,7 +414,7 @@ impl HasContext for Context {
         gl.BindFragDataLocation(
             program,
             color_number,
-            name.as_ptr() as *const native_gl::types::GLchar,
+            name.as_ptr() as *const native_gl::GLchar,
         );
     }
 
@@ -847,7 +846,7 @@ impl HasContext for Context {
     unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String {
         let gl = &self.raw;
         let raw_ptr = gl.GetStringi(parameter, index);
-        std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::types::GLchar)
+        std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::GLchar)
             .to_str()
             .unwrap()
             .to_owned()
@@ -856,7 +855,7 @@ impl HasContext for Context {
     unsafe fn get_parameter_string(&self, parameter: u32) -> String {
         let gl = &self.raw;
         let raw_ptr = gl.GetString(parameter);
-        std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::types::GLchar)
+        std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::GLchar)
             .to_str()
             .unwrap()
             .to_owned()
@@ -870,7 +869,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
         let uniform_location =
-            gl.GetUniformLocation(program, name.as_ptr() as *const native_gl::types::GLchar);
+            gl.GetUniformLocation(program, name.as_ptr() as *const native_gl::GLchar);
         if uniform_location < 0 {
             None
         } else {
@@ -882,7 +881,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
         let attrib_location =
-            gl.GetAttribLocation(program, name.as_ptr() as *const native_gl::types::GLchar);
+            gl.GetAttribLocation(program, name.as_ptr() as *const native_gl::GLchar);
         if attrib_location < 0 {
             None
         } else {
@@ -893,11 +892,7 @@ impl HasContext for Context {
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        gl.BindAttribLocation(
-            program,
-            index,
-            name.as_ptr() as *const native_gl::types::GLchar,
-        );
+        gl.BindAttribLocation(program, index, name.as_ptr() as *const native_gl::GLchar);
     }
 
     unsafe fn get_active_attributes(&self, program: Self::Program) -> u32 {
@@ -931,7 +926,7 @@ impl HasContext for Context {
             &mut length,
             &mut size,
             &mut atype,
-            name.as_ptr() as *mut native_gl::types::GLchar,
+            name.as_ptr() as *mut native_gl::GLchar,
         );
 
         name.truncate(length as usize);
@@ -1817,7 +1812,7 @@ impl HasContext for Context {
             id,
             severity,
             length,
-            message.as_ptr() as *const native_gl::types::GLchar,
+            message.as_ptr() as *const native_gl::GLchar,
         );
     }
 
@@ -1886,12 +1881,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         let msg = message.as_ref().as_bytes();
         let length = msg.len() as i32;
-        gl.PushDebugGroup(
-            source,
-            id,
-            length,
-            msg.as_ptr() as *const native_gl::types::GLchar,
-        );
+        gl.PushDebugGroup(source, id, length, msg.as_ptr() as *const native_gl::GLchar);
     }
 
     unsafe fn pop_debug_group(&self) {
@@ -1913,7 +1903,7 @@ impl HasContext for Context {
                     identifier,
                     name,
                     length,
-                    lbl.as_ptr() as *const native_gl::types::GLchar,
+                    lbl.as_ptr() as *const native_gl::GLchar,
                 );
             }
             None => gl.ObjectLabel(identifier, name, 0, std::ptr::null()),
@@ -1951,7 +1941,7 @@ impl HasContext for Context {
                 gl.ObjectPtrLabel(
                     sync as *mut std::ffi::c_void,
                     length,
-                    lbl.as_ptr() as *const native_gl::types::GLchar,
+                    lbl.as_ptr() as *const native_gl::GLchar,
                 );
             }
             None => gl.ObjectPtrLabel(sync as *mut std::ffi::c_void, 0, std::ptr::null()),
@@ -2165,7 +2155,7 @@ extern "system" fn raw_debug_message_callback<F>(
     id: u32,
     severity: u32,
     length: i32,
-    message: *const native_gl::types::GLchar,
+    message: *const native_gl::GLchar,
     user_param: *mut std::ffi::c_void,
 ) where
     F: FnMut(u32, u32, u32, u32, &str),

@@ -1653,6 +1653,46 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn vertex_attrib_1_f32(&self, index: u32, x: f32) {
+        let gl = &self.raw;
+        gl.VertexAttrib1f(index, x);
+    }
+
+    unsafe fn vertex_attrib_2_f32(&self, index: u32, x: f32, y: f32) {
+        let gl = &self.raw;
+        gl.VertexAttrib2f(index, x, y);
+    }
+
+    unsafe fn vertex_attrib_3_f32(&self, index: u32, x: f32, y: f32, z: f32) {
+        let gl = &self.raw;
+        gl.VertexAttrib3f(index, x, y, z);
+    }
+
+    unsafe fn vertex_attrib_4_f32(&self, index: u32, x: f32, y: f32, z: f32, w: f32) {
+        let gl = &self.raw;
+        gl.VertexAttrib4f(index, x, y, z, w);
+    }
+
+    unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32; 1]) {
+        let gl = &self.raw;
+        gl.VertexAttrib1fv(index, v.as_ptr());
+    }
+
+    unsafe fn vertex_attrib_2_f32_slice(&self, index: u32, v: &[f32; 2]) {
+        let gl = &self.raw;
+        gl.VertexAttrib2fv(index, v.as_ptr());
+    }
+
+    unsafe fn vertex_attrib_3_f32_slice(&self, index: u32, v: &[f32; 3]) {
+        let gl = &self.raw;
+        gl.VertexAttrib3fv(index, v.as_ptr());
+    }
+
+    unsafe fn vertex_attrib_4_f32_slice(&self, index: u32, v: &[f32; 4]) {
+        let gl = &self.raw;
+        gl.VertexAttrib4fv(index, v.as_ptr());
+    }
+
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32) {
         let gl = &self.raw;
         gl.Viewport(x, y, width, height);

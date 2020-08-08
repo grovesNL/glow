@@ -2627,6 +2627,62 @@ impl HasContext for Context {
         panic!("64-bit float precision is not supported in WebGL");
     }
 
+    unsafe fn vertex_attrib_1_f32(&self, index: u32, x: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib1f(index, x),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib1f(index, x),
+        }
+    }
+
+    unsafe fn vertex_attrib_2_f32(&self, index: u32, x: f32, y: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib2f(index, x, y),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib2f(index, x, y),
+        }
+    }
+
+    unsafe fn vertex_attrib_3_f32(&self, index: u32, x: f32, y: f32, z: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib3f(index, x, y, z),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib3f(index, x, y, z),
+        }
+    }
+
+    unsafe fn vertex_attrib_4_f32(&self, index: u32, x: f32, y: f32, z: f32, w: f32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib4f(index, x, y, z, w),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib4f(index, x, y, z, w),
+        }
+    }
+
+    unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32; 1]) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib1fv_with_f32_array(index, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib1fv_with_f32_array(index, v),
+        }
+    }
+
+    unsafe fn vertex_attrib_2_f32_slice(&self, index: u32, v: &[f32; 2]) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib2fv_with_f32_array(index, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib2fv_with_f32_array(index, v),
+        }
+    }
+
+    unsafe fn vertex_attrib_3_f32_slice(&self, index: u32, v: &[f32; 3]) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib3fv_with_f32_array(index, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib3fv_with_f32_array(index, v),
+        }
+    }
+
+    unsafe fn vertex_attrib_4_f32_slice(&self, index: u32, v: &[f32; 4]) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib4fv_with_f32_array(index, v),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib4fv_with_f32_array(index, v),
+        }
+    }
+
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.viewport(x, y, width, height),

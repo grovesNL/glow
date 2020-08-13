@@ -767,7 +767,7 @@ pub trait HasContext {
 
     unsafe fn vertex_attrib_4_f32(&self, index: u32, x: f32, y: f32, z: f32, w: f32);
 
-    unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32; 1]);
+    unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32]);
 
     unsafe fn vertex_attrib_2_f32_slice(&self, index: u32, v: &[f32; 2]);
 

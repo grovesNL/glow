@@ -2655,7 +2655,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32; 1]) {
+    unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib1fv_with_f32_array(index, v),
             RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib1fv_with_f32_array(index, v),

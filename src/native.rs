@@ -1678,17 +1678,17 @@ impl HasContext for Context {
         gl.VertexAttrib1fv(index, v.as_ptr());
     }
 
-    unsafe fn vertex_attrib_2_f32_slice(&self, index: u32, v: &[f32; 2]) {
+    unsafe fn vertex_attrib_2_f32_slice(&self, index: u32, v: &[f32]) {
         let gl = &self.raw;
         gl.VertexAttrib2fv(index, v.as_ptr());
     }
 
-    unsafe fn vertex_attrib_3_f32_slice(&self, index: u32, v: &[f32; 3]) {
+    unsafe fn vertex_attrib_3_f32_slice(&self, index: u32, v: &[f32]) {
         let gl = &self.raw;
         gl.VertexAttrib3fv(index, v.as_ptr());
     }
 
-    unsafe fn vertex_attrib_4_f32_slice(&self, index: u32, v: &[f32; 4]) {
+    unsafe fn vertex_attrib_4_f32_slice(&self, index: u32, v: &[f32]) {
         let gl = &self.raw;
         gl.VertexAttrib4fv(index, v.as_ptr());
     }

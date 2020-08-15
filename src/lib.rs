@@ -12,6 +12,8 @@ use core::hash::Hash;
 mod native;
 #[cfg(not(target_arch = "wasm32"))]
 pub use native::*;
+#[cfg(not(target_arch = "wasm32"))]
+mod gl46;
 
 #[cfg(all(target_arch = "wasm32", feature = "stdweb"))]
 #[path = "stdweb.rs"]

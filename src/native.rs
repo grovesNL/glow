@@ -3,7 +3,7 @@ use super::*;
 use std::collections::HashSet;
 use std::ffi::CString;
 
-use gl46 as native_gl;
+use crate::gl46 as native_gl;
 
 #[derive(Default)]
 struct Constants {
@@ -21,10 +21,17 @@ impl Context {
     where
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {
-        let raw = native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
-            let c_str = unsafe { std::ffi::CStr::from_ptr(p) };
-            loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
-        });
+        let raw: native_gl::GlFns = unsafe {
+            // Note(Lokathor): This is wildly inefficient, because the loader_function
+            // is doubtlessly just going to allocate the `&str` we pass into a new `CString`
+            // so that it can pass that `*const c_char` off to the OS's actual loader.
+            // However, this is the best we can do without changing the outer function
+            // signature into something that's less alloc crazy.
+            native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
+                let c_str = std::ffi::CStr::from_ptr(p);
+                loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
+            })
+        };
 
         // Setup extensions and constants after the context has been built
         let mut context = Self {

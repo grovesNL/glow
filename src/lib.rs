@@ -759,6 +759,22 @@ pub trait HasContext {
         offset: i32,
     );
 
+    unsafe fn vertex_attrib_1_f32(&self, index: u32, x: f32);
+
+    unsafe fn vertex_attrib_2_f32(&self, index: u32, x: f32, y: f32);
+
+    unsafe fn vertex_attrib_3_f32(&self, index: u32, x: f32, y: f32, z: f32);
+
+    unsafe fn vertex_attrib_4_f32(&self, index: u32, x: f32, y: f32, z: f32, w: f32);
+
+    unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32]);
+
+    unsafe fn vertex_attrib_2_f32_slice(&self, index: u32, v: &[f32]);
+
+    unsafe fn vertex_attrib_3_f32_slice(&self, index: u32, v: &[f32]);
+
+    unsafe fn vertex_attrib_4_f32_slice(&self, index: u32, v: &[f32]);
+
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32);
 
     unsafe fn viewport_f32_slice(&self, first: u32, count: i32, values: &[[f32; 4]]);

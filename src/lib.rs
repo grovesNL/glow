@@ -99,15 +99,23 @@ pub trait HasContext {
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String>;
 
+    unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool;
+
     unsafe fn create_query(&self) -> Result<Self::Query, String>;
 
     unsafe fn create_renderbuffer(&self) -> Result<Self::Renderbuffer, String>;
+
+    unsafe fn is_renderbuffer(&self, renderbuffer: Self::Renderbuffer) -> bool;
 
     unsafe fn create_sampler(&self) -> Result<Self::Sampler, String>;
 
     unsafe fn create_shader(&self, shader_type: u32) -> Result<Self::Shader, String>;
 
+    unsafe fn is_shader(&self, shader: Self::Shader) -> bool;
+
     unsafe fn create_texture(&self) -> Result<Self::Texture, String>;
+
+    unsafe fn is_texture(&self, texture: Self::Texture) -> bool;
 
     unsafe fn delete_shader(&self, shader: Self::Shader);
 
@@ -129,6 +137,8 @@ pub trait HasContext {
     );
 
     unsafe fn create_program(&self) -> Result<Self::Program, String>;
+
+    unsafe fn is_program(&self, program: Self::Program) -> bool;
 
     unsafe fn delete_program(&self, program: Self::Program);
 
@@ -153,6 +163,8 @@ pub trait HasContext {
     unsafe fn use_program(&self, program: Option<Self::Program>);
 
     unsafe fn create_buffer(&self) -> Result<Self::Buffer, String>;
+
+    unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool;
 
     unsafe fn bind_buffer(&self, target: u32, buffer: Option<Self::Buffer>);
 

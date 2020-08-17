@@ -92,6 +92,11 @@ impl HasContext for Context {
         Ok(name)
     }
 
+    unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool {
+        let gl = &self.raw;
+        gl.IsFramebuffer(framebuffer) != 0
+    }
+
     unsafe fn create_query(&self) -> Result<Self::Query, String> {
         let gl = &self.raw;
         let mut name = 0;
@@ -106,6 +111,11 @@ impl HasContext for Context {
         Ok(name)
     }
 
+    unsafe fn is_renderbuffer(&self, renderbuffer: Self::Renderbuffer) -> bool {
+        let gl = &self.raw;
+        gl.IsRenderbuffer(renderbuffer) != 0
+    }
+
     unsafe fn create_sampler(&self) -> Result<Self::Sampler, String> {
         let gl = &self.raw;
         let mut name = 0;
@@ -118,11 +128,21 @@ impl HasContext for Context {
         Ok(gl.CreateShader(shader_type as u32))
     }
 
+    unsafe fn is_shader(&self, shader: Self::Shader) -> bool {
+        let gl = &self.raw;
+        gl.IsShader(shader) != 0
+    }
+
     unsafe fn create_texture(&self) -> Result<Self::Texture, String> {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenTextures(1, &mut name);
         Ok(name)
+    }
+
+    unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
+        let gl = &self.raw;
+        gl.IsTexture(texture) != 0
     }
 
     unsafe fn delete_shader(&self, shader: Self::Shader) {
@@ -196,6 +216,11 @@ impl HasContext for Context {
     unsafe fn create_program(&self) -> Result<Self::Program, String> {
         let gl = &self.raw;
         Ok(gl.CreateProgram())
+    }
+
+    unsafe fn is_program(&self, program: Self::Program) -> bool {
+        let gl = &self.raw;
+        gl.IsProgram(program) != 0
     }
 
     unsafe fn delete_program(&self, program: Self::Program) {
@@ -290,6 +315,11 @@ impl HasContext for Context {
         let mut buffer = 0;
         gl.GenBuffers(1, &mut buffer);
         Ok(buffer)
+    }
+
+    unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
+        let gl = &self.raw;
+        gl.IsBuffer(buffer) != 0
     }
 
     unsafe fn bind_buffer(&self, target: u32, buffer: Option<Self::Buffer>) {

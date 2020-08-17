@@ -435,6 +435,18 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool {
+        let framebuffers = self.framebuffers.borrow_mut();
+        if let Some(ref f) = framebuffers.1.get(framebuffer) {
+            match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.is_framebuffer(Some(f)),
+                RawRenderingContext::WebGl2(ref gl) => gl.is_framebuffer(Some(f)),
+            }
+        } else {
+            false
+        }
+    }
+
     unsafe fn create_query(&self) -> Result<Self::Query, String> {
         let raw_query = match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
@@ -466,6 +478,18 @@ impl HasContext for Context {
                 Ok(key)
             }
             None => Err(String::from("Unable to create renderbuffer object")),
+        }
+    }
+
+    unsafe fn is_renderbuffer(&self, renderbuffer: Self::Renderbuffer) -> bool {
+        let renderbuffers = self.renderbuffers.borrow_mut();
+        if let Some(ref r) = renderbuffers.1.get(renderbuffer) {
+            match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.is_renderbuffer(Some(r)),
+                RawRenderingContext::WebGl2(ref gl) => gl.is_renderbuffer(Some(r)),
+            }
+        } else {
+            false
         }
     }
 
@@ -501,6 +525,18 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn is_shader(&self, shader: Self::Shader) -> bool {
+        let shaders = self.shaders.borrow_mut();
+        if let Some(ref s) = shaders.1.get(shader) {
+            match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.is_shader(Some(s)),
+                RawRenderingContext::WebGl2(ref gl) => gl.is_shader(Some(s)),
+            }
+        } else {
+            false
+        }
+    }
+
     unsafe fn create_texture(&self) -> Result<Self::Texture, String> {
         let raw_texture = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.create_texture(),
@@ -514,6 +550,18 @@ impl HasContext for Context {
                 Ok(key)
             }
             None => Err(String::from("Unable to create texture object")),
+        }
+    }
+
+    unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
+        let textures = self.textures.borrow_mut();
+        if let Some(ref t) = textures.1.get(texture) {
+            match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.is_texture(Some(t)),
+                RawRenderingContext::WebGl2(ref gl) => gl.is_texture(Some(t)),
+            }
+        } else {
+            false
         }
     }
 
@@ -594,6 +642,18 @@ impl HasContext for Context {
                 Ok(key)
             }
             None => Err(String::from("Unable to create program object")),
+        }
+    }
+
+    unsafe fn is_program(&self, program: Self::Program) -> bool {
+        let programs = self.programs.borrow_mut();
+        if let Some(ref p) = programs.1.get(program) {
+            match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.is_program(Some(p)),
+                RawRenderingContext::WebGl2(ref gl) => gl.is_program(Some(p)),
+            }
+        } else {
+            false
         }
     }
 
@@ -728,6 +788,18 @@ impl HasContext for Context {
                 Ok(key)
             }
             None => Err(String::from("Unable to create buffer object")),
+        }
+    }
+
+    unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
+        let buffers = self.buffers.borrow_mut();
+        if let Some(ref b) = buffers.1.get(buffer) {
+            match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => gl.is_buffer(Some(b)),
+                RawRenderingContext::WebGl2(ref gl) => gl.is_buffer(Some(b)),
+            }
+        } else {
+            false
         }
     }
 

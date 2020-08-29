@@ -11,6 +11,18 @@ repository = "https://github.com/grovesNL/glow"
 license = "MIT OR Apache-2.0"
 edition = "2018"
 
+[package.metadata.docs.rs]
+features = ["web-sys"]
+default-target = "x86_64-unknown-linux-gnu"
+targets = [
+  "x86_64-unknown-linux-gnu",
+  "x86_64-apple-darwin",
+  "x86_64-pc-windows-msvc",
+  "i686-unknown-linux-gnu",
+  "i686-pc-windows-msvc",
+  "wasm32-unknown-unknown"
+]
+
 [lib]
 name = "glow"
 path = "src/lib.rs"

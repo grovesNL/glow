@@ -11,24 +11,24 @@ jobs:
         rust: [stable, beta, nightly]
         sdl: [true, false]
         include:
-          - os: ubuntu-18.04
-            rust: 1.40.0
-            sdl: true
-          - os: ubuntu-18.04
-            rust: stable
-            sdl: true
-          - os: ubuntu-18.04
-            rust: beta
-            sdl: true
-          - os: ubuntu-18.04
-            rust: nightly
-            sdl: true
-          - os: macos-10.15
-            rust: stable
-            sdl: false
-          - os: windows-2019
-            rust: stable
-            sdl: false
+        - os: ubuntu-18.04
+          rust: 1.40.0
+          sdl: true
+        - os: ubuntu-18.04
+          rust: stable
+          sdl: true
+        - os: ubuntu-18.04
+          rust: beta
+          sdl: true
+        - os: ubuntu-18.04
+          rust: nightly
+          sdl: true
+        - os: macos-10.15
+          rust: stable
+          sdl: false
+        - os: windows-2019
+          rust: stable
+          sdl: false
     steps:
     - name: Checkout
       uses: actions/checkout@v2

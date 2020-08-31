@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Min%20Rust-1.40-green.svg" alt="Minimum Rust Version">
   <a href="https://crates.io/crates/glow"><img src="https://img.shields.io/crates/v/glow.svg?label=glow" alt="crates.io"></a>
   <a href="https://docs.rs/glow"><img src="https://docs.rs/glow/badge.svg" alt="docs.rs"></a>
-  <img src="https://github.com/grovesNL/glow/workflows/ci/badge.svg" alt="Build Status" />
+  <a href="https://github.com/grovesNL/glow/actions"><img src="https://github.com/grovesNL/glow/workflows/CI/badge.svg?branch=master" alt="Build Status" /></a>
 </div>
 
 ## Build commands
@@ -19,7 +19,7 @@
 cargo build
 
 # web-sys
-cargo build --target="wasm32-unknown-unknown"
+cargo build --target wasm32-unknown-unknown
 
 # stdweb (requires cargo-web installed)
 cargo web build --no-default-features --features stdweb

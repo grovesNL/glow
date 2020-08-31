@@ -65,8 +65,9 @@ jobs:
         cargo web build --verbose --no-default-features --features stdweb
         (cd examples/hello && cargo web build --no-default-features --features stdweb)
     - name: android
-      if: ${{ matrix.build == stable }}
+      if: matrix.build == 'stable'
       run: |
+        rustup add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
         cargo build --verbose --features glutin --target aarch64-linux-android
         cargo build --verbose --features glutin --target armv7-linux-androideabi
         cargo build --verbose --features glutin --target x86_64-linux-android

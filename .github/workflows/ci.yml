@@ -7,31 +7,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [pinned, stable, beta, nightly, macos, windows]
         sdl: [true, false]
         include:
-          - build: pinned
-            os: ubuntu-18.04
+          - os: ubuntu-18.04
             rust: 1.40.0
             sdl: true
-          - build: stable
-            os: ubuntu-18.04
+          - os: ubuntu-18.04
             rust: stable
             sdl: true
-          - build: beta
-            os: ubuntu-18.04
+          - os: ubuntu-18.04
             rust: beta
             sdl: true
-          - build: nightly
-            os: ubuntu-18.04
+          - os: ubuntu-18.04
             rust: nightly
             sdl: true
-          - build: macos
-            os: macos-10.15
+          - os: macos-10.15
             rust: stable
             sdl: false
-          - build: windows
-            os: windows-2019
+          - os: windows-2019
             rust: stable
             sdl: false
     steps:

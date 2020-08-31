@@ -17,7 +17,7 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn from_loader_function<F>(mut loader_function: F) -> Self
+    pub unsafe fn from_loader_function<F>(mut loader_function: F) -> Self
     where
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {

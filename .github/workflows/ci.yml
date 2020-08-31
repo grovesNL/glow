@@ -1,0 +1,63 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [pinned, stable, beta, nightly, macos, windows]
+        sdl: [true, false]
+        include:
+          - build: pinned
+            os: ubuntu-18.04
+            rust: 1.40.0
+            sdl: true
+          - build: stable
+            os: ubuntu-18.04
+            rust: stable
+            sdl: true
+          - build: beta
+            os: ubuntu-18.04
+            rust: beta
+            sdl: true
+          - build: nightly
+            os: ubuntu-18.04
+            rust: nightly
+            sdl: true
+          - build: macos
+            os: macos-10.15
+            rust: stable
+            sdl: false
+          - build: windows
+            os: windows-2019
+            rust: stable
+            sdl: false
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install toolchain 
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ matrix.rust }}
+        override: true
+        profile: minimal
+        target: wasm32-unknown-unknown
+    - run: cargo build --verbose --features glutin    
+    - run: cargo build --verbose --target wasm32-unknown-unknown
+    - run: cargo test --verbose
+    - run: (cd examples/hello && cargo build --features window-glutin)
+    - run: (cd examples/hello && cargo build --target wasm32-unknown-unknown)
+    - name: sdl
+      if: ${{ matrix.sdl == true }}
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get -qq install libsdl2-dev
+        cargo build --verbose --features sdl2
+        (cd examples/hello && cargo build --features window-sdl2)
+    - name: stdweb
+      run: |
+        cargo install -f cargo-web
+        cargo web build --verbose --no-default-features --features stdweb
+        (cd examples/hello && cargo web build --no-default-features --features stdweb)

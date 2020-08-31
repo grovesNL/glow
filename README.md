@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Min%20Rust-1.40-green.svg" alt="Minimum Rust Version">
   <a href="https://crates.io/crates/glow"><img src="https://img.shields.io/crates/v/glow.svg?label=glow" alt="crates.io"></a>
   <a href="https://docs.rs/glow"><img src="https://docs.rs/glow/badge.svg" alt="docs.rs"></a>
-  <a href="https://travis-ci.org/grovesNL/glow"><img src="https://travis-ci.org/grovesNL/glow.svg?branch=master" alt="Travis Build Status" /></a>
+  <img src="https://github.com/grovesNL/glow/workflows/ci/badge.svg" alt="Build Status" />
 </div>
 
 ## Build commands

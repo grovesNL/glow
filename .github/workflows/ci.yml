@@ -68,6 +68,6 @@ jobs:
       if: matrix.build == 'stable'
       run: |
         rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
-        cargo build --verbose --features glutin --target aarch64-linux-android
-        cargo build --verbose --features glutin --target armv7-linux-androideabi
-        cargo build --verbose --features glutin --target x86_64-linux-android
+        cargo build --verbose --target aarch64-linux-android
+        cargo build --verbose --target armv7-linux-androideabi
+        cargo build --verbose --target x86_64-linux-android

@@ -1,6 +1,10 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore: [staging.tmp]
+  pull_request:
+    branches-ignore: [staging.tmp]
 
 jobs:
   build:

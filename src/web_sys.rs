@@ -387,6 +387,32 @@ impl Context {
             }
         }
     }
+
+    pub unsafe fn tex_sub_image_2d_with_html_image(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        format: u32,
+        ty: u32,
+        image: &HtmlImageElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.tex_sub_image_2d_with_u32_and_u32_and_image(
+                    target, level, x_offset, y_offset, format, ty, image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_u32_and_u32_and_html_image_element(
+                    target, level, x_offset, y_offset, format, ty, image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
 }
 
 new_key_type! { pub struct WebShaderKey; }

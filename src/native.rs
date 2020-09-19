@@ -536,6 +536,11 @@ impl HasContext for Context {
         gl.ClientWaitSync(fence, flags, timeout as u64)
     }
 
+    unsafe fn wait_sync(&self, fence: Self::Fence, flags: u32, timeout: u64) {
+        let gl = &self.raw;
+        gl.WaitSync(fence, flags, timeout)
+    }
+
     unsafe fn copy_buffer_sub_data(
         &self,
         src_target: u32,

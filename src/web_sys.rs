@@ -1133,6 +1133,10 @@ impl HasContext for Context {
         panic!("Client wait sync is not supported")
     }
 
+    unsafe fn wait_sync(&self, _fence: Self::Fence, _flags: u32, _timeout: u64) {
+        panic!("Wait sync is not supported")
+    }
+
     unsafe fn copy_buffer_sub_data(
         &self,
         src_target: u32,

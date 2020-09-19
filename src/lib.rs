@@ -250,6 +250,7 @@ pub trait HasContext {
     );
 
     unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: u32, timeout: i32) -> u32;
+    unsafe fn wait_sync(&self, fence: Self::Fence, flags: u32, timeout: u64);
 
     unsafe fn copy_buffer_sub_data(
         &self,

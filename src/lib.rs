@@ -15,19 +15,9 @@ pub use native::*;
 #[cfg(not(target_arch = "wasm32"))]
 mod gl46;
 
-#[cfg(all(target_arch = "wasm32", feature = "stdweb"))]
-#[path = "stdweb.rs"]
-mod web;
-#[cfg(all(target_arch = "wasm32", feature = "web-sys"))]
+#[cfg(target_arch = "wasm32")]
 #[path = "web_sys.rs"]
 mod web;
-#[cfg(all(feature = "web-sys", feature = "stdweb"))]
-compile_error!("Please enable only one of the web_sys and stdweb features");
-#[cfg(all(
-    target_arch = "wasm32",
-    not(any(feature = "web-sys", feature = "stdweb"))
-))]
-compile_error!("Please enable one of web-sys or stdweb to work on web");
 #[cfg(target_arch = "wasm32")]
 pub use web::*;
 

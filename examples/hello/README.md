@@ -26,9 +26,3 @@ mkdir -p generated
 wasm-bindgen ../../target/wasm32-unknown-unknown/debug/hello.wasm --out-dir generated --target web
 cp index.html generated
 ```
-
-To run with stdweb:
-
-```shell
-cargo web start --no-default-features --features stdweb --target wasm32-unknown-unknown
-```

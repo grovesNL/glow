@@ -30,7 +30,6 @@ path = "src/lib.rs"
 [features]
 default = ["web-sys"]
 web-sys = ["web_sys", "js-sys", "wasm-bindgen"]
-stdweb = ["std_web", "webgl_stdweb"]
 
 [target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
 glutin = { version = "0.24", optional = true }
@@ -39,13 +38,7 @@ sdl2 = { version = "0.33", optional = true }
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = { version = "~0.3", optional = true }
 wasm-bindgen = { version = "~0.2", optional = true }
-webgl_stdweb = { version = "0.3", optional = true }
 slotmap = "0.4"
-
-[target.'cfg(target_arch = "wasm32")'.dependencies.std_web]
-version = "0.4.20"
-package = "stdweb"
-optional = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.web_sys]
 version = "~0.3.37"

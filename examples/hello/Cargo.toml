@@ -13,12 +13,9 @@ sdl2 = { version = "0.33", optional = true }
 [features]
 default = ["web-sys"]
 web-sys = ["web_sys", "wasm-bindgen", "glow/web-sys"]
-stdweb = ["std_web", "webgl_stdweb", "glow/stdweb"]
 window-sdl2 = ["sdl2", "glow/sdl2"]
 window-glutin = ["glutin", "glow/glutin"]
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 web_sys = { version = "0.3", package = "web-sys", features=["console"], optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
-std_web  = { version = "0.4", package = "stdweb", optional = true }
-webgl_stdweb = { version = "0.3", optional = true }

@@ -59,11 +59,6 @@ jobs:
         sudo apt-get -qq install libsdl2-dev
         cargo build --verbose --features sdl2
         (cd examples/hello && cargo build --features window-sdl2)
-    - name: stdweb
-      run: |
-        cargo install -f cargo-web
-        cargo web build --verbose --no-default-features --features stdweb
-        (cd examples/hello && cargo web build --no-default-features --features stdweb)
     - name: android
       if: matrix.build == 'stable'
       run: |

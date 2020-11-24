@@ -2541,18 +2541,30 @@ impl HasContext for Context {
                     PixelUnpackData::BufferOffset(_) => {
                         panic!("Sub image 2D pixel buffer offset is not supported");
                     }
-                    PixelUnpackData::Slice(data) => gl
-                        .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_u8_array(
-                            target,
-                            level,
-                            x_offset,
-                            y_offset,
-                            width,
-                            height,
-                            format,
-                            ty,
-                            Some(data),
-                        ),
+                    PixelUnpackData::Slice(data) => {
+                        let tex_sub_image_2d = |data| {
+                            gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
+                                target, level, x_offset, y_offset, width, height, format, ty, data,
+                            )
+                        };
+                        match ty {
+                            UNSIGNED_SHORT_5_6_5 | UNSIGNED_SHORT_4_4_4_4 | UNSIGNED_SHORT_5_5_5_1 | HALF_FLOAT => {
+                                let data = std::slice::from_raw_parts(
+                                    data.as_ptr() as *const u16,
+                                    data.len() * std::mem::size_of::<u16>(),
+                                );
+                                tex_sub_image_2d(Some(&js_sys::Uint16Array::view(data)))
+                            }
+                            FLOAT => {
+                                let data = std::slice::from_raw_parts(
+                                    data.as_ptr() as *const u32,
+                                    data.len() * std::mem::size_of::<u32>(),
+                                );
+                                tex_sub_image_2d(Some(&js_sys::Uint32Array::view(data)))
+                            }
+                            _ => tex_sub_image_2d(Some(&js_sys::Uint8Array::view(data))),
+                        }
+                    }
                 }
                 .unwrap(); // TODO: Handle return value?
             }
@@ -2570,18 +2582,30 @@ impl HasContext for Context {
                             ty,
                             offset as i32,
                         ),
-                    PixelUnpackData::Slice(slice) => gl
-                        .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_u8_array(
-                            target,
-                            level,
-                            x_offset,
-                            y_offset,
-                            width,
-                            height,
-                            format,
-                            ty,
-                            Some(slice),
-                        ),
+                    PixelUnpackData::Slice(data) => {
+                        let tex_sub_image_2d = |data| {
+                            gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
+                                target, level, x_offset, y_offset, width, height, format, ty, data,
+                            )
+                        };
+                        match ty {
+                            UNSIGNED_SHORT_5_6_5 | UNSIGNED_SHORT_4_4_4_4 | UNSIGNED_SHORT_5_5_5_1 | HALF_FLOAT => {
+                                let data = std::slice::from_raw_parts(
+                                    data.as_ptr() as *const u16,
+                                    data.len() * std::mem::size_of::<u16>(),
+                                );
+                                tex_sub_image_2d(Some(&js_sys::Uint16Array::view(data)))
+                            }
+                            FLOAT => {
+                                let data = std::slice::from_raw_parts(
+                                    data.as_ptr() as *const u32,
+                                    data.len() * std::mem::size_of::<u32>(),
+                                );
+                                tex_sub_image_2d(Some(&js_sys::Uint32Array::view(data)))
+                            }
+                            _ => tex_sub_image_2d(Some(&js_sys::Uint8Array::view(data))),
+                        }
+                    }
                 }
                 .unwrap(); // TODO: Handle return value?
             }

@@ -3201,7 +3201,7 @@ impl HasContext for Context {
 
 /// Sending texture data requires different data views for different data types.
 /// This function reinterprets the byte data into the correct type for the texture.
-/// https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D
+/// The lookup is generated from this table: https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_PIXELS_TYPE_TABLE
 unsafe fn texture_data_view(ty: u32, bytes: &[u8]) -> js_sys::Object {
     use std::mem::size_of;
     use std::slice::from_raw_parts;

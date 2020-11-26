@@ -1812,74 +1812,7 @@ impl HasContext for Context {
         ty: u32,
         pixels: Option<&[u8]>,
     ) {
-        let pixels = pixels.map(|bytes| -> js_sys::Object {
-            use std::mem::size_of;
-            use std::slice::from_raw_parts;
-
-            match ty {
-                BYTE => {
-                    let data =
-                        from_raw_parts(bytes.as_ptr() as *const i8, bytes.len() / size_of::<i8>());
-                    js_sys::Int8Array::view(data).into()
-                }
-
-                SHORT => {
-                    #[allow(clippy::cast_ptr_alignment)]
-                    let data = from_raw_parts(
-                        bytes.as_ptr() as *const i16,
-                        bytes.len() / size_of::<i16>(),
-                    );
-                    js_sys::Int16Array::view(data).into()
-                }
-
-                UNSIGNED_SHORT
-                | UNSIGNED_SHORT_5_6_5
-                | UNSIGNED_SHORT_5_5_5_1
-                | UNSIGNED_SHORT_4_4_4_4
-                | HALF_FLOAT => {
-                    #[allow(clippy::cast_ptr_alignment)]
-                    let data = from_raw_parts(
-                        bytes.as_ptr() as *const u16,
-                        bytes.len() / size_of::<u16>(),
-                    );
-                    js_sys::Uint16Array::view(data).into()
-                }
-
-                INT => {
-                    #[allow(clippy::cast_ptr_alignment)]
-                    let data = from_raw_parts(
-                        bytes.as_ptr() as *const i32,
-                        bytes.len() / size_of::<i32>(),
-                    );
-                    js_sys::Int32Array::view(data).into()
-                }
-
-                UNSIGNED_INT
-                | UNSIGNED_INT_5_9_9_9_REV
-                | UNSIGNED_INT_2_10_10_10_REV
-                | UNSIGNED_INT_10F_11F_11F_REV
-                | UNSIGNED_INT_24_8 => {
-                    #[allow(clippy::cast_ptr_alignment)]
-                    let data = from_raw_parts(
-                        bytes.as_ptr() as *const u32,
-                        bytes.len() / size_of::<u32>(),
-                    );
-                    js_sys::Uint32Array::view(data).into()
-                }
-
-                FLOAT => {
-                    #[allow(clippy::cast_ptr_alignment)]
-                    let data = from_raw_parts(
-                        bytes.as_ptr() as *const f32,
-                        bytes.len() / size_of::<f32>(),
-                    );
-                    js_sys::Float32Array::view(data).into()
-                }
-
-                UNSIGNED_BYTE | _ => js_sys::Uint8Array::view(bytes).into(),
-            }
-        });
-
+        let pixels = pixels.map(|bytes| texture_data_view(ty, bytes));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 // TODO: Handle return value?
@@ -1930,8 +1863,9 @@ impl HasContext for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("3d textures are not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
+                let pixels = pixels.map(|bytes| texture_data_view(ty, bytes));
                 // TODO: Handle return value?
-                gl.tex_image_3d_with_opt_u8_array(
+                gl.tex_image_3d_with_opt_array_buffer_view(
                     target,
                     level,
                     internal_format,
@@ -1941,7 +1875,7 @@ impl HasContext for Context {
                     border,
                     format,
                     ty,
-                    pixels,
+                    pixels.as_ref(),
                 )
                 .unwrap();
             }
@@ -2541,18 +2475,12 @@ impl HasContext for Context {
                     PixelUnpackData::BufferOffset(_) => {
                         panic!("Sub image 2D pixel buffer offset is not supported");
                     }
-                    PixelUnpackData::Slice(data) => gl
-                        .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_u8_array(
-                            target,
-                            level,
-                            x_offset,
-                            y_offset,
-                            width,
-                            height,
-                            format,
-                            ty,
-                            Some(data),
-                        ),
+                    PixelUnpackData::Slice(data) => {
+                        let data = texture_data_view(ty, data);
+                        gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
+                            target, level, x_offset, y_offset, width, height, format, ty, Some(&data),
+                        )
+                    }
                 }
                 .unwrap(); // TODO: Handle return value?
             }
@@ -2570,18 +2498,12 @@ impl HasContext for Context {
                             ty,
                             offset as i32,
                         ),
-                    PixelUnpackData::Slice(slice) => gl
-                        .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_u8_array(
-                            target,
-                            level,
-                            x_offset,
-                            y_offset,
-                            width,
-                            height,
-                            format,
-                            ty,
-                            Some(slice),
-                        ),
+                    PixelUnpackData::Slice(data) => {
+                        let data = texture_data_view(ty, data);
+                        gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
+                            target, level, x_offset, y_offset, width, height, format, ty, Some(&data),
+                        )
+                    }
                 }
                 .unwrap(); // TODO: Handle return value?
             }
@@ -2621,19 +2543,22 @@ impl HasContext for Context {
                         ty,
                         offset as i32,
                     ),
-                    PixelUnpackData::Slice(slice) => gl.tex_sub_image_3d_with_opt_u8_array(
-                        target,
-                        level,
-                        x_offset,
-                        y_offset,
-                        z_offset,
-                        width,
-                        height,
-                        depth,
-                        format,
-                        ty,
-                        Some(slice),
-                    ),
+                    PixelUnpackData::Slice(slice) => {
+                        let slice = texture_data_view(ty, slice);
+                        gl.tex_sub_image_3d_with_opt_array_buffer_view(
+                            target,
+                            level,
+                            x_offset,
+                            y_offset,
+                            z_offset,
+                            width,
+                            height,
+                            depth,
+                            format,
+                            ty,
+                            Some(&slice),
+                        )
+                    }
                 }
                 .unwrap(); // TODO: Handle return value?
             }
@@ -3271,6 +3196,61 @@ impl HasContext for Context {
                     name: info.name(),
                 }),
         }
+    }
+}
+
+/// Sending texture data requires different data views for different data types.
+/// This function reinterprets the byte data into the correct type for the texture.
+/// The lookup is generated from this table: https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_PIXELS_TYPE_TABLE
+unsafe fn texture_data_view(ty: u32, bytes: &[u8]) -> js_sys::Object {
+    use std::mem::size_of;
+    use std::slice::from_raw_parts;
+
+    match ty {
+        BYTE => {
+            let data = from_raw_parts(bytes.as_ptr() as *const i8, bytes.len() / size_of::<i8>());
+            js_sys::Int8Array::view(data).into()
+        }
+
+        SHORT => {
+            #[allow(clippy::cast_ptr_alignment)]
+            let data = from_raw_parts(bytes.as_ptr() as *const i16, bytes.len() / size_of::<i16>());
+            js_sys::Int16Array::view(data).into()
+        }
+
+        UNSIGNED_SHORT
+        | UNSIGNED_SHORT_5_6_5
+        | UNSIGNED_SHORT_5_5_5_1
+        | UNSIGNED_SHORT_4_4_4_4
+        | HALF_FLOAT => {
+            #[allow(clippy::cast_ptr_alignment)]
+            let data = from_raw_parts(bytes.as_ptr() as *const u16, bytes.len() / size_of::<u16>());
+            js_sys::Uint16Array::view(data).into()
+        }
+
+        INT => {
+            #[allow(clippy::cast_ptr_alignment)]
+            let data = from_raw_parts(bytes.as_ptr() as *const i32, bytes.len() / size_of::<i32>());
+            js_sys::Int32Array::view(data).into()
+        }
+
+        UNSIGNED_INT
+        | UNSIGNED_INT_5_9_9_9_REV
+        | UNSIGNED_INT_2_10_10_10_REV
+        | UNSIGNED_INT_10F_11F_11F_REV
+        | UNSIGNED_INT_24_8 => {
+            #[allow(clippy::cast_ptr_alignment)]
+            let data = from_raw_parts(bytes.as_ptr() as *const u32, bytes.len() / size_of::<u32>());
+            js_sys::Uint32Array::view(data).into()
+        }
+
+        FLOAT => {
+            #[allow(clippy::cast_ptr_alignment)]
+            let data = from_raw_parts(bytes.as_ptr() as *const f32, bytes.len() / size_of::<f32>());
+            js_sys::Float32Array::view(data).into()
+        }
+
+        UNSIGNED_BYTE | _ => js_sys::Uint8Array::view(bytes).into(),
     }
 }
 

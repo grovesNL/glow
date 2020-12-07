@@ -33,7 +33,7 @@ web-sys = ["web_sys", "js-sys", "wasm-bindgen"]
 
 [target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
 glutin = { version = "0.24", optional = true }
-sdl2 = { version = "0.33", optional = true }
+sdl2 = { version = "0.34", optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = { version = "~0.3", optional = true }

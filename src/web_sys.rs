@@ -1428,9 +1428,12 @@ impl HasContext for Context {
         let renderbuffers = self.renderbuffers.borrow();
         let raw_renderbuffer = renderbuffer.map(|r| renderbuffers.1.get_unchecked(r));
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Framebuffer renderbuffer is not supported");
-            }
+            RawRenderingContext::WebGl1(ref gl) => gl.framebuffer_renderbuffer(
+                target,
+                attachment,
+                renderbuffer_target,
+                raw_renderbuffer,
+            ),
             RawRenderingContext::WebGl2(ref gl) => gl.framebuffer_renderbuffer(
                 target,
                 attachment,

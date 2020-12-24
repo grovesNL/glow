@@ -7098,19 +7098,35 @@ pub mod struct_commands {
                         flags
                     );
                 }
-            let out = call_atomic_ptr_4arg(
-                "glBufferStorage",
-                &self.glBufferStorage_p,
-                target,
-                size,
-                data,
-                flags,
-            );
-            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
-                {
-                    self.automatic_glGetError("glBufferStorage");
-                }
-            out
+            if self.BufferStorage_is_loaded() {
+                let out = call_atomic_ptr_4arg(
+                    "glBufferStorage",
+                    &self.glBufferStorage_p,
+                    target,
+                    size,
+                    data,
+                    flags,
+                );
+                #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+                    {
+                        self.automatic_glGetError("glBufferStorage");
+                    }
+                out
+            } else {
+                let out = call_atomic_ptr_4arg(
+                    "glBufferStorageEXT",
+                    &self.glBufferStorageEXT_p,
+                    target,
+                    size,
+                    data,
+                    flags,
+                );
+                #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+                    {
+                        self.automatic_glGetError("glBufferStorageEXT");
+                    }
+                out
+            }
         }
         #[doc(hidden)]
         pub unsafe fn BufferStorage_load_with_dyn(

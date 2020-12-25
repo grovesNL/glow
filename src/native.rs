@@ -491,12 +491,13 @@ impl HasContext for Context {
 
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&[u8]>, flags: u32) {
         let gl = &self.raw;
-        gl.BufferStorage(
-            target,
-            size as isize,
-            data.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
-            flags,
-        );
+        let size = size as isize;
+        let data = data.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void;
+        if gl.BufferData_is_loaded() {
+            gl.BufferStorage(target, size, data, flags);
+        } else {
+            gl.BufferStorageEXT(target, size, data, flags);
+        }
     }
 
     unsafe fn check_framebuffer_status(&self, target: u32) -> u32 {

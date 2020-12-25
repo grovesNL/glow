@@ -41,11 +41,9 @@ fn main() {
                 .build_windowed(wb, &el)
                 .unwrap();
             let windowed_context = windowed_context.make_current().unwrap();
-            let context = unsafe {
-                glow::Context::from_loader_function(|s| {
-                    windowed_context.get_proc_address(s) as *const _
-                })
-            };
+            let context = glow::Context::from_loader_function(|s| {
+                windowed_context.get_proc_address(s) as *const _
+            });
             (context, el, windowed_context, "#version 410")
         };
 

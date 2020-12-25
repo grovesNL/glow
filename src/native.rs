@@ -21,17 +21,16 @@ impl Context {
     where
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {
-        let raw: native_gl::GlFns = unsafe {
-            // Note(Lokathor): This is wildly inefficient, because the loader_function
-            // is doubtlessly just going to allocate the `&str` we pass into a new `CString`
-            // so that it can pass that `*const c_char` off to the OS's actual loader.
-            // However, this is the best we can do without changing the outer function
-            // signature into something that's less alloc crazy.
-            native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
-                let c_str = std::ffi::CStr::from_ptr(p);
-                loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
-            })
-        };
+
+        // Note(Lokathor): This is wildly inefficient, because the loader_function
+        // is doubtlessly just going to allocate the `&str` we pass into a new `CString`
+        // so that it can pass that `*const c_char` off to the OS's actual loader.
+        // However, this is the best we can do without changing the outer function
+        // signature into something that's less alloc crazy.
+        let raw: native_gl::GlFns = native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
+            let c_str = std::ffi::CStr::from_ptr(p);
+            loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
+        });
 
         // Setup extensions and constants after the context has been built
         let mut context = Self {
@@ -42,17 +41,17 @@ impl Context {
 
         // Use core-only functions to populate extension list
         // TODO: Use a fallback for versions < 3.0
-        let num_extensions = unsafe { context.get_parameter_i32(NUM_EXTENSIONS) };
+        let num_extensions = context.get_parameter_i32(NUM_EXTENSIONS);
         for i in 0..num_extensions {
             let extension_name =
-                unsafe { context.get_parameter_indexed_string(EXTENSIONS, i as u32) };
+                context.get_parameter_indexed_string(EXTENSIONS, i as u32);
             context.extensions.insert(extension_name);
         }
 
         // After the extensions are known, we can populate constants (including
         // constants that depend on extensions being enabled)
         context.constants.max_label_length = if context.supports_debug() {
-            unsafe { context.get_parameter_i32(MAX_LABEL_LENGTH) }
+            context.get_parameter_i32(MAX_LABEL_LENGTH)
         } else {
             0
         };
@@ -492,12 +491,13 @@ impl HasContext for Context {
 
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&[u8]>, flags: u32) {
         let gl = &self.raw;
-        gl.BufferStorage(
-            target,
-            size as isize,
-            data.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
-            flags,
-        );
+        let size = size as isize;
+        let data = data.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void;
+        if gl.BufferData_is_loaded() {
+            gl.BufferStorage(target, size, data, flags);
+        } else {
+            gl.BufferStorageEXT(target, size, data, flags);
+        }
     }
 
     unsafe fn check_framebuffer_status(&self, target: u32) -> u32 {

@@ -480,6 +480,8 @@ pub mod enums {
     #[doc = "`GL_BUFFER_IMMUTABLE_STORAGE: GLenum = 0x821F`"]
     #[doc = "* **Groups:** VertexBufferObjectParameter, BufferPNameARB"]
     pub const GL_BUFFER_IMMUTABLE_STORAGE: GLenum = 0x821F;
+    #[doc = "`GL_BUFFER_IMMUTABLE_STORAGE_EXT: GLenum = 0x821F`"]
+    pub const GL_BUFFER_IMMUTABLE_STORAGE_EXT: GLenum = 0x821F;
     #[doc = "`GL_BUFFER_MAPPED: GLenum = 0x88BC`"]
     #[doc = "* **Groups:** VertexBufferObjectParameter, BufferPNameARB"]
     pub const GL_BUFFER_MAPPED: GLenum = 0x88BC;
@@ -896,15 +898,11 @@ pub mod enums {
     #[doc = "* **Group:** GetPointervPName"]
     pub const GL_DEBUG_CALLBACK_FUNCTION: GLenum = 0x8244;
     #[doc = "`GL_DEBUG_CALLBACK_FUNCTION_ARB: GLenum = 0x8244`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_CALLBACK_FUNCTION_ARB: GLenum = 0x8244;
     #[doc = "`GL_DEBUG_CALLBACK_USER_PARAM: GLenum = 0x8245`"]
     #[doc = "* **Group:** GetPointervPName"]
     pub const GL_DEBUG_CALLBACK_USER_PARAM: GLenum = 0x8245;
     #[doc = "`GL_DEBUG_CALLBACK_USER_PARAM_ARB: GLenum = 0x8245`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_CALLBACK_USER_PARAM_ARB: GLenum = 0x8245;
     #[doc = "`GL_DEBUG_GROUP_STACK_DEPTH: GLenum = 0x826D`"]
     #[doc = "* **Group:** GetPName"]
@@ -912,14 +910,10 @@ pub mod enums {
     #[doc = "`GL_DEBUG_LOGGED_MESSAGES: GLenum = 0x9145`"]
     pub const GL_DEBUG_LOGGED_MESSAGES: GLenum = 0x9145;
     #[doc = "`GL_DEBUG_LOGGED_MESSAGES_ARB: GLenum = 0x9145`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_LOGGED_MESSAGES_ARB: GLenum = 0x9145;
     #[doc = "`GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH: GLenum = 0x8243`"]
     pub const GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH: GLenum = 0x8243;
     #[doc = "`GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH_ARB: GLenum = 0x8243`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH_ARB: GLenum = 0x8243;
     #[doc = "`GL_DEBUG_OUTPUT: GLenum = 0x92E0`"]
     #[doc = "* **Group:** EnableCap"]
@@ -928,29 +922,21 @@ pub mod enums {
     #[doc = "* **Group:** EnableCap"]
     pub const GL_DEBUG_OUTPUT_SYNCHRONOUS: GLenum = 0x8242;
     #[doc = "`GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB: GLenum = 0x8242`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB: GLenum = 0x8242;
     #[doc = "`GL_DEBUG_SEVERITY_HIGH: GLenum = 0x9146`"]
     #[doc = "* **Group:** DebugSeverity"]
     pub const GL_DEBUG_SEVERITY_HIGH: GLenum = 0x9146;
     #[doc = "`GL_DEBUG_SEVERITY_HIGH_ARB: GLenum = 0x9146`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_SEVERITY_HIGH_ARB: GLenum = 0x9146;
     #[doc = "`GL_DEBUG_SEVERITY_LOW: GLenum = 0x9148`"]
     #[doc = "* **Group:** DebugSeverity"]
     pub const GL_DEBUG_SEVERITY_LOW: GLenum = 0x9148;
     #[doc = "`GL_DEBUG_SEVERITY_LOW_ARB: GLenum = 0x9148`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_SEVERITY_LOW_ARB: GLenum = 0x9148;
     #[doc = "`GL_DEBUG_SEVERITY_MEDIUM: GLenum = 0x9147`"]
     #[doc = "* **Group:** DebugSeverity"]
     pub const GL_DEBUG_SEVERITY_MEDIUM: GLenum = 0x9147;
     #[doc = "`GL_DEBUG_SEVERITY_MEDIUM_ARB: GLenum = 0x9147`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_SEVERITY_MEDIUM_ARB: GLenum = 0x9147;
     #[doc = "`GL_DEBUG_SEVERITY_NOTIFICATION: GLenum = 0x826B`"]
     #[doc = "* **Group:** DebugSeverity"]
@@ -959,57 +945,41 @@ pub mod enums {
     #[doc = "* **Group:** DebugSource"]
     pub const GL_DEBUG_SOURCE_API: GLenum = 0x8246;
     #[doc = "`GL_DEBUG_SOURCE_API_ARB: GLenum = 0x8246`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_SOURCE_API_ARB: GLenum = 0x8246;
     #[doc = "`GL_DEBUG_SOURCE_APPLICATION: GLenum = 0x824A`"]
     #[doc = "* **Group:** DebugSource"]
     pub const GL_DEBUG_SOURCE_APPLICATION: GLenum = 0x824A;
     #[doc = "`GL_DEBUG_SOURCE_APPLICATION_ARB: GLenum = 0x824A`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_SOURCE_APPLICATION_ARB: GLenum = 0x824A;
     #[doc = "`GL_DEBUG_SOURCE_OTHER: GLenum = 0x824B`"]
     #[doc = "* **Group:** DebugSource"]
     pub const GL_DEBUG_SOURCE_OTHER: GLenum = 0x824B;
     #[doc = "`GL_DEBUG_SOURCE_OTHER_ARB: GLenum = 0x824B`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_SOURCE_OTHER_ARB: GLenum = 0x824B;
     #[doc = "`GL_DEBUG_SOURCE_SHADER_COMPILER: GLenum = 0x8248`"]
     #[doc = "* **Group:** DebugSource"]
     pub const GL_DEBUG_SOURCE_SHADER_COMPILER: GLenum = 0x8248;
     #[doc = "`GL_DEBUG_SOURCE_SHADER_COMPILER_ARB: GLenum = 0x8248`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_SOURCE_SHADER_COMPILER_ARB: GLenum = 0x8248;
     #[doc = "`GL_DEBUG_SOURCE_THIRD_PARTY: GLenum = 0x8249`"]
     #[doc = "* **Group:** DebugSource"]
     pub const GL_DEBUG_SOURCE_THIRD_PARTY: GLenum = 0x8249;
     #[doc = "`GL_DEBUG_SOURCE_THIRD_PARTY_ARB: GLenum = 0x8249`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_SOURCE_THIRD_PARTY_ARB: GLenum = 0x8249;
     #[doc = "`GL_DEBUG_SOURCE_WINDOW_SYSTEM: GLenum = 0x8247`"]
     #[doc = "* **Group:** DebugSource"]
     pub const GL_DEBUG_SOURCE_WINDOW_SYSTEM: GLenum = 0x8247;
     #[doc = "`GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB: GLenum = 0x8247`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB: GLenum = 0x8247;
     #[doc = "`GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: GLenum = 0x824D`"]
     #[doc = "* **Group:** DebugType"]
     pub const GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: GLenum = 0x824D;
     #[doc = "`GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB: GLenum = 0x824D`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB: GLenum = 0x824D;
     #[doc = "`GL_DEBUG_TYPE_ERROR: GLenum = 0x824C`"]
     #[doc = "* **Group:** DebugType"]
     pub const GL_DEBUG_TYPE_ERROR: GLenum = 0x824C;
     #[doc = "`GL_DEBUG_TYPE_ERROR_ARB: GLenum = 0x824C`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_TYPE_ERROR_ARB: GLenum = 0x824C;
     #[doc = "`GL_DEBUG_TYPE_MARKER: GLenum = 0x8268`"]
     #[doc = "* **Group:** DebugType"]
@@ -1018,15 +988,11 @@ pub mod enums {
     #[doc = "* **Group:** DebugType"]
     pub const GL_DEBUG_TYPE_OTHER: GLenum = 0x8251;
     #[doc = "`GL_DEBUG_TYPE_OTHER_ARB: GLenum = 0x8251`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_TYPE_OTHER_ARB: GLenum = 0x8251;
     #[doc = "`GL_DEBUG_TYPE_PERFORMANCE: GLenum = 0x8250`"]
     #[doc = "* **Group:** DebugType"]
     pub const GL_DEBUG_TYPE_PERFORMANCE: GLenum = 0x8250;
     #[doc = "`GL_DEBUG_TYPE_PERFORMANCE_ARB: GLenum = 0x8250`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_TYPE_PERFORMANCE_ARB: GLenum = 0x8250;
     #[doc = "`GL_DEBUG_TYPE_POP_GROUP: GLenum = 0x826A`"]
     #[doc = "* **Group:** DebugType"]
@@ -1035,8 +1001,6 @@ pub mod enums {
     #[doc = "* **Group:** DebugType"]
     pub const GL_DEBUG_TYPE_PORTABILITY: GLenum = 0x824F;
     #[doc = "`GL_DEBUG_TYPE_PORTABILITY_ARB: GLenum = 0x824F`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_TYPE_PORTABILITY_ARB: GLenum = 0x824F;
     #[doc = "`GL_DEBUG_TYPE_PUSH_GROUP: GLenum = 0x8269`"]
     #[doc = "* **Group:** DebugType"]
@@ -1045,8 +1009,6 @@ pub mod enums {
     #[doc = "* **Group:** DebugType"]
     pub const GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: GLenum = 0x824E;
     #[doc = "`GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB: GLenum = 0x824E`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB: GLenum = 0x824E;
     #[doc = "`GL_DECR: GLenum = 0x1E03`"]
     #[doc = "* **Group:** StencilOp"]
@@ -2021,14 +1983,10 @@ pub mod enums {
     #[doc = "`GL_MAX_DEBUG_LOGGED_MESSAGES: GLenum = 0x9144`"]
     pub const GL_MAX_DEBUG_LOGGED_MESSAGES: GLenum = 0x9144;
     #[doc = "`GL_MAX_DEBUG_LOGGED_MESSAGES_ARB: GLenum = 0x9144`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_MAX_DEBUG_LOGGED_MESSAGES_ARB: GLenum = 0x9144;
     #[doc = "`GL_MAX_DEBUG_MESSAGE_LENGTH: GLenum = 0x9143`"]
     pub const GL_MAX_DEBUG_MESSAGE_LENGTH: GLenum = 0x9143;
     #[doc = "`GL_MAX_DEBUG_MESSAGE_LENGTH_ARB: GLenum = 0x9143`"]
-    #[cfg(any(feature = "GL_ARB_debug_output"))]
-    #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
     pub const GL_MAX_DEBUG_MESSAGE_LENGTH_ARB: GLenum = 0x9143;
     #[doc = "`GL_MAX_DEPTH: GLenum = 0x8280`"]
     #[doc = "* **Group:** InternalFormatPName"]
@@ -4738,23 +4696,11 @@ pub mod struct_commands {
             self.CreateVertexArrays_load_with_dyn(get_proc_address);
             self.CullFace_load_with_dyn(get_proc_address);
             self.DebugMessageCallback_load_with_dyn(get_proc_address);
-            #[cfg(any(feature = "GL_ARB_debug_output"))]
-            #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
-            {
-                self.DebugMessageCallbackARB_load_with_dyn(get_proc_address);
-            }
+            self.DebugMessageCallbackARB_load_with_dyn(get_proc_address);
             self.DebugMessageControl_load_with_dyn(get_proc_address);
-            #[cfg(any(feature = "GL_ARB_debug_output"))]
-            #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
-            {
-                self.DebugMessageControlARB_load_with_dyn(get_proc_address);
-            }
+            self.DebugMessageControlARB_load_with_dyn(get_proc_address);
             self.DebugMessageInsert_load_with_dyn(get_proc_address);
-            #[cfg(any(feature = "GL_ARB_debug_output"))]
-            #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
-            {
-                self.DebugMessageInsertARB_load_with_dyn(get_proc_address);
-            }
+            self.DebugMessageInsertARB_load_with_dyn(get_proc_address);
             self.DeleteBuffers_load_with_dyn(get_proc_address);
             self.DeleteFramebuffers_load_with_dyn(get_proc_address);
             self.DeleteProgram_load_with_dyn(get_proc_address);
@@ -4858,11 +4804,7 @@ pub mod struct_commands {
             self.GetCompressedTextureImage_load_with_dyn(get_proc_address);
             self.GetCompressedTextureSubImage_load_with_dyn(get_proc_address);
             self.GetDebugMessageLog_load_with_dyn(get_proc_address);
-            #[cfg(any(feature = "GL_ARB_debug_output"))]
-            #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
-            {
-                self.GetDebugMessageLogARB_load_with_dyn(get_proc_address);
-            }
+            self.GetDebugMessageLogARB_load_with_dyn(get_proc_address);
             self.GetDoublei_v_load_with_dyn(get_proc_address);
             self.GetDoublev_load_with_dyn(get_proc_address);
             self.GetError_load_with_dyn(get_proc_address);
@@ -7089,44 +7031,28 @@ pub mod struct_commands {
             flags: GLbitfield,
         ) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
-                {
-                    trace!(
-                        "calling gl.BufferStorage({:#X}, {:?}, {:p}, {:?});",
-                        target,
-                        size,
-                        data,
-                        flags
-                    );
-                }
-            if self.BufferStorage_is_loaded() {
-                let out = call_atomic_ptr_4arg(
-                    "glBufferStorage",
-                    &self.glBufferStorage_p,
+            {
+                trace!(
+                    "calling gl.BufferStorage({:#X}, {:?}, {:p}, {:?});",
                     target,
                     size,
                     data,
-                    flags,
+                    flags
                 );
-                #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
-                    {
-                        self.automatic_glGetError("glBufferStorage");
-                    }
-                out
-            } else {
-                let out = call_atomic_ptr_4arg(
-                    "glBufferStorageEXT",
-                    &self.glBufferStorageEXT_p,
-                    target,
-                    size,
-                    data,
-                    flags,
-                );
-                #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
-                    {
-                        self.automatic_glGetError("glBufferStorageEXT");
-                    }
-                out
             }
+            let out = call_atomic_ptr_4arg(
+                "glBufferStorage",
+                &self.glBufferStorage_p,
+                target,
+                size,
+                data,
+                flags,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glBufferStorage");
+            }
+            out
         }
         #[doc(hidden)]
         pub unsafe fn BufferStorage_load_with_dyn(
@@ -10303,8 +10229,6 @@ pub mod struct_commands {
         /// * alias of: [`glDebugMessageCallback`]
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         pub unsafe fn DebugMessageCallbackARB(
             &self,
             callback: GLDEBUGPROCARB,
@@ -10330,8 +10254,6 @@ pub mod struct_commands {
             }
             out
         }
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         #[doc(hidden)]
         pub unsafe fn DebugMessageCallbackARB_load_with_dyn(
             &self,
@@ -10345,8 +10267,6 @@ pub mod struct_commands {
         }
         #[inline]
         #[doc(hidden)]
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         pub fn DebugMessageCallbackARB_is_loaded(&self) -> bool {
             !self.glDebugMessageCallbackARB_p.load(RELAX).is_null()
         }
@@ -10418,8 +10338,6 @@ pub mod struct_commands {
         /// * alias of: [`glDebugMessageControl`]
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         pub unsafe fn DebugMessageControlARB(
             &self,
             source: GLenum,
@@ -10457,8 +10375,6 @@ pub mod struct_commands {
             }
             out
         }
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         #[doc(hidden)]
         pub unsafe fn DebugMessageControlARB_load_with_dyn(
             &self,
@@ -10472,8 +10388,6 @@ pub mod struct_commands {
         }
         #[inline]
         #[doc(hidden)]
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         pub fn DebugMessageControlARB_is_loaded(&self) -> bool {
             !self.glDebugMessageControlARB_p.load(RELAX).is_null()
         }
@@ -10545,8 +10459,6 @@ pub mod struct_commands {
         /// * alias of: [`glDebugMessageInsert`]
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         pub unsafe fn DebugMessageInsertARB(
             &self,
             source: GLenum,
@@ -10584,8 +10496,6 @@ pub mod struct_commands {
             }
             out
         }
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         #[doc(hidden)]
         pub unsafe fn DebugMessageInsertARB_load_with_dyn(
             &self,
@@ -10599,8 +10509,6 @@ pub mod struct_commands {
         }
         #[inline]
         #[doc(hidden)]
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         pub fn DebugMessageInsertARB_is_loaded(&self) -> bool {
             !self.glDebugMessageInsertARB_p.load(RELAX).is_null()
         }
@@ -12828,6 +12736,7 @@ pub mod struct_commands {
         }
         /// [glFenceSync](http://docs.gl/gl4/glFenceSync)(condition, flags)
         /// * `condition` group: SyncCondition
+        /// * `flags` group: SyncBehaviorFlags
         /// * return value group: sync
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
@@ -14985,8 +14894,6 @@ pub mod struct_commands {
         /// * alias of: [`glGetDebugMessageLog`]
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         pub unsafe fn GetDebugMessageLogARB(
             &self,
             count: GLuint,
@@ -15020,8 +14927,6 @@ pub mod struct_commands {
             }
             out
         }
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         #[doc(hidden)]
         pub unsafe fn GetDebugMessageLogARB_load_with_dyn(
             &self,
@@ -15035,12 +14940,11 @@ pub mod struct_commands {
         }
         #[inline]
         #[doc(hidden)]
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         pub fn GetDebugMessageLogARB_is_loaded(&self) -> bool {
             !self.glGetDebugMessageLogARB_p.load(RELAX).is_null()
         }
         /// [glGetDoublei_v](http://docs.gl/gl4/glGetDoublei_v)(target, index, data)
+        /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
@@ -15138,6 +15042,7 @@ pub mod struct_commands {
             !self.glGetError_p.load(RELAX).is_null()
         }
         /// [glGetFloati_v](http://docs.gl/gl4/glGetFloati_v)(target, index, data)
+        /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
@@ -15414,6 +15319,7 @@ pub mod struct_commands {
             !self.glGetGraphicsResetStatus_p.load(RELAX).is_null()
         }
         /// [glGetInteger64i_v](http://docs.gl/gl4/glGet)(target, index, data)
+        /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
@@ -15540,6 +15446,7 @@ pub mod struct_commands {
             !self.glGetIntegerIndexedvEXT_p.load(RELAX).is_null()
         }
         /// [glGetIntegeri_v](http://docs.gl/gl4/glGet)(target, index, data)
+        /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
@@ -15867,6 +15774,7 @@ pub mod struct_commands {
         }
         /// [glGetNamedBufferPointerv](http://docs.gl/gl4/glGetNamedBufferPointerv)(buffer, pname, params)
         /// * `pname` group: BufferPointerNameARB
+        /// * `params` len: 1
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetNamedBufferPointerv(
@@ -26517,8 +26425,9 @@ pub mod struct_commands {
         pub fn ScissorIndexedv_is_loaded(&self) -> bool {
             !self.glScissorIndexedv_p.load(RELAX).is_null()
         }
-        /// [glShaderBinary](http://docs.gl/gl4/glShaderBinary)(count, shaders, binaryformat, binary, length)
+        /// [glShaderBinary](http://docs.gl/gl4/glShaderBinary)(count, shaders, binaryFormat, binary, length)
         /// * `shaders` len: count
+        /// * `binaryFormat` group: ShaderBinaryFormat
         /// * `binary` len: length
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
@@ -26526,7 +26435,7 @@ pub mod struct_commands {
             &self,
             count: GLsizei,
             shaders: *const GLuint,
-            binaryformat: GLenum,
+            binaryFormat: GLenum,
             binary: *const c_void,
             length: GLsizei,
         ) {
@@ -26536,7 +26445,7 @@ pub mod struct_commands {
                     "calling gl.ShaderBinary({:?}, {:p}, {:#X}, {:p}, {:?});",
                     count,
                     shaders,
-                    binaryformat,
+                    binaryFormat,
                     binary,
                     length
                 );
@@ -26546,7 +26455,7 @@ pub mod struct_commands {
                 &self.glShaderBinary_p,
                 count,
                 shaders,
-                binaryformat,
+                binaryFormat,
                 binary,
                 length,
             );
@@ -35273,6 +35182,7 @@ pub mod struct_commands {
         }
         /// [glWaitSync](http://docs.gl/gl4/glWaitSync)(sync, flags, timeout)
         /// * `sync` group: sync
+        /// * `flags` group: SyncBehaviorFlags
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn WaitSync(&self, sync: GLsync, flags: GLbitfield, timeout: GLuint64) {
@@ -35417,16 +35327,10 @@ pub mod struct_commands {
         glCreateVertexArrays_p: APcv,
         glCullFace_p: APcv,
         glDebugMessageCallback_p: APcv,
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         glDebugMessageCallbackARB_p: APcv,
         glDebugMessageControl_p: APcv,
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         glDebugMessageControlARB_p: APcv,
         glDebugMessageInsert_p: APcv,
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         glDebugMessageInsertARB_p: APcv,
         glDeleteBuffers_p: APcv,
         glDeleteFramebuffers_p: APcv,
@@ -35531,8 +35435,6 @@ pub mod struct_commands {
         glGetCompressedTextureImage_p: APcv,
         glGetCompressedTextureSubImage_p: APcv,
         glGetDebugMessageLog_p: APcv,
-        #[cfg(any(feature = "GL_ARB_debug_output"))]
-        #[cfg_attr(docs_rs, doc(cfg(any(feature = "GL_ARB_debug_output"))))]
         glGetDebugMessageLogARB_p: APcv,
         glGetDoublei_v_p: APcv,
         glGetDoublev_p: APcv,

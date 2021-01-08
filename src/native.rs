@@ -493,7 +493,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         let size = size as isize;
         let data = data.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void;
-        if gl.BufferData_is_loaded() {
+        if gl.BufferStorage_is_loaded() {
             gl.BufferStorage(target, size, data, flags);
         } else {
             gl.BufferStorageEXT(target, size, data, flags);

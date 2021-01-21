@@ -2229,6 +2229,16 @@ impl HasContext for Context {
 
         Some(ActiveTransformFeedback { size, tftype, name })
     }
+
+    unsafe fn memory_barrier(&self, barriers: u32) {
+        let gl = &self.raw;
+        gl.MemoryBarrier(barriers);
+    }
+
+    unsafe fn memory_barrier_by_region(&self, barriers: u32) {
+        let gl = &self.raw;
+        gl.MemoryBarrierByRegion(barriers);
+    }
 }
 
 extern "system" fn raw_debug_message_callback<F>(

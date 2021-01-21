@@ -934,6 +934,10 @@ pub trait HasContext {
         program: Self::Program,
         index: u32,
     ) -> Option<ActiveTransformFeedback>;
+
+    unsafe fn memory_barrier(&self, barriers: u32);
+
+    unsafe fn memory_barrier_by_region(&self, barriers: u32);
 }
 
 pub trait HasRenderLoop {

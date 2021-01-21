@@ -3200,6 +3200,14 @@ impl HasContext for Context {
                 }),
         }
     }
+
+    unsafe fn memory_barrier(&self, barriers: u32) {
+        panic!("Memory barriers are not supported")
+    }
+
+    unsafe fn memory_barrier_by_region(&self, barriers: u32) {
+        panic!("Memory barriers are not supported")
+    }
 }
 
 /// Sending texture data requires different data views for different data types.

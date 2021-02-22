@@ -1556,12 +1556,12 @@ impl HasContext for Context {
         .unwrap_or(0)
     }
 
-    unsafe fn get_parameter_i32_slice(&self, parameter: u32, v : &mut[i32]) {
-
+    unsafe fn get_parameter_i32_slice(&self, parameter: u32, v: &mut [i32]) {
         let value = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
             RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
-        }.unwrap();
+        }
+        .unwrap();
         use wasm_bindgen::JsCast;
         if let Some(value) = value.as_f64() {
             v[0] = value as i32;
@@ -1583,12 +1583,12 @@ impl HasContext for Context {
         .unwrap_or(0.0)
     }
 
-    unsafe fn get_parameter_f32_slice(&self, parameter: u32, v : &mut[f32]) {
-
+    unsafe fn get_parameter_f32_slice(&self, parameter: u32, v: &mut [f32]) {
         let value = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
             RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
-        }.unwrap();
+        }
+        .unwrap();
         use wasm_bindgen::JsCast;
         if let Some(value) = value.as_f64() {
             v[0] = value as f32;
@@ -1596,7 +1596,6 @@ impl HasContext for Context {
             values.copy_to(v)
         }
     }
-
 
     unsafe fn get_parameter_indexed_i32(&self, parameter: u32, index: u32) -> i32 {
         match self.raw {

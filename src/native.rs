@@ -21,16 +21,16 @@ impl Context {
     where
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {
-
         // Note(Lokathor): This is wildly inefficient, because the loader_function
         // is doubtlessly just going to allocate the `&str` we pass into a new `CString`
         // so that it can pass that `*const c_char` off to the OS's actual loader.
         // However, this is the best we can do without changing the outer function
         // signature into something that's less alloc crazy.
-        let raw: native_gl::GlFns = native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
-            let c_str = std::ffi::CStr::from_ptr(p);
-            loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
-        });
+        let raw: native_gl::GlFns =
+            native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
+                let c_str = std::ffi::CStr::from_ptr(p);
+                loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
+            });
 
         // Setup extensions and constants after the context has been built
         let mut context = Self {
@@ -43,8 +43,7 @@ impl Context {
         // TODO: Use a fallback for versions < 3.0
         let num_extensions = context.get_parameter_i32(NUM_EXTENSIONS);
         for i in 0..num_extensions {
-            let extension_name =
-                context.get_parameter_indexed_string(EXTENSIONS, i as u32);
+            let extension_name = context.get_parameter_indexed_string(EXTENSIONS, i as u32);
             context.extensions.insert(extension_name);
         }
 
@@ -878,19 +877,19 @@ impl HasContext for Context {
         value
     }
 
-    unsafe fn get_parameter_i32_slice(&self, parameter : u32, out : &mut[i32]) {
+    unsafe fn get_parameter_i32_slice(&self, parameter: u32, out: &mut [i32]) {
         let gl = &self.raw;
         gl.GetIntegerv(parameter, &mut out[0]);
     }
-   
-    unsafe fn get_parameter_f32(&self, parameter: u32) -> f32{
+
+    unsafe fn get_parameter_f32(&self, parameter: u32) -> f32 {
         let gl = &self.raw;
-        let mut value : f32 = 0.0;
+        let mut value: f32 = 0.0;
         gl.GetFloatv(parameter, &mut value);
         value
     }
 
-    unsafe fn get_parameter_f32_slice(&self, parameter : u32, out : &mut[f32]){
+    unsafe fn get_parameter_f32_slice(&self, parameter: u32, out: &mut [f32]) {
         let gl = &self.raw;
         gl.GetFloatv(parameter, &mut out[0]);
     }

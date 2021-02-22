@@ -878,6 +878,23 @@ impl HasContext for Context {
         value
     }
 
+    unsafe fn get_parameter_i32_slice(&self, parameter : u32, out : &mut[i32]) {
+        let gl = &self.raw;
+        gl.GetIntegerv(parameter, &mut out[0]);
+    }
+   
+    unsafe fn get_parameter_f32(&self, parameter: u32) -> f32{
+        let gl = &self.raw;
+        let mut value : f32 = 0.0;
+        gl.GetFloatv(parameter, &mut value);
+        value
+    }
+
+    unsafe fn get_parameter_f32_slice(&self, parameter : u32, out : &mut[f32]){
+        let gl = &self.raw;
+        gl.GetFloatv(parameter, &mut out[0]);
+    }
+
     unsafe fn get_parameter_indexed_i32(&self, parameter: u32, index: u32) -> i32 {
         let gl = &self.raw;
         let mut value = 0;

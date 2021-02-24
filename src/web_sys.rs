@@ -1556,6 +1556,47 @@ impl HasContext for Context {
         .unwrap_or(0)
     }
 
+    unsafe fn get_parameter_i32_slice(&self, parameter: u32, v: &mut [i32]) {
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .unwrap();
+        use wasm_bindgen::JsCast;
+        if let Some(value) = value.as_f64() {
+            v[0] = value as i32;
+        } else if let Some(values) = value.dyn_ref::<js_sys::Int32Array>() {
+            values.copy_to(v)
+        }
+    }
+
+    unsafe fn get_parameter_f32(&self, parameter: u32) -> f32 {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .unwrap()
+        .as_f64()
+        .map(|v| v as f32)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0.0)
+    }
+
+    unsafe fn get_parameter_f32_slice(&self, parameter: u32, v: &mut [f32]) {
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .unwrap();
+        use wasm_bindgen::JsCast;
+        if let Some(value) = value.as_f64() {
+            v[0] = value as f32;
+        } else if let Some(values) = value.dyn_ref::<js_sys::Float32Array>() {
+            values.copy_to(v)
+        }
+    }
+
     unsafe fn get_parameter_indexed_i32(&self, parameter: u32, index: u32) -> i32 {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {

@@ -397,6 +397,12 @@ pub trait HasContext {
 
     unsafe fn get_parameter_i32(&self, parameter: u32) -> i32;
 
+    unsafe fn get_parameter_i32_slice(&self, parameter: u32, out: &mut [i32]);
+
+    unsafe fn get_parameter_f32(&self, parameter: u32) -> f32;
+
+    unsafe fn get_parameter_f32_slice(&self, parameter: u32, out: &mut [f32]);
+
     unsafe fn get_parameter_indexed_i32(&self, parameter: u32, index: u32) -> i32;
 
     unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String;

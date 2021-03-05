@@ -5,13 +5,13 @@
 To run with glutin:
 
 ```shell
-cargo run --features=window-glutin
+cargo run --features=glutin
 ```
 
 To run with sdl2:
 
 ```shell
-cargo run --features=window-sdl2
+cargo run --features=sdl2
 ```
 
 ## Web

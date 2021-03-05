@@ -1,10 +1,9 @@
 use super::*;
 
-use js_sys::Array;
+use js_sys::{self, Array};
 use slotmap::{new_key_type, SecondaryMap, SlotMap};
 use std::cell::RefCell;
-use wasm_bindgen::prelude::*;
-use web_sys::{
+use web_sys::{self,
     HtmlCanvasElement, HtmlImageElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer,
     WebGlFramebuffer, WebGlProgram, WebGlQuery, WebGlRenderbuffer, WebGlRenderingContext,
     WebGlSampler, WebGlShader, WebGlSync, WebGlTexture, WebGlTransformFeedback,
@@ -3242,11 +3241,11 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn memory_barrier(&self, barriers: u32) {
+    unsafe fn memory_barrier(&self, _barriers: u32) {
         panic!("Memory barriers are not supported")
     }
 
-    unsafe fn memory_barrier_by_region(&self, barriers: u32) {
+    unsafe fn memory_barrier_by_region(&self, _barriers: u32) {
         panic!("Memory barriers are not supported")
     }
 }
@@ -3303,41 +3302,5 @@ unsafe fn texture_data_view(ty: u32, bytes: &[u8]) -> js_sys::Object {
         }
 
         UNSIGNED_BYTE | _ => js_sys::Uint8Array::view(bytes).into(),
-    }
-}
-
-pub struct RenderLoop;
-
-impl RenderLoop {
-    pub fn from_request_animation_frame() -> Self {
-        RenderLoop
-    }
-}
-
-impl HasRenderLoop for RenderLoop {
-    type Window = ();
-
-    fn run<F: FnMut(&mut bool) + 'static>(&self, mut callback: F) {
-        fn request_animation_frame(f: &Closure<dyn FnMut()>) {
-            use wasm_bindgen::JsCast;
-            web_sys::window()
-                .unwrap()
-                .request_animation_frame(f.as_ref().unchecked_ref())
-                .unwrap();
-        }
-
-        let mut running = true;
-        let f = std::rc::Rc::new(std::cell::RefCell::new(None));
-        let g = f.clone();
-        *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-            callback(&mut running);
-            if !running {
-                let _ = f.borrow_mut().take();
-                return;
-            }
-            request_animation_frame(f.borrow().as_ref().unwrap());
-        }) as Box<dyn FnMut()>));
-
-        request_animation_frame(g.borrow().as_ref().unwrap());
     }
 }

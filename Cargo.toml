@@ -27,23 +27,14 @@ targets = [
 name = "glow"
 path = "src/lib.rs"
 
-[features]
-default = ["web-sys"]
-web-sys = ["web_sys", "js-sys", "wasm-bindgen"]
-
-[target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
-glutin = { version = "0.24", optional = true }
-sdl2 = { version = "0.34", optional = true }
-
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-js-sys = { version = "~0.3", optional = true }
-wasm-bindgen = { version = "~0.2", optional = true }
+js-sys = "~0.3"
+wasm-bindgen = "~0.2"
 slotmap = "0.4"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.web_sys]
 version = "~0.3.37"
 package = "web-sys"
-optional = true
 features = [
   "Document",
   "Element",

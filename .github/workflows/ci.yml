@@ -47,18 +47,18 @@ jobs:
         override: true
         profile: minimal
         target: wasm32-unknown-unknown
-    - run: cargo build --verbose --features glutin
+    - run: cargo build --verbose
     - run: cargo build --verbose --target wasm32-unknown-unknown
     - run: cargo test --verbose
-    - run: (cd examples/hello && cargo build --features window-glutin)
+    - run: (cd examples/hello && cargo build --features glutin)
     - run: (cd examples/hello && cargo build --target wasm32-unknown-unknown)
     - name: sdl
       if: ${{ matrix.sdl == true }}
       run: |
         sudo apt-get -qq update
         sudo apt-get -qq install libsdl2-dev
-        cargo build --verbose --features sdl2
-        (cd examples/hello && cargo build --features window-sdl2)
+        cargo build --verbose
+        (cd examples/hello && cargo build --features sdl2)
     - name: android
       if: matrix.build == 'stable'
       run: |

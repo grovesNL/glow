@@ -946,12 +946,6 @@ pub trait HasContext {
     unsafe fn memory_barrier_by_region(&self, barriers: u32);
 }
 
-pub trait HasRenderLoop {
-    type Window;
-
-    fn run<F: FnMut(&mut bool) + 'static>(&self, callback: F);
-}
-
 pub const ACTIVE_ATOMIC_COUNTER_BUFFERS: u32 = 0x92D9;
 
 pub const ACTIVE_ATTRIBUTES: u32 = 0x8B89;

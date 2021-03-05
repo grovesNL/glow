@@ -3,8 +3,8 @@ use glow::*;
 fn main() {
     unsafe {
         // Create a context from a WebGL2 context on wasm32 targets
-        #[cfg(all(target_arch = "wasm32", feature = "web-sys"))]
-        let (_window, gl, _events_loop, render_loop, shader_version) = {
+        #[cfg(target_arch = "wasm32")]
+        let (gl, shader_version) = {
             use wasm_bindgen::JsCast;
             let canvas = web_sys::window()
                 .unwrap()
@@ -20,42 +20,36 @@ fn main() {
                 .unwrap()
                 .dyn_into::<web_sys::WebGl2RenderingContext>()
                 .unwrap();
-            (
-                (),
-                glow::Context::from_webgl2_context(webgl2_context),
-                (),
-                glow::RenderLoop::from_request_animation_frame(),
-                "#version 300 es",
-            )
+            let gl = glow::Context::from_webgl2_context(webgl2_context);
+            (gl, "#version 300 es")
         };
 
         // Create a context from a glutin window on non-wasm32 targets
-        #[cfg(feature = "window-glutin")]
-        let (gl, event_loop, windowed_context, shader_version) = {
-            let el = glutin::event_loop::EventLoop::new();
-            let wb = glutin::window::WindowBuilder::new()
+        #[cfg(feature = "glutin")]
+        let (gl, shader_version, window, event_loop) = {
+            let event_loop = glutin::event_loop::EventLoop::new();
+            let window_builder = glutin::window::WindowBuilder::new()
                 .with_title("Hello triangle!")
                 .with_inner_size(glutin::dpi::LogicalSize::new(1024.0, 768.0));
-            let windowed_context = glutin::ContextBuilder::new()
+            let window = glutin::ContextBuilder::new()
                 .with_vsync(true)
-                .build_windowed(wb, &el)
+                .build_windowed(window_builder, &event_loop)
+                .unwrap()
+                .make_current()
                 .unwrap();
-            let windowed_context = windowed_context.make_current().unwrap();
-            let context = glow::Context::from_loader_function(|s| {
-                windowed_context.get_proc_address(s) as *const _
-            });
-            (context, el, windowed_context, "#version 410")
+            let gl =
+                glow::Context::from_loader_function(|s| window.get_proc_address(s) as *const _);
+            (gl, "#version 410", window, event_loop)
         };
 
         // Create a context from a sdl2 window
-        #[cfg(feature = "window-sdl2")]
-        let (gl, mut events_loop, render_loop, shader_version, _gl_context) = {
+        #[cfg(feature = "sdl2")]
+        let (gl, shader_version, window, mut events_loop, _context) = {
             let sdl = sdl2::init().unwrap();
             let video = sdl.video().unwrap();
             let gl_attr = video.gl_attr();
             gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
             gl_attr.set_context_version(3, 0);
-
             let window = video
                 .window("Hello triangle!", 1024, 769)
                 .opengl()
@@ -63,12 +57,10 @@ fn main() {
                 .build()
                 .unwrap();
             let gl_context = window.gl_create_context().unwrap();
-            let context = unsafe {
-                glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _)
-            };
-            let render_loop = glow::RenderLoop::<sdl2::video::Window>::from_sdl_window(window);
+            let gl =
+                glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _);
             let event_loop = sdl.event_pump().unwrap();
-            (context, event_loop, render_loop, "#version 410", gl_context)
+            (gl, "#version 410", window, event_loop, gl_context)
         };
 
         let vertex_array = gl
@@ -132,7 +124,7 @@ fn main() {
 
         // We handle events differently between targets
 
-        #[cfg(feature = "window-glutin")]
+        #[cfg(feature = "glutin")]
         {
             use glutin::event::{Event, WindowEvent};
             use glutin::event_loop::ControlFlow;
@@ -144,16 +136,16 @@ fn main() {
                         return;
                     }
                     Event::MainEventsCleared => {
-                        windowed_context.window().request_redraw();
+                        window.window().request_redraw();
                     }
                     Event::RedrawRequested(_) => {
                         gl.clear(glow::COLOR_BUFFER_BIT);
                         gl.draw_arrays(glow::TRIANGLES, 0, 3);
-                        windowed_context.swap_buffers().unwrap();
+                        window.swap_buffers().unwrap();
                     }
                     Event::WindowEvent { ref event, .. } => match event {
                         WindowEvent::Resized(physical_size) => {
-                            windowed_context.resize(*physical_size);
+                            window.resize(*physical_size);
                         }
                         WindowEvent::CloseRequested => {
                             gl.delete_program(program);
@@ -167,25 +159,38 @@ fn main() {
             });
         }
 
-        #[cfg(not(feature = "window-glutin"))]
-        render_loop.run(move |running: &mut bool| {
-            #[cfg(feature = "window-sdl2")]
-            {
-                for event in events_loop.poll_iter() {
-                    match event {
-                        sdl2::event::Event::Quit { .. } => *running = false,
-                        _ => {}
+        #[cfg(feature = "sdl2")]
+        {
+            let mut running = true;
+            while running {
+                {
+                    for event in events_loop.poll_iter() {
+                        match event {
+                            sdl2::event::Event::Quit { .. } => running = false,
+                            _ => {}
+                        }
                     }
                 }
-            }
 
+                gl.clear(glow::COLOR_BUFFER_BIT);
+                gl.draw_arrays(glow::TRIANGLES, 0, 3);
+                window.gl_swap_window();
+
+                if !running {
+                    gl.delete_program(program);
+                    gl.delete_vertex_array(vertex_array);
+                }
+            }
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
+            // This could be called from `requestAnimationFrame`, a winit event
+            // loop, etc.
             gl.clear(glow::COLOR_BUFFER_BIT);
             gl.draw_arrays(glow::TRIANGLES, 0, 3);
-
-            if !*running {
-                gl.delete_program(program);
-                gl.delete_vertex_array(vertex_array);
-            }
-        });
+            gl.delete_program(program);
+            gl.delete_vertex_array(vertex_array);
+        }
     }
 }

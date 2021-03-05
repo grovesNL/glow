@@ -1,6 +1,6 @@
 [package]
 name = "glow"
-version = "0.8.0"
+version = "0.8.1"
 description = "GL on Whatever: a set of bindings to run GL (Open GL, OpenGL ES, and WebGL) anywhere, and avoid target-specific code."
 authors = [
   "Joshua Groves <josh@joshgroves.com>",
@@ -12,7 +12,6 @@ license = "MIT OR Apache-2.0"
 edition = "2018"
 
 [package.metadata.docs.rs]
-features = ["web-sys"]
 default-target = "x86_64-unknown-linux-gnu"
 targets = [
   "x86_64-unknown-linux-gnu",

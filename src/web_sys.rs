@@ -3,8 +3,8 @@ use super::*;
 use js_sys::{self, Array};
 use slotmap::{new_key_type, SecondaryMap, SlotMap};
 use std::cell::RefCell;
-use web_sys::{self,
-    HtmlCanvasElement, HtmlImageElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer,
+use web_sys::{
+    self, HtmlCanvasElement, HtmlImageElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer,
     WebGlFramebuffer, WebGlProgram, WebGlQuery, WebGlRenderbuffer, WebGlRenderingContext,
     WebGlSampler, WebGlShader, WebGlSync, WebGlTexture, WebGlTransformFeedback,
     WebGlUniformLocation, WebGlVertexArrayObject,
@@ -1284,7 +1284,11 @@ impl HasContext for Context {
     unsafe fn draw_buffer(&self, draw_buffer: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("draw_buffer not supported on webgl1");
+                if let Some(ext) = &self.extensions.webgl_draw_buffers {
+                    ext.draw_buffers_webgl(&Array::of1(&draw_buffer.into()))
+                } else {
+                    panic!("webgl1 WEBGL_draw_buffers extension not available");
+                }
             }
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.draw_buffers(&Array::of1(&draw_buffer.into()));
@@ -1295,7 +1299,15 @@ impl HasContext for Context {
     unsafe fn draw_buffers(&self, buffers: &[u32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("draw_buffers not supported on webgl1");
+                if let Some(ext) = &self.extensions.webgl_draw_buffers {
+                    let js_buffers = Array::new();
+                    for &b in buffers {
+                        js_buffers.push(&b.into());
+                    }
+                    ext.draw_buffers_webgl(&Array::of1(&js_buffers))
+                } else {
+                    panic!("webgl1 WEBGL_draw_buffers extension not available");
+                }
             }
             RawRenderingContext::WebGl2(ref gl) => {
                 let js_buffers = Array::new();

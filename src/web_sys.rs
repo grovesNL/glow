@@ -1855,6 +1855,19 @@ impl HasContext for Context {
         panic!("Tex image 1D is not supported");
     }
 
+    unsafe fn compressed_tex_image_1d(
+        &self,
+        _target: u32,
+        _level: i32,
+        _internal_format: i32,
+        _width: i32,
+        _border: i32,
+        _image_size: i32,
+        _pixels: &[u8],
+    ) {
+        panic!("Compressed tex image 1D is not supported");
+    }
+
     unsafe fn tex_image_2d(
         &self,
         target: u32,
@@ -1902,6 +1915,42 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn compressed_tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+        _image_size: i32,
+        pixels: &[u8],
+    ) {
+        let src_data = js_sys::Uint8Array::view(pixels);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl
+                .compressed_tex_image_2d_with_array_buffer_view(
+                    target,
+                    level,
+                    internal_format as u32,
+                    width,
+                    height,
+                    border,
+                    &src_data,
+                ),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .compressed_tex_image_2d_with_array_buffer_view(
+                    target,
+                    level,
+                    internal_format as u32,
+                    width,
+                    height,
+                    border,
+                    &src_data,
+                ),
+        }
+    }
+
     unsafe fn tex_image_3d(
         &self,
         target: u32,
@@ -1934,6 +1983,37 @@ impl HasContext for Context {
                 )
                 .unwrap();
             }
+        }
+    }
+
+    unsafe fn compressed_tex_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        border: i32,
+        _image_size: i32,
+        pixels: &[u8],
+    ) {
+        let src_data = js_sys::Uint8Array::view(pixels);
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Compressed 3D textures are not supported.")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .compressed_tex_image_3d_with_array_buffer_view(
+                    target,
+                    level,
+                    internal_format as u32,
+                    width,
+                    height,
+                    depth,
+                    border,
+                    &src_data,
+                ),
         }
     }
 

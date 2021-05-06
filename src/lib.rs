@@ -473,6 +473,17 @@ pub trait HasContext {
         pixels: Option<&[u8]>,
     );
 
+    unsafe fn compressed_tex_image_1d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        border: i32,
+        image_size: i32,
+        pixels: &[u8],
+    );
+
     unsafe fn tex_image_2d(
         &self,
         target: u32,
@@ -484,6 +495,18 @@ pub trait HasContext {
         format: u32,
         ty: u32,
         pixels: Option<&[u8]>,
+    );
+
+    unsafe fn compressed_tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+        image_size: i32,
+        pixels: &[u8],
     );
 
     unsafe fn tex_image_3d(
@@ -498,6 +521,19 @@ pub trait HasContext {
         format: u32,
         ty: u32,
         pixels: Option<&[u8]>,
+    );
+
+    unsafe fn compressed_tex_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        border: i32,
+        image_size: i32,
+        pixels: &[u8],
     );
 
     unsafe fn tex_storage_1d(&self, target: u32, levels: i32, internal_format: u32, width: i32);

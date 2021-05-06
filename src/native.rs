@@ -1083,6 +1083,28 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn compressed_tex_image_1d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        border: i32,
+        image_size: i32,
+        pixels: &[u8],
+    ) {
+        let gl = &self.raw;
+        gl.CompressedTexImage1D(
+            target,
+            level,
+            internal_format as u32,
+            width,
+            border,
+            image_size,
+            pixels.as_ptr() as *const std::ffi::c_void,
+        );
+    }
+
     unsafe fn tex_image_2d(
         &self,
         target: u32,
@@ -1106,6 +1128,30 @@ impl HasContext for Context {
             format,
             ty,
             pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn compressed_tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+        image_size: i32,
+        pixels: &[u8],
+    ) {
+        let gl = &self.raw;
+        gl.CompressedTexImage2D(
+            target,
+            level,
+            internal_format as u32,
+            width,
+            height,
+            border,
+            image_size,
+            pixels.as_ptr() as *const std::ffi::c_void,
         );
     }
 
@@ -1134,6 +1180,32 @@ impl HasContext for Context {
             format,
             ty,
             pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn compressed_tex_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        border: i32,
+        image_size: i32,
+        pixels: &[u8],
+    ) {
+        let gl = &self.raw;
+        gl.CompressedTexImage3D(
+            target,
+            level,
+            internal_format as u32,
+            width,
+            height,
+            depth,
+            border,
+            image_size,
+            pixels.as_ptr() as *const std::ffi::c_void,
         );
     }
 

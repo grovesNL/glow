@@ -1,7 +1,7 @@
 use super::*;
 
 use js_sys::{self, Array};
-use slotmap::{new_key_type, SecondaryMap, SlotMap};
+use slotmap::{new_key_type, SlotMap};
 use std::cell::RefCell;
 use web_sys::{
     self, HtmlCanvasElement, HtmlImageElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer,
@@ -55,14 +55,10 @@ struct Extensions {
     pub webgl_lose_context: Option<web_sys::WebglLoseContext>,
 }
 
-// Workaround for stable Rust
-// See https://github.com/orlp/slotmap/blob/b5df4ac7ee8aa795668bf79ebf8929d2f39bec8e/src/lib.rs#L198
-type SlotMapWithoutCopy<K, V> = (SlotMap<K, ()>, SecondaryMap<K, V>);
-
-type TrackedResource<K, V> = RefCell<SlotMapWithoutCopy<K, V>>;
+type TrackedResource<K, V> = RefCell<SlotMap<K, V>>;
 
 fn tracked_resource<K: slotmap::Key, V>() -> TrackedResource<K, V> {
-    RefCell::new((SlotMap::with_key(), SecondaryMap::new()))
+    RefCell::new(SlotMap::with_key())
 }
 
 #[derive(Debug)]
@@ -452,8 +448,7 @@ impl HasContext for Context {
 
         match raw_framebuffer {
             Some(s) => {
-                let key = self.framebuffers.borrow_mut().0.insert(());
-                self.framebuffers.borrow_mut().1.insert(key, s);
+                let key = self.framebuffers.borrow_mut().insert(s);
                 Ok(key)
             }
             None => Err(String::from("Unable to create framebuffer object")),
@@ -462,7 +457,7 @@ impl HasContext for Context {
 
     unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool {
         let framebuffers = self.framebuffers.borrow_mut();
-        if let Some(ref f) = framebuffers.1.get(framebuffer) {
+        if let Some(ref f) = framebuffers.get(framebuffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_framebuffer(Some(f)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_framebuffer(Some(f)),
@@ -482,8 +477,7 @@ impl HasContext for Context {
 
         match raw_query {
             Some(s) => {
-                let key = self.queries.borrow_mut().0.insert(());
-                self.queries.borrow_mut().1.insert(key, s);
+                let key = self.queries.borrow_mut().insert(s);
                 Ok(key)
             }
             None => Err(String::from("Unable to create query object")),
@@ -498,8 +492,7 @@ impl HasContext for Context {
 
         match raw_renderbuffer {
             Some(s) => {
-                let key = self.renderbuffers.borrow_mut().0.insert(());
-                self.renderbuffers.borrow_mut().1.insert(key, s);
+                let key = self.renderbuffers.borrow_mut().insert(s);
                 Ok(key)
             }
             None => Err(String::from("Unable to create renderbuffer object")),
@@ -508,7 +501,7 @@ impl HasContext for Context {
 
     unsafe fn is_renderbuffer(&self, renderbuffer: Self::Renderbuffer) -> bool {
         let renderbuffers = self.renderbuffers.borrow_mut();
-        if let Some(ref r) = renderbuffers.1.get(renderbuffer) {
+        if let Some(ref r) = renderbuffers.get(renderbuffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_renderbuffer(Some(r)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_renderbuffer(Some(r)),
@@ -526,8 +519,7 @@ impl HasContext for Context {
 
         match raw_sampler {
             Some(s) => {
-                let key = self.samplers.borrow_mut().0.insert(());
-                self.samplers.borrow_mut().1.insert(key, s);
+                let key = self.samplers.borrow_mut().insert(s);
                 Ok(key)
             }
             None => Err(String::from("Unable to create sampler object")),
@@ -542,8 +534,7 @@ impl HasContext for Context {
 
         match raw_shader {
             Some(s) => {
-                let key = self.shaders.borrow_mut().0.insert(());
-                self.shaders.borrow_mut().1.insert(key, s);
+                let key = self.shaders.borrow_mut().insert(s);
                 Ok(key)
             }
             None => Err(String::from("Unable to create shader object")),
@@ -552,7 +543,7 @@ impl HasContext for Context {
 
     unsafe fn is_shader(&self, shader: Self::Shader) -> bool {
         let shaders = self.shaders.borrow_mut();
-        if let Some(ref s) = shaders.1.get(shader) {
+        if let Some(ref s) = shaders.get(shader) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_shader(Some(s)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_shader(Some(s)),
@@ -570,8 +561,7 @@ impl HasContext for Context {
 
         match raw_texture {
             Some(t) => {
-                let key = self.textures.borrow_mut().0.insert(());
-                self.textures.borrow_mut().1.insert(key, t);
+                let key = self.textures.borrow_mut().insert(t);
                 Ok(key)
             }
             None => Err(String::from("Unable to create texture object")),
@@ -580,7 +570,7 @@ impl HasContext for Context {
 
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
         let textures = self.textures.borrow_mut();
-        if let Some(ref t) = textures.1.get(texture) {
+        if let Some(ref t) = textures.get(texture) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_texture(Some(t)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_texture(Some(t)),
@@ -592,7 +582,7 @@ impl HasContext for Context {
 
     unsafe fn delete_shader(&self, shader: Self::Shader) {
         let mut shaders = self.shaders.borrow_mut();
-        if let Some(ref s) = shaders.1.remove(shader) {
+        if let Some(ref s) = shaders.remove(shader) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_shader(Some(s)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_shader(Some(s)),
@@ -602,7 +592,7 @@ impl HasContext for Context {
 
     unsafe fn shader_source(&self, shader: Self::Shader, source: &str) {
         let shaders = self.shaders.borrow();
-        let raw_shader = shaders.1.get_unchecked(shader);
+        let raw_shader = shaders.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.shader_source(raw_shader, source),
             RawRenderingContext::WebGl2(ref gl) => gl.shader_source(raw_shader, source),
@@ -611,7 +601,7 @@ impl HasContext for Context {
 
     unsafe fn compile_shader(&self, shader: Self::Shader) {
         let shaders = self.shaders.borrow();
-        let raw_shader = shaders.1.get_unchecked(shader);
+        let raw_shader = shaders.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.compile_shader(raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.compile_shader(raw_shader),
@@ -620,7 +610,7 @@ impl HasContext for Context {
 
     unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool {
         let shaders = self.shaders.borrow();
-        let raw_shader = shaders.1.get_unchecked(shader);
+        let raw_shader = shaders.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.get_shader_parameter(raw_shader, COMPILE_STATUS)
@@ -635,7 +625,7 @@ impl HasContext for Context {
 
     unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String {
         let shaders = self.shaders.borrow();
-        let raw_shader = shaders.1.get_unchecked(shader);
+        let raw_shader = shaders.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_shader_info_log(raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.get_shader_info_log(raw_shader),
@@ -662,8 +652,7 @@ impl HasContext for Context {
 
         match raw_program {
             Some(p) => {
-                let key = self.programs.borrow_mut().0.insert(());
-                self.programs.borrow_mut().1.insert(key, p);
+                let key = self.programs.borrow_mut().insert(p);
                 Ok(key)
             }
             None => Err(String::from("Unable to create program object")),
@@ -672,7 +661,7 @@ impl HasContext for Context {
 
     unsafe fn is_program(&self, program: Self::Program) -> bool {
         let programs = self.programs.borrow_mut();
-        if let Some(ref p) = programs.1.get(program) {
+        if let Some(ref p) = programs.get(program) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_program(Some(p)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_program(Some(p)),
@@ -684,7 +673,7 @@ impl HasContext for Context {
 
     unsafe fn delete_program(&self, program: Self::Program) {
         let mut programs = self.programs.borrow_mut();
-        if let Some(ref p) = programs.1.remove(program) {
+        if let Some(ref p) = programs.remove(program) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_program(Some(p)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_program(Some(p)),
@@ -695,8 +684,8 @@ impl HasContext for Context {
     unsafe fn attach_shader(&self, program: Self::Program, shader: Self::Shader) {
         let programs = self.programs.borrow();
         let shaders = self.shaders.borrow();
-        let raw_program = programs.1.get_unchecked(program);
-        let raw_shader = shaders.1.get_unchecked(shader);
+        let raw_program = programs.get_unchecked(program);
+        let raw_shader = shaders.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.attach_shader(raw_program, raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.attach_shader(raw_program, raw_shader),
@@ -706,8 +695,8 @@ impl HasContext for Context {
     unsafe fn detach_shader(&self, program: Self::Program, shader: Self::Shader) {
         let programs = self.programs.borrow();
         let shaders = self.shaders.borrow();
-        let raw_program = programs.1.get_unchecked(program);
-        let raw_shader = shaders.1.get_unchecked(shader);
+        let raw_program = programs.get_unchecked(program);
+        let raw_shader = shaders.get_unchecked(shader);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.detach_shader(raw_program, raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.detach_shader(raw_program, raw_shader),
@@ -716,7 +705,7 @@ impl HasContext for Context {
 
     unsafe fn link_program(&self, program: Self::Program) {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.link_program(raw_program),
             RawRenderingContext::WebGl2(ref gl) => gl.link_program(raw_program),
@@ -725,7 +714,7 @@ impl HasContext for Context {
 
     unsafe fn get_program_link_status(&self, program: Self::Program) -> bool {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.get_program_parameter(raw_program, LINK_STATUS)
@@ -740,7 +729,7 @@ impl HasContext for Context {
 
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_program_info_log(raw_program),
             RawRenderingContext::WebGl2(ref gl) => gl.get_program_info_log(raw_program),
@@ -750,7 +739,7 @@ impl HasContext for Context {
 
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32 {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.get_program_parameter(raw_program, WebGlRenderingContext::ACTIVE_UNIFORMS)
@@ -770,7 +759,7 @@ impl HasContext for Context {
         index: u32,
     ) -> Option<ActiveUniform> {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.get_active_uniform(raw_program, index)
@@ -793,7 +782,7 @@ impl HasContext for Context {
 
     unsafe fn use_program(&self, program: Option<Self::Program>) {
         let programs = self.programs.borrow();
-        let raw_program = program.map(|p| programs.1.get_unchecked(p));
+        let raw_program = program.map(|p| programs.get_unchecked(p));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.use_program(raw_program),
             RawRenderingContext::WebGl2(ref gl) => gl.use_program(raw_program),
@@ -808,8 +797,7 @@ impl HasContext for Context {
 
         match raw_buffer {
             Some(p) => {
-                let key = self.buffers.borrow_mut().0.insert(());
-                self.buffers.borrow_mut().1.insert(key, p);
+                let key = self.buffers.borrow_mut().insert(p);
                 Ok(key)
             }
             None => Err(String::from("Unable to create buffer object")),
@@ -818,7 +806,7 @@ impl HasContext for Context {
 
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
         let buffers = self.buffers.borrow_mut();
-        if let Some(ref b) = buffers.1.get(buffer) {
+        if let Some(ref b) = buffers.get(buffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_buffer(Some(b)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_buffer(Some(b)),
@@ -830,7 +818,7 @@ impl HasContext for Context {
 
     unsafe fn bind_buffer(&self, target: u32, buffer: Option<Self::Buffer>) {
         let buffers = self.buffers.borrow();
-        let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
+        let raw_buffer = buffer.map(|b| buffers.get_unchecked(b));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.bind_buffer(target, raw_buffer),
             RawRenderingContext::WebGl2(ref gl) => gl.bind_buffer(target, raw_buffer),
@@ -839,7 +827,7 @@ impl HasContext for Context {
 
     unsafe fn bind_buffer_base(&self, target: u32, index: u32, buffer: Option<Self::Buffer>) {
         let buffers = self.buffers.borrow();
-        let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
+        let raw_buffer = buffer.map(|b| buffers.get_unchecked(b));
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("bind_buffer_base not supported on webgl1")
@@ -857,7 +845,7 @@ impl HasContext for Context {
         size: i32,
     ) {
         let buffers = self.buffers.borrow();
-        let raw_buffer = buffer.map(|b| buffers.1.get_unchecked(b));
+        let raw_buffer = buffer.map(|b| buffers.get_unchecked(b));
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("bind_buffer_range not supported on webgl1");
@@ -870,7 +858,7 @@ impl HasContext for Context {
 
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>) {
         let framebuffers = self.framebuffers.borrow();
-        let raw_framebuffer = framebuffer.map(|f| framebuffers.1.get_unchecked(f));
+        let raw_framebuffer = framebuffer.map(|f| framebuffers.get_unchecked(f));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.bind_framebuffer(target, raw_framebuffer),
             RawRenderingContext::WebGl2(ref gl) => gl.bind_framebuffer(target, raw_framebuffer),
@@ -879,7 +867,7 @@ impl HasContext for Context {
 
     unsafe fn bind_renderbuffer(&self, target: u32, renderbuffer: Option<Self::Renderbuffer>) {
         let renderbuffers = self.renderbuffers.borrow();
-        let raw_renderbuffer = renderbuffer.map(|r| renderbuffers.1.get_unchecked(r));
+        let raw_renderbuffer = renderbuffer.map(|r| renderbuffers.get_unchecked(r));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.bind_renderbuffer(target, raw_renderbuffer),
             RawRenderingContext::WebGl2(ref gl) => gl.bind_renderbuffer(target, raw_renderbuffer),
@@ -924,8 +912,7 @@ impl HasContext for Context {
 
         match raw_vertex_array {
             Some(va) => {
-                let key = self.vertex_arrays.borrow_mut().0.insert(());
-                self.vertex_arrays.borrow_mut().1.insert(key, va);
+                let key = self.vertex_arrays.borrow_mut().insert(va);
                 Ok(key)
             }
             None => Err(String::from("Unable to create vertex array object")),
@@ -934,7 +921,7 @@ impl HasContext for Context {
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
         let mut vertex_arrays = self.vertex_arrays.borrow_mut();
-        if let Some(ref va) = vertex_arrays.1.remove(vertex_array) {
+        if let Some(ref va) = vertex_arrays.remove(vertex_array) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => {
                     match &self.extensions.oes_vertex_array_object {
@@ -949,7 +936,7 @@ impl HasContext for Context {
 
     unsafe fn bind_vertex_array(&self, vertex_array: Option<Self::VertexArray>) {
         let vertex_arrays = self.vertex_arrays.borrow();
-        let raw_vertex_array = vertex_array.map(|va| vertex_arrays.1.get_unchecked(va));
+        let raw_vertex_array = vertex_array.map(|va| vertex_arrays.get_unchecked(va));
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 match &self.extensions.oes_vertex_array_object {
@@ -1155,7 +1142,7 @@ impl HasContext for Context {
 
     unsafe fn delete_buffer(&self, buffer: Self::Buffer) {
         let mut buffers = self.buffers.borrow_mut();
-        if let Some(ref b) = buffers.1.remove(buffer) {
+        if let Some(ref b) = buffers.remove(buffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_buffer(Some(b)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_buffer(Some(b)),
@@ -1165,7 +1152,7 @@ impl HasContext for Context {
 
     unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer) {
         let mut framebuffers = self.framebuffers.borrow_mut();
-        if let Some(ref f) = framebuffers.1.remove(framebuffer) {
+        if let Some(ref f) = framebuffers.remove(framebuffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_framebuffer(Some(f)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_framebuffer(Some(f)),
@@ -1175,7 +1162,7 @@ impl HasContext for Context {
 
     unsafe fn delete_query(&self, query: Self::Query) {
         let mut queries = self.queries.borrow_mut();
-        if let Some(ref r) = queries.1.remove(query) {
+        if let Some(ref r) = queries.remove(query) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_query(Some(r)),
@@ -1185,7 +1172,7 @@ impl HasContext for Context {
 
     unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer) {
         let mut renderbuffers = self.renderbuffers.borrow_mut();
-        if let Some(ref r) = renderbuffers.1.remove(renderbuffer) {
+        if let Some(ref r) = renderbuffers.remove(renderbuffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_renderbuffer(Some(r)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_renderbuffer(Some(r)),
@@ -1195,7 +1182,7 @@ impl HasContext for Context {
 
     unsafe fn delete_sampler(&self, sampler: Self::Sampler) {
         let mut samplers = self.samplers.borrow_mut();
-        if let Some(ref s) = samplers.1.remove(sampler) {
+        if let Some(ref s) = samplers.remove(sampler) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => panic!("Samplers are not supported"),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_sampler(Some(s)),
@@ -1205,7 +1192,7 @@ impl HasContext for Context {
 
     unsafe fn delete_sync(&self, fence: Self::Fence) {
         let mut fences = self.fences.borrow_mut();
-        if let Some(ref f) = fences.1.remove(fence) {
+        if let Some(ref f) = fences.remove(fence) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => panic!("Fences are not supported"),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_sync(Some(f)),
@@ -1215,7 +1202,7 @@ impl HasContext for Context {
 
     unsafe fn delete_texture(&self, texture: Self::Texture) {
         let mut textures = self.textures.borrow_mut();
-        if let Some(ref t) = textures.1.remove(texture) {
+        if let Some(ref t) = textures.remove(texture) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.delete_texture(Some(t)),
                 RawRenderingContext::WebGl2(ref gl) => gl.delete_texture(Some(t)),
@@ -1437,7 +1424,7 @@ impl HasContext for Context {
         renderbuffer: Option<Self::Renderbuffer>,
     ) {
         let renderbuffers = self.renderbuffers.borrow();
-        let raw_renderbuffer = renderbuffer.map(|r| renderbuffers.1.get_unchecked(r));
+        let raw_renderbuffer = renderbuffer.map(|r| renderbuffers.get_unchecked(r));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.framebuffer_renderbuffer(
                 target,
@@ -1473,7 +1460,7 @@ impl HasContext for Context {
         level: i32,
     ) {
         let textures = self.textures.borrow();
-        let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
+        let raw_texture = texture.map(|t| textures.get_unchecked(t));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.framebuffer_texture_2d(target, attachment, texture_target, raw_texture, level);
@@ -1505,7 +1492,7 @@ impl HasContext for Context {
         layer: i32,
     ) {
         let textures = self.textures.borrow();
-        let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
+        let raw_texture = texture.map(|t| textures.get_unchecked(t));
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Framebuffer texture layer is not supported");
@@ -1655,7 +1642,7 @@ impl HasContext for Context {
         name: &str,
     ) -> Option<Self::UniformLocation> {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_uniform_location(raw_program, name),
             RawRenderingContext::WebGl2(ref gl) => gl.get_uniform_location(raw_program, name),
@@ -1664,7 +1651,7 @@ impl HasContext for Context {
 
     unsafe fn get_attrib_location(&self, program: Self::Program, name: &str) -> Option<u32> {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         let attrib_location = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_attrib_location(raw_program, name),
             RawRenderingContext::WebGl2(ref gl) => gl.get_attrib_location(raw_program, name),
@@ -1678,7 +1665,7 @@ impl HasContext for Context {
 
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.bind_attrib_location(raw_program, index, name)
@@ -1691,7 +1678,7 @@ impl HasContext for Context {
 
     unsafe fn get_active_attributes(&self, program: Self::Program) -> u32 {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.get_program_parameter(raw_program, WebGlRenderingContext::ACTIVE_ATTRIBUTES)
@@ -1711,7 +1698,7 @@ impl HasContext for Context {
         index: u32,
     ) -> Option<ActiveAttribute> {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
                 gl.get_active_attrib(raw_program, index)
@@ -1734,7 +1721,7 @@ impl HasContext for Context {
 
     unsafe fn get_sync_status(&self, fence: Self::Fence) -> u32 {
         let fences = self.fences.borrow();
-        let raw_fence = fences.1.get_unchecked(fence);
+        let raw_fence = fences.get_unchecked(fence);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Sync is not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl
@@ -1747,7 +1734,7 @@ impl HasContext for Context {
 
     unsafe fn is_sync(&self, fence: Self::Fence) -> bool {
         let fences = self.fences.borrow();
-        let raw_fence = fences.1.get_unchecked(fence);
+        let raw_fence = fences.get_unchecked(fence);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Sync is not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl.is_sync(Some(raw_fence)),
@@ -1797,7 +1784,7 @@ impl HasContext for Context {
 
     unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32) {
         let samplers = self.samplers.borrow();
-        let raw_sampler = samplers.1.get_unchecked(sampler);
+        let raw_sampler = samplers.get_unchecked(sampler);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Samper parameter for `f32` is not supported")
@@ -1819,7 +1806,7 @@ impl HasContext for Context {
 
     unsafe fn sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32, value: i32) {
         let samplers = self.samplers.borrow();
-        let raw_sampler = samplers.1.get_unchecked(sampler);
+        let raw_sampler = samplers.get_unchecked(sampler);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Samper parameter for `i32` is not supported")
@@ -2543,7 +2530,7 @@ impl HasContext for Context {
 
     unsafe fn bind_texture(&self, target: u32, texture: Option<Self::Texture>) {
         let textures = self.textures.borrow();
-        let raw_texture = texture.map(|t| textures.1.get_unchecked(t));
+        let raw_texture = texture.map(|t| textures.get_unchecked(t));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.bind_texture(target, raw_texture),
             RawRenderingContext::WebGl2(ref gl) => gl.bind_texture(target, raw_texture),
@@ -2552,7 +2539,7 @@ impl HasContext for Context {
 
     unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>) {
         let samplers = self.samplers.borrow();
-        let raw_sampler = sampler.map(|s| samplers.1.get_unchecked(s));
+        let raw_sampler = sampler.map(|s| samplers.get_unchecked(s));
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Bind sampler is not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl.bind_sampler(unit, raw_sampler),
@@ -2573,8 +2560,7 @@ impl HasContext for Context {
         };
         match raw_fence {
             Some(f) => {
-                let key = self.fences.borrow_mut().0.insert(());
-                self.fences.borrow_mut().1.insert(key, f);
+                let key = self.fences.borrow_mut().insert(f);
                 Ok(key)
             }
             None => Err(String::from("Unable to create fence object")),
@@ -3074,7 +3060,7 @@ impl HasContext for Context {
 
     unsafe fn get_uniform_block_index(&self, program: Self::Program, name: &str) -> Option<u32> {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         let index = match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform blocks are not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl.get_uniform_block_index(raw_program, name),
@@ -3093,7 +3079,7 @@ impl HasContext for Context {
             }
             RawRenderingContext::WebGl2(ref gl) => {
                 let programs = self.programs.borrow();
-                let raw_program = programs.1.get_unchecked(program);
+                let raw_program = programs.get_unchecked(program);
                 gl.uniform_block_binding(raw_program, index, binding);
             }
         }
@@ -3156,7 +3142,7 @@ impl HasContext for Context {
         v: &mut [i32],
     ) {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         let value = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_uniform(&raw_program, location),
             RawRenderingContext::WebGl2(ref gl) => gl.get_uniform(&raw_program, location),
@@ -3176,7 +3162,7 @@ impl HasContext for Context {
         v: &mut [f32],
     ) {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         let value = match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_uniform(&raw_program, location),
             RawRenderingContext::WebGl2(ref gl) => gl.get_uniform(&raw_program, location),
@@ -3191,7 +3177,7 @@ impl HasContext for Context {
 
     unsafe fn begin_query(&self, target: u32, query: Self::Query) {
         let queries = self.queries.borrow();
-        let raw_query = queries.1.get_unchecked(query);
+        let raw_query = queries.get_unchecked(query);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl.begin_query(target, raw_query),
@@ -3207,7 +3193,7 @@ impl HasContext for Context {
 
     unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32 {
         let queries = self.queries.borrow();
-        let raw_query = queries.1.get_unchecked(query);
+        let raw_query = queries.get_unchecked(query);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
             RawRenderingContext::WebGl2(ref gl) => gl
@@ -3228,8 +3214,7 @@ impl HasContext for Context {
 
         match raw_transform_feedback {
             Some(t) => {
-                let key = self.transform_feedbacks.borrow_mut().0.insert(());
-                self.transform_feedbacks.borrow_mut().1.insert(key, t);
+                let key = self.transform_feedbacks.borrow_mut().insert(t);
                 Ok(key)
             }
             None => Err(String::from("Unable to create TransformFeedback object")),
@@ -3238,7 +3223,7 @@ impl HasContext for Context {
 
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback) {
         let mut transform_feedbacks = self.transform_feedbacks.borrow_mut();
-        if let Some(ref t) = transform_feedbacks.1.remove(transform_feedback) {
+        if let Some(ref t) = transform_feedbacks.remove(transform_feedback) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref _gl) => {
                     panic!("TransformFeedback objects are not supported")
@@ -3255,7 +3240,7 @@ impl HasContext for Context {
     ) {
         let transform_feedbacks = self.transform_feedbacks.borrow();
         let raw_transform_feedback =
-            transform_feedback.map(|tf| transform_feedbacks.1.get_unchecked(tf));
+            transform_feedback.map(|tf| transform_feedbacks.get_unchecked(tf));
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("TransformFeedback objects are not supported")
@@ -3309,7 +3294,7 @@ impl HasContext for Context {
         buffer_mode: u32,
     ) {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("TransformFeedback objects are not supported")
@@ -3330,7 +3315,7 @@ impl HasContext for Context {
         index: u32,
     ) -> Option<ActiveTransformFeedback> {
         let programs = self.programs.borrow();
-        let raw_program = programs.1.get_unchecked(program);
+        let raw_program = programs.get_unchecked(program);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("TransformFeedback objects are not supported")

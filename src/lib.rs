@@ -71,6 +71,11 @@ pub enum PixelUnpackData<'a> {
     Slice(&'a [u8]),
 }
 
+pub enum CompressedPixelUnpackData<'a> {
+    BufferRange(core::ops::Range<u32>),
+    Slice(&'a [u8]),
+}
+
 pub trait HasContext {
     type Shader: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Program: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
@@ -747,6 +752,18 @@ pub trait HasContext {
         format: u32,
         ty: u32,
         pixels: PixelUnpackData,
+    );
+
+    unsafe fn compressed_tex_sub_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        pixels: CompressedPixelUnpackData,
     );
 
     unsafe fn tex_sub_image_3d(

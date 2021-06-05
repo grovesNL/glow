@@ -1659,6 +1659,33 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn compressed_tex_sub_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        pixels: CompressedPixelUnpackData,
+    ) {
+        let gl = &self.raw;
+        let (data, image_size) = match pixels {
+            CompressedPixelUnpackData::BufferRange(ref range) => (
+                range.start as *const std::ffi::c_void,
+                (range.end - range.start) as i32,
+            ),
+            CompressedPixelUnpackData::Slice(data) => {
+                (data.as_ptr() as *const std::ffi::c_void, data.len() as i32)
+            }
+        };
+
+        gl.CompressedTexSubImage2D(
+            target, level, x_offset, y_offset, width, height, format, image_size, data,
+        );
+    }
+
     unsafe fn tex_sub_image_3d(
         &self,
         target: u32,

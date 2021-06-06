@@ -1906,12 +1906,12 @@ impl HasContext for Context {
         &self,
         target: u32,
         samples: i32,
-        internal_format: u32,
+        internal_format: i32,
         width: i32,
         height: i32,
         fixed_sample_locations: bool
     ) {
-        unimplemented!()
+        panic!("Tex image 2D multisample is not supported");
     }
 
     unsafe fn compressed_tex_image_2d(

@@ -1144,10 +1144,10 @@ impl HasContext for Context {
         gl.TexImage2DMultisample(
             target,
             samples,
-            internal_format,
+            internal_format as u32,
             width,
             height,
-            fixed_sample_locations
+            if fixed_sample_locations { 1 } else { 0 }
         );
     }
 

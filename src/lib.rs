@@ -509,7 +509,7 @@ pub trait HasContext {
         internal_format: i32,
         width: i32,
         height: i32,
-        fixed_sample_locations: bool
+        fixed_sample_locations: bool,
     );
 
     unsafe fn compressed_tex_image_2d(
@@ -1366,6 +1366,22 @@ pub const COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2: u32 = 0x9277;
 pub const COMPRESSED_SRGB_ALPHA: u32 = 0x8C49;
 
 pub const COMPRESSED_SRGB_ALPHA_BPTC_UNORM: u32 = 0x8E8D;
+
+pub const COMPRESSED_RGB_S3TC_DXT1_EXT: u32 = 0x83F0;
+
+pub const COMPRESSED_RGBA_S3TC_DXT1_EXT: u32 = 0x83F1;
+
+pub const COMPRESSED_RGBA_S3TC_DXT3_EXT: u32 = 0x83F2;
+
+pub const COMPRESSED_RGBA_S3TC_DXT5_EXT: u32 = 0x83F3;
+
+pub const COMPRESSED_SRGB_S3TC_DXT1_EXT: u32 = 0x8C4C;
+
+pub const COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT: u32 = 0x8C4D;
+
+pub const COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT: u32 = 0x8C4E;
+
+pub const COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT: u32 = 0x8C4F;
 
 pub const COMPRESSED_TEXTURE_FORMATS: u32 = 0x86A3;
 

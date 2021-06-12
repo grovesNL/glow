@@ -1115,12 +1115,26 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn client_wait_sync(&self, _fence: Self::Fence, _flags: u32, _timeout: i32) -> u32 {
-        panic!("Client wait sync is not supported")
+    unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: u32, timeout: i32) -> u32 {
+        let fences = self.fences.borrow();
+        let raw_fence = fences.get_unchecked(fence);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Client wait sync is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.client_wait_sync_with_u32(raw_fence, flags, timeout as u32)
+            }
+        }
     }
 
-    unsafe fn wait_sync(&self, _fence: Self::Fence, _flags: u32, _timeout: u64) {
-        panic!("Wait sync is not supported")
+    unsafe fn wait_sync(&self, fence: Self::Fence, flags: u32, timeout: u64) {
+        let fences = self.fences.borrow();
+        let raw_fence = fences.get_unchecked(fence);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Wait sync is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.wait_sync_with_i32(raw_fence, flags, timeout as i32)
+            }
+        }
     }
 
     unsafe fn copy_buffer_sub_data(

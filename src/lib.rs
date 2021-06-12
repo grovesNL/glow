@@ -10,7 +10,6 @@ use core::hash::Hash;
 use std::collections::HashSet;
 
 mod version;
-pub use version::Version;
 
 #[cfg(not(target_arch = "wasm32"))]
 mod native;

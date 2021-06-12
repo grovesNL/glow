@@ -4,6 +4,7 @@ use std::collections::HashSet;
 use std::ffi::CString;
 
 use crate::gl46 as native_gl;
+use crate::version::Version;
 
 #[derive(Default)]
 struct Constants {

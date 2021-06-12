@@ -1,6 +1,6 @@
 /// A version number for a specific component of an OpenGL implementation
 #[derive(Clone, Eq, Ord, PartialEq, PartialOrd)]
-pub struct Version {
+pub(crate) struct Version {
     pub major: u32,
     pub minor: u32,
     pub is_embedded: bool,

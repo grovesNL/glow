@@ -436,6 +436,15 @@ impl HasContext for Context {
     type UniformLocation = WebGlUniformLocation;
     type TransformFeedback = WebTransformFeedbackKey;
 
+    fn get_supported_extensions(&self) -> HashSet<String> {
+        let extensions_array = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_supported_extensions(),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_supported_extensions(),
+        }
+        .unwrap();
+        extensions_array.iter().map(|val| val.as_string()).collect()
+    }
+
     fn supports_debug(&self) -> bool {
         false
     }
@@ -1544,12 +1553,7 @@ impl HasContext for Context {
     unsafe fn get_parameter_i32(&self, parameter: u32) -> i32 {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
-            RawRenderingContext::WebGl2(ref gl) => {
-                if parameter == NUM_EXTENSIONS {
-                    return gl.get_supported_extensions().unwrap().length() as i32;
-                }
-                gl.get_parameter(parameter)
-            }
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
         }
         .unwrap()
         .as_f64()
@@ -1620,37 +1624,16 @@ impl HasContext for Context {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Get parameter indexed is not supported")
             }
-            RawRenderingContext::WebGl2(ref gl) => {
-                if parameter == EXTENSIONS {
-                    gl.get_supported_extensions()
-                        .unwrap()
-                        .get(index)
-                        .as_string()
-                        .unwrap_or_else(|| String::from(""))
-                } else {
-                    gl.get_indexed_parameter(parameter, index)
-                        .unwrap()
-                        .as_string()
-                        // Errors will be caught by the browser or through `get_error`
-                        // so return a default instead
-                        .unwrap_or_else(|| String::from(""))
-                }
-            }
+            RawRenderingContext::WebGl2(ref gl) => gl.get_indexed_parameter(parameter, index),
         }
+        .unwrap()
+        .as_string()
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or_else(|| String::from(""))
     }
 
     unsafe fn get_parameter_string(&self, parameter: u32) -> String {
-        if parameter == EXTENSIONS {
-            return match self.raw {
-                RawRenderingContext::WebGl1(ref gl) => gl.get_supported_extensions(),
-                RawRenderingContext::WebGl2(ref gl) => gl.get_supported_extensions(),
-            }
-            .unwrap()
-            .join(" ")
-            .as_string()
-            .unwrap();
-        }
-
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
             RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),

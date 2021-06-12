@@ -47,6 +47,14 @@ impl Context {
             context.extensions.insert(extension_name);
         }
 
+        // Fallback
+        context.extensions.extend(
+            context
+                .get_parameter_string(EXTENSIONS)
+                .split(' ')
+                .map(|s| s.to_string()),
+        );
+
         // After the extensions are known, we can populate constants (including
         // constants that depend on extensions being enabled)
         context.constants.max_label_length = if context.supports_debug() {
@@ -78,6 +86,10 @@ impl HasContext for Context {
     type Query = native_gl::GLuint;
     type UniformLocation = native_gl::GLuint;
     type TransformFeedback = native_gl::GLuint;
+
+    fn get_supported_extensions(&self) -> HashSet<String> {
+        self.extensions.clone()
+    }
 
     fn supports_debug(&self) -> bool {
         self.extensions.contains("GL_KHR_debug")
@@ -1138,7 +1150,7 @@ impl HasContext for Context {
         internal_format: i32,
         width: i32,
         height: i32,
-        fixed_sample_locations: bool
+        fixed_sample_locations: bool,
     ) {
         let gl = &self.raw;
         gl.TexImage2DMultisample(
@@ -1147,7 +1159,7 @@ impl HasContext for Context {
             internal_format as u32,
             width,
             height,
-            if fixed_sample_locations { 1 } else { 0 }
+            if fixed_sample_locations { 1 } else { 0 },
         );
     }
 

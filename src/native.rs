@@ -39,21 +39,27 @@ impl Context {
             constants: Constants::default(),
         };
 
-        // Use core-only functions to populate extension list
-        // TODO: Use a fallback for versions < 3.0
-        let num_extensions = context.get_parameter_i32(NUM_EXTENSIONS);
-        for i in 0..num_extensions {
-            let extension_name = context.get_parameter_indexed_string(EXTENSIONS, i as u32);
-            context.extensions.insert(extension_name);
-        }
+        let raw_version = context.get_parameter_string(VERSION);
+        let version = Version::parse(&raw_version).unwrap();
 
-        // Fallback
-        context.extensions.extend(
-            context
-                .get_parameter_string(EXTENSIONS)
-                .split(' ')
-                .map(|s| s.to_string()),
-        );
+        // Use core-only functions to populate extension list
+        if (version >= Version::new(3, 0, None, String::from("")))
+            || (version >= Version::new_embedded(3, 0, String::from("")))
+        {
+            let num_extensions = context.get_parameter_i32(NUM_EXTENSIONS);
+            for i in 0..num_extensions {
+                let extension_name = context.get_parameter_indexed_string(EXTENSIONS, i as u32);
+                context.extensions.insert(extension_name);
+            }
+        } else {
+            // Fallback
+            context.extensions.extend(
+                context
+                    .get_parameter_string(EXTENSIONS)
+                    .split(' ')
+                    .map(|s| s.to_string()),
+            );
+        };
 
         // After the extensions are known, we can populate constants (including
         // constants that depend on extensions being enabled)

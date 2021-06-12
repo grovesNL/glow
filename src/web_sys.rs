@@ -442,7 +442,10 @@ impl HasContext for Context {
             RawRenderingContext::WebGl2(ref gl) => gl.get_supported_extensions(),
         }
         .unwrap();
-        extensions_array.iter().map(|val| val.as_string()).collect()
+        extensions_array
+            .iter()
+            .map(|val| val.as_string().unwrap())
+            .collect()
     }
 
     fn supports_debug(&self) -> bool {

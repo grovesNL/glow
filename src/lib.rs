@@ -93,7 +93,7 @@ pub trait HasContext {
     type TransformFeedback: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type UniformLocation: Clone + Debug;
 
-    fn get_supported_extensions(&self) -> HashSet<String>;
+    fn supported_extensions(&self) -> &HashSet<String>;
 
     fn supports_debug(&self) -> bool;
 

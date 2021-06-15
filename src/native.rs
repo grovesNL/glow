@@ -94,8 +94,8 @@ impl HasContext for Context {
     type UniformLocation = native_gl::GLuint;
     type TransformFeedback = native_gl::GLuint;
 
-    fn get_supported_extensions(&self) -> HashSet<String> {
-        self.extensions.clone()
+    fn supported_extensions(&self) -> &HashSet<String> {
+        &self.extensions
     }
 
     fn supports_debug(&self) -> bool {

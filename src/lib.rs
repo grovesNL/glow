@@ -7,6 +7,9 @@
 
 use core::fmt::Debug;
 use core::hash::Hash;
+use std::collections::HashSet;
+
+mod version;
 
 #[cfg(not(target_arch = "wasm32"))]
 mod native;
@@ -89,6 +92,8 @@ pub trait HasContext {
     type Query: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type TransformFeedback: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type UniformLocation: Clone + Debug;
+
+    fn supported_extensions(&self) -> &HashSet<String>;
 
     fn supports_debug(&self) -> bool;
 

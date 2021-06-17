@@ -4,6 +4,7 @@ use std::collections::HashSet;
 use std::ffi::CString;
 
 use crate::gl46 as native_gl;
+use crate::version::Version;
 
 #[derive(Default)]
 struct Constants {
@@ -39,13 +40,27 @@ impl Context {
             constants: Constants::default(),
         };
 
+        let raw_version = context.get_parameter_string(VERSION);
+        let version = Version::parse(&raw_version).unwrap();
+
         // Use core-only functions to populate extension list
-        // TODO: Use a fallback for versions < 3.0
-        let num_extensions = context.get_parameter_i32(NUM_EXTENSIONS);
-        for i in 0..num_extensions {
-            let extension_name = context.get_parameter_indexed_string(EXTENSIONS, i as u32);
-            context.extensions.insert(extension_name);
-        }
+        if (version >= Version::new(3, 0, None, String::from("")))
+            || (version >= Version::new_embedded(3, 0, String::from("")))
+        {
+            let num_extensions = context.get_parameter_i32(NUM_EXTENSIONS);
+            for i in 0..num_extensions {
+                let extension_name = context.get_parameter_indexed_string(EXTENSIONS, i as u32);
+                context.extensions.insert(extension_name);
+            }
+        } else {
+            // Fallback
+            context.extensions.extend(
+                context
+                    .get_parameter_string(EXTENSIONS)
+                    .split(' ')
+                    .map(|s| s.to_string()),
+            );
+        };
 
         // After the extensions are known, we can populate constants (including
         // constants that depend on extensions being enabled)
@@ -78,6 +93,10 @@ impl HasContext for Context {
     type Query = native_gl::GLuint;
     type UniformLocation = native_gl::GLuint;
     type TransformFeedback = native_gl::GLuint;
+
+    fn supported_extensions(&self) -> &HashSet<String> {
+        &self.extensions
+    }
 
     fn supports_debug(&self) -> bool {
         self.extensions.contains("GL_KHR_debug")
@@ -1138,7 +1157,7 @@ impl HasContext for Context {
         internal_format: i32,
         width: i32,
         height: i32,
-        fixed_sample_locations: bool
+        fixed_sample_locations: bool,
     ) {
         let gl = &self.raw;
         gl.TexImage2DMultisample(
@@ -1147,7 +1166,7 @@ impl HasContext for Context {
             internal_format as u32,
             width,
             height,
-            if fixed_sample_locations { 1 } else { 0 }
+            if fixed_sample_locations { 1 } else { 0 },
         );
     }
 

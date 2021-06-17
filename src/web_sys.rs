@@ -65,6 +65,7 @@ fn tracked_resource<K: slotmap::Key, V>() -> TrackedResource<K, V> {
 pub struct Context {
     raw: RawRenderingContext,
     extensions: Extensions,
+    supported_extensions: HashSet<String>,
     shaders: TrackedResource<WebShaderKey, WebGlShader>,
     programs: TrackedResource<WebProgramKey, WebGlProgram>,
     buffers: TrackedResource<WebBufferKey, WebGlBuffer>,
@@ -102,7 +103,7 @@ macro_rules! build_extensions {
                 .and_then(|maybe_ext| maybe_ext.map(|_| ()))
         }
 
-        Extensions {
+        let extensions = Extensions {
             angle_instanced_arrays: get_extension::<web_sys::AngleInstancedArrays>(
                 &$context,
                 "ANGLE_instanced_arrays",
@@ -229,16 +230,26 @@ macro_rules! build_extensions {
                 &$context,
                 "WEBGL_lose_context",
             ),
-        }
+        };
+
+        let supported_extensions = $context
+            .get_supported_extensions()
+            .unwrap()
+            .iter()
+            .map(|val| val.as_string().unwrap())
+            .collect::<HashSet<String>>();
+
+        (extensions, supported_extensions)
     }};
 }
 
 impl Context {
     pub fn from_webgl1_context(context: WebGlRenderingContext) -> Self {
-        let extensions = build_extensions!(context, WebGlRenderingContext);
+        let (extensions, supported_extensions) = build_extensions!(context, WebGlRenderingContext);
         Self {
             raw: RawRenderingContext::WebGl1(context),
             extensions,
+            supported_extensions,
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),
@@ -254,10 +265,11 @@ impl Context {
     }
 
     pub fn from_webgl2_context(context: WebGl2RenderingContext) -> Self {
-        let extensions = build_extensions!(context, WebGl2RenderingContext);
+        let (extensions, supported_extensions) = build_extensions!(context, WebGl2RenderingContext);
         Self {
             raw: RawRenderingContext::WebGl2(context),
             extensions,
+            supported_extensions,
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),
@@ -435,6 +447,10 @@ impl HasContext for Context {
     type Query = WebQueryKey;
     type UniformLocation = WebGlUniformLocation;
     type TransformFeedback = WebTransformFeedbackKey;
+
+    fn supported_extensions(&self) -> &HashSet<String> {
+        &self.supported_extensions
+    }
 
     fn supports_debug(&self) -> bool {
         false
@@ -1923,7 +1939,7 @@ impl HasContext for Context {
         internal_format: i32,
         width: i32,
         height: i32,
-        fixed_sample_locations: bool
+        fixed_sample_locations: bool,
     ) {
         panic!("Tex image 2D multisample is not supported");
     }

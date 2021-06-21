@@ -3413,6 +3413,19 @@ impl HasContext for Context {
     unsafe fn memory_barrier_by_region(&self, _barriers: u32) {
         panic!("Memory barriers are not supported")
     }
+
+    unsafe fn bind_image_texture(
+        &self,
+        _unit: u32,
+        _texture: Self::Texture,
+        _level: i32,
+        _layered: bool,
+        _layer: i32,
+        _access: u32,
+        _format: u32,
+    ) {
+        panic!("Image load/store is not supported")
+    }
 }
 
 /// Sending texture data requires different data views for different data types.

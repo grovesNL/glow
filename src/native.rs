@@ -2393,6 +2393,20 @@ impl HasContext for Context {
         let gl = &self.raw;
         gl.MemoryBarrierByRegion(barriers);
     }
+
+    unsafe fn bind_image_texture(
+        &self,
+        unit: u32,
+        texture: Self::Texture,
+        level: i32,
+        layered: bool,
+        layer: i32,
+        access: u32,
+        format: u32,
+    ) {
+        let gl = &self.raw;
+        gl.BindImageTexture(unit, texture, level, layered as u8, layer, access, format);
+    }
 }
 
 extern "system" fn raw_debug_message_callback<F>(

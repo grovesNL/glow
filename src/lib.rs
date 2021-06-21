@@ -1012,6 +1012,17 @@ pub trait HasContext {
     unsafe fn memory_barrier(&self, barriers: u32);
 
     unsafe fn memory_barrier_by_region(&self, barriers: u32);
+
+    unsafe fn bind_image_texture(
+        &self,
+        unit: u32,
+        texture: Self::Texture,
+        level: i32,
+        layered: bool,
+        layer: i32,
+        access: u32,
+        format: u32,
+    );
 }
 
 pub const ACTIVE_ATOMIC_COUNTER_BUFFERS: u32 = 0x92D9;

@@ -1081,7 +1081,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
+    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &[i32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Clear buffer with `i32` slice is not supported");
@@ -1092,7 +1092,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &mut [u32]) {
+    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &[u32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Clear buffer with `u32` slice is not supported")
@@ -1103,7 +1103,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &mut [f32]) {
+    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &[f32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Clear buffer with `f32` slice is not supported")
@@ -1829,7 +1829,7 @@ impl HasContext for Context {
         &self,
         _sampler: Self::Sampler,
         _name: u32,
-        _value: &mut [f32],
+        _value: &[f32],
     ) {
         panic!("Sampler parameter for `f32` slice is not supported");
     }

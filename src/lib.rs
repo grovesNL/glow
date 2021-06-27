@@ -235,11 +235,11 @@ pub trait HasContext {
 
     unsafe fn check_framebuffer_status(&self, target: u32) -> u32;
 
-    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]);
+    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &[i32]);
 
-    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &mut [u32]);
+    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &[u32]);
 
-    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &mut [f32]);
+    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &[f32]);
 
     unsafe fn clear_buffer_depth_stencil(
         &self,
@@ -460,12 +460,7 @@ pub trait HasContext {
 
     unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32);
 
-    unsafe fn sampler_parameter_f32_slice(
-        &self,
-        sampler: Self::Sampler,
-        name: u32,
-        value: &mut [f32],
-    );
+    unsafe fn sampler_parameter_f32_slice(&self, sampler: Self::Sampler, name: u32, value: &[f32]);
 
     unsafe fn sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32, value: i32);
 

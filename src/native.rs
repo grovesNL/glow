@@ -523,17 +523,17 @@ impl HasContext for Context {
         gl.CheckFramebufferStatus(target)
     }
 
-    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
+    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &[i32]) {
         let gl = &self.raw;
         gl.ClearBufferiv(target, draw_buffer as i32, values.as_ptr());
     }
 
-    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &mut [u32]) {
+    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &[u32]) {
         let gl = &self.raw;
         gl.ClearBufferuiv(target, draw_buffer as i32, values.as_ptr());
     }
 
-    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &mut [f32]) {
+    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &[f32]) {
         let gl = &self.raw;
         gl.ClearBufferfv(target, draw_buffer as i32, values.as_ptr());
     }
@@ -1058,12 +1058,7 @@ impl HasContext for Context {
         gl.SamplerParameterf(sampler, name, value);
     }
 
-    unsafe fn sampler_parameter_f32_slice(
-        &self,
-        sampler: Self::Sampler,
-        name: u32,
-        value: &mut [f32],
-    ) {
+    unsafe fn sampler_parameter_f32_slice(&self, sampler: Self::Sampler, name: u32, value: &[f32]) {
         let gl = &self.raw;
         gl.SamplerParameterfv(sampler, name, value.as_ptr());
     }

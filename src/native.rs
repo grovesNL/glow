@@ -1265,6 +1265,26 @@ impl HasContext for Context {
         gl.TexStorage2D(target, levels, internal_format, width, height);
     }
 
+    unsafe fn tex_storage_2d_multisample(
+        &self,
+        target: u32,
+        samples: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+        fixed_sample_locations: bool,
+    ) {
+        let gl = &self.raw;
+        gl.TexStorage2DMultisample(
+            target,
+            samples,
+            internal_format,
+            width,
+            height,
+            if fixed_sample_locations { 1 } else { 0 },
+        );
+    }
+
     unsafe fn tex_storage_3d(
         &self,
         target: u32,

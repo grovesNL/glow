@@ -567,6 +567,16 @@ pub trait HasContext {
         height: i32,
     );
 
+    unsafe fn tex_storage_2d_multisample(
+        &self,
+        target: u32,
+        samples: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+        fixed_sample_locations: bool,
+    );
+
     unsafe fn tex_storage_3d(
         &self,
         target: u32,

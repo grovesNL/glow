@@ -2072,6 +2072,18 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn tex_storage_2d_multisample(
+        &self,
+        _target: u32,
+        _samples: i32,
+        _internal_format: u32,
+        _width: i32,
+        _height: i32,
+        _fixed_sample_locations: bool,
+    ) {
+        panic!("Tex storage 2D multisample is not supported");
+    }
+
     unsafe fn tex_storage_3d(
         &self,
         target: u32,

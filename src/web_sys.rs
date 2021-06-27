@@ -1298,6 +1298,10 @@ impl HasContext for Context {
         panic!("Draw arrays instanced base instance is not supported");
     }
 
+    unsafe fn draw_arrays_indirect_offset(&self, _mode: u32, _offset: i32) {
+        panic!("Draw arrays indirect is not supported");
+    }
+
     unsafe fn draw_buffer(&self, draw_buffer: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
@@ -1412,6 +1416,10 @@ impl HasContext for Context {
         _base_instance: u32,
     ) {
         panic!("Draw elements instanced base vertex base instance is not supported");
+    }
+
+    unsafe fn draw_elements_indirect_offset(&self, _mode: u32, _element_type: u32, _offset: i32) {
+        panic!("Draw elements indirect is not supported");
     }
 
     unsafe fn enable(&self, parameter: u32) {

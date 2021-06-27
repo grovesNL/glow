@@ -298,6 +298,8 @@ pub trait HasContext {
         base_instance: u32,
     );
 
+    unsafe fn draw_arrays_indirect_offset(&self, mode: u32, offset: i32);
+
     unsafe fn draw_buffer(&self, buffer: u32);
 
     unsafe fn draw_buffers(&self, buffers: &[u32]);
@@ -342,6 +344,8 @@ pub trait HasContext {
         base_vertex: i32,
         base_instance: u32,
     );
+
+    unsafe fn draw_elements_indirect_offset(&self, mode: u32, element_type: u32, offset: i32);
 
     unsafe fn enable(&self, parameter: u32);
 

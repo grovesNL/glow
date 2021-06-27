@@ -665,6 +665,11 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn draw_arrays_indirect_offset(&self, mode: u32, offset: i32) {
+        let gl = &self.raw;
+        gl.DrawArraysIndirect(mode, offset as *const std::ffi::c_void);
+    }
+
     unsafe fn draw_buffer(&self, draw_buffer: u32) {
         let gl = &self.raw;
         gl.DrawBuffer(draw_buffer);
@@ -761,6 +766,11 @@ impl HasContext for Context {
             base_vertex,
             base_instance,
         );
+    }
+
+    unsafe fn draw_elements_indirect_offset(&self, mode: u32, element_type: u32, offset: i32) {
+        let gl = &self.raw;
+        gl.DrawElementsIndirect(mode, element_type, offset as *const std::ffi::c_void);
     }
 
     unsafe fn enable(&self, parameter: u32) {

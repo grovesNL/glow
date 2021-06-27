@@ -1170,6 +1170,72 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn copy_tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: u32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.copy_tex_image_2d(target, level, internal_format, x, y, width, height, border);
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.copy_tex_image_2d(target, level, internal_format, x, y, width, height, border);
+            }
+        }
+    }
+
+    unsafe fn copy_tex_sub_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.copy_tex_sub_image_2d(target, level, x_offset, y_offset, x, y, width, height);
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.copy_tex_sub_image_2d(target, level, x_offset, y_offset, x, y, width, height);
+            }
+        }
+    }
+
+    unsafe fn copy_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Copy tex subimage 3D is not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.copy_tex_sub_image_3d(
+                    target, level, x_offset, y_offset, z_offset, x, y, width, height,
+                );
+            }
+        }
+    }
+
     unsafe fn delete_buffer(&self, buffer: Self::Buffer) {
         let mut buffers = self.buffers.borrow_mut();
         if let Some(ref b) = buffers.remove(buffer) {

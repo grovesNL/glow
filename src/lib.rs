@@ -261,6 +261,43 @@ pub trait HasContext {
         size: i32,
     );
 
+    unsafe fn copy_tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: u32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+    );
+
+    unsafe fn copy_tex_sub_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    );
+
+    unsafe fn copy_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    );
+
     unsafe fn delete_buffer(&self, buffer: Self::Buffer);
 
     unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer);

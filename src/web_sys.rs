@@ -1081,7 +1081,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
+    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &[i32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Clear buffer with `i32` slice is not supported");
@@ -1092,7 +1092,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &mut [u32]) {
+    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &[u32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Clear buffer with `u32` slice is not supported")
@@ -1103,7 +1103,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &mut [f32]) {
+    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &[f32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("Clear buffer with `f32` slice is not supported")
@@ -1167,6 +1167,72 @@ impl HasContext for Context {
                 .copy_buffer_sub_data_with_i32_and_i32_and_i32(
                     src_target, dst_target, src_offset, dst_offset, size,
                 ),
+        }
+    }
+
+    unsafe fn copy_tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: u32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.copy_tex_image_2d(target, level, internal_format, x, y, width, height, border);
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.copy_tex_image_2d(target, level, internal_format, x, y, width, height, border);
+            }
+        }
+    }
+
+    unsafe fn copy_tex_sub_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.copy_tex_sub_image_2d(target, level, x_offset, y_offset, x, y, width, height);
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.copy_tex_sub_image_2d(target, level, x_offset, y_offset, x, y, width, height);
+            }
+        }
+    }
+
+    unsafe fn copy_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Copy tex subimage 3D is not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.copy_tex_sub_image_3d(
+                    target, level, x_offset, y_offset, z_offset, x, y, width, height,
+                );
+            }
         }
     }
 
@@ -1298,6 +1364,10 @@ impl HasContext for Context {
         panic!("Draw arrays instanced base instance is not supported");
     }
 
+    unsafe fn draw_arrays_indirect_offset(&self, _mode: u32, _offset: i32) {
+        panic!("Draw arrays indirect is not supported");
+    }
+
     unsafe fn draw_buffer(&self, draw_buffer: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
@@ -1412,6 +1482,10 @@ impl HasContext for Context {
         _base_instance: u32,
     ) {
         panic!("Draw elements instanced base vertex base instance is not supported");
+    }
+
+    unsafe fn draw_elements_indirect_offset(&self, _mode: u32, _element_type: u32, _offset: i32) {
+        panic!("Draw elements indirect is not supported");
     }
 
     unsafe fn enable(&self, parameter: u32) {
@@ -1829,7 +1903,7 @@ impl HasContext for Context {
         &self,
         _sampler: Self::Sampler,
         _name: u32,
-        _value: &mut [f32],
+        _value: &[f32],
     ) {
         panic!("Sampler parameter for `f32` slice is not supported");
     }
@@ -2070,6 +2144,18 @@ impl HasContext for Context {
                 gl.tex_storage_2d(target, levels, internal_format, width, height);
             }
         }
+    }
+
+    unsafe fn tex_storage_2d_multisample(
+        &self,
+        _target: u32,
+        _samples: i32,
+        _internal_format: u32,
+        _width: i32,
+        _height: i32,
+        _fixed_sample_locations: bool,
+    ) {
+        panic!("Tex storage 2D multisample is not supported");
     }
 
     unsafe fn tex_storage_3d(

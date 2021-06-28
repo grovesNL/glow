@@ -523,17 +523,17 @@ impl HasContext for Context {
         gl.CheckFramebufferStatus(target)
     }
 
-    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]) {
+    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &[i32]) {
         let gl = &self.raw;
         gl.ClearBufferiv(target, draw_buffer as i32, values.as_ptr());
     }
 
-    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &mut [u32]) {
+    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &[u32]) {
         let gl = &self.raw;
         gl.ClearBufferuiv(target, draw_buffer as i32, values.as_ptr());
     }
 
-    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &mut [f32]) {
+    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &[f32]) {
         let gl = &self.raw;
         gl.ClearBufferfv(target, draw_buffer as i32, values.as_ptr());
     }
@@ -574,6 +574,54 @@ impl HasContext for Context {
             src_offset as isize,
             dst_offset as isize,
             size as isize,
+        );
+    }
+
+    unsafe fn copy_tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: u32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+    ) {
+        let gl = &self.raw;
+        gl.CopyTexImage2D(target, level, internal_format, x, y, width, height, border);
+    }
+
+    unsafe fn copy_tex_sub_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) {
+        let gl = &self.raw;
+        gl.CopyTexSubImage2D(target, level, x_offset, y_offset, x, y, width, height);
+    }
+
+    unsafe fn copy_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) {
+        let gl = &self.raw;
+        gl.CopyTexSubImage3D(
+            target, level, x_offset, y_offset, z_offset, x, y, width, height,
         );
     }
 
@@ -663,6 +711,11 @@ impl HasContext for Context {
             instance_count,
             base_instance,
         );
+    }
+
+    unsafe fn draw_arrays_indirect_offset(&self, mode: u32, offset: i32) {
+        let gl = &self.raw;
+        gl.DrawArraysIndirect(mode, offset as *const std::ffi::c_void);
     }
 
     unsafe fn draw_buffer(&self, draw_buffer: u32) {
@@ -761,6 +814,11 @@ impl HasContext for Context {
             base_vertex,
             base_instance,
         );
+    }
+
+    unsafe fn draw_elements_indirect_offset(&self, mode: u32, element_type: u32, offset: i32) {
+        let gl = &self.raw;
+        gl.DrawElementsIndirect(mode, element_type, offset as *const std::ffi::c_void);
     }
 
     unsafe fn enable(&self, parameter: u32) {
@@ -1058,12 +1116,7 @@ impl HasContext for Context {
         gl.SamplerParameterf(sampler, name, value);
     }
 
-    unsafe fn sampler_parameter_f32_slice(
-        &self,
-        sampler: Self::Sampler,
-        name: u32,
-        value: &mut [f32],
-    ) {
+    unsafe fn sampler_parameter_f32_slice(&self, sampler: Self::Sampler, name: u32, value: &[f32]) {
         let gl = &self.raw;
         gl.SamplerParameterfv(sampler, name, value.as_ptr());
     }
@@ -1263,6 +1316,26 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         gl.TexStorage2D(target, levels, internal_format, width, height);
+    }
+
+    unsafe fn tex_storage_2d_multisample(
+        &self,
+        target: u32,
+        samples: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+        fixed_sample_locations: bool,
+    ) {
+        let gl = &self.raw;
+        gl.TexStorage2DMultisample(
+            target,
+            samples,
+            internal_format,
+            width,
+            height,
+            if fixed_sample_locations { 1 } else { 0 },
+        );
     }
 
     unsafe fn tex_storage_3d(

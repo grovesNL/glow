@@ -235,11 +235,11 @@ pub trait HasContext {
 
     unsafe fn check_framebuffer_status(&self, target: u32) -> u32;
 
-    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &mut [i32]);
+    unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &[i32]);
 
-    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &mut [u32]);
+    unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &[u32]);
 
-    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &mut [f32]);
+    unsafe fn clear_buffer_f32_slice(&self, target: u32, draw_buffer: u32, values: &[f32]);
 
     unsafe fn clear_buffer_depth_stencil(
         &self,
@@ -259,6 +259,43 @@ pub trait HasContext {
         src_offset: i32,
         dst_offset: i32,
         size: i32,
+    );
+
+    unsafe fn copy_tex_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: u32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+        border: i32,
+    );
+
+    unsafe fn copy_tex_sub_image_2d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    );
+
+    unsafe fn copy_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
     );
 
     unsafe fn delete_buffer(&self, buffer: Self::Buffer);
@@ -297,6 +334,8 @@ pub trait HasContext {
         instance_count: i32,
         base_instance: u32,
     );
+
+    unsafe fn draw_arrays_indirect_offset(&self, mode: u32, offset: i32);
 
     unsafe fn draw_buffer(&self, buffer: u32);
 
@@ -342,6 +381,8 @@ pub trait HasContext {
         base_vertex: i32,
         base_instance: u32,
     );
+
+    unsafe fn draw_elements_indirect_offset(&self, mode: u32, element_type: u32, offset: i32);
 
     unsafe fn enable(&self, parameter: u32);
 
@@ -460,12 +501,7 @@ pub trait HasContext {
 
     unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32);
 
-    unsafe fn sampler_parameter_f32_slice(
-        &self,
-        sampler: Self::Sampler,
-        name: u32,
-        value: &mut [f32],
-    );
+    unsafe fn sampler_parameter_f32_slice(&self, sampler: Self::Sampler, name: u32, value: &[f32]);
 
     unsafe fn sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32, value: i32);
 
@@ -565,6 +601,16 @@ pub trait HasContext {
         internal_format: u32,
         width: i32,
         height: i32,
+    );
+
+    unsafe fn tex_storage_2d_multisample(
+        &self,
+        target: u32,
+        samples: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+        fixed_sample_locations: bool,
     );
 
     unsafe fn tex_storage_3d(

@@ -941,6 +941,8 @@ pub trait HasContext {
 
     unsafe fn vertex_attrib_binding(&self, attrib_index: u32, binding_index: u32);
 
+    unsafe fn vertex_binding_divisor(&self, binding_index: u32, divisor: u32);
+
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32);
 
     unsafe fn viewport_f32_slice(&self, first: u32, count: i32, values: &[[f32; 4]]);

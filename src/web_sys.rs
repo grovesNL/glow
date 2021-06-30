@@ -3083,6 +3083,10 @@ impl HasContext for Context {
         panic!("Vertex attrib binding is not supported");
     }
 
+    unsafe fn vertex_binding_divisor(&self, _binding_index: u32, _divisor: u32) {
+        panic!("Vertex binding divisor is not supported");
+    }
+
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.viewport(x, y, width, height),

@@ -179,6 +179,14 @@ pub trait HasContext {
         size: i32,
     );
 
+    unsafe fn bind_vertex_buffer(
+        &self,
+        binding_index: u32,
+        buffer: Option<Buffer>,
+        offset: i32,
+        stride: i32,
+    );
+
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>);
 
     unsafe fn bind_renderbuffer(&self, target: u32, renderbuffer: Option<Self::Renderbuffer>);

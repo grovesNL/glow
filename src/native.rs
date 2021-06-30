@@ -367,6 +367,17 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn bind_vertex_buffer(
+        &self,
+        binding_index: u32,
+        buffer: Option<Buffer>,
+        offset: i32,
+        stride: i32,
+    ) {
+        let gl = &self.raw;
+        gl.BindVertexBuffer(binding_index, buffer.unwrap_or(0), offset as isize, stride);
+    }
+
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>) {
         let gl = &self.raw;
         gl.BindFramebuffer(target, framebuffer.unwrap_or(0));

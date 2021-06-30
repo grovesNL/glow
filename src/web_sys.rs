@@ -872,6 +872,16 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn bind_vertex_buffer(
+        &self,
+        _binding_index: u32,
+        _buffer: Option<Buffer>,
+        _offset: i32,
+        _stride: i32,
+    ) {
+        panic!("Bind vertex buffer is not supported")
+    }
+
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>) {
         let framebuffers = self.framebuffers.borrow();
         let raw_framebuffer = framebuffer.map(|f| framebuffers.get_unchecked(f));

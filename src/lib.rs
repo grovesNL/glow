@@ -892,6 +892,23 @@ pub trait HasContext {
         offset: i32,
     );
 
+    unsafe fn vertex_attrib_format_f32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        normalized: bool,
+        relative_offset: u32,
+    );
+
+    unsafe fn vertex_attrib_format_i32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        relative_offset: u32,
+    );
+
     unsafe fn vertex_attrib_1_f32(&self, index: u32, x: f32);
 
     unsafe fn vertex_attrib_2_f32(&self, index: u32, x: f32, y: f32);

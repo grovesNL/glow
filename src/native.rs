@@ -1933,6 +1933,29 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn vertex_attrib_format_f32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        normalized: bool,
+        relative_offset: u32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexAttribFormat(index, size, data_type, normalized as u8, relative_offset);
+    }
+
+    unsafe fn vertex_attrib_format_i32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        relative_offset: u32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexAttribIFormat(index, size, data_type, relative_offset);
+    }
+
     unsafe fn vertex_attrib_1_f32(&self, index: u32, x: f32) {
         let gl = &self.raw;
         gl.VertexAttrib1f(index, x);

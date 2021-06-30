@@ -179,6 +179,14 @@ pub trait HasContext {
         size: i32,
     );
 
+    unsafe fn bind_vertex_buffer(
+        &self,
+        binding_index: u32,
+        buffer: Option<Buffer>,
+        offset: i32,
+        stride: i32,
+    );
+
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>);
 
     unsafe fn bind_renderbuffer(&self, target: u32, renderbuffer: Option<Self::Renderbuffer>);
@@ -842,6 +850,20 @@ pub trait HasContext {
         pixels: PixelUnpackData,
     );
 
+    unsafe fn compressed_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        pixels: CompressedPixelUnpackData,
+    );
+
     unsafe fn depth_func(&self, func: u32);
 
     unsafe fn depth_range_f32(&self, near: f32, far: f32);
@@ -884,6 +906,23 @@ pub trait HasContext {
         offset: i32,
     );
 
+    unsafe fn vertex_attrib_format_f32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        normalized: bool,
+        relative_offset: u32,
+    );
+
+    unsafe fn vertex_attrib_format_i32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        relative_offset: u32,
+    );
+
     unsafe fn vertex_attrib_1_f32(&self, index: u32, x: f32);
 
     unsafe fn vertex_attrib_2_f32(&self, index: u32, x: f32, y: f32);
@@ -901,6 +940,8 @@ pub trait HasContext {
     unsafe fn vertex_attrib_4_f32_slice(&self, index: u32, v: &[f32]);
 
     unsafe fn vertex_attrib_binding(&self, attrib_index: u32, binding_index: u32);
+
+    unsafe fn vertex_binding_divisor(&self, binding_index: u32, divisor: u32);
 
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32);
 

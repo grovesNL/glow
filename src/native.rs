@@ -367,6 +367,17 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn bind_vertex_buffer(
+        &self,
+        binding_index: u32,
+        buffer: Option<Buffer>,
+        offset: i32,
+        stride: i32,
+    ) {
+        let gl = &self.raw;
+        gl.BindVertexBuffer(binding_index, buffer.unwrap_or(0), offset as isize, stride);
+    }
+
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>) {
         let gl = &self.raw;
         gl.BindFramebuffer(target, framebuffer.unwrap_or(0));
@@ -1831,6 +1842,36 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn compressed_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        pixels: CompressedPixelUnpackData,
+    ) {
+        let gl = &self.raw;
+        let (data, image_size) = match pixels {
+            CompressedPixelUnpackData::BufferRange(ref range) => (
+                range.start as *const std::ffi::c_void,
+                (range.end - range.start) as i32,
+            ),
+            CompressedPixelUnpackData::Slice(data) => {
+                (data.as_ptr() as *const std::ffi::c_void, data.len() as i32)
+            }
+        };
+
+        gl.CompressedTexSubImage3D(
+            target, level, x_offset, y_offset, z_offset, width, height, depth, format, image_size,
+            data,
+        );
+    }
+
     unsafe fn depth_func(&self, func: u32) {
         let gl = &self.raw;
         gl.DepthFunc(func as u32);
@@ -1922,6 +1963,29 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn vertex_attrib_format_f32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        normalized: bool,
+        relative_offset: u32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexAttribFormat(index, size, data_type, normalized as u8, relative_offset);
+    }
+
+    unsafe fn vertex_attrib_format_i32(
+        &self,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        relative_offset: u32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexAttribIFormat(index, size, data_type, relative_offset);
+    }
+
     unsafe fn vertex_attrib_1_f32(&self, index: u32, x: f32) {
         let gl = &self.raw;
         gl.VertexAttrib1f(index, x);
@@ -1965,6 +2029,11 @@ impl HasContext for Context {
     unsafe fn vertex_attrib_binding(&self, attrib_index: u32, binding_index: u32) {
         let gl = &self.raw;
         gl.VertexAttribBinding(attrib_index, binding_index);
+    }
+
+    unsafe fn vertex_binding_divisor(&self, binding_index: u32, divisor: u32) {
+        let gl = &self.raw;
+        gl.VertexBindingDivisor(binding_index, divisor);
     }
 
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32) {

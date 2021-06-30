@@ -872,6 +872,16 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn bind_vertex_buffer(
+        &self,
+        _binding_index: u32,
+        _buffer: Option<Buffer>,
+        _offset: i32,
+        _stride: i32,
+    ) {
+        panic!("Bind vertex buffer is not supported")
+    }
+
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>) {
         let framebuffers = self.framebuffers.borrow();
         let raw_framebuffer = framebuffer.map(|f| framebuffers.get_unchecked(f));
@@ -2773,7 +2783,7 @@ impl HasContext for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => match pixels {
                 CompressedPixelUnpackData::BufferRange(_) => {
-                    panic!("Sub image 2D pixel buffer range is not supported");
+                    panic!("Compressed sub image 2D pixel buffer range is not supported");
                 }
                 CompressedPixelUnpackData::Slice(data) => {
                     let data = texture_data_view(BYTE, data);
@@ -2857,6 +2867,49 @@ impl HasContext for Context {
                 }
                 .unwrap(); // TODO: Handle return value?
             }
+        }
+    }
+
+    unsafe fn compressed_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        pixels: CompressedPixelUnpackData,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Compressed sub image 3D is not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => match pixels {
+                CompressedPixelUnpackData::BufferRange(range) => gl
+                    .compressed_tex_sub_image_3d_with_i32_and_i32(
+                        target,
+                        level,
+                        x_offset,
+                        y_offset,
+                        z_offset,
+                        width,
+                        height,
+                        depth,
+                        format,
+                        (range.end - range.start) as i32,
+                        range.start as i32,
+                    ),
+                CompressedPixelUnpackData::Slice(data) => {
+                    let data = texture_data_view(BYTE, data);
+                    gl.compressed_tex_sub_image_3d_with_array_buffer_view(
+                        target, level, x_offset, y_offset, z_offset, width, height, depth, format,
+                        &data,
+                    )
+                }
+            },
         }
     }
 
@@ -2949,6 +3002,27 @@ impl HasContext for Context {
         panic!("64-bit float precision is not supported in WebGL");
     }
 
+    unsafe fn vertex_attrib_format_f32(
+        &self,
+        _index: u32,
+        _size: i32,
+        _data_type: u32,
+        _normalized: bool,
+        _relative_offset: u32,
+    ) {
+        panic!("Vertex attrib format is not supported in WebGL");
+    }
+
+    unsafe fn vertex_attrib_format_i32(
+        &self,
+        _index: u32,
+        _size: i32,
+        _data_type: u32,
+        _relative_offset: u32,
+    ) {
+        panic!("Vertex attrib format is not supported in WebGL");
+    }
+
     unsafe fn vertex_attrib_1_f32(&self, index: u32, x: f32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib1f(index, x),
@@ -3007,6 +3081,10 @@ impl HasContext for Context {
 
     unsafe fn vertex_attrib_binding(&self, _attrib_index: u32, _binding_index: u32) {
         panic!("Vertex attrib binding is not supported");
+    }
+
+    unsafe fn vertex_binding_divisor(&self, _binding_index: u32, _divisor: u32) {
+        panic!("Vertex binding divisor is not supported");
     }
 
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32) {

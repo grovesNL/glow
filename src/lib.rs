@@ -850,6 +850,20 @@ pub trait HasContext {
         pixels: PixelUnpackData,
     );
 
+    unsafe fn compressed_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        pixels: CompressedPixelUnpackData,
+    );
+
     unsafe fn depth_func(&self, func: u32);
 
     unsafe fn depth_range_f32(&self, near: f32, far: f32);

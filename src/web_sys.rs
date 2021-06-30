@@ -2783,7 +2783,7 @@ impl HasContext for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => match pixels {
                 CompressedPixelUnpackData::BufferRange(_) => {
-                    panic!("Sub image 2D pixel buffer range is not supported");
+                    panic!("Compressed sub image 2D pixel buffer range is not supported");
                 }
                 CompressedPixelUnpackData::Slice(data) => {
                     let data = texture_data_view(BYTE, data);
@@ -2867,6 +2867,49 @@ impl HasContext for Context {
                 }
                 .unwrap(); // TODO: Handle return value?
             }
+        }
+    }
+
+    unsafe fn compressed_tex_sub_image_3d(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        pixels: CompressedPixelUnpackData,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Compressed sub image 3D is not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => match pixels {
+                CompressedPixelUnpackData::BufferRange(range) => gl
+                    .compressed_tex_sub_image_3d_with_i32_and_i32(
+                        target,
+                        level,
+                        x_offset,
+                        y_offset,
+                        z_offset,
+                        width,
+                        height,
+                        depth,
+                        format,
+                        (range.end - range.start) as i32,
+                        range.start as i32,
+                    ),
+                CompressedPixelUnpackData::Slice(data) => {
+                    let data = texture_data_view(BYTE, data);
+                    gl.compressed_tex_sub_image_3d_with_array_buffer_view(
+                        target, level, x_offset, y_offset, z_offset, width, height, depth, format,
+                        &data,
+                    )
+                }
+            },
         }
     }
 

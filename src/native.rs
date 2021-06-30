@@ -1962,6 +1962,11 @@ impl HasContext for Context {
         gl.VertexAttrib4fv(index, v.as_ptr());
     }
 
+    unsafe fn vertex_attrib_binding(&self, attrib_index: u32, binding_index: u32) {
+        let gl = &self.raw;
+        gl.VertexAttribBinding(attrib_index, binding_index);
+    }
+
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32) {
         let gl = &self.raw;
         gl.Viewport(x, y, width, height);

@@ -2008,12 +2008,12 @@ impl HasContext for Context {
 
     unsafe fn tex_image_2d_multisample(
         &self,
-        target: u32,
-        samples: i32,
-        internal_format: i32,
-        width: i32,
-        height: i32,
-        fixed_sample_locations: bool,
+        _target: u32,
+        _samples: i32,
+        _internal_format: i32,
+        _width: i32,
+        _height: i32,
+        _fixed_sample_locations: bool,
     ) {
         panic!("Tex image 2D multisample is not supported");
     }
@@ -3003,6 +3003,10 @@ impl HasContext for Context {
             RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib4fv_with_f32_array(index, v),
             RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib4fv_with_f32_array(index, v),
         }
+    }
+
+    unsafe fn vertex_attrib_binding(&self, _attrib_index: u32, _binding_index: u32) {
+        panic!("Vertex attrib binding is not supported");
     }
 
     unsafe fn viewport(&self, x: i32, y: i32, width: i32, height: i32) {

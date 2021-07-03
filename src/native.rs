@@ -1,10 +1,6 @@
 use super::*;
-
-use std::collections::HashSet;
-use std::ffi::CString;
-
-use crate::gl46 as native_gl;
-use crate::version::Version;
+use crate::{gl46 as native_gl, version::Version};
+use std::{collections::HashSet, ffi::CString, num::NonZeroU32};
 
 #[derive(Default)]
 struct Constants {
@@ -80,19 +76,59 @@ impl std::fmt::Debug for Context {
     }
 }
 
+fn non_zero_gl_name(value: native_gl::GLuint) -> NonZeroU32 {
+    NonZeroU32::new(value as u32).expect("expected non-zero GL name")
+}
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeShader(NonZeroU32);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeProgram(NonZeroU32);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeBuffer(NonZeroU32);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeVertexArray(NonZeroU32);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeTexture(NonZeroU32);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeSampler(NonZeroU32);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeFence(native_gl::GLsync);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeFramebuffer(NonZeroU32);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeRenderbuffer(NonZeroU32);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeQuery(NonZeroU32);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeUniformLocation(native_gl::GLuint);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NativeTransformFeedback(NonZeroU32);
+
 impl HasContext for Context {
-    type Shader = native_gl::GLuint;
-    type Program = native_gl::GLuint;
-    type Buffer = native_gl::GLuint;
-    type VertexArray = native_gl::GLuint;
-    type Texture = native_gl::GLuint;
-    type Sampler = native_gl::GLuint;
-    type Fence = native_gl::GLsync;
-    type Framebuffer = native_gl::GLuint;
-    type Renderbuffer = native_gl::GLuint;
-    type Query = native_gl::GLuint;
-    type UniformLocation = native_gl::GLuint;
-    type TransformFeedback = native_gl::GLuint;
+    type Shader = NativeShader;
+    type Program = NativeProgram;
+    type Buffer = NativeBuffer;
+    type VertexArray = NativeVertexArray;
+    type Texture = NativeTexture;
+    type Sampler = NativeSampler;
+    type Fence = NativeFence;
+    type Framebuffer = NativeFramebuffer;
+    type Renderbuffer = NativeRenderbuffer;
+    type Query = NativeQuery;
+    type UniformLocation = NativeUniformLocation;
+    type TransformFeedback = NativeTransformFeedback;
 
     fn supported_extensions(&self) -> &HashSet<String> {
         &self.extensions
@@ -106,71 +142,73 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenFramebuffers(1, &mut name);
-        Ok(name)
+        Ok(NativeFramebuffer(non_zero_gl_name(name)))
     }
 
     unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool {
         let gl = &self.raw;
-        gl.IsFramebuffer(framebuffer) != 0
+        gl.IsFramebuffer(framebuffer.0.get()) != 0
     }
 
     unsafe fn create_query(&self) -> Result<Self::Query, String> {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenQueries(1, &mut name);
-        Ok(name)
+        Ok(NativeQuery(non_zero_gl_name(name)))
     }
 
     unsafe fn create_renderbuffer(&self) -> Result<Self::Renderbuffer, String> {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenRenderbuffers(1, &mut name);
-        Ok(name)
+        Ok(NativeRenderbuffer(non_zero_gl_name(name)))
     }
 
     unsafe fn is_renderbuffer(&self, renderbuffer: Self::Renderbuffer) -> bool {
         let gl = &self.raw;
-        gl.IsRenderbuffer(renderbuffer) != 0
+        gl.IsRenderbuffer(renderbuffer.0.get()) != 0
     }
 
     unsafe fn create_sampler(&self) -> Result<Self::Sampler, String> {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenSamplers(1, &mut name);
-        Ok(name)
+        Ok(NativeSampler(non_zero_gl_name(name)))
     }
 
     unsafe fn create_shader(&self, shader_type: u32) -> Result<Self::Shader, String> {
         let gl = &self.raw;
-        Ok(gl.CreateShader(shader_type as u32))
+        Ok(NativeShader(non_zero_gl_name(
+            gl.CreateShader(shader_type as u32),
+        )))
     }
 
     unsafe fn is_shader(&self, shader: Self::Shader) -> bool {
         let gl = &self.raw;
-        gl.IsShader(shader) != 0
+        gl.IsShader(shader.0.get()) != 0
     }
 
     unsafe fn create_texture(&self) -> Result<Self::Texture, String> {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenTextures(1, &mut name);
-        Ok(name)
+        Ok(NativeTexture(non_zero_gl_name(name)))
     }
 
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
         let gl = &self.raw;
-        gl.IsTexture(texture) != 0
+        gl.IsTexture(texture.0.get()) != 0
     }
 
     unsafe fn delete_shader(&self, shader: Self::Shader) {
         let gl = &self.raw;
-        gl.DeleteShader(shader);
+        gl.DeleteShader(shader.0.get());
     }
 
     unsafe fn shader_source(&self, shader: Self::Shader, source: &str) {
         let gl = &self.raw;
         gl.ShaderSource(
-            shader,
+            shader.0.get(),
             1,
             &(source.as_ptr() as *const native_gl::GLchar),
             &(source.len() as native_gl::GLint),
@@ -179,25 +217,25 @@ impl HasContext for Context {
 
     unsafe fn compile_shader(&self, shader: Self::Shader) {
         let gl = &self.raw;
-        gl.CompileShader(shader);
+        gl.CompileShader(shader.0.get());
     }
 
     unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool {
         let gl = &self.raw;
         let mut status = 0;
-        gl.GetShaderiv(shader, COMPILE_STATUS, &mut status);
+        gl.GetShaderiv(shader.0.get(), COMPILE_STATUS, &mut status);
         1 == status
     }
 
     unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String {
         let gl = &self.raw;
         let mut length = 0;
-        gl.GetShaderiv(shader, INFO_LOG_LENGTH, &mut length);
+        gl.GetShaderiv(shader.0.get(), INFO_LOG_LENGTH, &mut length);
         if length > 0 {
             let mut log = String::with_capacity(length as usize);
             log.extend(std::iter::repeat('\0').take(length as usize));
             gl.GetShaderInfoLog(
-                shader,
+                shader.0.get(),
                 length,
                 &mut length,
                 (&log[..]).as_ptr() as *mut native_gl::GLchar,
@@ -232,50 +270,50 @@ impl HasContext for Context {
 
     unsafe fn create_program(&self) -> Result<Self::Program, String> {
         let gl = &self.raw;
-        Ok(gl.CreateProgram())
+        Ok(NativeProgram(non_zero_gl_name(gl.CreateProgram())))
     }
 
     unsafe fn is_program(&self, program: Self::Program) -> bool {
         let gl = &self.raw;
-        gl.IsProgram(program) != 0
+        gl.IsProgram(program.0.get()) != 0
     }
 
     unsafe fn delete_program(&self, program: Self::Program) {
         let gl = &self.raw;
-        gl.DeleteProgram(program);
+        gl.DeleteProgram(program.0.get());
     }
 
     unsafe fn attach_shader(&self, program: Self::Program, shader: Self::Shader) {
         let gl = &self.raw;
-        gl.AttachShader(program, shader);
+        gl.AttachShader(program.0.get(), shader.0.get());
     }
 
     unsafe fn detach_shader(&self, program: Self::Program, shader: Self::Shader) {
         let gl = &self.raw;
-        gl.DetachShader(program, shader);
+        gl.DetachShader(program.0.get(), shader.0.get());
     }
 
     unsafe fn link_program(&self, program: Self::Program) {
         let gl = &self.raw;
-        gl.LinkProgram(program);
+        gl.LinkProgram(program.0.get());
     }
 
     unsafe fn get_program_link_status(&self, program: Self::Program) -> bool {
         let gl = &self.raw;
         let mut status = 0;
-        gl.GetProgramiv(program, LINK_STATUS, &mut status);
+        gl.GetProgramiv(program.0.get(), LINK_STATUS, &mut status);
         1 == status
     }
 
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String {
         let gl = &self.raw;
         let mut length = 0;
-        gl.GetProgramiv(program, INFO_LOG_LENGTH, &mut length);
+        gl.GetProgramiv(program.0.get(), INFO_LOG_LENGTH, &mut length);
         if length > 0 {
             let mut log = String::with_capacity(length as usize);
             log.extend(std::iter::repeat('\0').take(length as usize));
             gl.GetProgramInfoLog(
-                program,
+                program.0.get(),
                 length,
                 &mut length,
                 (&log[..]).as_ptr() as *mut native_gl::GLchar,
@@ -290,7 +328,7 @@ impl HasContext for Context {
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32 {
         let gl = &self.raw;
         let mut count = 0;
-        gl.GetProgramiv(program, ACTIVE_UNIFORMS, &mut count);
+        gl.GetProgramiv(program.0.get(), ACTIVE_UNIFORMS, &mut count);
         count as u32
     }
 
@@ -301,7 +339,11 @@ impl HasContext for Context {
     ) -> Option<ActiveUniform> {
         let gl = &self.raw;
         let mut uniform_max_size = 0;
-        gl.GetProgramiv(program, ACTIVE_UNIFORM_MAX_LENGTH, &mut uniform_max_size);
+        gl.GetProgramiv(
+            program.0.get(),
+            ACTIVE_UNIFORM_MAX_LENGTH,
+            &mut uniform_max_size,
+        );
 
         let mut name = String::with_capacity(uniform_max_size as usize);
         name.extend(std::iter::repeat('\0').take(uniform_max_size as usize));
@@ -309,7 +351,7 @@ impl HasContext for Context {
         let mut size = 0;
         let mut utype = 0;
         gl.GetActiveUniform(
-            program,
+            program.0.get(),
             index,
             uniform_max_size,
             &mut length,
@@ -324,29 +366,29 @@ impl HasContext for Context {
 
     unsafe fn use_program(&self, program: Option<Self::Program>) {
         let gl = &self.raw;
-        gl.UseProgram(program.unwrap_or(0));
+        gl.UseProgram(program.map(|p| p.0.get()).unwrap_or(0));
     }
 
     unsafe fn create_buffer(&self) -> Result<Self::Buffer, String> {
         let gl = &self.raw;
         let mut buffer = 0;
         gl.GenBuffers(1, &mut buffer);
-        Ok(buffer)
+        Ok(NativeBuffer(non_zero_gl_name(buffer)))
     }
 
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
         let gl = &self.raw;
-        gl.IsBuffer(buffer) != 0
+        gl.IsBuffer(buffer.0.get()) != 0
     }
 
     unsafe fn bind_buffer(&self, target: u32, buffer: Option<Self::Buffer>) {
         let gl = &self.raw;
-        gl.BindBuffer(target, buffer.unwrap_or(0));
+        gl.BindBuffer(target, buffer.map(|b| b.0.get()).unwrap_or(0));
     }
 
     unsafe fn bind_buffer_base(&self, target: u32, index: u32, buffer: Option<Self::Buffer>) {
         let gl = &self.raw;
-        gl.BindBufferBase(target, index, buffer.unwrap_or(0));
+        gl.BindBufferBase(target, index, buffer.map(|b| b.0.get()).unwrap_or(0));
     }
 
     unsafe fn bind_buffer_range(
@@ -361,7 +403,7 @@ impl HasContext for Context {
         gl.BindBufferRange(
             target,
             index,
-            buffer.unwrap_or(0),
+            buffer.map(|b| b.0.get()).unwrap_or(0),
             offset as isize,
             size as isize,
         );
@@ -375,17 +417,22 @@ impl HasContext for Context {
         stride: i32,
     ) {
         let gl = &self.raw;
-        gl.BindVertexBuffer(binding_index, buffer.unwrap_or(0), offset as isize, stride);
+        gl.BindVertexBuffer(
+            binding_index,
+            buffer.map(|b| b.0.get()).unwrap_or(0),
+            offset as isize,
+            stride,
+        );
     }
 
     unsafe fn bind_framebuffer(&self, target: u32, framebuffer: Option<Self::Framebuffer>) {
         let gl = &self.raw;
-        gl.BindFramebuffer(target, framebuffer.unwrap_or(0));
+        gl.BindFramebuffer(target, framebuffer.map(|fb| fb.0.get()).unwrap_or(0));
     }
 
     unsafe fn bind_renderbuffer(&self, target: u32, renderbuffer: Option<Self::Renderbuffer>) {
         let gl = &self.raw;
-        gl.BindRenderbuffer(target, renderbuffer.unwrap_or(0));
+        gl.BindRenderbuffer(target, renderbuffer.map(|rb| rb.0.get()).unwrap_or(0));
     }
 
     unsafe fn blit_framebuffer(
@@ -411,17 +458,17 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut vertex_array = 0;
         gl.GenVertexArrays(1, &mut vertex_array);
-        Ok(vertex_array)
+        Ok(NativeVertexArray(non_zero_gl_name(vertex_array)))
     }
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
         let gl = &self.raw;
-        gl.DeleteVertexArrays(1, &vertex_array);
+        gl.DeleteVertexArrays(1, &vertex_array.0.get());
     }
 
     unsafe fn bind_vertex_array(&self, vertex_array: Option<Self::VertexArray>) {
         let gl = &self.raw;
-        gl.BindVertexArray(vertex_array.unwrap_or(0));
+        gl.BindVertexArray(vertex_array.map(|va| va.0.get()).unwrap_or(0));
     }
 
     unsafe fn clear_color(&self, red: f32, green: f32, blue: f32, alpha: f32) {
@@ -477,7 +524,7 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         gl.BindFragDataLocation(
-            program,
+            program.0.get(),
             color_number,
             name.as_ptr() as *const native_gl::GLchar,
         );
@@ -562,12 +609,12 @@ impl HasContext for Context {
 
     unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: u32, timeout: i32) -> u32 {
         let gl = &self.raw;
-        gl.ClientWaitSync(fence, flags, timeout as u64)
+        gl.ClientWaitSync(fence.0, flags, timeout as u64)
     }
 
     unsafe fn wait_sync(&self, fence: Self::Fence, flags: u32, timeout: u64) {
         let gl = &self.raw;
-        gl.WaitSync(fence, flags, timeout)
+        gl.WaitSync(fence.0, flags, timeout)
     }
 
     unsafe fn copy_buffer_sub_data(
@@ -638,37 +685,37 @@ impl HasContext for Context {
 
     unsafe fn delete_buffer(&self, buffer: Self::Buffer) {
         let gl = &self.raw;
-        gl.DeleteBuffers(1, &buffer);
+        gl.DeleteBuffers(1, &buffer.0.get());
     }
 
     unsafe fn delete_framebuffer(&self, framebuffer: Self::Framebuffer) {
         let gl = &self.raw;
-        gl.DeleteFramebuffers(1, &framebuffer);
+        gl.DeleteFramebuffers(1, &framebuffer.0.get());
     }
 
     unsafe fn delete_query(&self, query: Self::Query) {
         let gl = &self.raw;
-        gl.DeleteQueries(1, &query);
+        gl.DeleteQueries(1, &query.0.get());
     }
 
     unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer) {
         let gl = &self.raw;
-        gl.DeleteRenderbuffers(1, &renderbuffer);
+        gl.DeleteRenderbuffers(1, &renderbuffer.0.get());
     }
 
     unsafe fn delete_sampler(&self, sampler: Self::Sampler) {
         let gl = &self.raw;
-        gl.DeleteSamplers(1, &sampler);
+        gl.DeleteSamplers(1, &sampler.0.get());
     }
 
     unsafe fn delete_sync(&self, fence: Self::Fence) {
         let gl = &self.raw;
-        gl.DeleteSync(fence);
+        gl.DeleteSync(fence.0);
     }
 
     unsafe fn delete_texture(&self, texture: Self::Texture) {
         let gl = &self.raw;
-        gl.DeleteTextures(1, &texture);
+        gl.DeleteTextures(1, &texture.0.get());
     }
 
     unsafe fn disable(&self, parameter: u32) {
@@ -869,7 +916,7 @@ impl HasContext for Context {
             target,
             attachment,
             renderbuffer_target,
-            renderbuffer.unwrap_or(0),
+            renderbuffer.map(|rb| rb.0.get()).unwrap_or(0),
         );
     }
 
@@ -881,7 +928,12 @@ impl HasContext for Context {
         level: i32,
     ) {
         let gl = &self.raw;
-        gl.FramebufferTexture(target, attachment, texture.unwrap_or(0), level);
+        gl.FramebufferTexture(
+            target,
+            attachment,
+            texture.map(|t| t.0.get()).unwrap_or(0),
+            level,
+        );
     }
 
     unsafe fn framebuffer_texture_2d(
@@ -897,7 +949,7 @@ impl HasContext for Context {
             target,
             attachment,
             texture_target,
-            texture.unwrap_or(0),
+            texture.map(|t| t.0.get()).unwrap_or(0),
             level,
         );
     }
@@ -916,7 +968,7 @@ impl HasContext for Context {
             target,
             attachment,
             texture_target,
-            texture.unwrap_or(0),
+            texture.map(|t| t.0.get()).unwrap_or(0),
             level,
             layer,
         );
@@ -931,7 +983,13 @@ impl HasContext for Context {
         layer: i32,
     ) {
         let gl = &self.raw;
-        gl.FramebufferTextureLayer(target, attachment, texture.unwrap_or(0), level, layer);
+        gl.FramebufferTextureLayer(
+            target,
+            attachment,
+            texture.map(|t| t.0.get()).unwrap_or(0),
+            level,
+            layer,
+        );
     }
 
     unsafe fn front_face(&self, value: u32) {
@@ -1015,11 +1073,11 @@ impl HasContext for Context {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
         let uniform_location =
-            gl.GetUniformLocation(program, name.as_ptr() as *const native_gl::GLchar);
+            gl.GetUniformLocation(program.0.get(), name.as_ptr() as *const native_gl::GLchar);
         if uniform_location < 0 {
             None
         } else {
-            Some(uniform_location as u32)
+            Some(NativeUniformLocation(uniform_location as u32))
         }
     }
 
@@ -1027,7 +1085,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
         let attrib_location =
-            gl.GetAttribLocation(program, name.as_ptr() as *const native_gl::GLchar);
+            gl.GetAttribLocation(program.0.get(), name.as_ptr() as *const native_gl::GLchar);
         if attrib_location < 0 {
             None
         } else {
@@ -1038,13 +1096,17 @@ impl HasContext for Context {
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        gl.BindAttribLocation(program, index, name.as_ptr() as *const native_gl::GLchar);
+        gl.BindAttribLocation(
+            program.0.get(),
+            index,
+            name.as_ptr() as *const native_gl::GLchar,
+        );
     }
 
     unsafe fn get_active_attributes(&self, program: Self::Program) -> u32 {
         let gl = &self.raw;
         let mut count = 0;
-        gl.GetProgramiv(program, ACTIVE_ATTRIBUTES, &mut count);
+        gl.GetProgramiv(program.0.get(), ACTIVE_ATTRIBUTES, &mut count);
         count as u32
     }
 
@@ -1056,7 +1118,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut attribute_max_size = 0;
         gl.GetProgramiv(
-            program,
+            program.0.get(),
             ACTIVE_ATTRIBUTE_MAX_LENGTH,
             &mut attribute_max_size,
         );
@@ -1066,7 +1128,7 @@ impl HasContext for Context {
         let mut size = 0;
         let mut atype = 0;
         gl.GetActiveAttrib(
-            program,
+            program.0.get(),
             index,
             attribute_max_size,
             &mut length,
@@ -1085,7 +1147,7 @@ impl HasContext for Context {
         let mut len = 0;
         let mut values = [UNSIGNALED as i32];
         gl.GetSynciv(
-            fence,
+            fence.0,
             SYNC_STATUS,
             values.len() as i32,
             &mut len,
@@ -1096,7 +1158,7 @@ impl HasContext for Context {
 
     unsafe fn is_sync(&self, fence: Self::Fence) -> bool {
         let gl = &self.raw;
-        1 == gl.IsSync(fence)
+        1 == gl.IsSync(fence.0)
     }
 
     unsafe fn renderbuffer_storage(
@@ -1124,17 +1186,17 @@ impl HasContext for Context {
 
     unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32) {
         let gl = &self.raw;
-        gl.SamplerParameterf(sampler, name, value);
+        gl.SamplerParameterf(sampler.0.get(), name, value);
     }
 
     unsafe fn sampler_parameter_f32_slice(&self, sampler: Self::Sampler, name: u32, value: &[f32]) {
         let gl = &self.raw;
-        gl.SamplerParameterfv(sampler, name, value.as_ptr());
+        gl.SamplerParameterfv(sampler.0.get(), name, value.as_ptr());
     }
 
     unsafe fn sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32, value: i32) {
         let gl = &self.raw;
-        gl.SamplerParameteri(sampler, name, value);
+        gl.SamplerParameteri(sampler.0.get(), name, value);
     }
 
     unsafe fn generate_mipmap(&self, target: u32) {
@@ -1369,7 +1431,11 @@ impl HasContext for Context {
         v: &mut [i32],
     ) {
         let gl = &self.raw;
-        gl.GetUniformiv(program as u32, *location as i32, v.as_mut_ptr() as *mut i32)
+        gl.GetUniformiv(
+            program.0.get() as u32,
+            location.0 as i32,
+            v.as_mut_ptr() as *mut i32,
+        )
     }
 
     unsafe fn get_uniform_f32(
@@ -1379,20 +1445,24 @@ impl HasContext for Context {
         v: &mut [f32],
     ) {
         let gl = &self.raw;
-        gl.GetUniformfv(program as u32, *location as i32, v.as_mut_ptr() as *mut f32)
+        gl.GetUniformfv(
+            program.0.get() as u32,
+            location.0 as i32,
+            v.as_mut_ptr() as *mut f32,
+        )
     }
 
     unsafe fn uniform_1_i32(&self, location: Option<&Self::UniformLocation>, x: i32) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform1i(*loc as i32, x);
+            gl.Uniform1i(loc.0 as i32, x);
         }
     }
 
     unsafe fn uniform_2_i32(&self, location: Option<&Self::UniformLocation>, x: i32, y: i32) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform2i(*loc as i32, x, y);
+            gl.Uniform2i(loc.0 as i32, x, y);
         }
     }
 
@@ -1405,7 +1475,7 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform3i(*loc as i32, x, y, z);
+            gl.Uniform3i(loc.0 as i32, x, y, z);
         }
     }
 
@@ -1419,49 +1489,49 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform4i(*loc as i32, x, y, z, w);
+            gl.Uniform4i(loc.0 as i32, x, y, z, w);
         }
     }
 
     unsafe fn uniform_1_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform1iv(*loc as i32, v.len() as i32, v.as_ptr());
+            gl.Uniform1iv(loc.0 as i32, v.len() as i32, v.as_ptr());
         }
     }
 
     unsafe fn uniform_2_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform2iv(*loc as i32, v.len() as i32 / 2, v.as_ptr());
+            gl.Uniform2iv(loc.0 as i32, v.len() as i32 / 2, v.as_ptr());
         }
     }
 
     unsafe fn uniform_3_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform3iv(*loc as i32, v.len() as i32 / 3, v.as_ptr());
+            gl.Uniform3iv(loc.0 as i32, v.len() as i32 / 3, v.as_ptr());
         }
     }
 
     unsafe fn uniform_4_i32_slice(&self, location: Option<&Self::UniformLocation>, v: &[i32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform4iv(*loc as i32, v.len() as i32 / 4, v.as_ptr());
+            gl.Uniform4iv(loc.0 as i32, v.len() as i32 / 4, v.as_ptr());
         }
     }
 
     unsafe fn uniform_1_u32(&self, location: Option<&Self::UniformLocation>, x: u32) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform1ui(*loc as i32, x);
+            gl.Uniform1ui(loc.0 as i32, x);
         }
     }
 
     unsafe fn uniform_2_u32(&self, location: Option<&Self::UniformLocation>, x: u32, y: u32) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform2ui(*loc as i32, x, y);
+            gl.Uniform2ui(loc.0 as i32, x, y);
         }
     }
 
@@ -1474,7 +1544,7 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform3ui(*loc as i32, x, y, z);
+            gl.Uniform3ui(loc.0 as i32, x, y, z);
         }
     }
 
@@ -1488,49 +1558,49 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform4ui(*loc as i32, x, y, z, w);
+            gl.Uniform4ui(loc.0 as i32, x, y, z, w);
         }
     }
 
     unsafe fn uniform_1_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform1uiv(*loc as i32, v.len() as i32, v.as_ptr());
+            gl.Uniform1uiv(loc.0 as i32, v.len() as i32, v.as_ptr());
         }
     }
 
     unsafe fn uniform_2_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform2uiv(*loc as i32, v.len() as i32 / 2, v.as_ptr());
+            gl.Uniform2uiv(loc.0 as i32, v.len() as i32 / 2, v.as_ptr());
         }
     }
 
     unsafe fn uniform_3_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform3uiv(*loc as i32, v.len() as i32 / 3, v.as_ptr());
+            gl.Uniform3uiv(loc.0 as i32, v.len() as i32 / 3, v.as_ptr());
         }
     }
 
     unsafe fn uniform_4_u32_slice(&self, location: Option<&Self::UniformLocation>, v: &[u32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform4uiv(*loc as i32, v.len() as i32 / 4, v.as_ptr());
+            gl.Uniform4uiv(loc.0 as i32, v.len() as i32 / 4, v.as_ptr());
         }
     }
 
     unsafe fn uniform_1_f32(&self, location: Option<&Self::UniformLocation>, x: f32) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform1f(*loc as i32, x);
+            gl.Uniform1f(loc.0 as i32, x);
         }
     }
 
     unsafe fn uniform_2_f32(&self, location: Option<&Self::UniformLocation>, x: f32, y: f32) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform2f(*loc as i32, x, y);
+            gl.Uniform2f(loc.0 as i32, x, y);
         }
     }
 
@@ -1543,7 +1613,7 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform3f(*loc as i32, x, y, z);
+            gl.Uniform3f(loc.0 as i32, x, y, z);
         }
     }
 
@@ -1557,35 +1627,35 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform4f(*loc as i32, x, y, z, w);
+            gl.Uniform4f(loc.0 as i32, x, y, z, w);
         }
     }
 
     unsafe fn uniform_1_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform1fv(*loc as i32, v.len() as i32, v.as_ptr());
+            gl.Uniform1fv(loc.0 as i32, v.len() as i32, v.as_ptr());
         }
     }
 
     unsafe fn uniform_2_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform2fv(*loc as i32, v.len() as i32 / 2, v.as_ptr());
+            gl.Uniform2fv(loc.0 as i32, v.len() as i32 / 2, v.as_ptr());
         }
     }
 
     unsafe fn uniform_3_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform3fv(*loc as i32, v.len() as i32 / 3, v.as_ptr());
+            gl.Uniform3fv(loc.0 as i32, v.len() as i32 / 3, v.as_ptr());
         }
     }
 
     unsafe fn uniform_4_f32_slice(&self, location: Option<&Self::UniformLocation>, v: &[f32]) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.Uniform4fv(*loc as i32, v.len() as i32 / 4, v.as_ptr());
+            gl.Uniform4fv(loc.0 as i32, v.len() as i32 / 4, v.as_ptr());
         }
     }
 
@@ -1597,7 +1667,12 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.UniformMatrix2fv(*loc as i32, v.len() as i32 / 4, transpose as u8, v.as_ptr());
+            gl.UniformMatrix2fv(
+                loc.0 as i32,
+                v.len() as i32 / 4,
+                transpose as u8,
+                v.as_ptr(),
+            );
         }
     }
 
@@ -1609,7 +1684,12 @@ impl HasContext for Context {
     ) {
         let gl = &self.raw;
         if let Some(loc) = location {
-            gl.UniformMatrix3fv(*loc as i32, v.len() as i32 / 9, transpose as u8, v.as_ptr());
+            gl.UniformMatrix3fv(
+                loc.0 as i32,
+                v.len() as i32 / 9,
+                transpose as u8,
+                v.as_ptr(),
+            );
         }
     }
 
@@ -1622,7 +1702,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         if let Some(loc) = location {
             gl.UniformMatrix4fv(
-                *loc as i32,
+                loc.0 as i32,
                 v.len() as i32 / 16,
                 transpose as u8,
                 v.as_ptr(),
@@ -1715,12 +1795,12 @@ impl HasContext for Context {
 
     unsafe fn bind_texture(&self, target: u32, texture: Option<Self::Texture>) {
         let gl = &self.raw;
-        gl.BindTexture(target, texture.unwrap_or(0));
+        gl.BindTexture(target, texture.map(|t| t.0.get()).unwrap_or(0));
     }
 
     unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>) {
         let gl = &self.raw;
-        gl.BindSampler(unit, sampler.unwrap_or(0));
+        gl.BindSampler(unit, sampler.map(|s| s.0.get()).unwrap_or(0));
     }
 
     unsafe fn active_texture(&self, unit: u32) {
@@ -1730,7 +1810,7 @@ impl HasContext for Context {
 
     unsafe fn fence_sync(&self, condition: u32, flags: u32) -> Result<Self::Fence, String> {
         let gl = &self.raw;
-        Ok(gl.FenceSync(condition as u32, flags))
+        Ok(NativeFence(gl.FenceSync(condition as u32, flags)))
     }
 
     unsafe fn tex_parameter_f32(&self, target: u32, parameter: u32, value: f32) {
@@ -2322,12 +2402,12 @@ impl HasContext for Context {
                 let lbl = l.as_ref().as_bytes();
                 let length = lbl.len() as i32;
                 gl.ObjectPtrLabel(
-                    sync as *mut std::ffi::c_void,
+                    sync.0 as *mut std::ffi::c_void,
                     length,
                     lbl.as_ptr() as *const native_gl::GLchar,
                 );
             }
-            None => gl.ObjectPtrLabel(sync as *mut std::ffi::c_void, 0, std::ptr::null()),
+            None => gl.ObjectPtrLabel(sync.0 as *mut std::ffi::c_void, 0, std::ptr::null()),
         }
     }
 
@@ -2336,7 +2416,7 @@ impl HasContext for Context {
         let mut len = 0;
         let mut label_buf = Vec::with_capacity(self.constants.max_label_length as usize);
         gl.GetObjectPtrLabel(
-            sync as *mut std::ffi::c_void,
+            sync.0 as *mut std::ffi::c_void,
             self.constants.max_label_length,
             &mut len,
             label_buf.as_mut_ptr(),
@@ -2351,7 +2431,7 @@ impl HasContext for Context {
     unsafe fn get_uniform_block_index(&self, program: Self::Program, name: &str) -> Option<u32> {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        let index = gl.GetUniformBlockIndex(program, name.as_ptr());
+        let index = gl.GetUniformBlockIndex(program.0.get(), name.as_ptr());
         if index == INVALID_INDEX {
             None
         } else {
@@ -2361,7 +2441,7 @@ impl HasContext for Context {
 
     unsafe fn uniform_block_binding(&self, program: Self::Program, index: u32, binding: u32) {
         let gl = &self.raw;
-        gl.UniformBlockBinding(program, index, binding);
+        gl.UniformBlockBinding(program.0.get(), index, binding);
     }
 
     unsafe fn get_shader_storage_block_index(
@@ -2371,7 +2451,8 @@ impl HasContext for Context {
     ) -> Option<u32> {
         let gl = &self.raw;
         let name = CString::new(name).unwrap();
-        let index = gl.GetProgramResourceIndex(program, SHADER_STORAGE_BLOCK, name.as_ptr());
+        let index =
+            gl.GetProgramResourceIndex(program.0.get(), SHADER_STORAGE_BLOCK, name.as_ptr());
         if index == INVALID_INDEX {
             None
         } else {
@@ -2386,7 +2467,7 @@ impl HasContext for Context {
         binding: u32,
     ) {
         let gl = &self.raw;
-        gl.ShaderStorageBlockBinding(program, index, binding);
+        gl.ShaderStorageBlockBinding(program.0.get(), index, binding);
     }
 
     unsafe fn read_buffer(&self, src: u32) {
@@ -2421,7 +2502,7 @@ impl HasContext for Context {
 
     unsafe fn begin_query(&self, target: u32, query: Self::Query) {
         let gl = &self.raw;
-        gl.BeginQuery(target, query);
+        gl.BeginQuery(target, query.0.get());
     }
 
     unsafe fn end_query(&self, target: u32) {
@@ -2432,7 +2513,7 @@ impl HasContext for Context {
     unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32 {
         let gl = &self.raw;
         let mut value = 0;
-        gl.GetQueryObjectuiv(query, parameter, &mut value);
+        gl.GetQueryObjectuiv(query.0.get(), parameter, &mut value);
         value
     }
 
@@ -2440,12 +2521,12 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenTransformFeedbacks(1, &mut name);
-        Ok(name)
+        Ok(NativeTransformFeedback(non_zero_gl_name(name)))
     }
 
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback) {
         let gl = &self.raw;
-        gl.DeleteTransformFeedbacks(1, &transform_feedback);
+        gl.DeleteTransformFeedbacks(1, &transform_feedback.0.get());
     }
 
     unsafe fn bind_transform_feedback(
@@ -2454,7 +2535,7 @@ impl HasContext for Context {
         transform_feedback: Option<Self::TransformFeedback>,
     ) {
         let gl = &self.raw;
-        gl.BindTransformFeedback(target, transform_feedback.unwrap_or(0));
+        gl.BindTransformFeedback(target, transform_feedback.map(|tf| tf.0.get()).unwrap_or(0));
     }
 
     unsafe fn begin_transform_feedback(&self, primitive_mode: u32) {
@@ -2494,7 +2575,7 @@ impl HasContext for Context {
         let varyings: Vec<_> = strings.iter().map(|c_str| c_str.as_ptr()).collect();
 
         gl.TransformFeedbackVaryings(
-            program,
+            program.0.get(),
             varyings.len() as i32,
             varyings.as_ptr(),
             buffer_mode,
@@ -2517,7 +2598,7 @@ impl HasContext for Context {
         let c_name_buf = c_name.into_raw();
 
         gl.GetTransformFeedbackVarying(
-            program,
+            program.0.get(),
             index,
             buf_size as i32,
             std::ptr::null_mut(),
@@ -2552,7 +2633,15 @@ impl HasContext for Context {
         format: u32,
     ) {
         let gl = &self.raw;
-        gl.BindImageTexture(unit, texture, level, layered as u8, layer, access, format);
+        gl.BindImageTexture(
+            unit,
+            texture.0.get(),
+            level,
+            layered as u8,
+            layer,
+            access,
+            format,
+        );
     }
 }
 

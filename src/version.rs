@@ -30,11 +30,6 @@ impl Version {
         }
     }
 
-    /// Get a tuple of (major, minor) versions
-    pub fn tuple(&self) -> (u32, u32) {
-        (self.major, self.minor)
-    }
-
     /// According to the OpenGL specification, the version information is
     /// expected to follow the following syntax:
     ///

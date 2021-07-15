@@ -71,17 +71,21 @@ fn main() {
         let program = gl.create_program().expect("Cannot create program");
 
         let (vertex_shader_source, fragment_shader_source) = (
-            r#"in vec2 in_position;
-            out vec2 position;
+            r#"const vec2 verts[3] = vec2[3](
+                vec2(0.5f, 1.0f),
+                vec2(0.0f, 0.0f),
+                vec2(1.0f, 0.0f)
+            );
+            out vec2 vert;
             void main() {
-                position = in_position;
-                gl_Position = vec4(in_position - 0.5, 0.0, 1.0);
+                vert = verts[gl_VertexID];
+                gl_Position = vec4(vert - 0.5, 0.0, 1.0);
             }"#,
             r#"precision mediump float;
-            in vec2 position;
+            in vec2 vert;
             out vec4 color;
             void main() {
-                color = vec4(position, 0.5, 1.0);
+                color = vec4(vert, 0.5, 1.0);
             }"#,
         );
 
@@ -116,23 +120,6 @@ fn main() {
         }
 
         gl.use_program(Some(program));
-
-        // This is a flat array of f32s that are to be interpreted as vec2s.
-        let triangle_vertices = [0.5f32, 1.0f32, 0.0f32, 0.0f32, 1.0f32, 0.0f32];
-        let triangle_vertices_u8: &[u8] = core::slice::from_raw_parts(
-            triangle_vertices.as_ptr() as *const u8,
-            triangle_vertices.len() * core::mem::size_of::<f32>(),
-        );
-        let vbo = gl.create_buffer().unwrap();
-        gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
-        gl.buffer_data_u8_slice(glow::ARRAY_BUFFER, triangle_vertices_u8, glow::STATIC_DRAW);
-
-        // We now construct a vertex array to describe the format of the input buffer
-        let vao = gl.create_vertex_array().unwrap();
-        gl.bind_vertex_array(Some(vao));
-        gl.enable_vertex_attrib_array(0);
-        gl.vertex_attrib_pointer_f32(0, 2, glow::FLOAT, false, 8, 0);
-
         gl.clear_color(0.1, 0.2, 0.3, 1.0);
 
         // We handle events differently between targets

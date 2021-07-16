@@ -60,7 +60,7 @@ fn main() {
             let gl =
                 glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _);
             let event_loop = sdl.event_pump().unwrap();
-            (gl, "#version 410", window, event_loop, gl_context)
+            (gl, "#version 130", window, event_loop, gl_context)
         };
 
         let vertex_array = gl

@@ -90,4 +90,5 @@ features = [
 [workspace]
 members = [
   "examples/hello",
+  "examples/howto",
 ]

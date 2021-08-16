@@ -3594,6 +3594,86 @@ impl HasContext for Context {
     ) {
         panic!("Image load/store is not supported")
     }
+
+    unsafe fn get_active_uniform_block_parameter_i32(
+        &self,
+        program: Self::Program,
+        uniform_block_index: u32,
+        parameter: u32
+    ) -> i32 {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) =>
+                panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl2(ref gl) =>
+                gl.get_active_uniform_block_parameter(
+                    raw_program,
+                    uniform_block_index,
+                    parameter)
+                    .unwrap()
+                    .as_f64()
+                    .map(|v| v as i32)
+                    // Errors will be caught by the browser or through `get_error`
+                    // so return a default instead
+                    .unwrap_or(0)
+        }
+    }
+
+    unsafe fn get_active_uniform_block_parameter_i32_slice(
+        &self,
+        program: Self::Program,
+        uniform_block_index: u32,
+        parameter: u32,
+        out: &mut [i32]
+    ) {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) =>
+                panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                let value = gl.get_active_uniform_block_parameter(
+                    raw_program,
+                    uniform_block_index,
+                    parameter)
+                    .unwrap();
+
+                use wasm_bindgen::JsCast;
+                if let Some(value) = value.as_f64() {
+                    out[0] = value as i32;
+                } else if let Some(values) = value.dyn_ref::<js_sys::Uint32Array>() {
+                    // To maintain compatibility with the pointers returned by
+                    // desktop GL, which are signed, an extra copy is needed
+                    // here.
+                    values.to_vec()
+                        .into_iter()
+                        .zip(out.iter_mut())
+                        .for_each(|(val, target)| *target = val as i32)
+                }
+            }
+        }
+    }
+    unsafe fn get_active_uniform_block_name(
+        &self,
+        program: Self::Program,
+        uniform_block_index: u32
+    ) -> String {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) =>
+                panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl2(ref gl) =>
+                gl.get_active_uniform_block_name(
+                    raw_program,
+                    uniform_block_index)
+                    .unwrap()
+        }
+    }
 }
 
 /// Sending texture data requires different data views for different data types.

@@ -468,6 +468,27 @@ pub trait HasContext {
 
     unsafe fn get_parameter_string(&self, parameter: u32) -> String;
 
+    unsafe fn get_active_uniform_block_parameter_i32(
+        &self,
+        program: Self::Program,
+        uniform_block_index: u32,
+        parameter: u32,
+    ) -> i32;
+
+    unsafe fn get_active_uniform_block_parameter_i32_slice(
+        &self,
+        program: Self::Program,
+        uniform_block_index: u32,
+        parameter: u32,
+        out: &mut [i32]
+    );
+
+    unsafe fn get_active_uniform_block_name(
+        &self,
+        program: Self::Program,
+        uniform_block_index: u32,
+    ) -> String;
+
     unsafe fn get_uniform_location(
         &self,
         program: Self::Program,

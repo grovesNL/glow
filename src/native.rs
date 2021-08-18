@@ -2683,13 +2683,22 @@ impl HasContext for Context {
     ) -> String {
         let gl = &self.raw;
 
-        // Unfortunately, there doesn't seem to be a way to query for the length
-        // of the uniform block name ahead of making the call to OpenGL. Fixing
-        // it at 256 bytes is an ugly, very C-like workaround that, alas, I have
-        // no better alternative for.
-        let mut buffer = [0; 256];
-        let mut length = 0;
+        // Probe for the length of the name of the uniform block, and, failing
+        // that, fall back to allocating a buffer that is 256 bytes long. This
+        // should be good enough for pretty much all contexts, including faulty
+        // or partially faulty ones.
+        let len = self.get_active_uniform_block_parameter_i32(
+            program,
+            uniform_block_index,
+            crate::UNIFORM_BLOCK_NAME_LENGTH);
+        let len = if gl.GetError() == crate::NO_ERROR && len > 0 {
+            len as usize
+        } else {
+            256
+        };
 
+        let mut buffer = vec![0; len];
+        let mut length = 0;
         gl.GetActiveUniformBlockName(
             program.0.get(),
             uniform_block_index,

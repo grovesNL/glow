@@ -1,6 +1,7 @@
 use super::*;
 use crate::{gl46 as native_gl, version::Version};
 use std::{collections::HashSet, ffi::CString, num::NonZeroU32};
+use std::ffi::CStr;
 
 #[derive(Default)]
 struct Constants {
@@ -2642,6 +2643,95 @@ impl HasContext for Context {
             access,
             format,
         );
+    }
+    unsafe fn get_active_uniform_block_parameter_i32(
+        &self,
+        program: Self::Program,
+        uniform_block_index: u32,
+        parameter: u32
+    ) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetActiveUniformBlockiv(
+            program.0.get(),
+            uniform_block_index,
+            parameter,
+            &mut value
+        );
+        value
+    }
+
+    unsafe fn get_active_uniform_block_parameter_i32_slice(
+        &self,
+        program: Self::Program,
+        uniform_block_index: u32,
+        parameter: u32,
+        out: &mut [i32]
+    ) {
+        let gl = &self.raw;
+        gl.GetActiveUniformBlockiv(
+            program.0.get(),
+            uniform_block_index,
+            parameter,
+            out.as_mut_ptr()
+        );
+    }
+    unsafe fn get_active_uniform_block_name(
+        &self,
+        program: Self::Program,
+        uniform_block_index: u32
+    ) -> String {
+        let gl = &self.raw;
+
+        // Probe for the length of the name of the uniform block, and, failing
+        // that, fall back to allocating a buffer that is 256 bytes long. This
+        // should be good enough for pretty much all contexts, including faulty
+        // or partially faulty ones.
+        let len = self.get_active_uniform_block_parameter_i32(
+            program,
+            uniform_block_index,
+            crate::UNIFORM_BLOCK_NAME_LENGTH);
+        let len = if gl.GetError() == crate::NO_ERROR && len > 0 {
+            len as usize
+        } else {
+            256
+        };
+
+        let mut buffer = vec![0; len];
+        let mut length = 0;
+        gl.GetActiveUniformBlockName(
+            program.0.get(),
+            uniform_block_index,
+            buffer.len() as _,
+            &mut length,
+            buffer.as_mut_ptr(),
+        );
+
+        if length > 0 {
+            assert_eq!(
+                std::mem::size_of::<u8>(),
+                std::mem::size_of::<native_gl::GLchar>(),
+                "This operation is only safe in systems in which the length of \
+                a GLchar is the same as that of an u8");
+            assert_eq!(
+                std::mem::align_of::<u8>(),
+                std::mem::align_of::<native_gl::GLchar>(),
+                "This operation is only safe in systems in which the alignment \
+                of a GLchar is the same as that of an u8");
+            let buffer = std::slice::from_raw_parts(
+                buffer.as_ptr() as *const u8,
+                (length as usize + 1).min(buffer.len()));
+
+            let name = CStr::from_bytes_with_nul(&buffer[..])
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_owned();
+
+            name
+        } else {
+            String::from("")
+        }
     }
 }
 

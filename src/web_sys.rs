@@ -420,6 +420,40 @@ impl Context {
             }
         }
     }
+
+    unsafe fn get_parameter_gl_name<TKey, TResource>(
+        &self,
+        parameter: u32,
+        tracked_resource: &TrackedResource<TKey, TResource>,
+    ) -> Option<TKey>
+    where
+        TKey: slotmap::Key,
+        TResource: From<wasm_bindgen::JsValue> + PartialEq,
+    {
+        let parameter_value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .ok();
+        match parameter_value {
+            Some(pv) => {
+                let resource: TResource = pv.into();
+                // TODO: Make this search less expensive. If we had a bi-directional map, we could
+                // find the key immediately.
+                match tracked_resource
+                    .borrow()
+                    .iter()
+                    .find(|(_, v)| **v == resource)
+                {
+                    Some((k, _)) => Some(k),
+                    None => panic!(
+                        "A resource was created externally. This is not currently supported."
+                    ),
+                }
+            }
+            None => None,
+        }
+    }
 }
 
 new_key_type! { pub struct WebShaderKey; }
@@ -472,7 +506,7 @@ impl HasContext for Context {
     }
 
     unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool {
-        let framebuffers = self.framebuffers.borrow_mut();
+        let framebuffers = self.framebuffers.borrow();
         if let Some(ref f) = framebuffers.get(framebuffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_framebuffer(Some(f)),
@@ -516,7 +550,7 @@ impl HasContext for Context {
     }
 
     unsafe fn is_renderbuffer(&self, renderbuffer: Self::Renderbuffer) -> bool {
-        let renderbuffers = self.renderbuffers.borrow_mut();
+        let renderbuffers = self.renderbuffers.borrow();
         if let Some(ref r) = renderbuffers.get(renderbuffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_renderbuffer(Some(r)),
@@ -558,7 +592,7 @@ impl HasContext for Context {
     }
 
     unsafe fn is_shader(&self, shader: Self::Shader) -> bool {
-        let shaders = self.shaders.borrow_mut();
+        let shaders = self.shaders.borrow();
         if let Some(ref s) = shaders.get(shader) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_shader(Some(s)),
@@ -585,7 +619,7 @@ impl HasContext for Context {
     }
 
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
-        let textures = self.textures.borrow_mut();
+        let textures = self.textures.borrow();
         if let Some(ref t) = textures.get(texture) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_texture(Some(t)),
@@ -676,7 +710,7 @@ impl HasContext for Context {
     }
 
     unsafe fn is_program(&self, program: Self::Program) -> bool {
-        let programs = self.programs.borrow_mut();
+        let programs = self.programs.borrow();
         if let Some(ref p) = programs.get(program) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_program(Some(p)),
@@ -821,7 +855,7 @@ impl HasContext for Context {
     }
 
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
-        let buffers = self.buffers.borrow_mut();
+        let buffers = self.buffers.borrow();
         if let Some(ref b) = buffers.get(buffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_buffer(Some(b)),
@@ -1750,6 +1784,41 @@ impl HasContext for Context {
         .unwrap_or_else(|| String::from(""))
     }
 
+    unsafe fn get_parameter_buffer(&self, parameter: u32) -> Option<Self::Buffer> {
+        self.get_parameter_gl_name(parameter, &self.buffers)
+    }
+
+    unsafe fn get_parameter_framebuffer(&self, parameter: u32) -> Option<Self::Framebuffer> {
+        self.get_parameter_gl_name(parameter, &self.framebuffers)
+    }
+
+    unsafe fn get_parameter_program(&self, parameter: u32) -> Option<Self::Program> {
+        self.get_parameter_gl_name(parameter, &self.programs)
+    }
+
+    unsafe fn get_parameter_renderbuffer(&self, parameter: u32) -> Option<Self::Renderbuffer> {
+        self.get_parameter_gl_name(parameter, &self.renderbuffers)
+    }
+
+    unsafe fn get_parameter_sampler(&self, parameter: u32) -> Option<Self::Sampler> {
+        self.get_parameter_gl_name(parameter, &self.samplers)
+    }
+
+    unsafe fn get_parameter_texture(&self, parameter: u32) -> Option<Self::Texture> {
+        self.get_parameter_gl_name(parameter, &self.textures)
+    }
+
+    unsafe fn get_parameter_transform_feedback(
+        &self,
+        parameter: u32,
+    ) -> Option<Self::TransformFeedback> {
+        self.get_parameter_gl_name(parameter, &self.transform_feedbacks)
+    }
+
+    unsafe fn get_parameter_vertex_array(&self, parameter: u32) -> Option<Self::VertexArray> {
+        self.get_parameter_gl_name(parameter, &self.vertex_arrays)
+    }
+
     unsafe fn get_uniform_location(
         &self,
         program: Self::Program,
@@ -1901,7 +1970,7 @@ impl HasContext for Context {
         let raw_sampler = samplers.get_unchecked(sampler);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
-                panic!("Samper parameter for `f32` is not supported")
+                panic!("Sampler parameter for `f32` is not supported")
             }
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.sampler_parameterf(raw_sampler, name, value);
@@ -3599,25 +3668,21 @@ impl HasContext for Context {
         &self,
         program: Self::Program,
         uniform_block_index: u32,
-        parameter: u32
+        parameter: u32,
     ) -> i32 {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);
 
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) =>
-                panic!("Uniform blocks are not supported"),
-            RawRenderingContext::WebGl2(ref gl) =>
-                gl.get_active_uniform_block_parameter(
-                    raw_program,
-                    uniform_block_index,
-                    parameter)
-                    .unwrap()
-                    .as_f64()
-                    .map(|v| v as i32)
-                    // Errors will be caught by the browser or through `get_error`
-                    // so return a default instead
-                    .unwrap_or(0)
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .get_active_uniform_block_parameter(raw_program, uniform_block_index, parameter)
+                .unwrap()
+                .as_f64()
+                .map(|v| v as i32)
+                // Errors will be caught by the browser or through `get_error`
+                // so return a default instead
+                .unwrap_or(0),
         }
     }
 
@@ -3626,19 +3691,16 @@ impl HasContext for Context {
         program: Self::Program,
         uniform_block_index: u32,
         parameter: u32,
-        out: &mut [i32]
+        out: &mut [i32],
     ) {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);
 
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) =>
-                panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform blocks are not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
-                let value = gl.get_active_uniform_block_parameter(
-                    raw_program,
-                    uniform_block_index,
-                    parameter)
+                let value = gl
+                    .get_active_uniform_block_parameter(raw_program, uniform_block_index, parameter)
                     .unwrap();
 
                 use wasm_bindgen::JsCast;
@@ -3648,7 +3710,8 @@ impl HasContext for Context {
                     // To maintain compatibility with the pointers returned by
                     // desktop GL, which are signed, an extra copy is needed
                     // here.
-                    values.to_vec()
+                    values
+                        .to_vec()
                         .into_iter()
                         .zip(out.iter_mut())
                         .for_each(|(val, target)| *target = val as i32)
@@ -3659,19 +3722,16 @@ impl HasContext for Context {
     unsafe fn get_active_uniform_block_name(
         &self,
         program: Self::Program,
-        uniform_block_index: u32
+        uniform_block_index: u32,
     ) -> String {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);
 
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) =>
-                panic!("Uniform blocks are not supported"),
-            RawRenderingContext::WebGl2(ref gl) =>
-                gl.get_active_uniform_block_name(
-                    raw_program,
-                    uniform_block_index)
-                    .unwrap()
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .get_active_uniform_block_name(raw_program, uniform_block_index)
+                .unwrap(),
         }
     }
 }

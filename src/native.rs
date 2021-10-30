@@ -196,6 +196,13 @@ impl HasContext for Context {
         Ok(NativeTexture(non_zero_gl_name(name)))
     }
 
+    unsafe fn create_textures(&self, target: u32) -> Result<Self::Texture, String> {
+        let gl = &self.raw;
+        let mut name = 0;
+        gl.CreateTextures(target, 1, &mut name);
+        Ok(NativeTexture(non_zero_gl_name(name)))
+    }
+    
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
         let gl = &self.raw;
         gl.IsTexture(texture.0.get()) != 0
@@ -377,6 +384,13 @@ impl HasContext for Context {
         Ok(NativeBuffer(non_zero_gl_name(buffer)))
     }
 
+    unsafe fn create_buffers(&self) -> Result<Self::Buffer, String> {
+        let gl = &self.raw;
+        let mut buffer = 0;
+        gl.CreateBuffers(1, &mut buffer);
+        Ok(NativeBuffer(non_zero_gl_name(buffer)))
+    }
+    
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
         let gl = &self.raw;
         gl.IsBuffer(buffer.0.get()) != 0
@@ -546,6 +560,16 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn named_buffer_data_u8_slice(&self, buffer: Self::Buffer, data: &[u8], usage: u32) {
+        let gl = &self.raw;
+        gl.NamedBufferData(
+            buffer.0.get(),
+            data.len() as isize,
+            data.as_ptr() as *const std::ffi::c_void,
+            usage,
+        );
+    }
+    
     unsafe fn buffer_sub_data_u8_slice(&self, target: u32, offset: i32, src_data: &[u8]) {
         let gl = &self.raw;
         gl.BufferSubData(
@@ -636,6 +660,44 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn copy_image_sub_data(
+        &self,
+        src_name: Self::Texture,
+        src_target: u32,
+        src_level: i32,
+        src_x: i32,
+        src_y: i32,
+        src_z: i32,
+        dst_name: Self::Texture,
+        dst_target: u32,
+        dst_level: i32,
+        dst_x: i32,
+        dst_y: i32,
+        dst_z: i32,
+        src_width: i32,
+        src_height: i32,
+        src_depth: i32,
+    ) {
+        let gl = &self.raw;
+        gl.CopyImageSubData(
+            src_name.0.get(),
+            src_target,
+            src_level,
+            src_x,
+            src_y,
+            src_z,
+            dst_name.0.get(),
+            dst_target,
+            dst_level,
+            dst_x,
+            dst_y,
+            dst_z,
+            src_width,
+            src_height,
+            src_depth,
+        );
+    }
+    
     unsafe fn copy_tex_image_2d(
         &self,
         target: u32,
@@ -893,6 +955,11 @@ impl HasContext for Context {
     unsafe fn enable_draw_buffer(&self, parameter: u32, draw_buffer: u32) {
         let gl = &self.raw;
         gl.Enablei(parameter, draw_buffer);
+    }
+
+    unsafe fn enable_vertex_array_attrib(&self, vao: Self::VertexArray, index: u32) {
+        let gl = &self.raw;
+        gl.EnableVertexArrayAttrib(vao.0.get(), index);
     }
 
     unsafe fn enable_vertex_attrib_array(&self, index: u32) {
@@ -1205,6 +1272,11 @@ impl HasContext for Context {
         gl.GenerateMipmap(target);
     }
 
+    unsafe fn generate_texture_mipmap(&self, texture: Self::Texture) {
+        let gl = &self.raw;
+        gl.GenerateTextureMipmap(texture.0.get());
+    }
+
     unsafe fn tex_image_1d(
         &self,
         target: u32,
@@ -1425,6 +1497,26 @@ impl HasContext for Context {
         gl.TexStorage3D(target, levels, internal_format, width, height, depth);
     }
 
+    unsafe fn texture_storage_3d(
+        &self,
+        texture: Self::Texture,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+        depth: i32,
+    ) {
+        let gl = &self.raw;
+        gl.TexStorage3D(
+            texture.0.get(),
+            levels,
+            internal_format,
+            width,
+            height,
+            depth,
+        );
+    }
+    
     unsafe fn get_uniform_i32(
         &self,
         program: Self::Program,
@@ -1824,6 +1916,11 @@ impl HasContext for Context {
         gl.TexParameteri(target, parameter, value);
     }
 
+    unsafe fn texture_parameter_i32(&self, texture: Self::Texture, parameter: u32, value: i32) {
+        let gl = &self.raw;
+        gl.TextureParameteri(texture.0.get(), parameter, value);
+    }
+    
     unsafe fn tex_parameter_f32_slice(&self, target: u32, parameter: u32, values: &[f32]) {
         let gl = &self.raw;
         gl.TexParameterfv(target, parameter, values.as_ptr());
@@ -1923,6 +2020,39 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn texture_sub_image_3d(
+        &self,
+        texture: Self::Texture,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixels: PixelUnpackData,
+    ) {
+        let gl = &self.raw;
+        gl.TexSubImage3D(
+            texture.0.get(),
+            level,
+            x_offset,
+            y_offset,
+            z_offset,
+            width,
+            height,
+            depth,
+            format,
+            ty,
+            match pixels {
+                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
+                PixelUnpackData::Slice(data) => data.as_ptr() as *const std::ffi::c_void,
+            },
+        );
+    }
+    
     unsafe fn compressed_tex_sub_image_3d(
         &self,
         target: u32,
@@ -1981,6 +2111,66 @@ impl HasContext for Context {
     unsafe fn scissor_slice(&self, first: u32, count: i32, scissors: &[[i32; 4]]) {
         let gl = &self.raw;
         gl.ScissorArrayv(first, count, scissors.as_ptr() as *const i32);
+    }
+
+    unsafe fn vertex_array_attrib_binding_f32(
+        &self,
+        vao: Self::VertexArray,
+        index: u32,
+        binding_index: u32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexArrayAttribBinding(vao.0.get(), index, binding_index);
+    }
+
+    unsafe fn vertex_array_attrib_format_f32(
+        &self,
+        vao: Self::VertexArray,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        normalized: bool,
+        relative_offset: u32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexArrayAttribFormat(
+            vao.0.get(),
+            index,
+            size,
+            data_type,
+            normalized as u8,
+            relative_offset,
+        );
+    }
+
+    unsafe fn vertex_array_attrib_format_i32(
+        &self,
+        vao: Self::VertexArray,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        relative_offset: u32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexArrayAttribIFormat(vao.0.get(), index, size, data_type, relative_offset);
+    }
+
+    unsafe fn vertex_array_vertex_buffer(
+        &self,
+        vao: Self::VertexArray,
+        binding_index: u32,
+        buffer: Option<Self::Buffer>,
+        offset: i32,
+        stride: i32,
+    ) {
+        let gl = &self.raw;
+        gl.VertexArrayVertexBuffer(
+            vao.0.get(),
+            binding_index,
+            buffer.map(|b| b.0.get()).unwrap_or(0),
+            offset as isize,
+            stride,
+        );
     }
 
     unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32) {

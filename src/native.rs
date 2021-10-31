@@ -1507,7 +1507,7 @@ impl HasContext for Context {
         depth: i32,
     ) {
         let gl = &self.raw;
-        gl.TexStorage3D(
+        gl.TextureStorage3D(
             texture.0.get(),
             levels,
             internal_format,
@@ -2035,7 +2035,7 @@ impl HasContext for Context {
         pixels: PixelUnpackData,
     ) {
         let gl = &self.raw;
-        gl.TexSubImage3D(
+        gl.TextureSubImage3D(
             texture.0.get(),
             level,
             x_offset,
@@ -2155,6 +2155,15 @@ impl HasContext for Context {
         gl.VertexArrayAttribIFormat(vao.0.get(), index, size, data_type, relative_offset);
     }
 
+    unsafe fn vertex_array_element_buffer(
+        &self,
+        vao: Self::VertexArray,
+        buffer: Option<Self::Buffer>,
+    ) {
+        let gl = &self.raw;
+        gl.VertexArrayElementBuffer(vao.0.get(), buffer.map(|b| b.0.get()).unwrap_or(0));
+    }
+    
     unsafe fn vertex_array_vertex_buffer(
         &self,
         vao: Self::VertexArray,

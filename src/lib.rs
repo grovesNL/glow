@@ -979,6 +979,12 @@ pub trait HasContext {
         relative_offset: u32,
     );
 
+    unsafe fn vertex_array_element_buffer(
+        &self,
+        vao: Self::VertexArray,
+        buffer: Option<Self::Buffer>,
+    );
+    
     unsafe fn vertex_array_vertex_buffer(
         &self,
         vao: Self::VertexArray,

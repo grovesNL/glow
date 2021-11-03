@@ -3369,12 +3369,13 @@ impl HasContext for Context {
             }
             PixelPackData::Slice(slice) => Some(slice),
         };
+        let data = data.map(|bytes| texture_data_view(gltype, bytes));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl
-                .read_pixels_with_opt_u8_array(x, y, width, height, format, gltype, data)
+                .read_pixels_with_opt_array_buffer_view(x, y, width, height, format, gltype, data.as_ref())
                 .unwrap(),
             RawRenderingContext::WebGl2(ref gl) => gl
-                .read_pixels_with_opt_u8_array(x, y, width, height, format, gltype, data)
+                .read_pixels_with_opt_array_buffer_view(x, y, width, height, format, gltype, data.as_ref())
                 .unwrap(),
         }
     }

@@ -3363,20 +3363,27 @@ impl HasContext for Context {
         gltype: u32,
         pixels: PixelPackData,
     ) {
-        let data = match pixels {
-            PixelPackData::BufferOffset(_) => {
-                panic!("Read pixels into buffer offset is not supported")
+        match pixels {
+            PixelPackData::BufferOffset(offset) => {
+                match self.raw {
+                    RawRenderingContext::WebGl1(ref gl) =>
+                        panic!("Read pixels into buffer offset is not supported"),
+                    RawRenderingContext::WebGl2(ref gl) => gl
+                        .read_pixels_with_i32(x, y, width, height, format, gltype, offset as i32)
+                        .unwrap(),
+                }
             }
-            PixelPackData::Slice(slice) => Some(slice),
-        };
-        let data = data.map(|bytes| texture_data_view(gltype, bytes));
-        match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => gl
-                .read_pixels_with_opt_array_buffer_view(x, y, width, height, format, gltype, data.as_ref())
-                .unwrap(),
-            RawRenderingContext::WebGl2(ref gl) => gl
-                .read_pixels_with_opt_array_buffer_view(x, y, width, height, format, gltype, data.as_ref())
-                .unwrap(),
+            PixelPackData::Slice(bytes) => {
+                let data = texture_data_view(gltype, bytes);
+                match self.raw {
+                    RawRenderingContext::WebGl1(ref gl) => gl
+                        .read_pixels_with_opt_array_buffer_view(x, y, width, height, format, gltype, Some(&data))
+                        .unwrap(),
+                    RawRenderingContext::WebGl2(ref gl) => gl
+                        .read_pixels_with_opt_array_buffer_view(x, y, width, height, format, gltype, Some(&data))
+                        .unwrap(),
+                }
+            }
         }
     }
 

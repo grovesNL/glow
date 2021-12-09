@@ -65,6 +65,7 @@ fn tracked_resource<K: slotmap::Key, V>() -> TrackedResource<K, V> {
 pub struct Context {
     raw: RawRenderingContext,
     extensions: Extensions,
+    version: Version,
     supported_extensions: HashSet<String>,
     shaders: TrackedResource<WebShaderKey, WebGlShader>,
     programs: TrackedResource<WebProgramKey, WebGlProgram>,
@@ -246,10 +247,16 @@ macro_rules! build_extensions {
 impl Context {
     pub fn from_webgl1_context(context: WebGlRenderingContext) -> Self {
         let (extensions, supported_extensions) = build_extensions!(context, WebGlRenderingContext);
+
+        // Retrieve and parse `GL_VERSION`
+        let raw_string = context.get_parameter(VERSION).unwrap().as_string().unwrap();
+        let version = Version::parse(&raw_string).unwrap();
+
         Self {
             raw: RawRenderingContext::WebGl1(context),
             extensions,
             supported_extensions,
+            version,
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),
@@ -266,10 +273,16 @@ impl Context {
 
     pub fn from_webgl2_context(context: WebGl2RenderingContext) -> Self {
         let (extensions, supported_extensions) = build_extensions!(context, WebGl2RenderingContext);
+
+        // Retrieve and parse `GL_VERSION`
+        let raw_string = context.get_parameter(VERSION).unwrap().as_string().unwrap();
+        let version = Version::parse(&raw_string).unwrap();
+
         Self {
             raw: RawRenderingContext::WebGl2(context),
             extensions,
             supported_extensions,
+            version,
             shaders: tracked_resource(),
             programs: tracked_resource(),
             buffers: tracked_resource(),
@@ -454,6 +467,10 @@ impl HasContext for Context {
 
     fn supports_debug(&self) -> bool {
         false
+    }
+
+    fn version(&self) -> &Version {
+        &self.version
     }
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {

@@ -12,6 +12,7 @@ pub struct Context {
     raw: native_gl::GlFns,
     extensions: HashSet<String>,
     constants: Constants,
+    version: Version,
 }
 
 impl Context {
@@ -30,19 +31,25 @@ impl Context {
                 loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
             });
 
+        // Retrieve and parse `GL_VERSION`
+        let raw_string = raw.GetString(VERSION);
+        let raw_version = std::ffi::CStr::from_ptr(raw_string as *const native_gl::GLchar)
+            .to_str()
+            .unwrap()
+            .to_owned();
+        let version = Version::parse(&raw_version).unwrap();
+
         // Setup extensions and constants after the context has been built
         let mut context = Self {
             raw,
             extensions: HashSet::new(),
             constants: Constants::default(),
+            version,
         };
 
-        let raw_version = context.get_parameter_string(VERSION);
-        let version = Version::parse(&raw_version).unwrap();
-
         // Use core-only functions to populate extension list
-        if (version >= Version::new(3, 0, None, String::from("")))
-            || (version >= Version::new_embedded(3, 0, String::from("")))
+        if (context.version >= Version::new(3, 0, None, String::from("")))
+            || (context.version >= Version::new_embedded(3, 0, String::from("")))
         {
             let num_extensions = context.get_parameter_i32(NUM_EXTENSIONS);
             for i in 0..num_extensions {
@@ -137,6 +144,10 @@ impl HasContext for Context {
 
     fn supports_debug(&self) -> bool {
         self.extensions.contains("GL_KHR_debug")
+    }
+
+    fn version(&self) -> &Version {
+        &self.version
     }
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String> {

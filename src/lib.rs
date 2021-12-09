@@ -10,6 +10,7 @@ use core::hash::Hash;
 use std::collections::HashSet;
 
 mod version;
+pub use version::Version;
 
 #[cfg(any(not(target_arch = "wasm32"), target_os = "emscripten"))]
 mod native;
@@ -96,6 +97,8 @@ pub trait HasContext {
     fn supported_extensions(&self) -> &HashSet<String>;
 
     fn supports_debug(&self) -> bool;
+
+    fn version(&self) -> &Version;
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String>;
 

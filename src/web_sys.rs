@@ -3381,23 +3381,38 @@ impl HasContext for Context {
         pixels: PixelPackData,
     ) {
         match pixels {
-            PixelPackData::BufferOffset(offset) => {
-                match self.raw {
-                    RawRenderingContext::WebGl1(ref gl) =>
-                        panic!("Read pixels into buffer offset is not supported"),
-                    RawRenderingContext::WebGl2(ref gl) => gl
-                        .read_pixels_with_i32(x, y, width, height, format, gltype, offset as i32)
-                        .unwrap(),
+            PixelPackData::BufferOffset(offset) => match self.raw {
+                RawRenderingContext::WebGl1(ref gl) => {
+                    panic!("Read pixels into buffer offset is not supported")
                 }
-            }
+                RawRenderingContext::WebGl2(ref gl) => gl
+                    .read_pixels_with_i32(x, y, width, height, format, gltype, offset as i32)
+                    .unwrap(),
+            },
             PixelPackData::Slice(bytes) => {
                 let data = texture_data_view(gltype, bytes);
                 match self.raw {
                     RawRenderingContext::WebGl1(ref gl) => gl
-                        .read_pixels_with_opt_array_buffer_view(x, y, width, height, format, gltype, Some(&data))
+                        .read_pixels_with_opt_array_buffer_view(
+                            x,
+                            y,
+                            width,
+                            height,
+                            format,
+                            gltype,
+                            Some(&data),
+                        )
                         .unwrap(),
                     RawRenderingContext::WebGl2(ref gl) => gl
-                        .read_pixels_with_opt_array_buffer_view(x, y, width, height, format, gltype, Some(&data))
+                        .read_pixels_with_opt_array_buffer_view(
+                            x,
+                            y,
+                            width,
+                            height,
+                            format,
+                            gltype,
+                            Some(&data),
+                        )
                         .unwrap(),
                 }
             }
@@ -3624,25 +3639,21 @@ impl HasContext for Context {
         &self,
         program: Self::Program,
         uniform_block_index: u32,
-        parameter: u32
+        parameter: u32,
     ) -> i32 {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);
 
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) =>
-                panic!("Uniform blocks are not supported"),
-            RawRenderingContext::WebGl2(ref gl) =>
-                gl.get_active_uniform_block_parameter(
-                    raw_program,
-                    uniform_block_index,
-                    parameter)
-                    .unwrap()
-                    .as_f64()
-                    .map(|v| v as i32)
-                    // Errors will be caught by the browser or through `get_error`
-                    // so return a default instead
-                    .unwrap_or(0)
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .get_active_uniform_block_parameter(raw_program, uniform_block_index, parameter)
+                .unwrap()
+                .as_f64()
+                .map(|v| v as i32)
+                // Errors will be caught by the browser or through `get_error`
+                // so return a default instead
+                .unwrap_or(0),
         }
     }
 
@@ -3651,19 +3662,16 @@ impl HasContext for Context {
         program: Self::Program,
         uniform_block_index: u32,
         parameter: u32,
-        out: &mut [i32]
+        out: &mut [i32],
     ) {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);
 
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) =>
-                panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform blocks are not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
-                let value = gl.get_active_uniform_block_parameter(
-                    raw_program,
-                    uniform_block_index,
-                    parameter)
+                let value = gl
+                    .get_active_uniform_block_parameter(raw_program, uniform_block_index, parameter)
                     .unwrap();
 
                 use wasm_bindgen::JsCast;
@@ -3673,7 +3681,8 @@ impl HasContext for Context {
                     // To maintain compatibility with the pointers returned by
                     // desktop GL, which are signed, an extra copy is needed
                     // here.
-                    values.to_vec()
+                    values
+                        .to_vec()
                         .into_iter()
                         .zip(out.iter_mut())
                         .for_each(|(val, target)| *target = val as i32)
@@ -3684,19 +3693,16 @@ impl HasContext for Context {
     unsafe fn get_active_uniform_block_name(
         &self,
         program: Self::Program,
-        uniform_block_index: u32
+        uniform_block_index: u32,
     ) -> String {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);
 
         match self.raw {
-            RawRenderingContext::WebGl1(ref _gl) =>
-                panic!("Uniform blocks are not supported"),
-            RawRenderingContext::WebGl2(ref gl) =>
-                gl.get_active_uniform_block_name(
-                    raw_program,
-                    uniform_block_index)
-                    .unwrap()
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .get_active_uniform_block_name(raw_program, uniform_block_index)
+                .unwrap(),
         }
     }
 }

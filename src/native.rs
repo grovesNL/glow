@@ -84,6 +84,14 @@ impl Context {
     pub unsafe fn create_texture_from_gl_name(gl_name: native_gl::GLuint) -> NativeTexture {
         NativeTexture(non_zero_gl_name(gl_name))
     }
+
+    /// Creates a framebuffer from an external GL name.
+    ///
+    /// This can be useful when a framebuffer is created outside of glow (e.g: via `surfman` or another
+    /// crate that supports sharing of buffers between GL contexts), but glow needs to set it as a target.
+    pub unsafe fn create_framebuffer_from_gl_name(gl_name: native_gl::GLuint) -> NativeFramebuffer {
+        NativeFramebuffer(non_zero_gl_name(gl_name))
+    }
 }
 
 impl std::fmt::Debug for Context {

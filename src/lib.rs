@@ -115,7 +115,7 @@ pub trait HasContext {
 
     unsafe fn create_texture(&self) -> Result<Self::Texture, String>;
 
-    unsafe fn create_textures(&self, target: u32) -> Result<Self::Texture, String>;
+    unsafe fn create_named_texture(&self, target: u32) -> Result<Self::Texture, String>;
 
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool;
 
@@ -166,7 +166,7 @@ pub trait HasContext {
 
     unsafe fn create_buffer(&self) -> Result<Self::Buffer, String>;
 
-    unsafe fn create_buffers(&self) -> Result<Self::Buffer, String>;
+    unsafe fn create_named_buffer(&self) -> Result<Self::Buffer, String>;
     
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool;
 

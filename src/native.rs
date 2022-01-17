@@ -196,7 +196,7 @@ impl HasContext for Context {
         Ok(NativeTexture(non_zero_gl_name(name)))
     }
 
-    unsafe fn create_textures(&self, target: u32) -> Result<Self::Texture, String> {
+    unsafe fn create_named_texture(&self, target: u32) -> Result<Self::Texture, String> {
         let gl = &self.raw;
         let mut name = 0;
         gl.CreateTextures(target, 1, &mut name);
@@ -384,7 +384,7 @@ impl HasContext for Context {
         Ok(NativeBuffer(non_zero_gl_name(buffer)))
     }
 
-    unsafe fn create_buffers(&self) -> Result<Self::Buffer, String> {
+    unsafe fn create_named_buffer(&self) -> Result<Self::Buffer, String> {
         let gl = &self.raw;
         let mut buffer = 0;
         gl.CreateBuffers(1, &mut buffer);

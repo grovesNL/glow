@@ -584,6 +584,10 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn create_named_texture(&self, target: u32) -> Result<Self::Texture, String> {
+        unimplemented!()
+    }
+
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
         let textures = self.textures.borrow_mut();
         if let Some(ref t) = textures.get(texture) {
@@ -818,6 +822,10 @@ impl HasContext for Context {
             }
             None => Err(String::from("Unable to create buffer object")),
         }
+    }
+
+    unsafe fn create_named_buffer(&self) -> Result<Self::Buffer, String> {
+        unimplemented!()
     }
 
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
@@ -1057,6 +1065,10 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn named_buffer_data_u8_slice(&self, buffer: Self::Buffer, data: &[u8], usage: u32) {
+        unimplemented!()
+    }
+
     unsafe fn buffer_sub_data_u8_slice(&self, target: u32, offset: i32, src_data: &[u8]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -1178,6 +1190,27 @@ impl HasContext for Context {
                     src_target, dst_target, src_offset, dst_offset, size,
                 ),
         }
+    }
+
+    unsafe fn copy_image_sub_data(
+        &self,
+        src_name: Self::Texture,
+        src_target: u32,
+        src_level: i32,
+        src_x: i32,
+        src_y: i32,
+        src_z: i32,
+        dst_name: Self::Texture,
+        dst_target: u32,
+        dst_level: i32,
+        dst_x: i32,
+        dst_y: i32,
+        dst_z: i32,
+        src_width: i32,
+        src_height: i32,
+        src_depth: i32,
+    ) {
+        unimplemented!()
     }
 
     unsafe fn copy_tex_image_2d(
@@ -1514,6 +1547,10 @@ impl HasContext for Context {
 
     unsafe fn enable_draw_buffer(&self, _parameter: u32, _draw_buffer: u32) {
         panic!("Draw buffer enable is not supported");
+    }
+
+    unsafe fn enable_vertex_array_attrib(&self, vao: Self::VertexArray, index: u32) {
+        unimplemented!()
     }
 
     unsafe fn enable_vertex_attrib_array(&self, index: u32) {
@@ -1940,6 +1977,10 @@ impl HasContext for Context {
                 gl.generate_mipmap(target);
             }
         }
+    }
+
+    unsafe fn generate_texture_mipmap(&self, texture: Self::Texture) {
+        unimplemented!()
     }
 
     unsafe fn tex_image_1d(
@@ -2707,6 +2748,10 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn texture_parameter_i32(&self, texture: Self::Texture, parameter: u32, value: i32) {
+        unimplemented!()
+    }
+
     unsafe fn tex_parameter_f32_slice(&self, _target: u32, _parameter: u32, _values: &[f32]) {
         // Blocked by https://github.com/rustwasm/wasm-bindgen/issues/1038
         panic!("Texture parameters for `&[f32]` are not supported yet");
@@ -2767,6 +2812,23 @@ impl HasContext for Context {
                 .unwrap(); // TODO: Handle return value?
             }
         }
+    }
+
+    unsafe fn texture_sub_image_3d(
+        &self,
+        texture: Self::Texture,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        pixels: PixelUnpackData,
+    ) {
+        unimplemented!()
     }
 
     unsafe fn compressed_tex_sub_image_2d(
@@ -2946,6 +3008,56 @@ impl HasContext for Context {
         panic!("Scissor slice is not supported");
     }
 
+    unsafe fn vertex_array_attrib_binding_f32(
+        &self,
+        vao: Self::VertexArray,
+        index: u32,
+        binding_index: u32,
+    ) {
+        unimplemented!()
+    }
+
+    unsafe fn vertex_array_attrib_format_f32(
+        &self,
+        vao: Self::VertexArray,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        normalized: bool,
+        relative_offset: u32,
+    ) {
+        unimplemented!()
+    }
+
+    unsafe fn vertex_array_attrib_format_i32(
+        &self,
+        vao: Self::VertexArray,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        relative_offset: u32,
+    ) {
+        unimplemented!()
+    }
+
+    unsafe fn vertex_array_element_buffer(
+        &self,
+        vao: Self::VertexArray,
+        buffer: Option<Self::Buffer>,
+    ) {
+        unimplemented!()
+    }
+
+    unsafe fn vertex_array_vertex_buffer(
+        &self,
+        vao: Self::VertexArray,
+        binding_index: u32,
+        buffer: Option<Self::Buffer>,
+        offset: i32,
+        stride: i32,
+    ) {
+        unimplemented!()
+    }
     unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => match &self.extensions.angle_instanced_arrays {
@@ -3377,6 +3489,18 @@ impl HasContext for Context {
                 .read_pixels_with_opt_u8_array(x, y, width, height, format, gltype, data)
                 .unwrap(),
         }
+    }
+
+    unsafe fn texture_storage_3d(
+        &self,
+        texture: Self::Texture,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+        depth: i32,
+    ) {
+        unimplemented!()
     }
 
     unsafe fn get_uniform_i32(

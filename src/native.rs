@@ -33,6 +33,11 @@ impl Context {
 
         // Retrieve and parse `GL_VERSION`
         let raw_string = raw.GetString(VERSION);
+
+        if raw_string.is_null() {
+            panic!("Reading GL_VERSION failed. Make sure there is a valid GL context currently active.")
+        }
+
         let raw_version = std::ffi::CStr::from_ptr(raw_string as *const native_gl::GLchar)
             .to_str()
             .unwrap()

@@ -26,6 +26,10 @@ targets = [
 name = "glow"
 path = "src/lib.rs"
 
+[features]
+debug_trace_calls = []
+debug_automatic_glGetError = []
+
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = "~0.3"
 wasm-bindgen = "~0.2"

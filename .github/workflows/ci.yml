@@ -15,7 +15,7 @@ jobs:
         include:
         - build: pinned
           os: ubuntu-18.04
-          rust: 1.49.0
+          rust: 1.54.0
           sdl: true
         - build: stable
           os: ubuntu-18.04

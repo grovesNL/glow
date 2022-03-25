@@ -24,8 +24,9 @@ cargo build --target wasm32-unknown-unknown
 
 ## License
 
-This project is licensed under either of [Apache License, Version
-2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT), at your option.
+This project is licensed under any one of [Apache License, Version
+2.0](LICENSE-APACHE), [zlib License](LICENSE-ZLIB), or [MIT
+license](LICENSE-MIT), at your option.
 
 ## Contribution
 

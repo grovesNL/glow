@@ -8,7 +8,7 @@ authors = [
 ]
 homepage = "https://github.com/grovesNL/glow.git"
 repository = "https://github.com/grovesNL/glow"
-license = "MIT OR Apache-2.0"
+license = "MIT OR Apache-2.0 OR Zlib"
 edition = "2018"
 
 [package.metadata.docs.rs]

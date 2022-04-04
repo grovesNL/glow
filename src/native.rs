@@ -110,40 +110,40 @@ fn non_zero_gl_name(value: native_gl::GLuint) -> NonZeroU32 {
 }
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeShader(NonZeroU32);
+pub struct NativeShader(pub NonZeroU32);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeProgram(NonZeroU32);
+pub struct NativeProgram(pub NonZeroU32);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeBuffer(NonZeroU32);
+pub struct NativeBuffer(pub NonZeroU32);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeVertexArray(NonZeroU32);
+pub struct NativeVertexArray(pub NonZeroU32);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeTexture(NonZeroU32);
+pub struct NativeTexture(pub NonZeroU32);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeSampler(NonZeroU32);
+pub struct NativeSampler(pub NonZeroU32);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeFence(native_gl::GLsync);
+pub struct NativeFence(pub native_gl::GLsync);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeFramebuffer(NonZeroU32);
+pub struct NativeFramebuffer(pub NonZeroU32);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeRenderbuffer(NonZeroU32);
+pub struct NativeRenderbuffer(pub NonZeroU32);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeQuery(NonZeroU32);
+pub struct NativeQuery(pub NonZeroU32);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeUniformLocation(native_gl::GLuint);
+pub struct NativeUniformLocation(pub native_gl::GLuint);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct NativeTransformFeedback(NonZeroU32);
+pub struct NativeTransformFeedback(pub NonZeroU32);
 
 impl HasContext for Context {
     type Shader = NativeShader;

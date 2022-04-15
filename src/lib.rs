@@ -128,6 +128,8 @@ pub trait HasContext {
 
     unsafe fn compile_shader(&self, shader: Self::Shader);
 
+    unsafe fn get_shader_completion_status(&self, shader: Self::Shader) -> bool;
+
     unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool;
 
     unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String;
@@ -152,6 +154,8 @@ pub trait HasContext {
     unsafe fn detach_shader(&self, program: Self::Program, shader: Self::Shader);
 
     unsafe fn link_program(&self, program: Self::Program);
+
+    unsafe fn get_program_completion_status(&self, program: Self::Program) -> bool;
 
     unsafe fn get_program_link_status(&self, program: Self::Program) -> bool;
 
@@ -1233,6 +1237,8 @@ pub trait HasContext {
         access: u32,
         format: u32,
     );
+
+    unsafe fn max_shader_compiler_threads(&self, count: u32);
 }
 
 pub const ACTIVE_ATOMIC_COUNTER_BUFFERS: u32 = 0x92D9;
@@ -1544,6 +1550,8 @@ pub const COMPARE_REF_TO_TEXTURE: u32 = 0x884E;
 pub const COMPATIBLE_SUBROUTINES: u32 = 0x8E4B;
 
 pub const COMPILE_STATUS: u32 = 0x8B81;
+
+pub const COMPLETION_STATUS: u32 = 0x91B1;
 
 pub const COMPRESSED_R11_EAC: u32 = 0x9270;
 
@@ -2580,6 +2588,8 @@ pub const MAX_SAMPLES: u32 = 0x8D57;
 pub const MAX_SAMPLE_MASK_WORDS: u32 = 0x8E59;
 
 pub const MAX_SERVER_WAIT_TIMEOUT: u32 = 0x9111;
+
+pub const MAX_SHADER_COMPILER_THREADS: u32 = 0x91B0;
 
 pub const MAX_SHADER_STORAGE_BLOCK_SIZE: u32 = 0x90DE;
 

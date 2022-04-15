@@ -18,6 +18,7 @@
 //! * `GL_ARB_framebuffer_object`
 //! * `GL_ARB_framebuffer_sRGB`
 //! * `GL_ARB_instanced_arrays`
+//! * `GL_ARB_parallel_shader_compile`
 //! * `GL_ARB_program_interface_query`
 //! * `GL_ARB_sampler_objects`
 //! * `GL_ARB_sync`
@@ -30,6 +31,7 @@
 //! * `GL_EXT_draw_buffers2`
 //! * `GL_EXT_texture_filter_anisotropic`
 //! * `GL_KHR_debug`
+//! * `GL_KHR_parallel_shader_compile`
 //! * `GL_NV_copy_buffer`
 //!
 //! Supported Features:
@@ -4943,6 +4945,8 @@ pub mod struct_commands {
             self.MapBufferRange_load_with_dyn(get_proc_address);
             self.MapNamedBuffer_load_with_dyn(get_proc_address);
             self.MapNamedBufferRange_load_with_dyn(get_proc_address);
+            self.MaxShaderCompilerThreadsARB_load_with_dyn(get_proc_address);
+            self.MaxShaderCompilerThreadsKHR_load_with_dyn(get_proc_address);
             self.MemoryBarrier_load_with_dyn(get_proc_address);
             self.MemoryBarrierByRegion_load_with_dyn(get_proc_address);
             self.MinSampleShading_load_with_dyn(get_proc_address);
@@ -21120,6 +21124,76 @@ pub mod struct_commands {
         pub fn MapNamedBufferRange_is_loaded(&self) -> bool {
             !self.glMapNamedBufferRange_p.load(RELAX).is_null()
         }
+        /// [MaxShaderCompilerThreadsARB](http://docs.gl/gl4/MaxShaderCompilerThreadsARB)(count)
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn MaxShaderCompilerThreadsARB(&self, count: GLuint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.MaxShaderCompilerThreadsARB({:?});", count);
+            }
+            let out = call_atomic_ptr_1arg(
+                "MaxShaderCompilerThreadsARB",
+                &self.glMaxShaderCompilerThreadsARB_p,
+                count
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glMaxShaderCompilerThreadsARB");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn MaxShaderCompilerThreadsARB_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glMaxShaderCompilerThreadsARB\0",
+                &self.glMaxShaderCompilerThreadsARB_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn MaxShaderCompilerThreadsARB_is_loaded(&self) -> bool {
+            !self.glMaxShaderCompilerThreadsARB_p.load(RELAX).is_null()
+        }
+        /// [MaxShaderCompilerThreadsKHR](http://docs.gl/gl4/MaxShaderCompilerThreadsKHR)(count)
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn MaxShaderCompilerThreadsKHR(&self, count: GLuint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.MaxShaderCompilerThreadsKHR({:?});", count);
+            }
+            let out = call_atomic_ptr_1arg(
+                "glMaxShaderCompilerThreadsKHR",
+                &self.glMaxShaderCompilerThreadsKHR_p,
+                count
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glMaxShaderCompilerThreadsKHR");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn MaxShaderCompilerThreadsKHR_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glMaxShaderCompilerThreadsKHR\0",
+                &self.glMaxShaderCompilerThreadsKHR_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn MaxShaderCompilerThreadsKHR_is_loaded(&self) -> bool {
+            !self.glMaxShaderCompilerThreadsKHR_p.load(RELAX).is_null()
+        }
         /// [glMemoryBarrier](http://docs.gl/gl4/glMemoryBarrier)(barriers)
         /// * `barriers` group: MemoryBarrierMask
         #[cfg_attr(feature = "inline", inline)]
@@ -35574,6 +35648,8 @@ pub mod struct_commands {
         glMapBufferRange_p: APcv,
         glMapNamedBuffer_p: APcv,
         glMapNamedBufferRange_p: APcv,
+        glMaxShaderCompilerThreadsARB_p: APcv,
+        glMaxShaderCompilerThreadsKHR_p: APcv,
         glMemoryBarrier_p: APcv,
         glMemoryBarrierByRegion_p: APcv,
         glMinSampleShading_p: APcv,

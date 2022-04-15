@@ -917,6 +917,24 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_shader_completion_status(&self, shader: Self::Shader) -> bool {
+        let shaders = self.shaders.borrow();
+        let raw_shader = shaders.get_unchecked(shader);
+        if self.extensions.khr_parallel_shader_compile.is_none() {
+            panic!("Parallel shader compile is not supported")
+        }
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_shader_parameter(raw_shader, COMPLETION_STATUS)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_shader_parameter(raw_shader, COMPLETION_STATUS)
+            }
+        }
+        .as_bool()
+        .unwrap_or(false)
+    }
+
     unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool {
         let shaders = self.shaders.borrow();
         let raw_shader = shaders.get_unchecked(shader);
@@ -1019,6 +1037,24 @@ impl HasContext for Context {
             RawRenderingContext::WebGl1(ref gl) => gl.link_program(raw_program),
             RawRenderingContext::WebGl2(ref gl) => gl.link_program(raw_program),
         }
+    }
+
+    unsafe fn get_program_completion_status(&self, program: Self::Program) -> bool {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+        if self.extensions.khr_parallel_shader_compile.is_none() {
+            panic!("Parallel shader compile is not supported")
+        }
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_program_parameter(raw_program, COMPLETION_STATUS)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_program_parameter(raw_program, COMPLETION_STATUS)
+            }
+        }
+        .as_bool()
+        .unwrap_or(false)
     }
 
     unsafe fn get_program_link_status(&self, program: Self::Program) -> bool {
@@ -4100,6 +4136,10 @@ impl HasContext for Context {
                 .get_active_uniform_block_name(raw_program, uniform_block_index)
                 .unwrap(),
         }
+    }
+
+    unsafe fn max_shader_compiler_threads(&self, _count: u32) {
+        // WebGL doesn't use this
     }
 }
 

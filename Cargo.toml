@@ -46,6 +46,7 @@ features = [
   "Element",
   "HtmlCanvasElement",
   "HtmlImageElement",
+  "HtmlVideoElement",
   "ImageBitmap",
   "WebGlActiveInfo",
   "WebGlBuffer",

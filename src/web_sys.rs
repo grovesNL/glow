@@ -4,7 +4,7 @@ use js_sys::{self, Array};
 use slotmap::{new_key_type, SlotMap};
 use std::cell::RefCell;
 use web_sys::{
-    self, HtmlCanvasElement, HtmlImageElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer,
+    self, HtmlCanvasElement, HtmlImageElement, HtmlVideoElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer,
     WebGlFramebuffer, WebGlProgram, WebGlQuery, WebGlRenderbuffer, WebGlRenderingContext,
     WebGlSampler, WebGlShader, WebGlSync, WebGlTexture, WebGlTransformFeedback,
     WebGlUniformLocation, WebGlVertexArrayObject,
@@ -408,6 +408,43 @@ impl Context {
                     format,
                     ty,
                     image,
+                )
+                .unwrap();
+            }
+        }
+    }
+
+    pub unsafe fn tex_image_2d_with_html_video(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        format: u32,
+        ty: u32,
+        video: &HtmlVideoElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_u32_and_u32_and_video(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    video,
+                )
+                .unwrap();
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_u32_and_u32_and_html_video_element(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    video,
                 )
                 .unwrap();
             }

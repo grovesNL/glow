@@ -706,7 +706,7 @@ impl Context {
         }
     }
 
-    pub unsafe fn bind_raw_framebuffer(&self, target: u32, framebuffer: &WebGlFramebuffer) {
+    pub unsafe fn bind_external_framebuffer(&self, target: u32, framebuffer: &WebGlFramebuffer) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.bind_framebuffer(target, Some(framebuffer)),
             RawRenderingContext::WebGl2(ref gl) => gl.bind_framebuffer(target, Some(framebuffer)),

@@ -705,6 +705,13 @@ impl Context {
             }
         }
     }
+
+    pub unsafe fn bind_raw_framebuffer(&self, target: u32, framebuffer: &WebGlFramebuffer) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_framebuffer(target, Some(framebuffer)),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_framebuffer(target, Some(framebuffer)),
+        }
+    }
 }
 
 new_key_type! { pub struct WebShaderKey; }

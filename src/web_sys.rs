@@ -721,7 +721,7 @@ impl Context {
             RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("OVR_multiview2 is not supported in WebGL1")
             }
-            RawRenderingContext::WebGl2(ref gl) => {
+            RawRenderingContext::WebGl2(ref _gl) => {
                 if let Some(ext) = &self.extensions.ovr_multiview2 {
                     ext.framebuffer_texture_multiview_ovr(
                         target,

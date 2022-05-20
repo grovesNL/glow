@@ -40,7 +40,7 @@ struct Extensions {
     pub oes_texture_half_float: Option<web_sys::OesTextureHalfFloat>,
     pub oes_texture_half_float_linear: Option<web_sys::OesTextureHalfFloatLinear>,
     pub oes_vertex_array_object: Option<web_sys::OesVertexArrayObject>,
-    pub ovr_multiview2: Option<()>,
+    pub ovr_multiview2: Option<web_sys::OvrMultiview2>,
     pub webgl_color_buffer_float: Option<web_sys::WebglColorBufferFloat>,
     pub webgl_compressed_texture_astc: Option<web_sys::WebglCompressedTextureAstc>,
     pub webgl_compressed_texture_etc: Option<web_sys::WebglCompressedTextureEtc>,
@@ -181,7 +181,7 @@ macro_rules! build_extensions {
                 &$context,
                 "OES_vertex_array_object",
             ),
-            ovr_multiview2: get_extension_no_object(&$context, "OVR_multiview2"),
+            ovr_multiview2: get_extension::<web_sys::OvrMultiview2>(&$context, "OVR_multiview2"),
             webgl_color_buffer_float: get_extension::<web_sys::WebglColorBufferFloat>(
                 &$context,
                 "WEBGL_color_buffer_float",
@@ -702,6 +702,36 @@ impl Context {
                     image,
                 )
                 .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
+    pub unsafe fn framebuffer_texture_multiview_ovr(
+        &self,
+        target: u32,
+        attachment: u32,
+        texture: Option<<Self as HasContext>::Texture>,
+        level: i32,
+        base_view_index: i32,
+        num_views: i32,
+    ) {
+        let textures = self.textures.borrow();
+        let raw_texture = texture.map(|t| textures.get_unchecked(t));
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("OVR_multiview2 is not supported in WebGL1")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                if let Some(ext) = &self.extensions.ovr_multiview2 {
+                    ext.framebuffer_texture_multiview_ovr(
+                        target,
+                        attachment,
+                        raw_texture,
+                        level,
+                        base_view_index,
+                        num_views,
+                    );
+                }
             }
         }
     }

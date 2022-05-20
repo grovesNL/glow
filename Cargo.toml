@@ -93,6 +93,7 @@ features = [
   "WebglDepthTexture",
   "WebglDrawBuffers",
   "WebglLoseContext",
+  "OvrMultiview2",
 ]
 
 [workspace]

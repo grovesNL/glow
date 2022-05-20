@@ -56,6 +56,7 @@ pub struct ActiveTransformFeedback {
     pub name: String,
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct DebugMessageLogEntry {
     source: u32,

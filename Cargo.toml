@@ -101,3 +101,8 @@ members = [
   "examples/hello",
   "examples/howto",
 ]
+
+[patch.crates-io]
+web-sys = { git = "https://github.com/rustwasm/wasm-bindgen" }
+js-sys = { git = "https://github.com/rustwasm/wasm-bindgen" }
+wasm-bindgen = { git = "https://github.com/rustwasm/wasm-bindgen" }

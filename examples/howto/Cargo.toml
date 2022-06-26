@@ -5,4 +5,4 @@ edition = "2018"
 
 [dependencies]
 glow = { path = "../../" }
-sdl2 = { version = "0.34" }
+sdl2 = { version = "0.35" }

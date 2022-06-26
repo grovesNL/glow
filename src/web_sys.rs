@@ -16,6 +16,7 @@ enum RawRenderingContext {
     WebGl2(WebGl2RenderingContext),
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Extensions {
     pub angle_instanced_arrays: Option<web_sys::AngleInstancedArrays>,
@@ -705,6 +706,13 @@ impl Context {
             }
         }
     }
+
+    pub unsafe fn bind_external_framebuffer(&self, target: u32, framebuffer: &WebGlFramebuffer) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.bind_framebuffer(target, Some(framebuffer)),
+            RawRenderingContext::WebGl2(ref gl) => gl.bind_framebuffer(target, Some(framebuffer)),
+        }
+    }
 }
 
 new_key_type! { pub struct WebShaderKey; }
@@ -873,7 +881,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn create_named_texture(&self, target: u32) -> Result<Self::Texture, String> {
+    unsafe fn create_named_texture(&self, _target: u32) -> Result<Self::Texture, String> {
         unimplemented!()
     }
 
@@ -915,6 +923,24 @@ impl HasContext for Context {
             RawRenderingContext::WebGl1(ref gl) => gl.compile_shader(raw_shader),
             RawRenderingContext::WebGl2(ref gl) => gl.compile_shader(raw_shader),
         }
+    }
+
+    unsafe fn get_shader_completion_status(&self, shader: Self::Shader) -> bool {
+        let shaders = self.shaders.borrow();
+        let raw_shader = shaders.get_unchecked(shader);
+        if self.extensions.khr_parallel_shader_compile.is_none() {
+            panic!("Parallel shader compile is not supported")
+        }
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_shader_parameter(raw_shader, COMPLETION_STATUS)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_shader_parameter(raw_shader, COMPLETION_STATUS)
+            }
+        }
+        .as_bool()
+        .unwrap_or(false)
     }
 
     unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool {
@@ -1019,6 +1045,24 @@ impl HasContext for Context {
             RawRenderingContext::WebGl1(ref gl) => gl.link_program(raw_program),
             RawRenderingContext::WebGl2(ref gl) => gl.link_program(raw_program),
         }
+    }
+
+    unsafe fn get_program_completion_status(&self, program: Self::Program) -> bool {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+        if self.extensions.khr_parallel_shader_compile.is_none() {
+            panic!("Parallel shader compile is not supported")
+        }
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_program_parameter(raw_program, COMPLETION_STATUS)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_program_parameter(raw_program, COMPLETION_STATUS)
+            }
+        }
+        .as_bool()
+        .unwrap_or(false)
     }
 
     unsafe fn get_program_link_status(&self, program: Self::Program) -> bool {
@@ -1354,7 +1398,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn named_buffer_data_u8_slice(&self, buffer: Self::Buffer, data: &[u8], usage: u32) {
+    unsafe fn named_buffer_data_u8_slice(&self, _buffer: Self::Buffer, _data: &[u8], _usage: u32) {
         unimplemented!()
     }
 
@@ -1483,21 +1527,21 @@ impl HasContext for Context {
 
     unsafe fn copy_image_sub_data(
         &self,
-        src_name: Self::Texture,
-        src_target: u32,
-        src_level: i32,
-        src_x: i32,
-        src_y: i32,
-        src_z: i32,
-        dst_name: Self::Texture,
-        dst_target: u32,
-        dst_level: i32,
-        dst_x: i32,
-        dst_y: i32,
-        dst_z: i32,
-        src_width: i32,
-        src_height: i32,
-        src_depth: i32,
+        _src_name: Self::Texture,
+        _src_target: u32,
+        _src_level: i32,
+        _src_x: i32,
+        _src_y: i32,
+        _src_z: i32,
+        _dst_name: Self::Texture,
+        _dst_target: u32,
+        _dst_level: i32,
+        _dst_x: i32,
+        _dst_y: i32,
+        _dst_z: i32,
+        _src_width: i32,
+        _src_height: i32,
+        _src_depth: i32,
     ) {
         unimplemented!()
     }
@@ -1838,7 +1882,7 @@ impl HasContext for Context {
         panic!("Draw buffer enable is not supported");
     }
 
-    unsafe fn enable_vertex_array_attrib(&self, vao: Self::VertexArray, index: u32) {
+    unsafe fn enable_vertex_array_attrib(&self, _vao: Self::VertexArray, _index: u32) {
         unimplemented!()
     }
 
@@ -2268,7 +2312,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn generate_texture_mipmap(&self, texture: Self::Texture) {
+    unsafe fn generate_texture_mipmap(&self, _texture: Self::Texture) {
         unimplemented!()
     }
 
@@ -3037,7 +3081,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn texture_parameter_i32(&self, texture: Self::Texture, parameter: u32, value: i32) {
+    unsafe fn texture_parameter_i32(&self, _texture: Self::Texture, _parameter: u32, _value: i32) {
         unimplemented!()
     }
 
@@ -3105,17 +3149,17 @@ impl HasContext for Context {
 
     unsafe fn texture_sub_image_3d(
         &self,
-        texture: Self::Texture,
-        level: i32,
-        x_offset: i32,
-        y_offset: i32,
-        z_offset: i32,
-        width: i32,
-        height: i32,
-        depth: i32,
-        format: u32,
-        ty: u32,
-        pixels: PixelUnpackData,
+        _texture: Self::Texture,
+        _level: i32,
+        _x_offset: i32,
+        _y_offset: i32,
+        _z_offset: i32,
+        _width: i32,
+        _height: i32,
+        _depth: i32,
+        _format: u32,
+        _ty: u32,
+        _pixels: PixelUnpackData,
     ) {
         unimplemented!()
     }
@@ -3299,54 +3343,55 @@ impl HasContext for Context {
 
     unsafe fn vertex_array_attrib_binding_f32(
         &self,
-        vao: Self::VertexArray,
-        index: u32,
-        binding_index: u32,
+        _vao: Self::VertexArray,
+        _index: u32,
+        _binding_index: u32,
     ) {
         unimplemented!()
     }
 
     unsafe fn vertex_array_attrib_format_f32(
         &self,
-        vao: Self::VertexArray,
-        index: u32,
-        size: i32,
-        data_type: u32,
-        normalized: bool,
-        relative_offset: u32,
+        _vao: Self::VertexArray,
+        _index: u32,
+        _size: i32,
+        _data_type: u32,
+        _normalized: bool,
+        _relative_offset: u32,
     ) {
         unimplemented!()
     }
 
     unsafe fn vertex_array_attrib_format_i32(
         &self,
-        vao: Self::VertexArray,
-        index: u32,
-        size: i32,
-        data_type: u32,
-        relative_offset: u32,
+        _vao: Self::VertexArray,
+        _index: u32,
+        _size: i32,
+        _data_type: u32,
+        _relative_offset: u32,
     ) {
         unimplemented!()
     }
 
     unsafe fn vertex_array_element_buffer(
         &self,
-        vao: Self::VertexArray,
-        buffer: Option<Self::Buffer>,
+        _vao: Self::VertexArray,
+        _buffer: Option<Self::Buffer>,
     ) {
         unimplemented!()
     }
 
     unsafe fn vertex_array_vertex_buffer(
         &self,
-        vao: Self::VertexArray,
-        binding_index: u32,
-        buffer: Option<Self::Buffer>,
-        offset: i32,
-        stride: i32,
+        _vao: Self::VertexArray,
+        _binding_index: u32,
+        _buffer: Option<Self::Buffer>,
+        _offset: i32,
+        _stride: i32,
     ) {
         unimplemented!()
     }
+
     unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => match &self.extensions.angle_instanced_arrays {
@@ -3766,7 +3811,7 @@ impl HasContext for Context {
     ) {
         match pixels {
             PixelPackData::BufferOffset(offset) => match self.raw {
-                RawRenderingContext::WebGl1(ref gl) => {
+                RawRenderingContext::WebGl1(ref _gl) => {
                     panic!("Read pixels into buffer offset is not supported")
                 }
                 RawRenderingContext::WebGl2(ref gl) => gl
@@ -3805,12 +3850,12 @@ impl HasContext for Context {
 
     unsafe fn texture_storage_3d(
         &self,
-        texture: Self::Texture,
-        levels: i32,
-        internal_format: u32,
-        width: i32,
-        height: i32,
-        depth: i32,
+        _texture: Self::Texture,
+        _levels: i32,
+        _internal_format: u32,
+        _width: i32,
+        _height: i32,
+        _depth: i32,
     ) {
         unimplemented!()
     }
@@ -4100,6 +4145,10 @@ impl HasContext for Context {
                 .get_active_uniform_block_name(raw_program, uniform_block_index)
                 .unwrap(),
         }
+    }
+
+    unsafe fn max_shader_compiler_threads(&self, _count: u32) {
+        // WebGL doesn't use this
     }
 }
 

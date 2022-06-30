@@ -260,6 +260,13 @@ impl HasContext for Context {
         gl.CompileShader(shader.0.get());
     }
 
+    unsafe fn get_shader_completion_status(&self, shader: Self::Shader) -> bool {
+        let gl = &self.raw;
+        let mut status = 0;
+        gl.GetShaderiv(shader.0.get(), COMPLETION_STATUS, &mut status);
+        1 == status
+    }
+
     unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool {
         let gl = &self.raw;
         let mut status = 0;
@@ -336,6 +343,13 @@ impl HasContext for Context {
     unsafe fn link_program(&self, program: Self::Program) {
         let gl = &self.raw;
         gl.LinkProgram(program.0.get());
+    }
+
+    unsafe fn get_program_completion_status(&self, program: Self::Program) -> bool {
+        let gl = &self.raw;
+        let mut status = 0;
+        gl.GetProgramiv(program.0.get(), COMPLETION_STATUS, &mut status);
+        1 == status
     }
 
     unsafe fn get_program_link_status(&self, program: Self::Program) -> bool {
@@ -2961,6 +2975,15 @@ impl HasContext for Context {
             name
         } else {
             String::from("")
+        }
+    }
+
+    unsafe fn max_shader_compiler_threads(&self, count: u32) {
+        let gl = &self.raw;
+        if gl.MaxShaderCompilerThreadsKHR_is_loaded() {
+            gl.MaxShaderCompilerThreadsKHR(count);
+        } else {
+            gl.MaxShaderCompilerThreadsARB(count);
         }
     }
 }

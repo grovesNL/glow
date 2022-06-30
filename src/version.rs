@@ -10,6 +10,7 @@ pub struct Version {
 
 impl Version {
     /// Create a new OpenGL version number
+    #[allow(dead_code)]
     pub(crate) fn new(major: u32, minor: u32, revision: Option<u32>, vendor_info: String) -> Self {
         Version {
             major: major,
@@ -19,7 +20,9 @@ impl Version {
             vendor_info,
         }
     }
+
     /// Create a new OpenGL ES version number
+    #[allow(dead_code)]
     pub(crate) fn new_embedded(major: u32, minor: u32, vendor_info: String) -> Self {
         Version {
             major,

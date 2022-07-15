@@ -39,7 +39,7 @@ wasm-bindgen = "~0.2"
 slotmap = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.web_sys]
-version = "~0.3.37"
+version = "~0.3.58"
 package = "web-sys"
 features = [
   "Document",
@@ -93,6 +93,7 @@ features = [
   "WebglDepthTexture",
   "WebglDrawBuffers",
   "WebglLoseContext",
+  "OvrMultiview2",
 ]
 
 [workspace]

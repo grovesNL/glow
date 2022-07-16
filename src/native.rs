@@ -81,9 +81,9 @@ impl Context {
     where
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {
-        self.from_loader_function_cstr(move |name| {
+        Self::from_loader_function_cstr(move |name| {
             loader_function(name.to_str().unwrap())
-        });
+        })
     }
 
     /// Creates a texture from an external GL name.

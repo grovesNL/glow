@@ -16,19 +16,14 @@ pub struct Context {
 }
 
 impl Context {
-    pub unsafe fn from_loader_function<F>(mut loader_function: F) -> Self
+    pub unsafe fn from_loader_function_cstr<F>(mut loader_function: F) -> Self
     where
-        F: FnMut(&str) -> *const std::os::raw::c_void,
+        F: FnMut(&CStr) -> *const std::os::raw::c_void,
     {
-        // Note(Lokathor): This is wildly inefficient, because the loader_function
-        // is doubtlessly just going to allocate the `&str` we pass into a new `CString`
-        // so that it can pass that `*const c_char` off to the OS's actual loader.
-        // However, this is the best we can do without changing the outer function
-        // signature into something that's less alloc crazy.
         let raw: native_gl::GlFns =
             native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
                 let c_str = std::ffi::CStr::from_ptr(p);
-                loader_function(c_str.to_str().unwrap()) as *mut std::os::raw::c_void
+                loader_function(c_str) as *mut std::os::raw::c_void
             });
 
         // Retrieve and parse `GL_VERSION`
@@ -80,6 +75,15 @@ impl Context {
         };
 
         context
+    }
+
+    pub unsafe fn from_loader_function<F>(mut loader_function: F) -> Self
+    where
+        F: FnMut(&str) -> *const std::os::raw::c_void,
+    {
+        Self::from_loader_function_cstr(move |name| {
+            loader_function(name.to_str().unwrap())
+        })
     }
 
     /// Creates a texture from an external GL name.

@@ -1177,6 +1177,12 @@ impl HasContext for Context {
     unsafe fn get_parameter_string(&self, parameter: u32) -> String {
         let gl = &self.raw;
         let raw_ptr = gl.GetString(parameter);
+        if raw_ptr.is_null() {
+            panic!(
+                "Get parameter string 0x{:X} failed. Maybe your GL context version is too outdated.",
+                parameter
+            )
+        }
         std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::GLchar)
             .to_str()
             .unwrap()

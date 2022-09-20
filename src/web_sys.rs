@@ -10,6 +10,9 @@ use web_sys::{
     WebGlUniformLocation, WebGlVertexArrayObject,
 };
 
+#[cfg(web_sys_unstable_apis)]
+use web_sys::VideoFrame;
+
 #[derive(Debug)]
 enum RawRenderingContext {
     WebGl1(WebGlRenderingContext),
@@ -303,6 +306,8 @@ impl Context {
     // - image_bitmap
     // - html_canvas
     // - html_image
+    // - html_video
+    // - video_frame
 
     pub unsafe fn tex_image_2d_with_image_bitmap(
         &self,
@@ -452,6 +457,44 @@ impl Context {
         }
     }
 
+    #[cfg(web_sys_unstable_apis)]
+    pub unsafe fn tex_image_2d_with_video_frame(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        format: u32,
+        ty: u32,
+        video_frame: &VideoFrame,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_u32_and_u32_and_video_frame(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    video_frame,
+                )
+                .unwrap();
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_u32_and_u32_and_video_frame(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    video_frame,
+                )
+                .unwrap();
+            }
+        }
+    }
+
     pub unsafe fn tex_sub_image_2d_with_image_bitmap(
         &self,
         target: u32,
@@ -524,6 +567,45 @@ impl Context {
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.tex_sub_image_2d_with_u32_and_u32_and_html_image_element(
                     target, level, x_offset, y_offset, format, ty, image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
+    #[cfg(web_sys_unstable_apis)]
+    pub unsafe fn tex_sub_image_2d_with_video_frame(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        format: u32,
+        ty: u32,
+        video_frame: &VideoFrame,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.tex_sub_image_2d_with_u32_and_u32_and_video_frame(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    format,
+                    ty,
+                    video_frame,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_u32_and_u32_and_video_frame(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    format,
+                    ty,
+                    video_frame,
                 )
                 .unwrap(); // TODO: Handle return value?
             }
@@ -629,6 +711,40 @@ impl Context {
         }
     }
 
+    #[cfg(web_sys_unstable_apis)]
+    pub unsafe fn tex_image_3d_with_video_frame(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        video_frame: &VideoFrame,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => panic!("3D images not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_image_3d_with_video_frame(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    depth,
+                    border,
+                    format,
+                    ty,
+                    video_frame,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
     pub unsafe fn tex_sub_image_3d_with_image_bitmap(
         &self,
         target: u32,
@@ -701,6 +817,42 @@ impl Context {
                 gl.tex_sub_image_3d_with_html_image_element(
                     target, level, x_offset, y_offset, z_offset, width, height, depth, format, ty,
                     image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
+    #[cfg(web_sys_unstable_apis)]
+    pub unsafe fn tex_sub_image_3d_with_video_frame(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        video_frame: &VideoFrame,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => panic!("3D images not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_3d_with_video_frame(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    z_offset,
+                    width,
+                    height,
+                    depth,
+                    format,
+                    ty,
+                    video_frame,
                 )
                 .unwrap(); // TODO: Handle return value?
             }

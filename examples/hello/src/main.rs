@@ -63,11 +63,6 @@ fn main() {
             (gl, "#version 130", window, event_loop, gl_context)
         };
 
-        let vertex_array = gl
-            .create_vertex_array()
-            .expect("Cannot create vertex array");
-        gl.bind_vertex_array(Some(vertex_array));
-
         let program = gl.create_program().expect("Cannot create program");
 
         let (vertex_shader_source, fragment_shader_source) = (
@@ -149,7 +144,6 @@ fn main() {
                         }
                         WindowEvent::CloseRequested => {
                             gl.delete_program(program);
-                            gl.delete_vertex_array(vertex_array);
                             *control_flow = ControlFlow::Exit
                         }
                         _ => (),
@@ -178,7 +172,6 @@ fn main() {
 
                 if !running {
                     gl.delete_program(program);
-                    gl.delete_vertex_array(vertex_array);
                 }
             }
         }
@@ -190,7 +183,6 @@ fn main() {
             gl.clear(glow::COLOR_BUFFER_BIT);
             gl.draw_arrays(glow::TRIANGLES, 0, 3);
             gl.delete_program(program);
-            gl.delete_vertex_array(vertex_array);
         }
     }
 }

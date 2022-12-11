@@ -4,10 +4,10 @@ use js_sys::{self, Array};
 use slotmap::{new_key_type, SlotMap};
 use std::cell::RefCell;
 use web_sys::{
-    self, HtmlCanvasElement, HtmlImageElement, HtmlVideoElement, ImageBitmap, WebGl2RenderingContext, WebGlBuffer,
-    WebGlFramebuffer, WebGlProgram, WebGlQuery, WebGlRenderbuffer, WebGlRenderingContext,
-    WebGlSampler, WebGlShader, WebGlSync, WebGlTexture, WebGlTransformFeedback,
-    WebGlUniformLocation, WebGlVertexArrayObject,
+    self, HtmlCanvasElement, HtmlImageElement, HtmlVideoElement, ImageBitmap,
+    WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlQuery,
+    WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
+    WebGlTransformFeedback, WebGlUniformLocation, WebGlVertexArrayObject,
 };
 
 #[cfg(web_sys_unstable_apis)]
@@ -346,6 +346,40 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
+    pub unsafe fn tex_image_2d_with_image_bitmap_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        pixels: &ImageBitmap,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_image_bitmap(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    0, // required to be zero
+                    format,
+                    ty,
+                    pixels,
+                )
+                .unwrap();
+            }
+        }
+    }
+
     pub unsafe fn tex_image_2d_with_html_canvas(
         &self,
         target: u32,
@@ -374,6 +408,40 @@ impl Context {
                     target,
                     level,
                     internal_format,
+                    format,
+                    ty,
+                    canvas,
+                )
+                .unwrap();
+            }
+        }
+    }
+
+    /// WebGL2 Only
+    pub unsafe fn tex_image_2d_with_html_canvas_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        canvas: &HtmlCanvasElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_html_canvas_element(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    0,  // required to be zero
                     format,
                     ty,
                     canvas,
@@ -420,6 +488,40 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
+    pub unsafe fn tex_image_2d_with_html_image_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        image: &HtmlImageElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_html_image_element(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    0,  // required to be zero
+                    format,
+                    ty,
+                    image,
+                )
+                .unwrap();
+            }
+        }
+    }
+
     pub unsafe fn tex_image_2d_with_html_video(
         &self,
         target: u32,
@@ -448,6 +550,40 @@ impl Context {
                     target,
                     level,
                     internal_format,
+                    format,
+                    ty,
+                    video,
+                )
+                .unwrap();
+            }
+        }
+    }
+
+    /// WebGL2 Only
+    pub unsafe fn tex_image_2d_with_html_video_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        video: &HtmlVideoElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_html_video_element(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    0,  // required to be zero
                     format,
                     ty,
                     video,
@@ -495,6 +631,41 @@ impl Context {
         }
     }
 
+    #[cfg(web_sys_unstable_apis)]
+    /// WebGL2 Only
+    pub unsafe fn tex_image_2d_with_video_frame_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        video_frame: &VideoFrame,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                // TODO: Handle return value?
+                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_video_frame(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    0,
+                    format,
+                    ty,
+                    video_frame,
+                )
+                .unwrap();
+            }
+        }
+    }
+
     pub unsafe fn tex_sub_image_2d_with_image_bitmap(
         &self,
         target: u32,
@@ -515,6 +686,32 @@ impl Context {
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.tex_sub_image_2d_with_u32_and_u32_and_image_bitmap(
                     target, level, x_offset, y_offset, format, ty, image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
+    /// WebGL2 Only
+    pub unsafe fn tex_sub_image_2d_with_image_bitmap_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        image: &ImageBitmap,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_image_bitmap(
+                    target, level, x_offset, y_offset, width, height, format, ty, image,
                 )
                 .unwrap(); // TODO: Handle return value?
             }
@@ -547,6 +744,32 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
+    pub unsafe fn tex_sub_image_2d_with_html_canvas_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        image: &HtmlCanvasElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_html_canvas_element(
+                    target, level, x_offset, y_offset, width, height, format, ty, image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
     pub unsafe fn tex_sub_image_2d_with_html_image(
         &self,
         target: u32,
@@ -573,6 +796,84 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
+    pub unsafe fn tex_sub_image_2d_with_html_image_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        image: &HtmlImageElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_html_image_element(
+                    target, level, x_offset, y_offset, width, height, format, ty, image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
+    pub unsafe fn tex_sub_image_2d_with_html_video(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        format: u32,
+        ty: u32,
+        image: &HtmlVideoElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.tex_sub_image_2d_with_u32_and_u32_and_video(
+                    target, level, x_offset, y_offset, format, ty, image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_u32_and_u32_and_html_video_element(
+                    target, level, x_offset, y_offset, format, ty, image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
+    /// WebGL2 Only
+    pub unsafe fn tex_sub_image_2d_with_html_video_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        image: &HtmlVideoElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_html_video_element(
+                    target, level, x_offset, y_offset, width, height, format, ty, image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
     #[cfg(web_sys_unstable_apis)]
     pub unsafe fn tex_sub_image_2d_with_video_frame(
         &self,
@@ -580,6 +881,8 @@ impl Context {
         level: i32,
         x_offset: i32,
         y_offset: i32,
+        width: i32,
+        height: i32,
         format: u32,
         ty: u32,
         video_frame: &VideoFrame,
@@ -612,6 +915,42 @@ impl Context {
         }
     }
 
+    #[cfg(web_sys_unstable_apis)]
+    /// WebGL2 Only
+    pub unsafe fn tex_sub_image_2d_with_video_frame_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        video_frame: &VideoFrame,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => {
+                panic!("Width and height not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_video_frame(
+                    target,
+                    level,
+                    x_offset,
+                    y_offset,
+                    width,
+                    height,
+                    format,
+                    ty,
+                    video_frame,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
+    /// WebGL2 Only
     pub unsafe fn tex_image_3d_with_image_bitmap(
         &self,
         target: u32,
@@ -645,6 +984,7 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
     pub unsafe fn tex_image_3d_with_html_canvas_element(
         &self,
         target: u32,
@@ -678,6 +1018,7 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
     pub unsafe fn tex_image_3d_with_html_image_element(
         &self,
         target: u32,
@@ -711,7 +1052,42 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
+    pub unsafe fn tex_image_3d_with_html_video_element(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        image: &HtmlVideoElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => panic!("3D images not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_image_3d_with_html_video_element(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    depth,
+                    border,
+                    format,
+                    ty,
+                    image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
     #[cfg(web_sys_unstable_apis)]
+    /// WebGL2 Only
     pub unsafe fn tex_image_3d_with_video_frame(
         &self,
         target: u32,
@@ -745,6 +1121,7 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
     pub unsafe fn tex_sub_image_3d_with_image_bitmap(
         &self,
         target: u32,
@@ -771,6 +1148,7 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
     pub unsafe fn tex_sub_image_3d_with_html_canvas_element(
         &self,
         target: u32,
@@ -797,6 +1175,7 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
     pub unsafe fn tex_sub_image_3d_with_html_image_element(
         &self,
         target: u32,
@@ -823,7 +1202,35 @@ impl Context {
         }
     }
 
+    /// WebGL2 Only
+    pub unsafe fn tex_sub_image_3d_with_html_video_element(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        image: &HtmlVideoElement,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => panic!("3D images not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.tex_sub_image_3d_with_html_video_element(
+                    target, level, x_offset, y_offset, z_offset, width, height, depth, format, ty,
+                    image,
+                )
+                .unwrap(); // TODO: Handle return value?
+            }
+        }
+    }
+
     #[cfg(web_sys_unstable_apis)]
+    /// WebGL2 Only
     pub unsafe fn tex_sub_image_3d_with_video_frame(
         &self,
         target: u32,

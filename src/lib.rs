@@ -162,6 +162,14 @@ pub trait HasContext {
 
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String;
 
+    unsafe fn get_program_resource_i32(
+        &self,
+        program: Self::Program,
+        interface: u32,
+        index: u32,
+        properties: &[u32],
+    ) -> Vec<i32>;
+
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32;
 
     unsafe fn get_active_uniform(

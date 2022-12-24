@@ -1,6 +1,7 @@
 use super::*;
 use crate::{gl46 as native_gl, version::Version};
 use std::ffi::CStr;
+use std::ptr;
 use std::{collections::HashSet, ffi::CString, num::NonZeroU32};
 
 #[derive(Default)]
@@ -390,6 +391,41 @@ impl HasContext for Context {
         } else {
             String::from("")
         }
+    }
+
+    unsafe fn get_program_resource_i32(
+        &self,
+        program: Self::Program,
+        interface: u32,
+        index: u32,
+        properties: &[u32],
+    ) -> Vec<i32> {
+        let gl = &self.raw;
+        // query the number of output parameters first
+        let mut length = 0i32;
+        gl.GetProgramResourceiv(
+            program.0.get(),
+            interface,
+            index,
+            properties.len() as i32,
+            properties.as_ptr(),
+            0,
+            &mut length,
+            ptr::null_mut(),
+        );
+        // get the parameter values
+        let mut params = vec![0i32; length as usize];
+        gl.GetProgramResourceiv(
+            program.0.get(),
+            interface,
+            index,
+            properties.len() as i32,
+            properties.as_ptr(),
+            length,
+            &mut length,
+            params.as_mut_ptr(),
+        );
+        params
     }
 
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32 {

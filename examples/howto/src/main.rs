@@ -48,7 +48,8 @@ unsafe fn create_sdl2_context() -> (
     let video = sdl.video().unwrap();
     let gl_attr = video.gl_attr();
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
-    gl_attr.set_context_version(3, 0);
+    gl_attr.set_context_version(3, 3);
+    gl_attr.set_context_flags().forward_compatible().set();
     let window = video
         .window("Hello triangle!", 1024, 769)
         .opengl()
@@ -130,14 +131,14 @@ unsafe fn set_uniform(gl: &glow::Context, program: NativeProgram, name: &str, va
     gl.uniform_1_f32(uniform_location.as_ref(), value)
 }
 
-const VERTEX_SHADER_SOURCE: &str = r#"#version 130
+const VERTEX_SHADER_SOURCE: &str = r#"#version 330
   in vec2 in_position;
   out vec2 position;
   void main() {
     position = in_position;
     gl_Position = vec4(in_position - 0.5, 0.0, 1.0);
   }"#;
-const FRAGMENT_SHADER_SOURCE: &str = r#"#version 130
+const FRAGMENT_SHADER_SOURCE: &str = r#"#version 330
   precision mediump float;
   in vec2 position;
   out vec4 color;

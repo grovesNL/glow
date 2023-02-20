@@ -1,7 +1,11 @@
 use super::*;
 use crate::{gl46gles32 as gl, version::Version};
-use std::ffi::{CStr, c_void};
-use std::{collections::HashSet, ffi::CString, num::NonZeroU32};
+use std::{
+    collections::HashSet,
+    ffi::{c_void, CStr, CString},
+    num::NonZeroU32,
+    os::raw::c_char,
+};
 
 #[derive(Default)]
 struct Constants {
@@ -27,17 +31,17 @@ impl Context {
         let mut not_loaded = HashSet::new();
 
         let load_fn = &|p: *const u8| {
-            let c_str = std::ffi::CStr::from_ptr(p as *const i8);
+            let c_str = std::ffi::CStr::from_ptr(p as *const c_char);
             loader_function(c_str) as *const c_void
         };
 
         match gl::load_gl_functions(load_fn) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => {
                 for s in e {
                     not_loaded.insert(s);
                 }
-            },
+            }
         };
 
         // Retrieve and parse `GL_VERSION`
@@ -47,7 +51,7 @@ impl Context {
             panic!("Reading GL_VERSION failed. Make sure there is a valid GL context currently active.")
         }
 
-        let raw_version = std::ffi::CStr::from_ptr(raw_string as *const i8)
+        let raw_version = std::ffi::CStr::from_ptr(raw_string as *const c_char)
             .to_str()
             .unwrap()
             .to_owned();
@@ -95,9 +99,7 @@ impl Context {
     where
         F: Fn(&str) -> *const std::os::raw::c_void,
     {
-        Self::from_loader_function_cstr(move |name| {
-            loader_function(name.to_str().unwrap())
-        })
+        Self::from_loader_function_cstr(move |name| loader_function(name.to_str().unwrap()))
     }
 
     /// Creates a texture from an external GL name.
@@ -224,9 +226,9 @@ impl HasContext for Context {
     }
 
     unsafe fn create_shader(&self, shader_type: u32) -> Result<Self::Shader, String> {
-        Ok(NativeShader(non_zero_gl_name(
-            gl::glCreateShader(shader_type as u32),
-        )))
+        Ok(NativeShader(non_zero_gl_name(gl::glCreateShader(
+            shader_type as u32,
+        ))))
     }
 
     unsafe fn is_shader(&self, shader: Self::Shader) -> bool {
@@ -244,7 +246,7 @@ impl HasContext for Context {
         gl::glCreateTextures(target, 1, &mut name);
         Ok(NativeTexture(non_zero_gl_name(name)))
     }
-    
+
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
         gl::glIsTexture(texture.0.get()) != 0
     }
@@ -426,7 +428,7 @@ impl HasContext for Context {
         gl::glCreateBuffers(1, &mut buffer);
         Ok(NativeBuffer(non_zero_gl_name(buffer)))
     }
-    
+
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
         gl::glIsBuffer(buffer.0.get()) != 0
     }
@@ -582,7 +584,7 @@ impl HasContext for Context {
             usage,
         );
     }
-    
+
     unsafe fn buffer_sub_data_u8_slice(&self, target: u32, offset: i32, src_data: &[u8]) {
         gl::glBufferSubData(
             target,
@@ -699,7 +701,7 @@ impl HasContext for Context {
             src_depth as u32,
         );
     }
-    
+
     unsafe fn copy_tex_image_2d(
         &self,
         target: u32,
@@ -711,7 +713,16 @@ impl HasContext for Context {
         height: i32,
         border: i32,
     ) {
-        gl::glCopyTexImage2D(target, level, internal_format, x, y, width as u32, height as u32, border);
+        gl::glCopyTexImage2D(
+            target,
+            level,
+            internal_format,
+            x,
+            y,
+            width as u32,
+            height as u32,
+            border,
+        );
     }
 
     unsafe fn copy_tex_sub_image_2d(
@@ -725,7 +736,16 @@ impl HasContext for Context {
         width: i32,
         height: i32,
     ) {
-        gl::glCopyTexSubImage2D(target, level, x_offset, y_offset, x, y, width as u32, height as u32);
+        gl::glCopyTexSubImage2D(
+            target,
+            level,
+            x_offset,
+            y_offset,
+            x,
+            y,
+            width as u32,
+            height as u32,
+        );
     }
 
     unsafe fn copy_tex_sub_image_3d(
@@ -741,7 +761,15 @@ impl HasContext for Context {
         height: i32,
     ) {
         gl::glCopyTexSubImage3D(
-            target, level, x_offset, y_offset, z_offset, x, y, width as u32, height as u32,
+            target,
+            level,
+            x_offset,
+            y_offset,
+            z_offset,
+            x,
+            y,
+            width as u32,
+            height as u32,
         );
     }
 
@@ -1072,7 +1100,7 @@ impl HasContext for Context {
 
     unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String {
         let raw_ptr = gl::glGetStringi(parameter, index);
-        std::ffi::CStr::from_ptr(raw_ptr as *const i8)
+        std::ffi::CStr::from_ptr(raw_ptr as *const c_char)
             .to_str()
             .unwrap()
             .to_owned()
@@ -1086,7 +1114,7 @@ impl HasContext for Context {
                 parameter
             )
         }
-        std::ffi::CStr::from_ptr(raw_ptr as *const i8)
+        std::ffi::CStr::from_ptr(raw_ptr as *const c_char)
             .to_str()
             .unwrap()
             .to_owned()
@@ -1120,11 +1148,7 @@ impl HasContext for Context {
 
     unsafe fn bind_attrib_location(&self, program: Self::Program, index: u32, name: &str) {
         let name = CString::new(name).unwrap();
-        gl::glBindAttribLocation(
-            program.0.get(),
-            index,
-            name.as_ptr() as *const gl::GLchar,
-        );
+        gl::glBindAttribLocation(program.0.get(), index, name.as_ptr() as *const gl::GLchar);
     }
 
     unsafe fn get_active_attributes(&self, program: Self::Program) -> u32 {
@@ -1199,7 +1223,13 @@ impl HasContext for Context {
         width: i32,
         height: i32,
     ) {
-        gl::glRenderbufferStorageMultisample(target, samples as u32, internal_format, width as u32, height as u32);
+        gl::glRenderbufferStorageMultisample(
+            target,
+            samples as u32,
+            internal_format,
+            width as u32,
+            height as u32,
+        );
     }
 
     unsafe fn sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32, value: f32) {
@@ -1397,7 +1427,13 @@ impl HasContext for Context {
         width: i32,
         height: i32,
     ) {
-        gl::glTexStorage2D(target, levels as u32, internal_format, width as u32, height as u32);
+        gl::glTexStorage2D(
+            target,
+            levels as u32,
+            internal_format,
+            width as u32,
+            height as u32,
+        );
     }
 
     unsafe fn tex_storage_2d_multisample(
@@ -1428,7 +1464,14 @@ impl HasContext for Context {
         height: i32,
         depth: i32,
     ) {
-        gl::glTexStorage3D(target, levels as u32, internal_format, width as u32, height as u32, depth as u32);
+        gl::glTexStorage3D(
+            target,
+            levels as u32,
+            internal_format,
+            width as u32,
+            height as u32,
+            depth as u32,
+        );
     }
 
     unsafe fn texture_storage_3d(
@@ -1449,7 +1492,7 @@ impl HasContext for Context {
             depth as u32,
         );
     }
-    
+
     unsafe fn get_uniform_i32(
         &self,
         program: Self::Program,
@@ -1727,7 +1770,13 @@ impl HasContext for Context {
         blue: bool,
         alpha: bool,
     ) {
-        gl::glColorMaski(draw_buffer, red as u32, green as u32, blue as u32, alpha as u32);
+        gl::glColorMaski(
+            draw_buffer,
+            red as u32,
+            green as u32,
+            blue as u32,
+            alpha as u32,
+        );
     }
 
     unsafe fn depth_mask(&self, value: bool) {
@@ -1803,7 +1852,7 @@ impl HasContext for Context {
     unsafe fn texture_parameter_i32(&self, texture: Self::Texture, parameter: u32, value: i32) {
         gl::glTextureParameteri(texture.0.get(), parameter, value);
     }
-    
+
     unsafe fn tex_parameter_f32_slice(&self, target: u32, parameter: u32, values: &[f32]) {
         gl::glTexParameterfv(target, parameter, values.as_ptr());
     }
@@ -1862,7 +1911,15 @@ impl HasContext for Context {
         };
 
         gl::glCompressedTexSubImage2D(
-            target, level, x_offset, y_offset, width as u32, height as u32, format, image_size as u32, data,
+            target,
+            level,
+            x_offset,
+            y_offset,
+            width as u32,
+            height as u32,
+            format,
+            image_size as u32,
+            data,
         );
     }
 
@@ -1929,7 +1986,7 @@ impl HasContext for Context {
             },
         );
     }
-    
+
     unsafe fn compressed_tex_sub_image_3d(
         &self,
         target: u32,
@@ -1954,7 +2011,16 @@ impl HasContext for Context {
         };
 
         gl::glCompressedTexSubImage3D(
-            target, level, x_offset, y_offset, z_offset, width as u32, height as u32, depth as u32, format, image_size as u32,
+            target,
+            level,
+            x_offset,
+            y_offset,
+            z_offset,
+            width as u32,
+            height as u32,
+            depth as u32,
+            format,
+            image_size as u32,
             data,
         );
     }
@@ -2029,7 +2095,7 @@ impl HasContext for Context {
     ) {
         gl::glVertexArrayElementBuffer(vao.0.get(), buffer.map(|b| b.0.get()).unwrap_or(0));
     }
-    
+
     unsafe fn vertex_array_vertex_buffer(
         &self,
         vao: Self::VertexArray,
@@ -2350,8 +2416,8 @@ impl HasContext for Context {
         let mut entries = Vec::new();
         let mut offset = 0;
         for i in 0..received {
-            let message =
-                std::ffi::CStr::from_ptr(message_log[offset..].as_ptr() as *const i8).to_string_lossy();
+            let message = std::ffi::CStr::from_ptr(message_log[offset..].as_ptr() as *const c_char)
+                .to_string_lossy();
             offset += lengths[i] as usize;
             entries.push(DebugMessageLogEntry {
                 source: sources[i],
@@ -2408,7 +2474,7 @@ impl HasContext for Context {
             label_buf.as_mut_ptr(),
         );
         label_buf.set_len(len as usize);
-        std::ffi::CStr::from_ptr(label_buf.as_ptr() as *const i8)
+        std::ffi::CStr::from_ptr(label_buf.as_ptr() as *const c_char)
             .to_str()
             .unwrap()
             .to_owned()
@@ -2442,7 +2508,7 @@ impl HasContext for Context {
             label_buf.as_mut_ptr(),
         );
         label_buf.set_len(len as usize);
-        std::ffi::CStr::from_ptr(label_buf.as_ptr() as *const i8)
+        std::ffi::CStr::from_ptr(label_buf.as_ptr() as *const c_char)
             .to_str()
             .unwrap()
             .to_owned()
@@ -2468,8 +2534,11 @@ impl HasContext for Context {
         name: &str,
     ) -> Option<u32> {
         let name = CString::new(name).unwrap();
-        let index =
-            gl::glGetProgramResourceIndex(program.0.get(), SHADER_STORAGE_BLOCK, name.as_ptr() as *const u8);
+        let index = gl::glGetProgramResourceIndex(
+            program.0.get(),
+            SHADER_STORAGE_BLOCK,
+            name.as_ptr() as *const u8,
+        );
         if index == INVALID_INDEX {
             None
         } else {
@@ -2607,9 +2676,15 @@ impl HasContext for Context {
             c_name_buf,
         );
 
-        let name = CString::from_raw(c_name_buf as *mut i8).into_string().unwrap();
+        let name = CString::from_raw(c_name_buf as *mut c_char)
+            .into_string()
+            .unwrap();
 
-        Some(ActiveTransformFeedback { size: size as i32, tftype, name })
+        Some(ActiveTransformFeedback {
+            size: size as i32,
+            tftype,
+            name,
+        })
     }
 
     unsafe fn memory_barrier(&self, barriers: u32) {

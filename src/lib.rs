@@ -17,7 +17,7 @@ mod native;
 #[cfg(any(not(target_arch = "wasm32"), target_os = "emscripten"))]
 pub use native::*;
 #[cfg(any(not(target_arch = "wasm32"), target_os = "emscripten"))]
-mod gl46;
+mod gl46gles32;
 
 #[cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))]
 #[path = "web_sys.rs"]

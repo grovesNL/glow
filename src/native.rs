@@ -81,9 +81,7 @@ impl Context {
     where
         F: FnMut(&str) -> *const std::os::raw::c_void,
     {
-        Self::from_loader_function_cstr(move |name| {
-            loader_function(name.to_str().unwrap())
-        })
+        Self::from_loader_function_cstr(move |name| loader_function(name.to_str().unwrap()))
     }
 
     /// Creates a texture from an external GL name.
@@ -240,7 +238,7 @@ impl HasContext for Context {
         gl.CreateTextures(target, 1, &mut name);
         Ok(NativeTexture(non_zero_gl_name(name)))
     }
-    
+
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
         let gl = &self.raw;
         gl.IsTexture(texture.0.get()) != 0
@@ -442,7 +440,7 @@ impl HasContext for Context {
         gl.CreateBuffers(1, &mut buffer);
         Ok(NativeBuffer(non_zero_gl_name(buffer)))
     }
-    
+
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
         let gl = &self.raw;
         gl.IsBuffer(buffer.0.get()) != 0
@@ -621,7 +619,7 @@ impl HasContext for Context {
             usage,
         );
     }
-    
+
     unsafe fn buffer_sub_data_u8_slice(&self, target: u32, offset: i32, src_data: &[u8]) {
         let gl = &self.raw;
         gl.BufferSubData(
@@ -749,7 +747,7 @@ impl HasContext for Context {
             src_depth,
         );
     }
-    
+
     unsafe fn copy_tex_image_2d(
         &self,
         target: u32,
@@ -1574,7 +1572,7 @@ impl HasContext for Context {
             depth,
         );
     }
-    
+
     unsafe fn get_uniform_i32(
         &self,
         program: Self::Program,
@@ -1978,7 +1976,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         gl.TextureParameteri(texture.0.get(), parameter, value);
     }
-    
+
     unsafe fn tex_parameter_f32_slice(&self, target: u32, parameter: u32, values: &[f32]) {
         let gl = &self.raw;
         gl.TexParameterfv(target, parameter, values.as_ptr());
@@ -2110,7 +2108,7 @@ impl HasContext for Context {
             },
         );
     }
-    
+
     unsafe fn compressed_tex_sub_image_3d(
         &self,
         target: u32,
@@ -2221,7 +2219,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         gl.VertexArrayElementBuffer(vao.0.get(), buffer.map(|b| b.0.get()).unwrap_or(0));
     }
-    
+
     unsafe fn vertex_array_vertex_buffer(
         &self,
         vao: Self::VertexArray,

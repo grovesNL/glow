@@ -186,7 +186,16 @@ impl HasContext for Context {
     }
 
     fn supports_debug(&self) -> bool {
-        self.extensions.contains("GL_KHR_debug")
+        if self.extensions.contains("GL_KHR_debug") {
+            // Supports extension (either GL or GL ES)
+            true
+        } else if self.version.is_embedded {
+            // GL ES >= 3.2
+            self.version.major == 3 && self.version.minor >= 2
+        } else {
+            // GL >= 4.3
+            self.version.major == 4 && self.version.minor >= 3
+        }
     }
 
     fn version(&self) -> &Version {
@@ -2379,10 +2388,18 @@ impl HasContext for Context {
     where
         F: FnMut(u32, u32, u32, u32, &str),
     {
-        gl::glDebugMessageCallback(
-            Some(raw_debug_message_callback::<F>),
-            &mut callback as *mut _ as *mut std::ffi::c_void,
-        );
+        if self.is_loaded("glDebugMessageCallback") {
+            gl::glDebugMessageCallback(
+                Some(raw_debug_message_callback::<F>),
+                &mut callback as *mut _ as *mut std::ffi::c_void,
+            );
+        } else {
+            // Fallback to extension
+            gl::glDebugMessageCallbackKHR(
+                Some(raw_debug_message_callback::<F>),
+                &mut callback as *mut _ as *mut std::ffi::c_void,
+            );
+        }
     }
 
     unsafe fn get_debug_message_log(&self, count: u32) -> Vec<DebugMessageLogEntry> {

@@ -175,7 +175,7 @@ pub trait HasContext {
     unsafe fn create_buffer(&self) -> Result<Self::Buffer, String>;
 
     unsafe fn create_named_buffer(&self) -> Result<Self::Buffer, String>;
-    
+
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool;
 
     unsafe fn bind_buffer(&self, target: u32, buffer: Option<Self::Buffer>);
@@ -248,7 +248,7 @@ pub trait HasContext {
     unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32);
 
     unsafe fn named_buffer_data_u8_slice(&self, buffer: Self::Buffer, data: &[u8], usage: u32);
-    
+
     unsafe fn buffer_sub_data_u8_slice(&self, target: u32, offset: i32, src_data: &[u8]);
 
     unsafe fn get_buffer_sub_data(&self, target: u32, offset: i32, dst_data: &mut [u8]);
@@ -301,7 +301,7 @@ pub trait HasContext {
         src_height: i32,
         src_depth: i32,
     );
-    
+
     unsafe fn copy_tex_image_2d(
         &self,
         target: u32,
@@ -432,7 +432,7 @@ pub trait HasContext {
     unsafe fn enable_draw_buffer(&self, parameter: u32, draw_buffer: u32);
 
     unsafe fn enable_vertex_array_attrib(&self, vao: Self::VertexArray, index: u32);
-    
+
     unsafe fn enable_vertex_attrib_array(&self, index: u32);
 
     unsafe fn flush(&self);
@@ -572,7 +572,7 @@ pub trait HasContext {
     unsafe fn generate_mipmap(&self, target: u32);
 
     unsafe fn generate_texture_mipmap(&self, texture: Self::Texture);
-    
+
     unsafe fn tex_image_1d(
         &self,
         target: u32,
@@ -698,7 +698,7 @@ pub trait HasContext {
         height: i32,
         depth: i32,
     );
-    
+
     unsafe fn get_uniform_i32(
         &self,
         program: Self::Program,
@@ -875,7 +875,7 @@ pub trait HasContext {
     unsafe fn tex_parameter_i32(&self, target: u32, parameter: u32, value: i32);
 
     unsafe fn texture_parameter_i32(&self, texture: Self::Texture, parameter: u32, value: i32);
-    
+
     unsafe fn tex_parameter_f32_slice(&self, target: u32, parameter: u32, values: &[f32]);
 
     unsafe fn tex_parameter_i32_slice(&self, target: u32, parameter: u32, values: &[i32]);
@@ -992,7 +992,7 @@ pub trait HasContext {
         vao: Self::VertexArray,
         buffer: Option<Self::Buffer>,
     );
-    
+
     unsafe fn vertex_array_vertex_buffer(
         &self,
         vao: Self::VertexArray,
@@ -1001,7 +1001,7 @@ pub trait HasContext {
         offset: i32,
         stride: i32,
     );
-    
+
     unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32);
 
     unsafe fn vertex_attrib_pointer_f32(

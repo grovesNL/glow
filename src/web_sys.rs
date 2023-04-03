@@ -1302,6 +1302,30 @@ impl Context {
             RawRenderingContext::WebGl2(ref gl) => gl.bind_framebuffer(target, Some(framebuffer)),
         }
     }
+
+    // Returns whether the "ldr" profile is support by the `WEBGL_compressed_texture_astc`
+    // extension, with `None` indicating that the extension itself isn't supported.
+    pub fn compressed_texture_astc_get_ldr_profile_support(&self) -> Option<bool> {
+        self.extensions
+            .webgl_compressed_texture_astc
+            .as_ref()
+            .map(|ext| {
+                let profiles = ext.get_supported_profiles().unwrap_or_default();
+                profiles.includes(&"ldr".into(), 0)
+            })
+    }
+
+    // Returns whether the "hdr" profile is support by the `WEBGL_compressed_texture_astc`
+    // extension, with `None` indicating that the extension itself isn't supported.
+    pub fn compressed_texture_astc_get_hdr_profile_support(&self) -> Option<bool> {
+        self.extensions
+            .webgl_compressed_texture_astc
+            .as_ref()
+            .map(|ext| {
+                let profiles = ext.get_supported_profiles().unwrap_or_default();
+                profiles.includes(&"hdr".into(), 0)
+            })
+    }
 }
 
 new_key_type! { pub struct WebShaderKey; }

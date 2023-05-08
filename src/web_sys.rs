@@ -1703,6 +1703,16 @@ impl HasContext for Context {
         .unwrap_or_else(|| String::from(""))
     }
 
+    unsafe fn get_program_resource_i32(
+        &self,
+        _program: Self::Program,
+        _interface: u32,
+        _index: u32,
+        _properties: &[u32],
+    ) -> Vec<i32> {
+        panic!("get_program_resource_i32 not supported on webgl");
+    }
+
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32 {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);

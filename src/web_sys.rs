@@ -1305,7 +1305,7 @@ impl Context {
 
     // Returns true if the `WEBGL_compressed_texture_astc` extension is enabled and the "ldr"
     // profile is supported.
-    pub fn compressed_texture_astc_supports_hdr_profile(&self) -> bool {
+    pub fn compressed_texture_astc_supports_ldr_profile(&self) -> bool {
         self.extensions
             .webgl_compressed_texture_astc
             .as_ref()

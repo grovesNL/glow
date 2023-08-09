@@ -4,10 +4,14 @@
 #![allow(clippy::unreadable_literal)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::pedantic)] // For anyone using pedantic and a source dep, this is needed
+#![no_std]
 
+extern crate alloc;
+
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::hash::Hash;
-use std::collections::HashSet;
 
 mod version;
 pub use version::Version;
@@ -95,7 +99,7 @@ pub trait HasContext {
     type TransformFeedback: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type UniformLocation: Clone + Debug;
 
-    fn supported_extensions(&self) -> &HashSet<String>;
+    fn supports_extension(&self, extension: &str) -> bool;
 
     fn supports_debug(&self) -> bool;
 

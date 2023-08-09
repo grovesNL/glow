@@ -54,6 +54,10 @@ jobs:
     - run: cargo build --verbose --target wasm32-unknown-unknown
       env:
         RUSTFLAGS: --cfg=web_sys_unstable_apis 
+    - run: cargo build --verbose --no-default-features
+    - run: cargo build --verbose --target wasm32-unknown-unknown --no-default-features
+      env:
+        RUSTFLAGS: --cfg=web_sys_unstable_apis 
     - run: cargo test --verbose
     - run: (cd examples/hello && cargo build --features glutin)
     - run: (cd examples/hello && cargo build --target wasm32-unknown-unknown)

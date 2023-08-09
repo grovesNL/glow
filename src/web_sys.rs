@@ -1,14 +1,16 @@
 use super::*;
 
+use core::cell::RefCell;
 use js_sys::{self, Array};
 use slotmap::{new_key_type, SlotMap};
-use std::cell::RefCell;
 use web_sys::{
     self, HtmlCanvasElement, HtmlImageElement, HtmlVideoElement, ImageBitmap,
     WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlQuery,
     WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
     WebGlTransformFeedback, WebGlUniformLocation, WebGlVertexArrayObject,
 };
+
+type HashSet<K> = hashbrown::HashSet<K, ahash::RandomState>;
 
 #[cfg(web_sys_unstable_apis)]
 use web_sys::VideoFrame;
@@ -237,12 +239,14 @@ macro_rules! build_extensions {
             ),
         };
 
-        let supported_extensions = $context
-            .get_supported_extensions()
-            .unwrap()
-            .iter()
-            .map(|val| val.as_string().unwrap())
-            .collect::<HashSet<String>>();
+        let mut supported_extensions = HashSet::with_hasher(ahash::RandomState::new());
+        supported_extensions.extend(
+            $context
+                .get_supported_extensions()
+                .unwrap()
+                .iter()
+                .map(|val| val.as_string().unwrap()),
+        );
 
         (extensions, supported_extensions)
     }};
@@ -1356,8 +1360,8 @@ impl HasContext for Context {
     type UniformLocation = WebGlUniformLocation;
     type TransformFeedback = WebTransformFeedbackKey;
 
-    fn supported_extensions(&self) -> &HashSet<String> {
-        &self.supported_extensions
+    fn supports_extension(&self, extension: &str) -> bool {
+        self.supported_extensions.contains(extension)
     }
 
     fn supports_debug(&self) -> bool {
@@ -4781,8 +4785,8 @@ impl HasContext for Context {
 /// This function reinterprets the byte data into the correct type for the texture.
 /// The lookup is generated from this table: https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_PIXELS_TYPE_TABLE
 unsafe fn texture_data_view(ty: u32, bytes: &[u8]) -> js_sys::Object {
-    use std::mem::size_of;
-    use std::slice::from_raw_parts;
+    use core::mem::size_of;
+    use core::slice::from_raw_parts;
 
     match ty {
         BYTE => {

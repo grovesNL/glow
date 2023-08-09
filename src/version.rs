@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use core::fmt;
+
 /// A version number for a specific component of an OpenGL implementation
 #[derive(Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Version {
@@ -121,8 +124,8 @@ impl Version {
     }
 }
 
-impl std::fmt::Debug for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl fmt::Debug for Version {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match (
             self.major,
             self.minor,
@@ -142,6 +145,7 @@ impl std::fmt::Debug for Version {
 #[cfg(test)]
 mod tests {
     use super::Version;
+    use alloc::string::{String, ToString};
 
     #[test]
     fn test_version_parse() {

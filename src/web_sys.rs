@@ -1328,6 +1328,23 @@ impl Context {
             })
             .unwrap_or(false)
     }
+
+    /// Simulate losing WebGL rendering context.
+    /// Only works when "WEBGL_lose_context" extension is available.
+    pub fn lose_context(&self) {
+        if let Some(ext) = &self.extensions.webgl_lose_context {
+            ext.lose_context()
+        }
+    }
+
+    /// Simulate restoring WebGL rendering context.
+    /// Only works when "WEBGL_lose_context" extension is available.
+    /// This will panic when the context is not lost.
+    pub fn restore_context(&self) {
+        if let Some(ext) = &self.extensions.webgl_lose_context {
+            ext.restore_context()
+        }
+    }
 }
 
 new_key_type! { pub struct WebShaderKey; }

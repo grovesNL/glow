@@ -9,11 +9,33 @@ struct Constants {
     max_label_length: i32,
 }
 
+/// Store a boxed callback (i.e., `Box<Box<dyn FnMut(...)>>`) as a raw pointer, so that it can be
+/// referenced by the C API and later converted back into a `Box` and dropped.
+///
+/// We use a raw pointer here because `Box` aliasing rules are not fully defined, so we can'
+/// guarantee that it's not undefined behavior to keep a `Box` here while it's used as a raw
+/// pointer in the C API.
+struct DebugCallbackRawPtr {
+    callback: *mut std::os::raw::c_void,
+}
+
+impl Drop for DebugCallbackRawPtr {
+    fn drop(&mut self) {
+        unsafe {
+            // Convert callback back into `Box` and drop it.
+            let thin_ptr = Box::from_raw(self.callback as *mut DebugCallback);
+            let callback = *thin_ptr;
+            drop(callback);
+        }
+    }
+}
+
 pub struct Context {
     raw: native_gl::GlFns,
     extensions: HashSet<String>,
     constants: Constants,
     version: Version,
+    debug_callback: Option<DebugCallbackRawPtr>,
 }
 
 impl Context {
@@ -46,6 +68,7 @@ impl Context {
             extensions: HashSet::new(),
             constants: Constants::default(),
             version,
+            debug_callback: None,
         };
 
         // Use core-only functions to populate extension list
@@ -2580,23 +2603,36 @@ impl HasContext for Context {
         );
     }
 
-    unsafe fn debug_message_callback<F>(&self, mut callback: F)
+    unsafe fn debug_message_callback<F>(&mut self, callback: F)
     where
-        F: FnMut(u32, u32, u32, u32, &str),
+        F: FnMut(u32, u32, u32, u32, &str) + 'static,
     {
-        let gl = &self.raw;
+        match self.debug_callback {
+            Some(_) => {
+                panic!("Debug callback already set");
+            }
+            None => {
+                let trait_object: DebugCallback = Box::new(callback);
+                let thin_ptr = Box::new(trait_object);
+                let raw_ptr = Box::into_raw(thin_ptr) as *mut _ as *mut std::ffi::c_void;
 
-        if gl.DebugMessageCallback_is_loaded() {
-            gl.DebugMessageCallback(
-                Some(raw_debug_message_callback::<F>),
-                &mut callback as *mut _ as *mut std::ffi::c_void,
-            );
-        } else {
-            // Fallback to extension
-            gl.DebugMessageCallbackKHR(
-                Some(raw_debug_message_callback::<F>),
-                &mut callback as *mut _ as *mut std::ffi::c_void,
-            );
+                let gl = &self.raw;
+
+                if gl.DebugMessageCallback_is_loaded() {
+                    gl.DebugMessageCallback(
+                        Some(raw_debug_message_callback),
+                        raw_ptr,
+                    );
+                } else {
+                    // Fallback to extension
+                    gl.DebugMessageCallbackKHR(
+                        Some(raw_debug_message_callback),
+                        raw_ptr,
+                    );
+                }
+
+                self.debug_callback = Some(DebugCallbackRawPtr { callback: raw_ptr });
+            }
         }
     }
 
@@ -3052,7 +3088,7 @@ impl HasContext for Context {
     }
 }
 
-extern "system" fn raw_debug_message_callback<F>(
+extern "system" fn raw_debug_message_callback(
     source: u32,
     gltype: u32,
     id: u32,
@@ -3060,14 +3096,12 @@ extern "system" fn raw_debug_message_callback<F>(
     length: i32,
     message: *const native_gl::GLchar,
     user_param: *mut std::ffi::c_void,
-) where
-    F: FnMut(u32, u32, u32, u32, &str),
+)
 {
-    std::panic::catch_unwind(move || unsafe {
-        let callback: &mut F = &mut *(user_param as *mut _);
+    let _result = std::panic::catch_unwind(move || unsafe {
+        let callback: &mut DebugCallback = &mut *(user_param as *mut DebugCallback);
         let slice = std::slice::from_raw_parts(message as *const u8, length as usize);
         let msg = std::str::from_utf8(slice).unwrap();
         (callback)(source, gltype, id, severity, msg);
-    })
-    .ok();
+    });
 }

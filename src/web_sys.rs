@@ -4329,9 +4329,9 @@ impl HasContext for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn debug_message_callback<F>(&self, _callback: F)
+    unsafe fn debug_message_callback<F>(&mut self, callback: F)
     where
-        F: FnMut(u32, u32, u32, u32, &str),
+        F: FnMut(u32, u32, u32, u32, &str) + 'static,
     {
         panic!("WebGL does not support the KHR_debug extension.")
     }

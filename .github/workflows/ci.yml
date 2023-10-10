@@ -47,9 +47,6 @@ jobs:
         override: true
         profile: minimal
         target: wasm32-unknown-unknown
-    # https://github.com/alexcrichton/scoped-tls/issues/20
-    - run: cargo update -p scoped-tls --precise 1.0.0
-      if: matrix.build == 'pinned'
     - run: cargo build --verbose
     - run: cargo build --verbose --target wasm32-unknown-unknown
       env:

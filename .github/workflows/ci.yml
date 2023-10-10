@@ -14,33 +14,33 @@ jobs:
         build: [pinned, stable, beta, nightly, macos, windows]
         include:
         - build: pinned
-          os: ubuntu-18.04
+          os: ubuntu-latest
           rust: 1.56.0
           sdl: true
         - build: stable
-          os: ubuntu-18.04
+          os: ubuntu-latest
           rust: stable
           sdl: true
         - build: beta
-          os: ubuntu-18.04
+          os: ubuntu-latest
           rust: beta
           sdl: true
         - build: nightly
-          os: ubuntu-18.04
+          os: ubuntu-latest
           rust: nightly
           sdl: true
         - build: macos
-          os: macos-10.15
+          os: macos-latest
           rust: stable
           sdl: false
         - build: windows
-          os: windows-2019
+          os: windows-latest
           rust: stable
           sdl: false
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Install toolchain 
+    - name: Install toolchain
       uses: actions-rs/toolchain@v1
       with:
         toolchain: ${{ matrix.rust }}

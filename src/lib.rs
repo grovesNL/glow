@@ -1147,9 +1147,9 @@ pub trait HasContext {
     ) where
         S: AsRef<str>;
 
-        unsafe fn debug_message_callback<F>(&mut self, callback: F)
-        where
-            F: FnMut(u32, u32, u32, u32, &str) + 'static;
+    unsafe fn debug_message_callback<F>(&mut self, callback: F)
+    where
+        F: FnMut(u32, u32, u32, u32, &str) + 'static;
 
     unsafe fn get_debug_message_log(&self, count: u32) -> Vec<DebugMessageLogEntry>;
 
@@ -1200,7 +1200,16 @@ pub trait HasContext {
 
     unsafe fn end_query(&self, target: u32);
 
+    unsafe fn query_counter(&self, query: Self::Query, target: u32);
+
     unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32;
+
+    unsafe fn get_query_parameter_u64_with_offset(
+        &self,
+        query: Self::Query,
+        parameter: u32,
+        offset: usize,
+    );
 
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback);
 

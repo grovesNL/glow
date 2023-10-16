@@ -4558,6 +4558,10 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn query_counter(&self, query: Self::Query, target: u32) {
+        panic!("Query counters are not supported");
+    }
+
     unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32 {
         let queries = self.queries.borrow();
         let raw_query = queries.get_unchecked(query);
@@ -4569,6 +4573,15 @@ impl HasContext for Context {
                 .map(|v| v as u32)
                 .unwrap_or(0),
         }
+    }
+
+    unsafe fn get_query_parameter_u64_with_offset(
+        &self,
+        query: Self::Query,
+        parameter: u32,
+        offset: usize,
+    ) {
+        panic!("Query buffers are not supported");
     }
 
     unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String> {

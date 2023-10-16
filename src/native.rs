@@ -2619,16 +2619,10 @@ impl HasContext for Context {
                 let gl = &self.raw;
 
                 if gl.DebugMessageCallback_is_loaded() {
-                    gl.DebugMessageCallback(
-                        Some(raw_debug_message_callback),
-                        raw_ptr,
-                    );
+                    gl.DebugMessageCallback(Some(raw_debug_message_callback), raw_ptr);
                 } else {
                     // Fallback to extension
-                    gl.DebugMessageCallbackKHR(
-                        Some(raw_debug_message_callback),
-                        raw_ptr,
-                    );
+                    gl.DebugMessageCallbackKHR(Some(raw_debug_message_callback), raw_ptr);
                 }
 
                 self.debug_callback = Some(DebugCallbackRawPtr { callback: raw_ptr });
@@ -2856,11 +2850,26 @@ impl HasContext for Context {
         gl.EndQuery(target);
     }
 
+    unsafe fn query_counter(&self, query: Self::Query, target: u32) {
+        let gl = &self.raw;
+        gl.QueryCounter(query.0.get(), target);
+    }
+
     unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32 {
         let gl = &self.raw;
         let mut value = 0;
         gl.GetQueryObjectuiv(query.0.get(), parameter, &mut value);
         value
+    }
+
+    unsafe fn get_query_parameter_u64_with_offset(
+        &self,
+        query: Self::Query,
+        parameter: u32,
+        offset: usize,
+    ) {
+        let gl = &self.raw;
+        gl.GetQueryObjectui64v(query.0.get(), parameter, offset as *mut _);
     }
 
     unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String> {
@@ -3096,8 +3105,7 @@ extern "system" fn raw_debug_message_callback(
     length: i32,
     message: *const native_gl::GLchar,
     user_param: *mut std::ffi::c_void,
-)
-{
+) {
     let _result = std::panic::catch_unwind(move || unsafe {
         let callback: &mut DebugCallback = &mut *(user_param as *mut DebugCallback);
         let slice = std::slice::from_raw_parts(message as *const u8, length as usize);

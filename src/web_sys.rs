@@ -3535,6 +3535,54 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn uniform_matrix_2x3_f32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                panic!("2x3 matrices not supported in uniforms");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform_matrix2x3fv_with_f32_array(uniform_location, transpose, v)
+            }
+        }
+    }
+
+    unsafe fn uniform_matrix_2x4_f32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                panic!("2x4 matrices not supported in uniforms");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform_matrix2x4fv_with_f32_array(uniform_location, transpose, v)
+            }
+        }
+    }
+
+    unsafe fn uniform_matrix_3x2_f32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                panic!("3x2 matrices not supported in uniforms");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform_matrix3x2fv_with_f32_array(uniform_location, transpose, v)
+            }
+        }
+    }
+
     unsafe fn uniform_matrix_3_f32_slice(
         &self,
         uniform_location: Option<&Self::UniformLocation>,
@@ -3547,6 +3595,54 @@ impl HasContext for Context {
             }
             RawRenderingContext::WebGl2(ref gl) => {
                 gl.uniform_matrix3fv_with_f32_array(uniform_location, transpose, v)
+            }
+        }
+    }
+
+    unsafe fn uniform_matrix_3x4_f32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                panic!("3x4 matrices not supported in uniforms");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform_matrix3x4fv_with_f32_array(uniform_location, transpose, v)
+            }
+        }
+    }
+
+    unsafe fn uniform_matrix_4x2_f32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                panic!("4x2 matrices not supported in uniforms");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform_matrix4x2fv_with_f32_array(uniform_location, transpose, v)
+            }
+        }
+    }
+
+    unsafe fn uniform_matrix_4x3_f32_slice(
+        &self,
+        uniform_location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                panic!("4x3 matrices not supported in uniforms");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.uniform_matrix4x3fv_with_f32_array(uniform_location, transpose, v)
             }
         }
     }

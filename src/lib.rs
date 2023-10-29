@@ -816,7 +816,49 @@ pub trait HasContext {
         v: &[f32],
     );
 
+    unsafe fn uniform_matrix_2x3_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn uniform_matrix_2x4_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn uniform_matrix_3x2_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
     unsafe fn uniform_matrix_3_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn uniform_matrix_3x4_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn uniform_matrix_4x2_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn uniform_matrix_4x3_f32_slice(
         &self,
         location: Option<&Self::UniformLocation>,
         transpose: bool,

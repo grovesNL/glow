@@ -1893,6 +1893,57 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn uniform_matrix_2x3_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.UniformMatrix2x3fv(
+                loc.0 as i32,
+                v.len() as i32 / 6,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn uniform_matrix_2x4_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.UniformMatrix2x4fv(
+                loc.0 as i32,
+                v.len() as i32 / 8,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn uniform_matrix_3x2_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.UniformMatrix3x2fv(
+                loc.0 as i32,
+                v.len() as i32 / 6,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
     unsafe fn uniform_matrix_3_f32_slice(
         &self,
         location: Option<&Self::UniformLocation>,
@@ -1904,6 +1955,57 @@ impl HasContext for Context {
             gl.UniformMatrix3fv(
                 loc.0 as i32,
                 v.len() as i32 / 9,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn uniform_matrix_3x4_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.UniformMatrix3x4fv(
+                loc.0 as i32,
+                v.len() as i32 / 12,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn uniform_matrix_4x2_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.UniformMatrix4x2fv(
+                loc.0 as i32,
+                v.len() as i32 / 8,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn uniform_matrix_4x3_f32_slice(
+        &self,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.UniformMatrix4x3fv(
+                loc.0 as i32,
+                v.len() as i32 / 12,
                 transpose as u8,
                 v.as_ptr(),
             );

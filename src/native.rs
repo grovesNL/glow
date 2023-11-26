@@ -19,6 +19,9 @@ struct DebugCallbackRawPtr {
     callback: *mut std::os::raw::c_void,
 }
 
+unsafe impl Send for DebugCallbackRawPtr {}
+unsafe impl Sync for DebugCallbackRawPtr {}
+
 impl Drop for DebugCallbackRawPtr {
     fn drop(&mut self) {
         unsafe {
@@ -2707,7 +2710,7 @@ impl HasContext for Context {
 
     unsafe fn debug_message_callback<F>(&mut self, callback: F)
     where
-        F: FnMut(u32, u32, u32, u32, &str) + 'static,
+        F: FnMut(u32, u32, u32, u32, &str) + Send + Sync + 'static,
     {
         match self.debug_callback {
             Some(_) => {

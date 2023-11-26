@@ -37,7 +37,7 @@ pub type Renderbuffer = <Context as HasContext>::Renderbuffer;
 pub type Query = <Context as HasContext>::Query;
 pub type UniformLocation = <Context as HasContext>::UniformLocation;
 pub type TransformFeedback = <Context as HasContext>::TransformFeedback;
-pub type DebugCallback = Box<dyn FnMut(u32, u32, u32, u32, &str)>;
+pub type DebugCallback = Box<dyn FnMut(u32, u32, u32, u32, &str) + Send + Sync>;
 
 pub struct ActiveUniform {
     pub size: i32,
@@ -1191,7 +1191,7 @@ pub trait HasContext {
 
     unsafe fn debug_message_callback<F>(&mut self, callback: F)
     where
-        F: FnMut(u32, u32, u32, u32, &str) + 'static;
+        F: FnMut(u32, u32, u32, u32, &str) + Send + Sync + 'static;
 
     unsafe fn get_debug_message_log(&self, count: u32) -> Vec<DebugMessageLogEntry>;
 

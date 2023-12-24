@@ -3185,6 +3185,17 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn texture_storage_2d(
+        &self,
+        _texture: Self::Texture,
+        _levels: i32,
+        _internal_format: u32,
+        _width: i32,
+        _height: i32,
+    ) {
+        unimplemented!()
+    }
+
     unsafe fn tex_storage_2d_multisample(
         &self,
         _target: u32,
@@ -3788,6 +3799,10 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn bind_texture_unit(&self, _unit: u32, _texture: Option<Self::Texture>) {
+        unimplemented!()
+    }
+
     unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>) {
         let samplers = self.samplers.borrow();
         let raw_sampler = sampler.map(|s| samplers.get_unchecked(s));
@@ -3896,6 +3911,21 @@ impl HasContext for Context {
                 .unwrap(); // TODO: Handle return value?
             }
         }
+    }
+
+    unsafe fn texture_sub_image_2d(
+        &self,
+        _texture: Self::Texture,
+        _level: i32,
+        _x_offset: i32,
+        _y_offset: i32,
+        _width: i32,
+        _height: i32,
+        _format: u32,
+        _ty: u32,
+        _pixels: PixelUnpackData,
+    ) {
+        unimplemented!()
     }
 
     unsafe fn texture_sub_image_3d(

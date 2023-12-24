@@ -1591,6 +1591,18 @@ impl HasContext for Context {
         gl.TexStorage2D(target, levels, internal_format, width, height);
     }
 
+    unsafe fn texture_storage_2d(
+        &self,
+        texture: Self::Texture,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    ) {
+        let gl = &self.raw;
+        gl.TextureStorage2D(texture.0.get(), levels, internal_format, width, height);
+    }
+
     unsafe fn tex_storage_2d_multisample(
         &self,
         target: u32,
@@ -2120,6 +2132,11 @@ impl HasContext for Context {
         gl.BindTexture(target, texture.map(|t| t.0.get()).unwrap_or(0));
     }
 
+    unsafe fn bind_texture_unit(&self, unit: u32, texture: Option<Self::Texture>) {
+        let gl = &self.raw;
+        gl.BindTextureUnit(unit, texture.map(|t| t.0.get()).unwrap_or(0));
+    }
+
     unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>) {
         let gl = &self.raw;
         gl.BindSampler(unit, sampler.map(|s| s.0.get()).unwrap_or(0));
@@ -2175,6 +2192,35 @@ impl HasContext for Context {
         let gl = &self.raw;
         gl.TexSubImage2D(
             target,
+            level,
+            x_offset,
+            y_offset,
+            width,
+            height,
+            format,
+            ty,
+            match pixels {
+                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
+                PixelUnpackData::Slice(data) => data.as_ptr() as *const std::ffi::c_void,
+            },
+        );
+    }
+
+    unsafe fn texture_sub_image_2d(
+        &self,
+        texture: Self::Texture,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        pixels: PixelUnpackData,
+    ) {
+        let gl = &self.raw;
+        gl.TextureSubImage2D(
+            texture.0.get(),
             level,
             x_offset,
             y_offset,

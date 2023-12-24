@@ -678,6 +678,15 @@ pub trait HasContext {
         height: i32,
     );
 
+    unsafe fn texture_storage_2d(
+        &self,
+        texture: Self::Texture,
+        levels: i32,
+        internal_format: u32,
+        width: i32,
+        height: i32,
+    );
+
     unsafe fn tex_storage_2d_multisample(
         &self,
         target: u32,
@@ -915,6 +924,8 @@ pub trait HasContext {
 
     unsafe fn bind_texture(&self, target: u32, texture: Option<Self::Texture>);
 
+    unsafe fn bind_texture_unit(&self, unit: u32, texture: Option<Self::Texture>);
+
     unsafe fn bind_sampler(&self, unit: u32, sampler: Option<Self::Sampler>);
 
     unsafe fn active_texture(&self, unit: u32);
@@ -934,6 +945,19 @@ pub trait HasContext {
     unsafe fn tex_sub_image_2d(
         &self,
         target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        pixels: PixelUnpackData,
+    );
+
+    unsafe fn texture_sub_image_2d(
+        &self,
+        texture: Self::Texture,
         level: i32,
         x_offset: i32,
         y_offset: i32,

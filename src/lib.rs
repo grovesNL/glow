@@ -254,11 +254,20 @@ pub trait HasContext {
 
     unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32);
 
+    unsafe fn named_buffer_data_size(&self, buffer: Self::Buffer, size: i32, usage: u32);
+
     unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32);
 
     unsafe fn named_buffer_data_u8_slice(&self, buffer: Self::Buffer, data: &[u8], usage: u32);
 
     unsafe fn buffer_sub_data_u8_slice(&self, target: u32, offset: i32, src_data: &[u8]);
+
+    unsafe fn named_buffer_sub_data_u8_slice(
+        &self,
+        buffer: Self::Buffer,
+        offset: i32,
+        src_data: &[u8],
+    );
 
     unsafe fn get_buffer_sub_data(&self, target: u32, offset: i32, dst_data: &mut [u8]);
 

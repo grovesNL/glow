@@ -2027,6 +2027,10 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn named_buffer_data_size(&self, _buffer: Self::Buffer, _size: i32, _usage: u32) {
+        unimplemented!()
+    }
+
     unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
@@ -2055,6 +2059,15 @@ impl HasContext for Context {
                 gl.buffer_sub_data_with_i32_and_array_buffer_view(target, offset, &array);
             }
         }
+    }
+
+    unsafe fn named_buffer_sub_data_u8_slice(
+        &self,
+        _buffer: Self::Buffer,
+        _offset: i32,
+        _src_data: &[u8],
+    ) {
+        unimplemented!()
     }
 
     unsafe fn get_buffer_sub_data(&self, target: u32, offset: i32, dst_data: &mut [u8]) {

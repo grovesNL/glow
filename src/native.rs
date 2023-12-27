@@ -671,6 +671,11 @@ impl HasContext for Context {
         gl.BufferData(target, size as isize, std::ptr::null(), usage);
     }
 
+    unsafe fn named_buffer_data_size(&self, buffer: Self::Buffer, size: i32, usage: u32) {
+        let gl = &self.raw;
+        gl.NamedBufferData(buffer.0.get(), size as isize, std::ptr::null(), usage);
+    }
+
     unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32) {
         let gl = &self.raw;
         gl.BufferData(
@@ -695,6 +700,21 @@ impl HasContext for Context {
         let gl = &self.raw;
         gl.BufferSubData(
             target,
+            offset as isize,
+            src_data.len() as isize,
+            src_data.as_ptr() as *const std::ffi::c_void,
+        );
+    }
+
+    unsafe fn named_buffer_sub_data_u8_slice(
+        &self,
+        buffer: Self::Buffer,
+        offset: i32,
+        src_data: &[u8],
+    ) {
+        let gl = &self.raw;
+        gl.NamedBufferSubData(
+            buffer.0.get(),
             offset as isize,
             src_data.len() as isize,
             src_data.as_ptr() as *const std::ffi::c_void,

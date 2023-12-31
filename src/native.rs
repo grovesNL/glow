@@ -3214,8 +3214,8 @@ extern "system" fn raw_debug_message_callback(
     let _result = std::panic::catch_unwind(move || unsafe {
         let callback: &mut DebugCallback = &mut *(user_param as *mut DebugCallback);
         let slice = std::slice::from_raw_parts(message as *const u8, length as usize);
-        let msg = std::str::from_utf8(slice).unwrap();
-        (callback)(source, gltype, id, severity, msg);
+        let msg = String::from_utf8_lossy(slice);
+        (callback)(source, gltype, id, severity, &msg);
     });
 }
 

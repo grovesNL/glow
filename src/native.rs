@@ -3268,6 +3268,25 @@ impl HasContext for Context {
     }
 }
 
+impl Drop for Context {
+    fn drop(&mut self) {
+        match self.debug_callback.take() {
+            Some(_) => {
+                // Unset the debug callback before destroying the context.
+                unsafe {
+                    let gl = &self.raw;
+                    if gl.DebugMessageCallback_is_loaded() {
+                        gl.DebugMessageCallback(None, std::ptr::null());
+                    } else {
+                        gl.DebugMessageCallbackKHR(None, std::ptr::null());
+                    }
+                }
+            }
+            None => {}
+        }
+    }
+}
+
 extern "system" fn raw_debug_message_callback(
     source: u32,
     gltype: u32,

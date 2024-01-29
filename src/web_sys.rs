@@ -4250,6 +4250,16 @@ impl HasContext for Context {
         panic!("Vertex attrib format is not supported in WebGL");
     }
 
+    unsafe fn vertex_attrib_format_f64(
+        &self,
+        _index: u32,
+        _size: i32,
+        _data_type: u32,
+        _relative_offset: u32,
+    ) {
+        panic!("Vertex attrib format is not supported in WebGL");
+    }
+
     unsafe fn vertex_attrib_1_f32(&self, index: u32, x: f32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib1f(index, x),

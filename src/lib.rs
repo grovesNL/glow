@@ -1071,6 +1071,15 @@ pub trait HasContext {
         relative_offset: u32,
     );
 
+    unsafe fn vertex_array_attrib_format_f64(
+        &self,
+        vao: Self::VertexArray,
+        index: u32,
+        size: i32,
+        data_type: u32,
+        relative_offset: u32,
+    );
+
     unsafe fn vertex_array_element_buffer(
         &self,
         vao: Self::VertexArray,

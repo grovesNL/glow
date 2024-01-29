@@ -4154,6 +4154,17 @@ impl HasContext for Context {
         unimplemented!()
     }
 
+    unsafe fn vertex_array_attrib_format_f64(
+        &self,
+        _vao: Self::VertexArray,
+        _index: u32,
+        _size: i32,
+        _data_type: u32,
+        _relative_offset: u32,
+    ) {
+        unimplemented!()
+    }
+
     unsafe fn vertex_array_element_buffer(
         &self,
         _vao: Self::VertexArray,

@@ -2,10 +2,10 @@
 
 ## Native
 
-To run with glutin:
+To run with glutin and winit:
 
 ```shell
-cargo run --features=glutin
+cargo run --features=glutin_winit
 ```
 
 To run with sdl2:

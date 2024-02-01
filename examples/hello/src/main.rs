@@ -1,5 +1,4 @@
 use glow::*;
-use glutin::config::GlConfig;
 
 fn main() {
     unsafe {
@@ -29,7 +28,7 @@ fn main() {
         #[cfg(feature = "glutin_winit")]
         let (gl, gl_surface, gl_context, shader_version, _window, event_loop) = {
             use glutin::{
-                config::ConfigTemplateBuilder,
+                config::{ConfigTemplateBuilder, GlConfig},
                 context::{ContextApi, ContextAttributesBuilder, NotCurrentGlContext},
                 display::{GetGlDisplay, GlDisplay},
                 surface::{GlSurface, SwapInterval},

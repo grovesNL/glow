@@ -15,7 +15,7 @@ jobs:
         include:
         - build: pinned
           os: ubuntu-latest
-          rust: 1.61.0
+          rust: 1.65.0
           sdl: true
         - build: stable
           os: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
       env:
         RUSTFLAGS: --cfg=web_sys_unstable_apis 
     - run: cargo test --verbose
-    - run: (cd examples/hello && cargo build --features glutin)
+    - run: (cd examples/hello && cargo build --features glutin_winit)
     - run: (cd examples/hello && cargo build --target wasm32-unknown-unknown)
     - name: sdl
       if: ${{ matrix.sdl == true }}

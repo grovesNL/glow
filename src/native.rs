@@ -456,6 +456,54 @@ impl HasContext for Context {
         params
     }
 
+    unsafe fn program_binary_retrievable_hint(&self, program: Self::Program, value: bool) {
+        let gl = &self.raw;
+        gl.ProgramParameteri(
+            program.0.get(),
+            crate::PROGRAM_BINARY_RETRIEVABLE_HINT,
+            value as i32,
+        )
+    }
+
+    unsafe fn get_program_binary(&self, program: Self::Program) -> Option<ProgramBinary> {
+        let gl = &self.raw;
+
+        // We don't need to error check here as if the call fails, length will be returned as 0.
+        let mut len = 0;
+        gl.GetProgramiv(program.0.get(), crate::PROGRAM_BINARY_LENGTH, &mut len);
+
+        let mut format = 0;
+        let mut buffer = vec![0u8; len as usize];
+
+        gl.GetProgramBinary(
+            program.0.get(),
+            len,
+            ptr::null_mut(),
+            &mut format,
+            buffer.as_mut_ptr() as *mut core::ffi::c_void,
+        );
+
+        if gl.GetError() == crate::NO_ERROR {
+            Some(ProgramBinary {
+                buffer,
+                format,
+            })
+        } else {
+            None
+        }
+    }
+
+    unsafe fn program_binary(&self, program: Self::Program, binary: &ProgramBinary) {
+        let gl = &self.raw;
+
+        gl.ProgramBinary(
+            program.0.get(),
+            binary.format,
+            binary.buffer.as_ptr() as *const core::ffi::c_void,
+            binary.buffer.len() as native_gl::types::GLsizei,
+        )
+    }
+
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32 {
         let gl = &self.raw;
         let mut count = 0;

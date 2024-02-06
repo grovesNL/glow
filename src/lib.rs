@@ -82,6 +82,11 @@ pub enum CompressedPixelUnpackData<'a> {
     Slice(&'a [u8]),
 }
 
+pub struct ProgramBinary {
+    pub buffer: Vec<u8>,
+    pub format: u32,
+}
+
 pub trait HasContext : __private::Sealed {
     type Shader: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Program: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
@@ -170,6 +175,12 @@ pub trait HasContext : __private::Sealed {
         index: u32,
         properties: &[u32],
     ) -> Vec<i32>;
+
+    unsafe fn program_binary_retrievable_hint(&self, program: Self::Program, value: bool);
+
+    unsafe fn get_program_binary(&self, program: Self::Program) -> Option<ProgramBinary>;
+
+    unsafe fn program_binary(&self, program: Self::Program, binary: &ProgramBinary);
 
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32;
 

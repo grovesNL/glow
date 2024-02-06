@@ -1734,6 +1734,18 @@ impl HasContext for Context {
         panic!("get_program_resource_i32 not supported on webgl");
     }
 
+    unsafe fn program_binary_retrievable_hint(&self, program: Self::Program, value: bool) {
+        panic!("Program binaries are not supported");
+    }
+
+    unsafe fn get_program_binary(&self, program: Self::Program) -> Option<ProgramBinary> {
+        panic!("Program binaries are not supported");
+    }
+
+    unsafe fn program_binary(&self, program: Self::Program, binary: &ProgramBinary) {
+        panic!("Program binaries are not supported");
+    }
+
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32 {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);

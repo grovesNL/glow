@@ -82,7 +82,7 @@ pub enum CompressedPixelUnpackData<'a> {
     Slice(&'a [u8]),
 }
 
-pub trait HasContext {
+pub trait HasContext : __private::Sealed {
     type Shader: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Program: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Buffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
@@ -4175,3 +4175,9 @@ pub const XOR: u32 = 0x1506;
 pub const ZERO: u32 = 0;
 
 pub const ZERO_TO_ONE: u32 = 0x935F;
+
+mod __private {
+    /// Prevents [`HasContext`] from being implemented outside of this crate.
+    #[doc(hidden)]
+    pub trait Sealed {}
+}

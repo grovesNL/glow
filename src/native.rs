@@ -176,6 +176,8 @@ pub struct NativeUniformLocation(pub native_gl::GLuint);
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct NativeTransformFeedback(pub NonZeroU32);
 
+impl crate::__private::Sealed for Context {}
+
 impl HasContext for Context {
     type Shader = NativeShader;
     type Program = NativeProgram;

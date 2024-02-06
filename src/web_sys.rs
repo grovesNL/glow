@@ -1359,6 +1359,8 @@ new_key_type! { pub struct WebRenderbufferKey; }
 new_key_type! { pub struct WebQueryKey; }
 new_key_type! { pub struct WebTransformFeedbackKey; }
 
+impl crate::__private::Sealed for Context {}
+
 impl HasContext for Context {
     type Shader = WebShaderKey;
     type Program = WebProgramKey;

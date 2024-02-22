@@ -1734,16 +1734,340 @@ impl HasContext for Context {
         panic!("get_program_resource_i32 not supported on webgl");
     }
 
-    unsafe fn program_binary_retrievable_hint(&self, program: Self::Program, value: bool) {
+    unsafe fn program_binary_retrievable_hint(&self, _program: Self::Program, _value: bool) {
         panic!("Program binaries are not supported");
     }
 
-    unsafe fn get_program_binary(&self, program: Self::Program) -> Option<ProgramBinary> {
+    unsafe fn get_program_binary(&self, _program: Self::Program) -> Option<ProgramBinary> {
         panic!("Program binaries are not supported");
     }
 
-    unsafe fn program_binary(&self, program: Self::Program, binary: &ProgramBinary) {
+    unsafe fn program_binary(&self, _program: Self::Program, _binary: &ProgramBinary) {
         panic!("Program binaries are not supported");
+    }
+
+    unsafe fn program_uniform_1_i32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: i32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_2_i32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: i32,
+        _y: i32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_3_i32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: i32,
+        _y: i32,
+        _z: i32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_4_i32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: i32,
+        _y: i32,
+        _z: i32,
+        _w: i32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_1_i32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[i32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_2_i32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[i32],
+    ) {
+        panic!("DSA _program objects are not supported")
+    }
+
+    unsafe fn program_uniform_3_i32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[i32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_4_i32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[i32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_1_u32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: u32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_2_u32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: u32,
+        _y: u32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_3_u32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: u32,
+        _y: u32,
+        _z: u32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_4_u32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: u32,
+        _y: u32,
+        _z: u32,
+        _w: u32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_1_u32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[u32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_2_u32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[u32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_3_u32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[u32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_4_u32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[u32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_1_f32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: f32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_2_f32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: f32,
+        _y: f32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_3_f32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: f32,
+        _y: f32,
+        _z: f32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_4_f32(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _x: f32,
+        _y: f32,
+        _z: f32,
+        _w: f32,
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_1_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_2_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_3_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_4_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_matrix_2_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _transpose: bool,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_matrix_2x3_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _transpose: bool,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_matrix_2x4_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _transpose: bool,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_matrix_3x2_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _transpose: bool,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_matrix_3_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _transpose: bool,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_matrix_3x4_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _transpose: bool,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_matrix_4x2_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _transpose: bool,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_matrix_4x3_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _transpose: bool,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
+    }
+
+    unsafe fn program_uniform_matrix_4_f32_slice(
+        &self,
+        _program: Self::Program,
+        _location: Option<&Self::UniformLocation>,
+        _transpose: bool,
+        _v: &[f32],
+    ) {
+        panic!("DSA program objects are not supported")
     }
 
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32 {
@@ -3580,7 +3904,7 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
+            RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("2x3 matrices not supported in uniforms");
             }
             RawRenderingContext::WebGl2(ref gl) => {
@@ -3596,7 +3920,7 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
+            RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("2x4 matrices not supported in uniforms");
             }
             RawRenderingContext::WebGl2(ref gl) => {
@@ -3612,7 +3936,7 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
+            RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("3x2 matrices not supported in uniforms");
             }
             RawRenderingContext::WebGl2(ref gl) => {
@@ -3644,7 +3968,7 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
+            RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("3x4 matrices not supported in uniforms");
             }
             RawRenderingContext::WebGl2(ref gl) => {
@@ -3660,7 +3984,7 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
+            RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("4x2 matrices not supported in uniforms");
             }
             RawRenderingContext::WebGl2(ref gl) => {
@@ -3676,7 +4000,7 @@ impl HasContext for Context {
         v: &[f32],
     ) {
         match self.raw {
-            RawRenderingContext::WebGl1(ref gl) => {
+            RawRenderingContext::WebGl1(ref _gl) => {
                 panic!("4x3 matrices not supported in uniforms");
             }
             RawRenderingContext::WebGl2(ref gl) => {
@@ -4520,7 +4844,7 @@ impl HasContext for Context {
         panic!("WebGL does not support the KHR_debug extension.")
     }
 
-    unsafe fn debug_message_callback<F>(&mut self, callback: F)
+    unsafe fn debug_message_callback<F>(&mut self, _callback: F)
     where
         F: FnMut(u32, u32, u32, u32, &str) + 'static,
     {
@@ -4732,7 +5056,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn query_counter(&self, query: Self::Query, target: u32) {
+    unsafe fn query_counter(&self, _query: Self::Query, _target: u32) {
         panic!("Query counters are not supported");
     }
 
@@ -4751,9 +5075,9 @@ impl HasContext for Context {
 
     unsafe fn get_query_parameter_u64_with_offset(
         &self,
-        query: Self::Query,
-        parameter: u32,
-        offset: usize,
+        _query: Self::Query,
+        _parameter: u32,
+        _offset: usize,
     ) {
         panic!("Query buffers are not supported");
     }

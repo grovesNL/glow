@@ -87,7 +87,7 @@ pub struct ProgramBinary {
     pub format: u32,
 }
 
-pub trait HasContext : __private::Sealed {
+pub trait HasContext: __private::Sealed {
     type Shader: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Program: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Buffer: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
@@ -175,6 +175,264 @@ pub trait HasContext : __private::Sealed {
         index: u32,
         properties: &[u32],
     ) -> Vec<i32>;
+
+    unsafe fn program_uniform_1_i32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: i32,
+    );
+
+    unsafe fn program_uniform_2_i32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: i32,
+        y: i32,
+    );
+
+    unsafe fn program_uniform_3_i32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: i32,
+        y: i32,
+        z: i32,
+    );
+
+    unsafe fn program_uniform_4_i32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: i32,
+        y: i32,
+        z: i32,
+        w: i32,
+    );
+
+    unsafe fn program_uniform_1_i32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[i32],
+    );
+
+    unsafe fn program_uniform_2_i32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[i32],
+    );
+
+    unsafe fn program_uniform_3_i32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[i32],
+    );
+
+    unsafe fn program_uniform_4_i32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[i32],
+    );
+
+    unsafe fn program_uniform_1_u32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+    );
+
+    unsafe fn program_uniform_2_u32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+    );
+
+    unsafe fn program_uniform_3_u32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+    );
+
+    unsafe fn program_uniform_4_u32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+        w: u32,
+    );
+
+    unsafe fn program_uniform_1_u32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    );
+
+    unsafe fn program_uniform_2_u32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    );
+
+    unsafe fn program_uniform_3_u32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    );
+
+    unsafe fn program_uniform_4_u32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    );
+
+    unsafe fn program_uniform_1_f32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: f32,
+    );
+
+    unsafe fn program_uniform_2_f32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: f32,
+        y: f32,
+    );
+
+    unsafe fn program_uniform_3_f32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: f32,
+        y: f32,
+        z: f32,
+    );
+
+    unsafe fn program_uniform_4_f32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: f32,
+        y: f32,
+        z: f32,
+        w: f32,
+    );
+
+    unsafe fn program_uniform_1_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_2_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_3_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_4_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_matrix_2_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_matrix_2x3_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_matrix_2x4_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_matrix_3x2_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_matrix_3_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_matrix_3x4_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_matrix_4x2_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_matrix_4x3_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
+
+    unsafe fn program_uniform_matrix_4_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    );
 
     unsafe fn program_binary_retrievable_hint(&self, program: Self::Program, value: bool);
 

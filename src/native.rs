@@ -456,6 +456,528 @@ impl HasContext for Context {
         params
     }
 
+    unsafe fn program_uniform_1_i32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: i32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform1i(program.0.get(), loc.0 as i32, x);
+        }
+    }
+
+    unsafe fn program_uniform_2_i32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: i32,
+        y: i32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform2i(program.0.get(), loc.0 as i32, x, y);
+        }
+    }
+
+    unsafe fn program_uniform_3_i32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: i32,
+        y: i32,
+        z: i32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform3i(program.0.get(), loc.0 as i32, x, y, z);
+        }
+    }
+
+    unsafe fn program_uniform_4_i32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: i32,
+        y: i32,
+        z: i32,
+        w: i32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform4i(program.0.get(), loc.0 as i32, x, y, z, w);
+        }
+    }
+
+    unsafe fn program_uniform_1_i32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[i32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform1iv(program.0.get(), loc.0 as i32, v.len() as i32, v.as_ptr());
+        }
+    }
+
+    unsafe fn program_uniform_2_i32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[i32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform2iv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 2,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_3_i32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[i32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform3iv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 3,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_4_i32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[i32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform4iv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 4,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_1_u32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform1ui(program.0.get(), loc.0 as i32, x);
+        }
+    }
+
+    unsafe fn program_uniform_2_u32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform2ui(program.0.get(), loc.0 as i32, x, y);
+        }
+    }
+
+    unsafe fn program_uniform_3_u32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform3ui(program.0.get(), loc.0 as i32, x, y, z);
+        }
+    }
+
+    unsafe fn program_uniform_4_u32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: u32,
+        y: u32,
+        z: u32,
+        w: u32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform4ui(program.0.get(), loc.0 as i32, x, y, z, w);
+        }
+    }
+
+    unsafe fn program_uniform_1_u32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform1uiv(program.0.get(), loc.0 as i32, v.len() as i32, v.as_ptr());
+        }
+    }
+
+    unsafe fn program_uniform_2_u32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform2uiv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 2,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_3_u32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform3uiv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 3,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_4_u32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[u32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform4uiv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 4,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_1_f32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: f32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform1f(program.0.get(), loc.0 as i32, x);
+        }
+    }
+
+    unsafe fn program_uniform_2_f32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: f32,
+        y: f32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform2f(program.0.get(), loc.0 as i32, x, y);
+        }
+    }
+
+    unsafe fn program_uniform_3_f32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: f32,
+        y: f32,
+        z: f32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform3f(program.0.get(), loc.0 as i32, x, y, z);
+        }
+    }
+
+    unsafe fn program_uniform_4_f32(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        x: f32,
+        y: f32,
+        z: f32,
+        w: f32,
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform4f(program.0.get(), loc.0 as i32, x, y, z, w);
+        }
+    }
+
+    unsafe fn program_uniform_1_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform1fv(program.0.get(), loc.0 as i32, v.len() as i32, v.as_ptr());
+        }
+    }
+
+    unsafe fn program_uniform_2_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform2fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 2,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_3_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform3fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 3,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_4_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniform4fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 4,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_matrix_2_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniformMatrix2fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 4,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_matrix_2x3_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniformMatrix2x3fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 6,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_matrix_2x4_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniformMatrix2x4fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 8,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_matrix_3x2_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniformMatrix3x2fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 6,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_matrix_3_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniformMatrix3fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 9,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_matrix_3x4_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniformMatrix3x4fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 12,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_matrix_4x2_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniformMatrix4x2fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 8,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_matrix_4x3_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniformMatrix4x3fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 12,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
+    unsafe fn program_uniform_matrix_4_f32_slice(
+        &self,
+        program: Self::Program,
+        location: Option<&Self::UniformLocation>,
+        transpose: bool,
+        v: &[f32],
+    ) {
+        let gl = &self.raw;
+        if let Some(loc) = location {
+            gl.ProgramUniformMatrix4fv(
+                program.0.get(),
+                loc.0 as i32,
+                v.len() as i32 / 16,
+                transpose as u8,
+                v.as_ptr(),
+            );
+        }
+    }
+
     unsafe fn program_binary_retrievable_hint(&self, program: Self::Program, value: bool) {
         let gl = &self.raw;
         gl.ProgramParameteri(
@@ -484,10 +1006,7 @@ impl HasContext for Context {
         );
 
         if gl.GetError() == crate::NO_ERROR {
-            Some(ProgramBinary {
-                buffer,
-                format,
-            })
+            Some(ProgramBinary { buffer, format })
         } else {
             None
         }

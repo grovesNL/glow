@@ -772,6 +772,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_error(&self) -> u32;
 
+    unsafe fn get_graphics_reset_status(&self) -> u32;
+
     unsafe fn get_tex_parameter_i32(&self, target: u32, parameter: u32) -> i32;
 
     unsafe fn get_buffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;

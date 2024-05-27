@@ -87,6 +87,19 @@ pub struct ProgramBinary {
     pub format: u32,
 }
 
+/// A trait for types that can be used as a context for OpenGL, OpenGL ES, and WebGL functions.
+///
+/// This trait is sealed and cannot be implemented outside of this crate.
+///
+/// # Safety
+///
+/// All GL API usage must be valid. For example, each function call should follow the rules in the
+/// relevant GL specification for the type of context being used. This crate doesn't enforce these
+/// rules, so it is up to the caller to ensure they're followed.
+///
+/// The context implementing this trait must be current when it is dropped. This is necessary to
+/// ensure that certain context state can be deleted on the correct thread. Usually this is only
+/// a concern for desktop GL contexts that are shared between threads.
 pub trait HasContext: __private::Sealed {
     type Shader: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type Program: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;

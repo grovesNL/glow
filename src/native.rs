@@ -3368,7 +3368,7 @@ impl HasContext for Context {
 
     unsafe fn debug_message_callback<F>(&mut self, callback: F)
     where
-        F: FnMut(u32, u32, u32, u32, &str) + Send + Sync + 'static,
+        F: Fn(u32, u32, u32, u32, &str) + Send + Sync + 'static,
     {
         match self.debug_callback {
             Some(_) => {
@@ -3889,7 +3889,7 @@ extern "system" fn raw_debug_message_callback(
     user_param: *mut std::ffi::c_void,
 ) {
     let _result = std::panic::catch_unwind(move || unsafe {
-        let callback: &mut DebugCallback = &mut *(user_param as *mut DebugCallback);
+        let callback: &DebugCallback = &*(user_param as *const DebugCallback);
         let slice = std::slice::from_raw_parts(message as *const u8, length as usize);
         let msg = String::from_utf8_lossy(slice);
         (callback)(source, gltype, id, severity, &msg);

@@ -1780,6 +1780,11 @@ impl HasContext for Context {
         gl.GetError()
     }
 
+    unsafe fn get_graphics_reset_status(&self) -> u32 {
+        let gl = &self.raw;
+        gl.GetGraphicsResetStatus()
+    }
+
     unsafe fn get_tex_parameter_i32(&self, target: u32, parameter: u32) -> i32 {
         let gl = &self.raw;
         let mut value = 0;

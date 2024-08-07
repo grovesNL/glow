@@ -66,7 +66,7 @@ fn main() {
             let context_attributes = ContextAttributesBuilder::new()
                 .with_context_api(ContextApi::OpenGl(Some(glutin::context::Version {
                     major: 4,
-                    minor: 10,
+                    minor: 1,
                 })))
                 .build(raw_window_handle);
 

@@ -571,6 +571,39 @@ pub trait HasContext: __private::Sealed {
         stencil: i32,
     );
 
+    unsafe fn clear_named_framebuffer_i32_slice(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+        draw_buffer: u32,
+        values: &[i32],
+    );
+
+    unsafe fn clear_named_framebuffer_u32_slice(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+        draw_buffer: u32,
+        values: &[u32],
+    );
+
+    unsafe fn clear_named_framebuffer_f32_slice(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+        draw_buffer: u32,
+        values: &[f32],
+    );
+
+    unsafe fn clear_named_framebuffer_depth_stencil(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+        draw_buffer: u32,
+        depth: f32,
+        stencil: i32,
+    );
+
     unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: u32, timeout: i32) -> u32;
     unsafe fn wait_sync(&self, fence: Self::Fence, flags: u32, timeout: u64);
 

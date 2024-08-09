@@ -2664,6 +2664,47 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn clear_named_framebuffer_i32_slice(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _target: u32,
+        _draw_buffer: u32,
+        _values: &[i32],
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
+    unsafe fn clear_named_framebuffer_u32_slice(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _target: u32,
+        _draw_buffer: u32,
+        _values: &[u32],
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
+    unsafe fn clear_named_framebuffer_f32_slice(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _target: u32,
+        _draw_buffer: u32,
+        _values: &[f32],
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
+    unsafe fn clear_named_framebuffer_depth_stencil(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _target: u32,
+        _draw_buffer: u32,
+        _depth: f32,
+        _stencil: i32,
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
     unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: u32, timeout: i32) -> u32 {
         let fences = self.fences.borrow();
         let raw_fence = fences.get_unchecked(fence);

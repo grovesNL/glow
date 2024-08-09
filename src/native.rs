@@ -1342,6 +1342,72 @@ impl HasContext for Context {
         gl.ClearBufferfi(target, draw_buffer as i32, depth, stencil);
     }
 
+    unsafe fn clear_named_framebuffer_i32_slice(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+        draw_buffer: u32,
+        values: &[i32],
+    ) {
+        let gl = &self.raw;
+        gl.ClearNamedFramebufferiv(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            target,
+            draw_buffer as i32,
+            values.as_ptr(),
+        );
+    }
+
+    unsafe fn clear_named_framebuffer_u32_slice(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+        draw_buffer: u32,
+        values: &[u32],
+    ) {
+        let gl = &self.raw;
+        gl.ClearNamedFramebufferuiv(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            target,
+            draw_buffer as i32,
+            values.as_ptr(),
+        );
+    }
+
+    unsafe fn clear_named_framebuffer_f32_slice(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+        draw_buffer: u32,
+        values: &[f32],
+    ) {
+        let gl = &self.raw;
+        gl.ClearNamedFramebufferfv(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            target,
+            draw_buffer as i32,
+            values.as_ptr(),
+        );
+    }
+
+    unsafe fn clear_named_framebuffer_depth_stencil(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+        draw_buffer: u32,
+        depth: f32,
+        stencil: i32,
+    ) {
+        let gl = &self.raw;
+        gl.ClearNamedFramebufferfi(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            target,
+            draw_buffer as i32,
+            depth,
+            stencil,
+        );
+    }
+
     unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: u32, timeout: i32) -> u32 {
         let gl = &self.raw;
         gl.ClientWaitSync(fence.0, flags, timeout as u64)

@@ -1316,6 +1316,15 @@ impl HasContext for Context {
         gl.CheckFramebufferStatus(target)
     }
 
+    unsafe fn check_named_framebuffer_status(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+    ) -> u32 {
+        let gl = &self.raw;
+        gl.CheckNamedFramebufferStatus(framebuffer.map(|f| f.0.get()).unwrap_or(0), target)
+    }
+
     unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &[i32]) {
         let gl = &self.raw;
         gl.ClearBufferiv(target, draw_buffer as i32, values.as_ptr());

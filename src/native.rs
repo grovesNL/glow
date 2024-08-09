@@ -1159,6 +1159,38 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn blit_named_framebuffer(
+        &self,
+        read_buffer: Option<Self::Framebuffer>,
+        draw_buffer: Option<Self::Framebuffer>,
+        src_x0: i32,
+        src_y0: i32,
+        src_x1: i32,
+        src_y1: i32,
+        dst_x0: i32,
+        dst_y0: i32,
+        dst_x1: i32,
+        dst_y1: i32,
+        mask: u32,
+        filter: u32,
+    ) {
+        let gl = &self.raw;
+        gl.BlitNamedFramebuffer(
+            read_buffer.map(|f| f.0.get()).unwrap_or(0),
+            draw_buffer.map(|f| f.0.get()).unwrap_or(0),
+            src_x0,
+            src_y0,
+            src_x1,
+            src_y1,
+            dst_x0,
+            dst_y0,
+            dst_x1,
+            dst_y1,
+            mask,
+            filter,
+        );
+    }
+
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let gl = &self.raw;
         let mut vertex_array = 0;

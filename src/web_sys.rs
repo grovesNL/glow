@@ -2431,6 +2431,24 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn blit_named_framebuffer(
+        &self,
+        _read_buffer: Option<Self::Framebuffer>,
+        _draw_buffer: Option<Self::Framebuffer>,
+        _src_x0: i32,
+        _src_y0: i32,
+        _src_x1: i32,
+        _src_y1: i32,
+        _dst_x0: i32,
+        _dst_y0: i32,
+        _dst_x1: i32,
+        _dst_y1: i32,
+        _mask: u32,
+        _filter: u32,
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let raw_vertex_array = match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {

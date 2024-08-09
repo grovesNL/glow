@@ -508,6 +508,22 @@ pub trait HasContext: __private::Sealed {
         filter: u32,
     );
 
+    unsafe fn blit_named_framebuffer(
+        &self,
+        read_buffer: Option<Self::Framebuffer>,
+        draw_buffer: Option<Self::Framebuffer>,
+        src_x0: i32,
+        src_y0: i32,
+        src_x1: i32,
+        src_y1: i32,
+        dst_x0: i32,
+        dst_y0: i32,
+        dst_x1: i32,
+        dst_y1: i32,
+        mask: u32,
+        filter: u32,
+    );
+
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String>;
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray);

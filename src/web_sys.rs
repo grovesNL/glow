@@ -2614,6 +2614,14 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn check_named_framebuffer_status(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _target: u32,
+    ) -> u32 {
+        panic!("Named framebuffers are not supported");
+    }
+
     unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &[i32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {

@@ -557,6 +557,12 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn check_framebuffer_status(&self, target: u32) -> u32;
 
+    unsafe fn check_named_framebuffer_status(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        target: u32,
+    ) -> u32;
+
     unsafe fn clear_buffer_i32_slice(&self, target: u32, draw_buffer: u32, values: &[i32]);
 
     unsafe fn clear_buffer_u32_slice(&self, target: u32, draw_buffer: u32, values: &[u32]);

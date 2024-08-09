@@ -1845,6 +1845,56 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn named_framebuffer_renderbuffer(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        attachment: u32,
+        renderbuffer_target: u32,
+        renderbuffer: Option<Self::Renderbuffer>,
+    ) {
+        let gl = &self.raw;
+        gl.NamedFramebufferRenderbuffer(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            attachment,
+            renderbuffer_target,
+            renderbuffer.map(|rb| rb.0.get()).unwrap_or(0),
+        );
+    }
+
+    unsafe fn named_framebuffer_texture(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        attachment: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+    ) {
+        let gl = &self.raw;
+        gl.NamedFramebufferTexture(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            attachment,
+            texture.map(|t| t.0.get()).unwrap_or(0),
+            level,
+        );
+    }
+
+    unsafe fn named_framebuffer_texture_layer(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        attachment: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+        layer: i32,
+    ) {
+        let gl = &self.raw;
+        gl.NamedFramebufferTextureLayer(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            attachment,
+            texture.map(|t| t.0.get()).unwrap_or(0),
+            level,
+            layer,
+        );
+    }
+
     unsafe fn front_face(&self, value: u32) {
         let gl = &self.raw;
         gl.FrontFace(value as u32);

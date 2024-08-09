@@ -3214,6 +3214,37 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn named_framebuffer_renderbuffer(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _attachment: u32,
+        _renderbuffer_target: u32,
+        _renderbuffer: Option<Self::Renderbuffer>,
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
+    unsafe fn named_framebuffer_texture(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _attachment: u32,
+        _texture: Option<Self::Texture>,
+        _level: i32,
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
+    unsafe fn named_framebuffer_texture_layer(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _attachment: u32,
+        _texture: Option<Self::Texture>,
+        _level: i32,
+        _layer: i32,
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
     unsafe fn front_face(&self, value: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.front_face(value as u32),

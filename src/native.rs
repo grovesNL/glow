@@ -1629,6 +1629,15 @@ impl HasContext for Context {
         gl.DrawBuffer(draw_buffer);
     }
 
+    unsafe fn named_framebuffer_draw_buffer(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        draw_buffer: u32,
+    ) {
+        let gl = &self.raw;
+        gl.NamedFramebufferDrawBuffer(framebuffer.map(|f| f.0.get()).unwrap_or(0), draw_buffer);
+    }
+
     unsafe fn draw_buffers(&self, buffers: &[u32]) {
         let gl = &self.raw;
         gl.DrawBuffers(buffers.len() as i32, buffers.as_ptr());
@@ -3701,6 +3710,15 @@ impl HasContext for Context {
     unsafe fn read_buffer(&self, src: u32) {
         let gl = &self.raw;
         gl.ReadBuffer(src);
+    }
+
+    unsafe fn named_framebuffer_read_buffer(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        src: u32,
+    ) {
+        let gl = &self.raw;
+        gl.NamedFramebufferReadBuffer(framebuffer.map(|f| f.0.get()).unwrap_or(0), src);
     }
 
     unsafe fn read_pixels(

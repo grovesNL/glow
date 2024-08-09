@@ -719,6 +719,12 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn draw_buffer(&self, buffer: u32);
 
+    unsafe fn named_framebuffer_draw_buffer(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        draw_buffer: u32,
+    );
+
     unsafe fn draw_buffers(&self, buffers: &[u32]);
 
     unsafe fn draw_elements(&self, mode: u32, count: i32, element_type: u32, offset: i32);
@@ -1622,6 +1628,12 @@ pub trait HasContext: __private::Sealed {
     unsafe fn shader_storage_block_binding(&self, program: Self::Program, index: u32, binding: u32);
 
     unsafe fn read_buffer(&self, src: u32);
+
+    unsafe fn named_framebuffer_read_buffer(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        src: u32,
+    );
 
     unsafe fn read_pixels(
         &self,

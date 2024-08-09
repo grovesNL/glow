@@ -1198,6 +1198,13 @@ impl HasContext for Context {
         Ok(NativeVertexArray(non_zero_gl_name(vertex_array)))
     }
 
+    unsafe fn create_named_vertex_array(&self) -> Result<Self::VertexArray, String> {
+        let gl = &self.raw;
+        let mut vertex_array = 0;
+        gl.CreateVertexArrays(1, &mut vertex_array);
+        Ok(NativeVertexArray(non_zero_gl_name(vertex_array)))
+    }
+
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
         let gl = &self.raw;
         gl.DeleteVertexArrays(1, &vertex_array.0.get());

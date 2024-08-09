@@ -526,6 +526,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String>;
 
+    unsafe fn create_named_vertex_array(&self) -> Result<Self::VertexArray, String>;
+
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray);
 
     unsafe fn bind_vertex_array(&self, vertex_array: Option<Self::VertexArray>);

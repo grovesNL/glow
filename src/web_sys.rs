@@ -2469,6 +2469,9 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn create_named_vertex_array(&self) -> Result<Self::VertexArray, String> {
+        unimplemented!()
+    }
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
         let mut vertex_arrays = self.vertex_arrays.borrow_mut();
         if let Some(ref va) = vertex_arrays.remove(vertex_array) {

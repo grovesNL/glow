@@ -220,6 +220,13 @@ impl HasContext for Context {
         Ok(NativeFramebuffer(non_zero_gl_name(name)))
     }
 
+    unsafe fn create_named_framebuffer(&self) -> Result<Self::Framebuffer, String> {
+        let gl = &self.raw;
+        let mut name = 0;
+        gl.CreateFramebuffers(1, &mut name);
+        Ok(NativeFramebuffer(non_zero_gl_name(name)))
+    }
+
     unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool {
         let gl = &self.raw;
         gl.IsFramebuffer(framebuffer.0.get()) != 0

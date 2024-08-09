@@ -1587,6 +1587,10 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn create_named_framebuffer(&self) -> Result<Self::Framebuffer, String> {
+        panic!("Named framebuffers are not supported");
+    }
+
     unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool {
         let framebuffers = self.framebuffers.borrow_mut();
         if let Some(ref f) = framebuffers.get(framebuffer) {

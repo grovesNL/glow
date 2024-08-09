@@ -122,6 +122,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn create_framebuffer(&self) -> Result<Self::Framebuffer, String>;
 
+    unsafe fn create_named_framebuffer(&self) -> Result<Self::Framebuffer, String>;
+
     unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool;
 
     unsafe fn create_query(&self) -> Result<Self::Query, String>;

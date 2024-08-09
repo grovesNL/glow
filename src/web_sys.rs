@@ -3042,6 +3042,14 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn named_framebuffer_draw_buffers(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _draw_buffers: &[u32],
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
     unsafe fn draw_elements(&self, mode: u32, count: i32, element_type: u32, offset: i32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {

@@ -1689,6 +1689,19 @@ impl HasContext for Context {
         gl.DrawBuffers(buffers.len() as i32, buffers.as_ptr());
     }
 
+    unsafe fn named_framebuffer_draw_buffers(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        buffers: &[u32],
+    ) {
+        let gl = &self.raw;
+        gl.NamedFramebufferDrawBuffers(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            buffers.len() as i32,
+            buffers.as_ptr(),
+        );
+    }
+
     unsafe fn draw_elements(&self, mode: u32, count: i32, element_type: u32, offset: i32) {
         let gl = &self.raw;
         gl.DrawElements(

@@ -745,6 +745,12 @@ pub trait HasContext: __private::Sealed {
         draw_buffer: u32,
     );
 
+    unsafe fn named_framebuffer_draw_buffers(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        buffers: &[u32],
+    );
+
     unsafe fn draw_buffers(&self, buffers: &[u32]);
 
     unsafe fn draw_elements(&self, mode: u32, count: i32, element_type: u32, offset: i32);

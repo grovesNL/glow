@@ -3404,6 +3404,49 @@ impl HasContext for Context {
         .unwrap_or_else(|| String::from(""))
     }
 
+    unsafe fn get_framebuffer_parameter_i32(&self, _target: u32, _parameter: u32) -> i32 {
+        panic!("Get framebuffer parameter is not supported");
+    }
+
+    unsafe fn get_named_framebuffer_parameter_i32(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _parameter: u32,
+    ) -> i32 {
+        panic!("Named framebuffers are not supported");
+    }
+
+    unsafe fn get_framebuffer_attachment_parameter_i32(
+        &self,
+        target: u32,
+        attachment: u32,
+        parameter: u32,
+    ) -> i32 {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_framebuffer_attachment_parameter(target, attachment, parameter)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_framebuffer_attachment_parameter(target, attachment, parameter)
+            }
+        }
+        .unwrap()
+        .as_f64()
+        .map(|v| v as i32)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0)
+    }
+
+    unsafe fn get_named_framebuffer_attachment_parameter_i32(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _attachment: u32,
+        _parameter: u32,
+    ) -> i32 {
+        panic!("Named framebuffers are not supported");
+    }
+
     unsafe fn get_uniform_location(
         &self,
         program: Self::Program,

@@ -2015,6 +2015,57 @@ impl HasContext for Context {
             .to_owned()
     }
 
+    unsafe fn get_framebuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetFramebufferParameteriv(target, parameter, &mut value);
+        value
+    }
+
+    unsafe fn get_named_framebuffer_parameter_i32(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        parameter: u32,
+    ) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetNamedFramebufferParameteriv(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            parameter,
+            &mut value,
+        );
+        value
+    }
+
+    unsafe fn get_framebuffer_attachment_parameter_i32(
+        &self,
+        target: u32,
+        attachment: u32,
+        parameter: u32,
+    ) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetFramebufferAttachmentParameteriv(target, attachment, parameter, &mut value);
+        value
+    }
+
+    unsafe fn get_named_framebuffer_attachment_parameter_i32(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        attachment: u32,
+        parameter: u32,
+    ) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetNamedFramebufferAttachmentParameteriv(
+            framebuffer.map(|f| f.0.get()).unwrap_or(0),
+            attachment,
+            parameter,
+            &mut value,
+        );
+        value
+    }
+
     unsafe fn get_uniform_location(
         &self,
         program: Self::Program,

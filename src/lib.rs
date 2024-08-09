@@ -889,6 +889,28 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_parameter_string(&self, parameter: u32) -> String;
 
+    unsafe fn get_framebuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;
+
+    unsafe fn get_named_framebuffer_parameter_i32(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        parameter: u32,
+    ) -> i32;
+
+    unsafe fn get_framebuffer_attachment_parameter_i32(
+        &self,
+        target: u32,
+        attachment: u32,
+        parameter: u32,
+    ) -> i32;
+
+    unsafe fn get_named_framebuffer_attachment_parameter_i32(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        attachment: u32,
+        parameter: u32,
+    ) -> i32;
+
     unsafe fn get_active_uniform_block_parameter_i32(
         &self,
         program: Self::Program,

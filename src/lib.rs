@@ -820,6 +820,31 @@ pub trait HasContext: __private::Sealed {
         layer: i32,
     );
 
+    unsafe fn named_framebuffer_renderbuffer(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        attachment: u32,
+        renderbuffer_target: u32,
+        renderbuffer: Option<Self::Renderbuffer>,
+    );
+
+    unsafe fn named_framebuffer_texture(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        attachment: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+    );
+
+    unsafe fn named_framebuffer_texture_layer(
+        &self,
+        framebuffer: Option<Self::Framebuffer>,
+        attachment: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+        layer: i32,
+    );
+
     unsafe fn front_face(&self, value: u32);
 
     unsafe fn get_error(&self) -> u32;

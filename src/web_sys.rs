@@ -2986,6 +2986,14 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn named_framebuffer_draw_buffer(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _draw_buffer: u32,
+    ) {
+        panic!("Named framebuffers are not supported");
+    }
+
     unsafe fn draw_buffers(&self, buffers: &[u32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {
@@ -5202,6 +5210,14 @@ impl HasContext for Context {
             RawRenderingContext::WebGl1(..) => panic!("read_buffer is not supported by WebGL1"),
             RawRenderingContext::WebGl2(ref gl) => gl.read_buffer(src),
         }
+    }
+
+    unsafe fn named_framebuffer_read_buffer(
+        &self,
+        _framebuffer: Option<Self::Framebuffer>,
+        _src: u32,
+    ) {
+        panic!("Named framebuffers are not supported");
     }
 
     unsafe fn read_pixels(

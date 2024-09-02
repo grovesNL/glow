@@ -885,18 +885,25 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_buffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;
 
+    #[doc(alias = "glGetIntegerv")]
     unsafe fn get_parameter_i32(&self, parameter: u32) -> i32;
 
+    #[doc(alias = "glGetIntegerv")]
     unsafe fn get_parameter_i32_slice(&self, parameter: u32, out: &mut [i32]);
 
+    #[doc(alias = "glGetFloatv")]
     unsafe fn get_parameter_f32(&self, parameter: u32) -> f32;
 
+    #[doc(alias = "glGetFloatv")]
     unsafe fn get_parameter_f32_slice(&self, parameter: u32, out: &mut [f32]);
 
+    #[doc(alias = "glGetIntegeri_v")]
     unsafe fn get_parameter_indexed_i32(&self, parameter: u32, index: u32) -> i32;
 
+    #[doc(alias = "glGetStringi")]
     unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String;
 
+    #[doc(alias = "glGetString")]
     unsafe fn get_parameter_string(&self, parameter: u32) -> String;
 
     unsafe fn get_framebuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;

@@ -3324,6 +3324,18 @@ impl HasContext for Context {
         .unwrap_or(0)
     }
 
+    unsafe fn get_parameter_bool(&self, parameter: u32) -> bool {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .unwrap()
+        .as_bool()
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(false)
+    }
+
     unsafe fn get_parameter_i32(&self, parameter: u32) -> i32 {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),

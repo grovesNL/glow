@@ -1987,6 +1987,13 @@ impl HasContext for Context {
         value
     }
 
+    unsafe fn get_parameter_bool(&self, parameter: u32) -> bool {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetBooleanv(parameter, &mut value);
+        value != FALSE
+    }
+
     unsafe fn get_parameter_i32(&self, parameter: u32) -> i32 {
         let gl = &self.raw;
         let mut value = 0;

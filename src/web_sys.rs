@@ -1530,6 +1530,40 @@ impl Context {
             ext.restore_context()
         }
     }
+
+    unsafe fn get_parameter_gl_name<TKey, TResource>(
+        &self,
+        parameter: u32,
+        tracked_resource: &TrackedResource<TKey, TResource>,
+    ) -> Option<TKey>
+    where
+        TKey: slotmap::Key,
+        TResource: From<wasm_bindgen::JsValue> + PartialEq,
+    {
+        let parameter_value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .ok();
+        match parameter_value {
+            Some(pv) => {
+                let resource: TResource = pv.into();
+                // TODO: Make this search less expensive. If we had a bi-directional map, we could
+                // find the key immediately.
+                match tracked_resource
+                    .borrow()
+                    .iter()
+                    .find(|(_, v)| **v == resource)
+                {
+                    Some((k, _)) => Some(k),
+                    None => panic!(
+                        "A resource was created externally. This is not currently supported."
+                    ),
+                }
+            }
+            None => None,
+        }
+    }
 }
 
 new_key_type! { pub struct WebShaderKey; }
@@ -3429,6 +3463,41 @@ impl HasContext for Context {
         // Errors will be caught by the browser or through `get_error`
         // so return a default instead
         .unwrap_or_else(|| String::from(""))
+    }
+
+    unsafe fn get_parameter_buffer(&self, parameter: u32) -> Option<Self::Buffer> {
+        self.get_parameter_gl_name(parameter, &self.buffers)
+    }
+
+    unsafe fn get_parameter_framebuffer(&self, parameter: u32) -> Option<Self::Framebuffer> {
+        self.get_parameter_gl_name(parameter, &self.framebuffers)
+    }
+
+    unsafe fn get_parameter_program(&self, parameter: u32) -> Option<Self::Program> {
+        self.get_parameter_gl_name(parameter, &self.programs)
+    }
+
+    unsafe fn get_parameter_renderbuffer(&self, parameter: u32) -> Option<Self::Renderbuffer> {
+        self.get_parameter_gl_name(parameter, &self.renderbuffers)
+    }
+
+    unsafe fn get_parameter_sampler(&self, parameter: u32) -> Option<Self::Sampler> {
+        self.get_parameter_gl_name(parameter, &self.samplers)
+    }
+
+    unsafe fn get_parameter_texture(&self, parameter: u32) -> Option<Self::Texture> {
+        self.get_parameter_gl_name(parameter, &self.textures)
+    }
+
+    unsafe fn get_parameter_transform_feedback(
+        &self,
+        parameter: u32,
+    ) -> Option<Self::TransformFeedback> {
+        self.get_parameter_gl_name(parameter, &self.transform_feedbacks)
+    }
+
+    unsafe fn get_parameter_vertex_array(&self, parameter: u32) -> Option<Self::VertexArray> {
+        self.get_parameter_gl_name(parameter, &self.vertex_arrays)
     }
 
     unsafe fn get_framebuffer_parameter_i32(&self, _target: u32, _parameter: u32) -> i32 {

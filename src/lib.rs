@@ -909,6 +909,25 @@ pub trait HasContext: __private::Sealed {
     #[doc(alias = "glGetString")]
     unsafe fn get_parameter_string(&self, parameter: u32) -> String;
 
+    unsafe fn get_parameter_buffer(&self, parameter: u32) -> Option<Self::Buffer>;
+
+    unsafe fn get_parameter_framebuffer(&self, parameter: u32) -> Option<Self::Framebuffer>;
+
+    unsafe fn get_parameter_program(&self, parameter: u32) -> Option<Self::Program>;
+
+    unsafe fn get_parameter_renderbuffer(&self, parameter: u32) -> Option<Self::Renderbuffer>;
+
+    unsafe fn get_parameter_sampler(&self, parameter: u32) -> Option<Self::Sampler>;
+
+    unsafe fn get_parameter_texture(&self, parameter: u32) -> Option<Self::Texture>;
+
+    unsafe fn get_parameter_transform_feedback(
+        &self,
+        parameter: u32,
+    ) -> Option<Self::TransformFeedback>;
+
+    unsafe fn get_parameter_vertex_array(&self, parameter: u32) -> Option<Self::VertexArray>;
+
     unsafe fn get_framebuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;
 
     unsafe fn get_named_framebuffer_parameter_i32(

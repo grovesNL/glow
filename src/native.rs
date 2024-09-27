@@ -128,6 +128,15 @@ impl Context {
     pub unsafe fn create_framebuffer_from_gl_name(gl_name: native_gl::GLuint) -> NativeFramebuffer {
         NativeFramebuffer(non_zero_gl_name(gl_name))
     }
+
+    unsafe fn get_parameter_gl_name(&self, parameter: u32) -> Option<NonZeroU32> {
+        let value = self.get_parameter_i32(parameter) as u32;
+        if value == 0 {
+            None
+        } else {
+            Some(non_zero_gl_name(value))
+        }
+    }
 }
 
 impl std::fmt::Debug for Context {
@@ -2047,6 +2056,43 @@ impl HasContext for Context {
             .to_str()
             .unwrap()
             .to_owned()
+    }
+
+    unsafe fn get_parameter_buffer(&self, parameter: u32) -> Option<Self::Buffer> {
+        self.get_parameter_gl_name(parameter).map(NativeBuffer)
+    }
+
+    unsafe fn get_parameter_framebuffer(&self, parameter: u32) -> Option<Self::Framebuffer> {
+        self.get_parameter_gl_name(parameter).map(NativeFramebuffer)
+    }
+
+    unsafe fn get_parameter_program(&self, parameter: u32) -> Option<Self::Program> {
+        self.get_parameter_gl_name(parameter).map(NativeProgram)
+    }
+
+    unsafe fn get_parameter_renderbuffer(&self, parameter: u32) -> Option<Self::Renderbuffer> {
+        self.get_parameter_gl_name(parameter)
+            .map(NativeRenderbuffer)
+    }
+
+    unsafe fn get_parameter_sampler(&self, parameter: u32) -> Option<Self::Sampler> {
+        self.get_parameter_gl_name(parameter).map(NativeSampler)
+    }
+
+    unsafe fn get_parameter_texture(&self, parameter: u32) -> Option<Self::Texture> {
+        self.get_parameter_gl_name(parameter).map(NativeTexture)
+    }
+
+    unsafe fn get_parameter_transform_feedback(
+        &self,
+        parameter: u32,
+    ) -> Option<Self::TransformFeedback> {
+        self.get_parameter_gl_name(parameter)
+            .map(NativeTransformFeedback)
+    }
+
+    unsafe fn get_parameter_vertex_array(&self, parameter: u32) -> Option<Self::VertexArray> {
+        self.get_parameter_gl_name(parameter).map(NativeVertexArray)
     }
 
     unsafe fn get_framebuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32 {

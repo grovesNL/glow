@@ -27,7 +27,7 @@ struct Extensions {
     pub ext_color_buffer_float: Option<web_sys::ExtColorBufferFloat>,
     pub ext_color_buffer_half_float: Option<web_sys::ExtColorBufferHalfFloat>,
     pub ext_disjoint_timer_query: Option<web_sys::ExtDisjointTimerQuery>,
-    pub ext_disjoint_timer_query_webgl2: Option<()>,
+    pub ext_disjoint_timer_query_webgl2: Option<web_sys::ExtDisjointTimerQuery>,
     pub ext_float_blend: Option<()>,
     pub ext_frag_depth: Option<web_sys::ExtFragDepth>,
     pub ext_shader_texture_lod: Option<web_sys::ExtShaderTextureLod>,
@@ -129,7 +129,7 @@ macro_rules! build_extensions {
                 &$context,
                 "EXT_disjoint_timer_query",
             ),
-            ext_disjoint_timer_query_webgl2: get_extension_no_object(
+            ext_disjoint_timer_query_webgl2: get_extension::<web_sys::ExtDisjointTimerQuery>(
                 &$context,
                 "EXT_disjoint_timer_query_webgl2",
             ),
@@ -5413,8 +5413,13 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn query_counter(&self, _query: Self::Query, _target: u32) {
-        panic!("Query counters are not supported");
+    unsafe fn query_counter(&self, query: Self::Query, target: u32) {
+        let queries = self.queries.borrow();
+        let raw_query = queries.get_unchecked(query);
+        match self.extensions.ext_disjoint_timer_query_webgl2 {
+            Some(ref ext) => ext.query_counter_ext(raw_query, target),
+            None => panic!("Query counters are not supported without EXT_disjoint_timer_query_webgl2"),
+        }
     }
 
     unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32 {

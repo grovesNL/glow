@@ -1712,8 +1712,8 @@ impl HasContext for Context {
     }
 
     unsafe fn is_shader(&self, shader: Self::Shader) -> bool {
-        let shaders = self.shaders.borrow_mut();
-        if let Some(ref s) = shaders.get(shader) {
+        let shaders = self.shaders.borrow();
+        if let Some(s) = shaders.get(shader) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_shader(Some(s)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_shader(Some(s)),
@@ -1743,8 +1743,8 @@ impl HasContext for Context {
     }
 
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
-        let textures = self.textures.borrow_mut();
-        if let Some(ref t) = textures.get(texture) {
+        let textures = self.textures.borrow();
+        if let Some(t) = textures.get(texture) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_texture(Some(t)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_texture(Some(t)),
@@ -1852,8 +1852,8 @@ impl HasContext for Context {
     }
 
     unsafe fn is_program(&self, program: Self::Program) -> bool {
-        let programs = self.programs.borrow_mut();
-        if let Some(ref p) = programs.get(program) {
+        let programs = self.programs.borrow();
+        if let Some(p) = programs.get(program) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_program(Some(p)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_program(Some(p)),
@@ -2365,8 +2365,8 @@ impl HasContext for Context {
     }
 
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
-        let buffers = self.buffers.borrow_mut();
-        if let Some(ref b) = buffers.get(buffer) {
+        let buffers = self.buffers.borrow();
+        if let Some(b) = buffers.get(buffer) {
             match self.raw {
                 RawRenderingContext::WebGl1(ref gl) => gl.is_buffer(Some(b)),
                 RawRenderingContext::WebGl2(ref gl) => gl.is_buffer(Some(b)),

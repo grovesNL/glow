@@ -888,6 +888,9 @@ pub trait HasContext: __private::Sealed {
     #[doc(alias = "glGetBooleanv")]
     unsafe fn get_parameter_bool(&self, parameter: u32) -> bool;
 
+    #[doc(alias = "glGetBooleanv")]
+    unsafe fn get_parameter_bool_array<const N: usize>(&self, parameter: u32) -> [bool; N];
+
     #[doc(alias = "glGetIntegerv")]
     unsafe fn get_parameter_i32(&self, parameter: u32) -> i32;
 

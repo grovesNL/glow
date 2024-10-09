@@ -1,6 +1,6 @@
 [package]
 name = "glow"
-version = "0.14.1"
+version = "0.14.2"
 description = "GL on Whatever: a set of bindings to run GL (Open GL, OpenGL ES, and WebGL) anywhere, and avoid target-specific code."
 authors = [
   "Joshua Groves <josh@joshgroves.com>",

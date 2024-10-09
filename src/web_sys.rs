@@ -3378,12 +3378,10 @@ impl HasContext for Context {
         .unwrap();
         use wasm_bindgen::JsCast;
         let mut v = [false; N];
-        if let Some(value) = value.as_bool() {
-            v[0] = value;
-        } else if let Some(values) = value.dyn_ref::<js_sys::Array>() {
-            for (i, val) in values.values().into_iter().enumerate() {
-                v[i] = val.unwrap().as_bool().unwrap_or_default();
-            }
+        if let Some(values) = value.dyn_ref::<js_sys::Array>() {
+            v.iter_mut()
+                .zip(values.values())
+                .for_each(|(v, val)| *v = val.unwrap().as_bool().unwrap_or_default())
         }
         v
     }

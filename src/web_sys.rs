@@ -3370,6 +3370,22 @@ impl HasContext for Context {
         .unwrap_or(false)
     }
 
+    unsafe fn get_parameter_bool_array<const N: usize>(&self, parameter: u32) -> [bool; N] {
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .unwrap();
+        use wasm_bindgen::JsCast;
+        let mut v = [false; N];
+        if let Some(values) = value.dyn_ref::<js_sys::Array>() {
+            v.iter_mut()
+                .zip(values.values())
+                .for_each(|(v, val)| *v = val.unwrap().as_bool().unwrap_or_default())
+        }
+        v
+    }
+
     unsafe fn get_parameter_i32(&self, parameter: u32) -> i32 {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
@@ -5499,7 +5515,9 @@ impl HasContext for Context {
         let raw_query = queries.get_unchecked(query);
         match self.extensions.ext_disjoint_timer_query_webgl2 {
             Some(ref ext) => ext.query_counter_ext(raw_query, target),
-            None => panic!("Query counters are not supported without EXT_disjoint_timer_query_webgl2"),
+            None => {
+                panic!("Query counters are not supported without EXT_disjoint_timer_query_webgl2")
+            }
         }
     }
 

@@ -536,7 +536,7 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn clear_color(&self, red: f32, green: f32, blue: f32, alpha: f32);
 
-    unsafe fn supports_f64_precision() -> bool;
+    unsafe fn supports_f64_precision(&self) -> bool;
 
     unsafe fn clear_depth_f64(&self, depth: f64);
 

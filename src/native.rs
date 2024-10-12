@@ -1236,9 +1236,8 @@ impl HasContext for Context {
         gl.ClearColor(red, green, blue, alpha);
     }
 
-    unsafe fn supports_f64_precision() -> bool {
-        // TODO: Handle OpenGL ES
-        true
+    unsafe fn supports_f64_precision(&self) -> bool {
+        !self.version.is_embedded
     }
 
     unsafe fn clear_depth_f64(&self, depth: f64) {
@@ -1252,7 +1251,7 @@ impl HasContext for Context {
     }
 
     unsafe fn clear_depth(&self, depth: f64) {
-        if !self.version.is_embedded {
+        if self.supports_f64_precision() {
             self.clear_depth_f64(depth);
         } else {
             self.clear_depth_f32(depth as f32);
@@ -3275,7 +3274,7 @@ impl HasContext for Context {
     }
 
     unsafe fn depth_range(&self, near: f64, far: f64) {
-        if !self.version.is_embedded {
+        if self.supports_f64_precision() {
             self.depth_range_f64(near, far);
         } else {
             self.depth_range_f32(near as f32, far as f32);

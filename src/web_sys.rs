@@ -2546,7 +2546,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn supports_f64_precision() -> bool {
+    unsafe fn supports_f64_precision(&self) -> bool {
         false
     }
 

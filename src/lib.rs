@@ -542,6 +542,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn clear_depth_f32(&self, depth: f32);
 
+    unsafe fn clear_depth(&self, depth: f64);
+
     unsafe fn clear_stencil(&self, stencil: i32);
 
     unsafe fn clear(&self, mask: u32);
@@ -1470,6 +1472,8 @@ pub trait HasContext: __private::Sealed {
     unsafe fn depth_range_f32(&self, near: f32, far: f32);
 
     unsafe fn depth_range_f64(&self, near: f64, far: f64);
+
+    unsafe fn depth_range(&self, near: f64, far: f64);
 
     unsafe fn depth_range_f64_slice(&self, first: u32, count: i32, values: &[[f64; 2]]);
 

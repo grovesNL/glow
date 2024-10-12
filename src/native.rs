@@ -1251,6 +1251,14 @@ impl HasContext for Context {
         gl.ClearDepthf(depth);
     }
 
+    unsafe fn clear_depth(&self, depth: f64) {
+        if !self.version.is_embedded {
+            self.clear_depth_f64(depth);
+        } else {
+            self.clear_depth_f32(depth as f32);
+        }
+    }
+
     unsafe fn clear_stencil(&self, stencil: i32) {
         let gl = &self.raw;
         gl.ClearStencil(stencil);
@@ -3264,6 +3272,14 @@ impl HasContext for Context {
     unsafe fn depth_range_f64(&self, near: f64, far: f64) {
         let gl = &self.raw;
         gl.DepthRange(near, far);
+    }
+
+    unsafe fn depth_range(&self, near: f64, far: f64) {
+        if !self.version.is_embedded {
+            self.depth_range_f64(near, far);
+        } else {
+            self.depth_range_f32(near as f32, far as f32);
+        }
     }
 
     unsafe fn depth_range_f64_slice(&self, first: u32, count: i32, values: &[[f64; 2]]) {

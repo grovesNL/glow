@@ -2546,7 +2546,7 @@ impl HasContext for Context {
         }
     }
 
-    unsafe fn supports_f64_precision() -> bool {
+    unsafe fn supports_f64_precision(&self) -> bool {
         false
     }
 
@@ -2559,6 +2559,10 @@ impl HasContext for Context {
             RawRenderingContext::WebGl1(ref gl) => gl.clear_depth(depth),
             RawRenderingContext::WebGl2(ref gl) => gl.clear_depth(depth),
         }
+    }
+
+    unsafe fn clear_depth(&self, depth: f64) {
+        self.clear_depth_f32(depth as f32);
     }
 
     unsafe fn clear_stencil(&self, stencil: i32) {
@@ -4889,6 +4893,10 @@ impl HasContext for Context {
 
     unsafe fn depth_range_f64(&self, _near: f64, _far: f64) {
         panic!("Depth range with 64-bit float values is not supported");
+    }
+
+    unsafe fn depth_range(&self, near: f64, far: f64) {
+        self.depth_range_f32(near as f32, far as f32)
     }
 
     unsafe fn depth_range_f64_slice(&self, _first: u32, _count: i32, _values: &[[f64; 2]]) {

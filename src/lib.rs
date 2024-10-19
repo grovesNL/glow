@@ -3584,6 +3584,8 @@ pub const READ_WRITE: u32 = 0x88BA;
 
 pub const RED: u32 = 0x1903;
 
+pub const RED_BITS: u32 = 0x0D52;
+
 pub const RED_INTEGER: u32 = 0x8D94;
 
 pub const REFERENCED_BY_COMPUTE_SHADER: u32 = 0x930B;

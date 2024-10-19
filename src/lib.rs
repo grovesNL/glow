@@ -899,6 +899,15 @@ pub trait HasContext: __private::Sealed {
     #[doc(alias = "glGetIntegerv")]
     unsafe fn get_parameter_i32_slice(&self, parameter: u32, out: &mut [i32]);
 
+    #[doc(alias = "glGetInteger64v")]
+    unsafe fn get_parameter_i64(&self, parameter: u32) -> i64;
+
+    #[doc(alias = "glGetInteger64v")]
+    unsafe fn get_parameter_i64_slice(&self, parameter: u32, out: &mut [i64]);
+
+    #[doc(alias = "glGetInteger64i_v")]
+    unsafe fn get_parameter_indexed_i64(&self, parameter: u32, index: u32) -> i64;
+
     #[doc(alias = "glGetFloatv")]
     unsafe fn get_parameter_f32(&self, parameter: u32) -> f32;
 

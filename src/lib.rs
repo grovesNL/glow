@@ -2364,6 +2364,8 @@ pub const DEPTH32F_STENCIL8: u32 = 0x8CAD;
 
 pub const DEPTH_ATTACHMENT: u32 = 0x8D00;
 
+pub const DEPTH_BITS: u32 = 0x0D56;
+
 pub const DEPTH_BUFFER_BIT: u32 = 0x00000100;
 
 pub const DEPTH_CLAMP: u32 = 0x864F;

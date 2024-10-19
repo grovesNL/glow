@@ -1932,6 +1932,8 @@ pub const BLOCK_INDEX: u32 = 0x92FD;
 
 pub const BLUE: u32 = 0x1905;
 
+pub const BLUE_BITS: u32 = 0x0D54;
+
 pub const BLUE_INTEGER: u32 = 0x8D96;
 
 pub const BOOL: u32 = 0x8B56;

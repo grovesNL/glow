@@ -2684,6 +2684,8 @@ pub const GREATER: u32 = 0x0204;
 
 pub const GREEN: u32 = 0x1904;
 
+pub const GREEN_BITS: u32 = 0x0D53;
+
 pub const GREEN_INTEGER: u32 = 0x8D95;
 
 pub const GUILTY_CONTEXT_RESET: u32 = 0x8253;

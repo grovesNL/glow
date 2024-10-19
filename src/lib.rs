@@ -2686,6 +2686,8 @@ pub const GREEN_INTEGER: u32 = 0x8D95;
 
 pub const GUILTY_CONTEXT_RESET: u32 = 0x8253;
 
+pub const HALF_FLOAT_OES: u32 = 0x8D61;
+
 pub const HALF_FLOAT: u32 = 0x140B;
 
 pub const HIGH_FLOAT: u32 = 0x8DF2;

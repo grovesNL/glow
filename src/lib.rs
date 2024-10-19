@@ -1836,6 +1836,8 @@ pub const ALL_SHADER_BITS: u32 = 0xFFFFFFFF;
 
 pub const ALPHA: u32 = 0x1906;
 
+pub const ALPHA_BITS: u32 = 0x0D55;
+
 pub const ALREADY_SIGNALED: u32 = 0x911A;
 
 pub const ALWAYS: u32 = 0x0207;

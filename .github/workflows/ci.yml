@@ -68,3 +68,20 @@ jobs:
         cargo build --verbose --target aarch64-linux-android
         cargo build --verbose --target armv7-linux-androideabi
         cargo build --verbose --target x86_64-linux-android
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check fmt
+        run: cargo fmt --check
+      - name: Install phosphorus from crates.io
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: phosphorus
+          version: '0.0.22'
+      - name: Test reproducability of gl46.rs
+        run: bash generate-native.sh
+      - uses: infotroph/tree-is-clean@v1
+        with:
+          check_untracked: true

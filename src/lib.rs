@@ -1837,11 +1837,15 @@ pub const ACTIVE_VARIABLES: u32 = 0x9305;
 
 pub const ALIASED_LINE_WIDTH_RANGE: u32 = 0x846E;
 
+pub const ALIASED_POINT_SIZE_RANGE: u32 = 0x846D;
+
 pub const ALL_BARRIER_BITS: u32 = 0xFFFFFFFF;
 
 pub const ALL_SHADER_BITS: u32 = 0xFFFFFFFF;
 
 pub const ALPHA: u32 = 0x1906;
+
+pub const ALPHA_BITS: u32 = 0x0D55;
 
 pub const ALREADY_SIGNALED: u32 = 0x911A;
 
@@ -1938,6 +1942,8 @@ pub const BLEND_SRC_RGB: u32 = 0x80C9;
 pub const BLOCK_INDEX: u32 = 0x92FD;
 
 pub const BLUE: u32 = 0x1905;
+
+pub const BLUE_BITS: u32 = 0x0D54;
 
 pub const BLUE_INTEGER: u32 = 0x8D96;
 
@@ -2369,6 +2375,8 @@ pub const DEPTH32F_STENCIL8: u32 = 0x8CAD;
 
 pub const DEPTH_ATTACHMENT: u32 = 0x8D00;
 
+pub const DEPTH_BITS: u32 = 0x0D56;
+
 pub const DEPTH_BUFFER_BIT: u32 = 0x00000100;
 
 pub const DEPTH_CLAMP: u32 = 0x864F;
@@ -2661,6 +2669,8 @@ pub const FUNC_REVERSE_SUBTRACT: u32 = 0x800B;
 
 pub const FUNC_SUBTRACT: u32 = 0x800A;
 
+pub const GENERATE_MIPMAP_HINT: u32 = 0x8192;
+
 pub const GEOMETRY_INPUT_TYPE: u32 = 0x8917;
 
 pub const GEOMETRY_OUTPUT_TYPE: u32 = 0x8918;
@@ -2691,9 +2701,13 @@ pub const GREATER: u32 = 0x0204;
 
 pub const GREEN: u32 = 0x1904;
 
+pub const GREEN_BITS: u32 = 0x0D53;
+
 pub const GREEN_INTEGER: u32 = 0x8D95;
 
 pub const GUILTY_CONTEXT_RESET: u32 = 0x8253;
+
+pub const HALF_FLOAT_OES: u32 = 0x8D61;
 
 pub const HALF_FLOAT: u32 = 0x140B;
 
@@ -3589,6 +3603,8 @@ pub const READ_WRITE: u32 = 0x88BA;
 
 pub const RED: u32 = 0x1903;
 
+pub const RED_BITS: u32 = 0x0D52;
+
 pub const RED_INTEGER: u32 = 0x8D94;
 
 pub const REFERENCED_BY_COMPUTE_SHADER: u32 = 0x930B;
@@ -3928,6 +3944,8 @@ pub const STENCIL_BACK_REF: u32 = 0x8CA3;
 pub const STENCIL_BACK_VALUE_MASK: u32 = 0x8CA4;
 
 pub const STENCIL_BACK_WRITEMASK: u32 = 0x8CA5;
+
+pub const STENCIL_BITS: u32 = 0x0D57;
 
 pub const STENCIL_BUFFER_BIT: u32 = 0x00000400;
 

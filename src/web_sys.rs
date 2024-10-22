@@ -5841,7 +5841,8 @@ unsafe fn texture_data_view(ty: u32, bytes: &[u8]) -> js_sys::Object {
         | UNSIGNED_SHORT_5_6_5
         | UNSIGNED_SHORT_5_5_5_1
         | UNSIGNED_SHORT_4_4_4_4
-        | HALF_FLOAT => {
+        | HALF_FLOAT
+        | HALF_FLOAT_OES => {
             #[allow(clippy::cast_ptr_alignment)]
             let data = from_raw_parts(bytes.as_ptr() as *const u16, bytes.len() / size_of::<u16>());
             js_sys::Uint16Array::view(data).into()

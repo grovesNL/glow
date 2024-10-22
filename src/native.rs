@@ -226,14 +226,18 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenFramebuffers(1, &mut name);
-        Ok(NativeFramebuffer(non_zero_gl_name(name)))
+        NonZeroU32::new(name)
+            .map(NativeFramebuffer)
+            .ok_or_else(|| String::from("Unable to create Framebuffer object"))
     }
 
     unsafe fn create_named_framebuffer(&self) -> Result<Self::Framebuffer, String> {
         let gl = &self.raw;
         let mut name = 0;
         gl.CreateFramebuffers(1, &mut name);
-        Ok(NativeFramebuffer(non_zero_gl_name(name)))
+        NonZeroU32::new(name)
+            .map(NativeFramebuffer)
+            .ok_or_else(|| String::from("Unable to create Framebuffer object"))
     }
 
     unsafe fn is_framebuffer(&self, framebuffer: Self::Framebuffer) -> bool {
@@ -245,14 +249,18 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenQueries(1, &mut name);
-        Ok(NativeQuery(non_zero_gl_name(name)))
+        NonZeroU32::new(name)
+            .map(NativeQuery)
+            .ok_or_else(|| String::from("Unable to create Query object"))
     }
 
     unsafe fn create_renderbuffer(&self) -> Result<Self::Renderbuffer, String> {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenRenderbuffers(1, &mut name);
-        Ok(NativeRenderbuffer(non_zero_gl_name(name)))
+        NonZeroU32::new(name)
+            .map(NativeRenderbuffer)
+            .ok_or_else(|| String::from("Unable to create Renderbuffer object"))
     }
 
     unsafe fn is_renderbuffer(&self, renderbuffer: Self::Renderbuffer) -> bool {
@@ -264,14 +272,16 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenSamplers(1, &mut name);
-        Ok(NativeSampler(non_zero_gl_name(name)))
+        NonZeroU32::new(name)
+            .map(NativeSampler)
+            .ok_or_else(|| String::from("Unable to create Sampler object"))
     }
 
     unsafe fn create_shader(&self, shader_type: u32) -> Result<Self::Shader, String> {
         let gl = &self.raw;
-        Ok(NativeShader(non_zero_gl_name(
-            gl.CreateShader(shader_type as u32),
-        )))
+        NonZeroU32::new(gl.CreateShader(shader_type as u32))
+            .map(NativeShader)
+            .ok_or_else(|| String::from("Unable to create Shader object"))
     }
 
     unsafe fn is_shader(&self, shader: Self::Shader) -> bool {
@@ -283,14 +293,18 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenTextures(1, &mut name);
-        Ok(NativeTexture(non_zero_gl_name(name)))
+        NonZeroU32::new(name)
+            .map(NativeTexture)
+            .ok_or_else(|| String::from("Unable to create Texture object"))
     }
 
     unsafe fn create_named_texture(&self, target: u32) -> Result<Self::Texture, String> {
         let gl = &self.raw;
         let mut name = 0;
         gl.CreateTextures(target, 1, &mut name);
-        Ok(NativeTexture(non_zero_gl_name(name)))
+        NonZeroU32::new(name)
+            .map(NativeTexture)
+            .ok_or_else(|| String::from("Unable to create Texture object"))
     }
 
     unsafe fn is_texture(&self, texture: Self::Texture) -> bool {
@@ -375,7 +389,9 @@ impl HasContext for Context {
 
     unsafe fn create_program(&self) -> Result<Self::Program, String> {
         let gl = &self.raw;
-        Ok(NativeProgram(non_zero_gl_name(gl.CreateProgram())))
+        NonZeroU32::new(gl.CreateProgram())
+            .map(NativeProgram)
+            .ok_or_else(|| String::from("Unable to create Program object"))
     }
 
     unsafe fn is_program(&self, program: Self::Program) -> bool {
@@ -1087,14 +1103,18 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut buffer = 0;
         gl.GenBuffers(1, &mut buffer);
-        Ok(NativeBuffer(non_zero_gl_name(buffer)))
+        NonZeroU32::new(buffer)
+            .map(NativeBuffer)
+            .ok_or_else(|| String::from("Unable to create Buffer object"))
     }
 
     unsafe fn create_named_buffer(&self) -> Result<Self::Buffer, String> {
         let gl = &self.raw;
         let mut buffer = 0;
         gl.CreateBuffers(1, &mut buffer);
-        Ok(NativeBuffer(non_zero_gl_name(buffer)))
+        NonZeroU32::new(buffer)
+            .map(NativeBuffer)
+            .ok_or_else(|| String::from("Unable to create Buffer object"))
     }
 
     unsafe fn is_buffer(&self, buffer: Self::Buffer) -> bool {
@@ -1211,14 +1231,18 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut vertex_array = 0;
         gl.GenVertexArrays(1, &mut vertex_array);
-        Ok(NativeVertexArray(non_zero_gl_name(vertex_array)))
+        NonZeroU32::new(vertex_array)
+            .map(NativeVertexArray)
+            .ok_or_else(|| String::from("Unable to create VertexArray object"))
     }
 
     unsafe fn create_named_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let gl = &self.raw;
         let mut vertex_array = 0;
         gl.CreateVertexArrays(1, &mut vertex_array);
-        Ok(NativeVertexArray(non_zero_gl_name(vertex_array)))
+        NonZeroU32::new(vertex_array)
+            .map(NativeVertexArray)
+            .ok_or_else(|| String::from("Unable to create VertexArray object"))
     }
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
@@ -3986,7 +4010,9 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut name = 0;
         gl.GenTransformFeedbacks(1, &mut name);
-        Ok(NativeTransformFeedback(non_zero_gl_name(name)))
+        NonZeroU32::new(name)
+            .map(NativeTransformFeedback)
+            .ok_or_else(|| String::from("Unable to create TransformFeedback object"))
     }
 
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback) {

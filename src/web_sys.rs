@@ -3417,6 +3417,50 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_parameter_i64(&self, parameter: u32) -> i64 {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .unwrap()
+        .as_f64()
+        .map(|v| v as i64)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0)
+    }
+
+    unsafe fn get_parameter_i64_slice(&self, parameter: u32, v: &mut [i64]) {
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_parameter(parameter),
+        }
+        .unwrap();
+        use wasm_bindgen::JsCast;
+        if let Some(value) = value.as_f64() {
+            v[0] = value as i64;
+        } else if let Some(values) = value.dyn_ref::<js_sys::Array>() {
+            v.iter_mut().zip(values.values()).for_each(|(v, val)| {
+                *v = val.unwrap().as_f64().map(|x| x as i64).unwrap_or_default()
+            })
+        }
+    }
+
+    unsafe fn get_parameter_indexed_i64(&self, parameter: u32, index: u32) -> i64 {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Get parameter indexed is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.get_indexed_parameter(parameter, index),
+        }
+        .unwrap()
+        .as_f64()
+        .map(|v| v as i64)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0)
+    }
+
     unsafe fn get_parameter_f32(&self, parameter: u32) -> f32 {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_parameter(parameter),

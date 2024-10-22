@@ -2029,6 +2029,25 @@ impl HasContext for Context {
         gl.GetIntegerv(parameter, &mut out[0]);
     }
 
+    unsafe fn get_parameter_i64(&self, parameter: u32) -> i64 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetInteger64v(parameter, &mut value);
+        value
+    }
+
+    unsafe fn get_parameter_i64_slice(&self, parameter: u32, out: &mut [i64]) {
+        let gl = &self.raw;
+        gl.GetInteger64v(parameter, &mut out[0]);
+    }
+
+    unsafe fn get_parameter_indexed_i64(&self, parameter: u32, index: u32) -> i64 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetInteger64i_v(parameter, index, &mut value);
+        value
+    }
+
     unsafe fn get_parameter_f32(&self, parameter: u32) -> f32 {
         let gl = &self.raw;
         let mut value: f32 = 0.0;

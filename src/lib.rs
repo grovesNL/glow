@@ -1838,6 +1838,14 @@ pub trait HasContext: __private::Sealed {
     unsafe fn hint(&self, target: u32, mode: u32);
 
     unsafe fn sample_coverage(&self, value: f32, invert: bool);
+
+    unsafe fn get_internal_format_i32_slice(
+        &self,
+        target: u32,
+        internal_format: u32,
+        pname: u32,
+        result: &mut [i32],
+    );
 }
 
 pub const ACTIVE_ATOMIC_COUNTER_BUFFERS: u32 = 0x92D9;

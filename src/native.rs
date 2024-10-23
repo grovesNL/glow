@@ -4330,6 +4330,23 @@ impl HasContext for Context {
         let gl = &self.raw;
         gl.SampleCoverage(value, invert as u8);
     }
+
+    unsafe fn get_internal_format_i32_slice(
+        &self,
+        target: u32,
+        internal_format: u32,
+        pname: u32,
+        result: &mut [i32],
+    ) {
+        let gl = &self.raw;
+        gl.GetInternalformativ(
+            target,
+            internal_format,
+            pname,
+            result.len() as _,
+            result.as_mut_ptr(),
+        )
+    }
 }
 
 impl Drop for Context {

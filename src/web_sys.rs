@@ -5987,6 +5987,30 @@ impl HasContext for Context {
             RawRenderingContext::WebGl2(ref gl) => gl.sample_coverage(value, invert),
         }
     }
+
+    unsafe fn get_internal_format_i32_slice(
+        &self,
+        target: u32,
+        internal_format: u32,
+        pname: u32,
+        result: &mut [i32],
+    ) {
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                panic!("get_internalformat_parameter not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_internalformat_parameter(target, internal_format, pname)
+            }
+        }
+        .unwrap();
+        use wasm_bindgen::JsCast;
+        if let Some(value) = value.as_f64() {
+            result[0] = value as i32;
+        } else if let Some(values) = value.dyn_ref::<js_sys::Int32Array>() {
+            values.copy_to(result)
+        }
+    }
 }
 
 /// Sending texture data requires different data views for different data types.

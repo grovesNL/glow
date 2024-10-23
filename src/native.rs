@@ -2052,6 +2052,13 @@ impl HasContext for Context {
         value
     }
 
+    unsafe fn get_tex_parameter_f32(&self, target: u32, parameter: u32) -> f32 {
+        let gl = &self.raw;
+        let mut value = 0.;
+        gl.GetTexParameterfv(target, parameter, &mut value);
+        value
+    }
+
     unsafe fn get_buffer_parameter_i32(&self, target: u32, parameter: u32) -> i32 {
         let gl = &self.raw;
         let mut value = 0;

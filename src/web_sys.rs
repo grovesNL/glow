@@ -1904,6 +1904,15 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn validate_program(&self, program: Self::Program) {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.validate_program(raw_program),
+            RawRenderingContext::WebGl2(ref gl) => gl.validate_program(raw_program),
+        }
+    }
+
     unsafe fn get_program_completion_status(&self, program: Self::Program) -> bool {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);

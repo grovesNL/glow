@@ -177,6 +177,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn link_program(&self, program: Self::Program);
 
+    unsafe fn validate_program(&self, program: Self::Program);
+
     unsafe fn get_program_completion_status(&self, program: Self::Program) -> bool;
 
     unsafe fn get_program_link_status(&self, program: Self::Program) -> bool;

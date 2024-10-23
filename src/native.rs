@@ -419,6 +419,11 @@ impl HasContext for Context {
         gl.LinkProgram(program.0.get());
     }
 
+    unsafe fn validate_program(&self, program: Self::Program) {
+        let gl = &self.raw;
+        gl.ValidateProgram(program.0.get());
+    }
+
     unsafe fn get_program_completion_status(&self, program: Self::Program) -> bool {
         let gl = &self.raw;
         let mut status = 0;

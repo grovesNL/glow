@@ -5155,6 +5155,20 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn vertex_attrib_4_i32(&self, index: u32, x: i32, y: i32, z: i32, w: i32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("vertex_attrib_4_i32 not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_i4i(index, x, y, z, w),
+        }
+    }
+
+    unsafe fn vertex_attrib_4_u32(&self, index: u32, x: u32, y: u32, z: u32, w: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("vertex_attrib_4_u32 not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.vertex_attrib_i4ui(index, x, y, z, w),
+        }
+    }
+
     unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32]) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.vertex_attrib1fv_with_f32_array(index, v),

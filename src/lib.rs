@@ -1607,6 +1607,10 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn vertex_attrib_4_f32(&self, index: u32, x: f32, y: f32, z: f32, w: f32);
 
+    unsafe fn vertex_attrib_4_i32(&self, index: u32, x: i32, y: i32, z: i32, w: i32);
+
+    unsafe fn vertex_attrib_4_u32(&self, index: u32, x: u32, y: u32, z: u32, w: u32);
+
     unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32]);
 
     unsafe fn vertex_attrib_2_f32_slice(&self, index: u32, v: &[f32]);

@@ -438,6 +438,13 @@ impl HasContext for Context {
         1 == status
     }
 
+    unsafe fn get_program_validate_status(&self, program: Self::Program) -> bool {
+        let gl = &self.raw;
+        let mut status = 0;
+        gl.GetProgramiv(program.0.get(), VALIDATE_STATUS, &mut status);
+        status == 1
+    }
+
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String {
         let gl = &self.raw;
         let mut length = 0;

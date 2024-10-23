@@ -1946,6 +1946,21 @@ impl HasContext for Context {
         .unwrap_or(false)
     }
 
+    unsafe fn get_program_validate_status(&self, program: Self::Program) -> bool {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_program_parameter(raw_program, VALIDATE_STATUS)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_program_parameter(raw_program, VALIDATE_STATUS)
+            }
+        }
+        .as_bool()
+        .unwrap_or(false)
+    }
+
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);

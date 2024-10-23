@@ -181,6 +181,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_program_completion_status(&self, program: Self::Program) -> bool;
 
+    unsafe fn get_program_validate_status(&self, program: Self::Program) -> bool;
+
     unsafe fn get_program_link_status(&self, program: Self::Program) -> bool;
 
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String;

@@ -3851,6 +3851,38 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32) -> i32 {
+        let samplers = self.samplers.borrow();
+        let raw_sampler = samplers.get_unchecked(sampler);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Samper parameter for `i32` is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.get_sampler_parameter(raw_sampler, name),
+        }
+        .as_f64()
+        .map(|v| v as i32)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0)
+    }
+
+    unsafe fn get_sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32) -> f32 {
+        let samplers = self.samplers.borrow();
+        let raw_sampler = samplers.get_unchecked(sampler);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Samper parameter for `i32` is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.get_sampler_parameter(raw_sampler, name),
+        }
+        .as_f64()
+        .map(|v| v as f32)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0.)
+    }
+
     unsafe fn generate_mipmap(&self, target: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {

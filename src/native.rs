@@ -3101,6 +3101,27 @@ impl HasContext for Context {
         gl.InvalidateFramebuffer(target, attachments.len() as i32, attachments.as_ptr());
     }
 
+    unsafe fn invalidate_sub_framebuffer(
+        &self,
+        target: u32,
+        attachments: &[u32],
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) {
+        let gl = &self.raw;
+        gl.InvalidateSubFramebuffer(
+            target,
+            attachments.len() as i32,
+            attachments.as_ptr(),
+            x,
+            y,
+            width,
+            height,
+        );
+    }
+
     unsafe fn polygon_offset(&self, factor: f32, units: f32) {
         let gl = &self.raw;
         gl.PolygonOffset(factor, units);

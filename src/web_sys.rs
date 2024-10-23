@@ -4697,6 +4697,30 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn invalidate_sub_framebuffer(
+        &self,
+        target: u32,
+        attachments: &[u32],
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Invalidate sub framebuffer is not supported");
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                let js_attachments = Array::new();
+                for &a in attachments {
+                    js_attachments.push(&a.into());
+                }
+                gl.invalidate_sub_framebuffer(target, &js_attachments, x, y, width, height)
+                    .unwrap();
+            }
+        }
+    }
+
     unsafe fn polygon_offset(&self, factor: f32, units: f32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.polygon_offset(factor, units),

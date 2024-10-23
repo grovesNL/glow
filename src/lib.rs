@@ -1383,6 +1383,16 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn invalidate_framebuffer(&self, target: u32, attachments: &[u32]);
 
+    unsafe fn invalidate_sub_framebuffer(
+        &self,
+        target: u32,
+        attachments: &[u32],
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    );
+
     unsafe fn polygon_offset(&self, factor: f32, units: f32);
 
     unsafe fn polygon_mode(&self, face: u32, mode: u32);

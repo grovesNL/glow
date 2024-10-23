@@ -2597,6 +2597,17 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_frag_data_location(&self, program: Self::Program, name: &str) -> i32 {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => {
+                panic!("Get frag data location is not supported")
+            }
+            RawRenderingContext::WebGl2(ref gl) => gl.get_frag_data_location(raw_program, name),
+        }
+    }
+
     unsafe fn bind_frag_data_location(
         &self,
         _program: Self::Program,

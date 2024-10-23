@@ -554,6 +554,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn pixel_store_bool(&self, parameter: u32, value: bool);
 
+    unsafe fn get_frag_data_location(&self, program: Self::Program, name: &str) -> i32;
+
     unsafe fn bind_frag_data_location(&self, program: Self::Program, color_number: u32, name: &str);
 
     unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32);

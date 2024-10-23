@@ -1307,6 +1307,12 @@ impl HasContext for Context {
         gl.PixelStorei(parameter, value as i32);
     }
 
+    unsafe fn get_frag_data_location(&self, program: Self::Program, name: &str) -> i32 {
+        let gl = &self.raw;
+        let name = CString::new(name).unwrap();
+        gl.GetFragDataLocation(program.0.get(), name.as_ptr() as *const native_gl::GLchar)
+    }
+
     unsafe fn bind_frag_data_location(
         &self,
         program: Self::Program,

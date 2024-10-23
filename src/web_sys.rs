@@ -5612,6 +5612,18 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn is_transform_feedback(&self, transform_feedback: Self::TransformFeedback) -> bool {
+        let transform_feedbacks = self.transform_feedbacks.borrow_mut();
+        if let Some(f) = transform_feedbacks.get(transform_feedback) {
+            match &self.raw {
+                RawRenderingContext::WebGl1(_gl) => panic!("TransformFeedback is not supported"),
+                RawRenderingContext::WebGl2(gl) => gl.is_transform_feedback(Some(f)),
+            }
+        } else {
+            false
+        }
+    }
+
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback) {
         let mut transform_feedbacks = self.transform_feedbacks.borrow_mut();
         if let Some(ref t) = transform_feedbacks.remove(transform_feedback) {

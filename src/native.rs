@@ -4015,6 +4015,11 @@ impl HasContext for Context {
             .ok_or_else(|| String::from("Unable to create TransformFeedback object"))
     }
 
+    unsafe fn is_transform_feedback(&self, transform_feedback: Self::TransformFeedback) -> bool {
+        let gl = &self.raw;
+        gl.IsTransformFeedback(transform_feedback.0.get()) != 0
+    }
+
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback) {
         let gl = &self.raw;
         gl.DeleteTransformFeedbacks(1, &transform_feedback.0.get());

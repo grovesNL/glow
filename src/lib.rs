@@ -1756,6 +1756,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback);
 
+    unsafe fn is_transform_feedback(&self, transform_feedback: Self::TransformFeedback) -> bool;
+
     unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String>;
 
     unsafe fn bind_transform_feedback(

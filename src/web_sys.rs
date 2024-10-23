@@ -2807,6 +2807,20 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_sync_parameter_i32(&self, fence: Self::Fence, parameter: u32) -> i32 {
+        let fences = self.fences.borrow();
+        let raw_fence = fences.get_unchecked(fence);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("get sync parameter is not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_sync_parameter(raw_fence, parameter),
+        }
+        .as_f64()
+        .map(|v| v as i32)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0)
+    }
+
     unsafe fn wait_sync(&self, fence: Self::Fence, flags: u32, timeout: u64) {
         let fences = self.fences.borrow();
         let raw_fence = fences.get_unchecked(fence);

@@ -637,6 +637,9 @@ pub trait HasContext: __private::Sealed {
     );
 
     unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: u32, timeout: i32) -> u32;
+
+    unsafe fn get_sync_parameter_i32(&self, fence: Self::Fence, parameter: u32) -> i32;
+
     unsafe fn wait_sync(&self, fence: Self::Fence, flags: u32, timeout: u64);
 
     unsafe fn copy_buffer_sub_data(

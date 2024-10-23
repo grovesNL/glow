@@ -1519,6 +1519,13 @@ impl HasContext for Context {
         gl.ClientWaitSync(fence.0, flags, timeout as u64)
     }
 
+    unsafe fn get_sync_parameter_i32(&self, fence: Self::Fence, parameter: u32) -> i32 {
+        let gl = &self.raw;
+        let mut v = 0;
+        gl.GetSynciv(fence.0, parameter, 1, ptr::null_mut(), &mut v);
+        v
+    }
+
     unsafe fn wait_sync(&self, fence: Self::Fence, flags: u32, timeout: u64) {
         let gl = &self.raw;
         gl.WaitSync(fence.0, flags, timeout)

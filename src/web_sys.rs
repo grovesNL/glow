@@ -1961,6 +1961,20 @@ impl HasContext for Context {
         .unwrap_or(false)
     }
 
+    unsafe fn get_program_parameter_i32(&self, program: Self::Program, parameter: u32) -> i32 {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_program_parameter(raw_program, parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_program_parameter(raw_program, parameter),
+        }
+        .as_f64()
+        .map(|v| v as i32)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0)
+    }
+
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String {
         let programs = self.programs.borrow();
         let raw_program = programs.get_unchecked(program);

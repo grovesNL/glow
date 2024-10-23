@@ -445,6 +445,13 @@ impl HasContext for Context {
         status == 1
     }
 
+    unsafe fn get_program_parameter_i32(&self, program: Self::Program, parameter: u32) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetProgramiv(program.0.get(), parameter, &mut value);
+        value
+    }
+
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String {
         let gl = &self.raw;
         let mut length = 0;

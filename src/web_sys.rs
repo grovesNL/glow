@@ -5816,6 +5816,13 @@ impl HasContext for Context {
     unsafe fn max_shader_compiler_threads(&self, _count: u32) {
         // WebGL doesn't use this
     }
+
+    unsafe fn hint(&self, target: u32, mode: u32) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.hint(target, mode),
+            RawRenderingContext::WebGl2(ref gl) => gl.hint(target, mode),
+        }
+    }
 }
 
 /// Sending texture data requires different data views for different data types.

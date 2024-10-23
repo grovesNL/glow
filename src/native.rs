@@ -4231,6 +4231,11 @@ impl HasContext for Context {
             gl.MaxShaderCompilerThreadsARB(count);
         }
     }
+
+    unsafe fn hint(&self, target: u32, mode: u32) {
+        let gl = &self.raw;
+        gl.Hint(target, mode);
+    }
 }
 
 impl Drop for Context {

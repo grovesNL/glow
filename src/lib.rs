@@ -1803,6 +1803,8 @@ pub trait HasContext: __private::Sealed {
     unsafe fn max_shader_compiler_threads(&self, count: u32);
 
     unsafe fn hint(&self, target: u32, mode: u32);
+
+    unsafe fn sample_coverage(&self, value: f32, invert: bool);
 }
 
 pub const ACTIVE_ATOMIC_COUNTER_BUFFERS: u32 = 0x92D9;

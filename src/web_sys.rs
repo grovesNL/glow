@@ -5823,6 +5823,13 @@ impl HasContext for Context {
             RawRenderingContext::WebGl2(ref gl) => gl.hint(target, mode),
         }
     }
+
+    unsafe fn sample_coverage(&self, value: f32, invert: bool) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.sample_coverage(value, invert),
+            RawRenderingContext::WebGl2(ref gl) => gl.sample_coverage(value, invert),
+        }
+    }
 }
 
 /// Sending texture data requires different data views for different data types.

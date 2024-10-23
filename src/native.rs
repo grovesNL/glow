@@ -4236,6 +4236,11 @@ impl HasContext for Context {
         let gl = &self.raw;
         gl.Hint(target, mode);
     }
+
+    unsafe fn sample_coverage(&self, value: f32, invert: bool) {
+        let gl = &self.raw;
+        gl.SampleCoverage(value, invert as u8);
+    }
 }
 
 impl Drop for Context {

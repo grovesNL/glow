@@ -1193,6 +1193,13 @@ pub trait HasContext: __private::Sealed {
         v: &mut [i32],
     );
 
+    unsafe fn get_uniform_u32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [u32],
+    );
+
     unsafe fn get_uniform_f32(
         &self,
         program: Self::Program,

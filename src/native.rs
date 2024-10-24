@@ -2659,11 +2659,17 @@ impl HasContext for Context {
         v: &mut [i32],
     ) {
         let gl = &self.raw;
-        gl.GetUniformiv(
-            program.0.get() as u32,
-            location.0 as i32,
-            v.as_mut_ptr() as *mut i32,
-        )
+        gl.GetUniformiv(program.0.get(), location.0 as i32, v.as_mut_ptr())
+    }
+
+    unsafe fn get_uniform_u32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [u32],
+    ) {
+        let gl = &self.raw;
+        gl.GetUniformuiv(program.0.get(), location.0 as i32, v.as_mut_ptr())
     }
 
     unsafe fn get_uniform_f32(

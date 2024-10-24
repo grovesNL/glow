@@ -3643,6 +3643,18 @@ impl HasContext for Context {
         panic!("Get framebuffer parameter is not supported");
     }
 
+    unsafe fn get_renderbuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32 {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_renderbuffer_parameter(target, parameter),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_renderbuffer_parameter(target, parameter),
+        }
+        .as_f64()
+        .map(|v| v as i32)
+        // Errors will be caught by the browser or through `get_error`
+        // so return a default instead
+        .unwrap_or(0)
+    }
+
     unsafe fn get_named_framebuffer_parameter_i32(
         &self,
         _framebuffer: Option<Self::Framebuffer>,

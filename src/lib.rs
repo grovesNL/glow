@@ -955,6 +955,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_parameter_vertex_array(&self, parameter: u32) -> Option<Self::VertexArray>;
 
+    unsafe fn get_renderbuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;
+
     unsafe fn get_framebuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;
 
     unsafe fn get_named_framebuffer_parameter_i32(

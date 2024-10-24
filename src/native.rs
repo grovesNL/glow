@@ -2191,6 +2191,13 @@ impl HasContext for Context {
         self.get_parameter_gl_name(parameter).map(NativeVertexArray)
     }
 
+    unsafe fn get_renderbuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetRenderbufferParameteriv(target, parameter, &mut value);
+        value
+    }
+
     unsafe fn get_framebuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32 {
         let gl = &self.raw;
         let mut value = 0;

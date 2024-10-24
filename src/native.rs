@@ -3499,6 +3499,16 @@ impl HasContext for Context {
         gl.VertexAttribDivisor(index, divisor);
     }
 
+    unsafe fn get_vertex_attrib_parameter_f32_slice(
+        &self,
+        index: u32,
+        pname: u32,
+        result: &mut [f32],
+    ) {
+        let gl = &self.raw;
+        gl.GetVertexAttribfv(index, pname, result.as_mut_ptr());
+    }
+
     unsafe fn vertex_attrib_pointer_f32(
         &self,
         index: u32,

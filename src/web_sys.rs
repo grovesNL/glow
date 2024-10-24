@@ -5161,6 +5161,25 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_vertex_attrib_parameter_f32_slice(
+        &self,
+        index: u32,
+        pname: u32,
+        result: &mut [f32],
+    ) {
+        let value = match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl.get_vertex_attrib(index, pname),
+            RawRenderingContext::WebGl2(ref gl) => gl.get_vertex_attrib(index, pname),
+        }
+        .unwrap();
+        use wasm_bindgen::JsCast;
+        if let Some(value) = value.as_f64() {
+            result[0] = value as f32;
+        } else if let Some(values) = value.dyn_ref::<js_sys::Float32Array>() {
+            values.copy_to(result)
+        }
+    }
+
     unsafe fn vertex_attrib_pointer_f32(
         &self,
         index: u32,

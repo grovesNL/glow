@@ -1569,6 +1569,13 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32);
 
+    unsafe fn get_vertex_attrib_parameter_f32_slice(
+        &self,
+        index: u32,
+        pname: u32,
+        result: &mut [f32],
+    );
+
     unsafe fn vertex_attrib_pointer_f32(
         &self,
         index: u32,

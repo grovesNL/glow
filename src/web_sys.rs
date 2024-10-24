@@ -5564,6 +5564,37 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_uniform_indices(
+        &self,
+        program: Self::Program,
+        names: &[&str],
+    ) -> Vec<Option<u32>> {
+        let programs = self.programs.borrow();
+        let raw_program = programs.get_unchecked(program);
+        let indices = match self.raw {
+            RawRenderingContext::WebGl1(ref _gl) => panic!("Uniform blocks are not supported"),
+            RawRenderingContext::WebGl2(ref gl) => {
+                let js_names = Array::new();
+                for &v in names {
+                    js_names.push(&v.into());
+                }
+                gl.get_uniform_indices(raw_program, &js_names)
+            }
+        }
+        .unwrap();
+        indices
+            .iter()
+            .map(|index| {
+                let index = index.as_f64().unwrap() as u32;
+                if index == INVALID_INDEX {
+                    None
+                } else {
+                    Some(index)
+                }
+            })
+            .collect()
+    }
+
     unsafe fn uniform_block_binding(&self, program: Self::Program, index: u32, binding: u32) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => {

@@ -4000,6 +4000,38 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_uniform_indices(
+        &self,
+        program: Self::Program,
+        names: &[&str],
+    ) -> Vec<Option<u32>> {
+        let gl = &self.raw;
+        let c_names = names
+            .iter()
+            .map(|&name| CString::new(name).unwrap())
+            .collect::<Vec<_>>();
+        let c_name_ptrs = c_names.iter().map(|name| name.as_ptr()).collect::<Vec<_>>();
+
+        let count = names.len();
+        let mut indices = vec![0; count];
+        gl.GetUniformIndices(
+            program.0.get(),
+            count as _,
+            c_name_ptrs.as_ptr(),
+            indices.as_mut_ptr(),
+        );
+        indices
+            .iter()
+            .map(|&index| {
+                if index == INVALID_INDEX {
+                    None
+                } else {
+                    Some(index)
+                }
+            })
+            .collect()
+    }
+
     unsafe fn uniform_block_binding(&self, program: Self::Program, index: u32, binding: u32) {
         let gl = &self.raw;
         gl.UniformBlockBinding(program.0.get(), index, binding);

@@ -1755,6 +1755,12 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_uniform_block_index(&self, program: Self::Program, name: &str) -> Option<u32>;
 
+    unsafe fn get_uniform_indices(
+        &self,
+        program: Self::Program,
+        names: &[&str],
+    ) -> Vec<Option<u32>>;
+
     unsafe fn uniform_block_binding(&self, program: Self::Program, index: u32, binding: u32);
 
     unsafe fn get_shader_storage_block_index(

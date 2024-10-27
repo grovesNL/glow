@@ -1829,6 +1829,10 @@ pub fn bytes_per_type(pixel_type: u32) -> usize {
     }
 }
 
+pub fn compute_size(width: i32, height: i32, format: u32, pixel_type: u32) -> usize {
+    width as usize * height as usize * components_per_format(format) * bytes_per_type(pixel_type)
+}
+
 pub const ACTIVE_ATOMIC_COUNTER_BUFFERS: u32 = 0x92D9;
 
 pub const ACTIVE_ATTRIBUTES: u32 = 0x8B89;

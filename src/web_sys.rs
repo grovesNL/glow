@@ -2347,6 +2347,15 @@ impl HasContext for Context {
         .unwrap_or(0)
     }
 
+    unsafe fn get_active_uniforms_parameter(
+        &self,
+        _program: Self::Program,
+        _uniforms: &[u32],
+        _pname: u32,
+    ) -> Vec<i32> {
+        panic!("GetActiveUniformsiv is not supported")
+    }
+
     unsafe fn get_active_uniform(
         &self,
         program: Self::Program,

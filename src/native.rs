@@ -1081,6 +1081,24 @@ impl HasContext for Context {
         count as u32
     }
 
+    unsafe fn get_active_uniforms_parameter(
+        &self,
+        program: Self::Program,
+        uniforms: &[u32],
+        pname: u32,
+    ) -> Vec<i32> {
+        let gl = &self.raw;
+        let mut results = vec![0; uniforms.len()];
+        gl.GetActiveUniformsiv(
+            program.0.get(),
+            uniforms.len() as _,
+            uniforms.as_ptr(),
+            pname,
+            results.as_mut_ptr(),
+        );
+        results
+    }
+
     unsafe fn get_active_uniform(
         &self,
         program: Self::Program,

@@ -463,6 +463,14 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32;
 
+    #[doc(alias = "GetActiveUniformsiv")]
+    unsafe fn get_active_uniforms_parameter(
+        &self,
+        program: Self::Program,
+        uniforms: &[u32],
+        pname: u32,
+    ) -> Vec<i32>;
+
     unsafe fn get_active_uniform(
         &self,
         program: Self::Program,

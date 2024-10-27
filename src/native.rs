@@ -1314,6 +1314,7 @@ impl HasContext for Context {
         name: &str,
     ) {
         let gl = &self.raw;
+        let name = CString::new(name).unwrap();
         gl.BindFragDataLocation(
             program.0.get(),
             color_number,

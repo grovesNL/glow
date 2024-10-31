@@ -366,6 +366,36 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn get_shader_precision_format(
+        &self,
+        shader_type: u32,
+        precision_type: u32,
+    ) -> Option<ShaderPrecisionFormat> {
+        let gl = &self.raw;
+
+        if gl.GetShaderPrecisionFormat_is_loaded() {
+            let mut range = [0, 0];
+            let mut precision = 0;
+            gl.GetShaderPrecisionFormat(
+                shader_type,
+                precision_type,
+                range.as_mut_ptr(),
+                &mut precision,
+            );
+            // In some cases GetShaderPrecisionFormat exists but it's just a stub
+            // so we return only if variables got populated
+            if range[1] != 0 {
+                return Some(ShaderPrecisionFormat {
+                    range_min: range[0],
+                    range_max: range[1],
+                    precision,
+                });
+            }
+        }
+
+        None
+    }
+
     unsafe fn get_tex_image(
         &self,
         target: u32,

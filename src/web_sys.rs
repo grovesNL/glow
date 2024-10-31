@@ -1825,6 +1825,26 @@ impl HasContext for Context {
         .unwrap_or_else(|| String::from(""))
     }
 
+    unsafe fn get_shader_precision_format(
+        &self,
+        shader_type: u32,
+        precision_mode: u32,
+    ) -> Option<ShaderPrecisionFormat> {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_shader_precision_format(shader_type, precision_mode)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_shader_precision_format(shader_type, precision_mode)
+            }
+        }
+        .map(|spf| ShaderPrecisionFormat {
+            range_min: spf.range_min(),
+            range_max: spf.range_max(),
+            precision: spf.precision(),
+        })
+    }
+
     unsafe fn get_tex_image(
         &self,
         _target: u32,

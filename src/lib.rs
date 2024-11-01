@@ -1878,6 +1878,36 @@ pub trait HasContext: __private::Sealed {
     );
 }
 
+/// Returns number of components used by format
+pub fn components_per_format(format: u32) -> usize {
+    match format {
+        RED | GREEN | BLUE => 1,
+        RED_INTEGER | GREEN_INTEGER | BLUE_INTEGER => 1,
+        ALPHA | LUMINANCE | DEPTH_COMPONENT => 1,
+        RG | LUMINANCE_ALPHA => 2,
+        RGB | BGR => 3,
+        RGBA | BGRA => 4,
+        _ => panic!("unsupported format: {:?}", format),
+    }
+}
+
+/// Returns number of bytes used by pixel type (in one component)
+pub fn bytes_per_type(pixel_type: u32) -> usize {
+    // per https://www.khronos.org/opengl/wiki/Pixel_Transfer#Pixel_type
+    match pixel_type {
+        BYTE | UNSIGNED_BYTE => 1,
+        SHORT | UNSIGNED_SHORT => 2,
+        INT | UNSIGNED_INT => 4,
+        HALF_FLOAT | HALF_FLOAT_OES => 2,
+        FLOAT => 4,
+        _ => panic!("unsupported pixel type: {:?}", pixel_type),
+    }
+}
+
+pub fn compute_size(width: i32, height: i32, format: u32, pixel_type: u32) -> usize {
+    width as usize * height as usize * components_per_format(format) * bytes_per_type(pixel_type)
+}
+
 pub const ACTIVE_ATOMIC_COUNTER_BUFFERS: u32 = 0x92D9;
 
 pub const ACTIVE_ATTRIBUTES: u32 = 0x8B89;

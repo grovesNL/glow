@@ -248,7 +248,11 @@ impl HasContext for Context {
     unsafe fn create_query(&self) -> Result<Self::Query, String> {
         let gl = &self.raw;
         let mut name = 0;
-        gl.GenQueries(1, &mut name);
+        if gl.GenQueries_is_loaded() {
+            gl.GenQueries(1, &mut name);
+        } else {
+            gl.GenQueriesEXT(1, &mut name);
+        }
         NonZeroU32::new(name)
             .map(NativeQuery)
             .ok_or_else(|| String::from("Unable to create Query object"))
@@ -1680,7 +1684,11 @@ impl HasContext for Context {
 
     unsafe fn delete_query(&self, query: Self::Query) {
         let gl = &self.raw;
-        gl.DeleteQueries(1, &query.0.get());
+        if gl.DeleteQueries_is_loaded() {
+            gl.DeleteQueries(1, &query.0.get());
+        } else {
+            gl.DeleteQueriesEXT(1, &query.0.get());
+        }
     }
 
     unsafe fn delete_renderbuffer(&self, renderbuffer: Self::Renderbuffer) {
@@ -4130,23 +4138,39 @@ impl HasContext for Context {
 
     unsafe fn begin_query(&self, target: u32, query: Self::Query) {
         let gl = &self.raw;
-        gl.BeginQuery(target, query.0.get());
+        if gl.BeginQuery_is_loaded() {
+            gl.BeginQuery(target, query.0.get());
+        } else {
+            gl.BeginQueryEXT(target, query.0.get());
+        }
     }
 
     unsafe fn end_query(&self, target: u32) {
         let gl = &self.raw;
-        gl.EndQuery(target);
+        if gl.EndQuery_is_loaded() {
+            gl.EndQuery(target);
+        } else {
+            gl.EndQueryEXT(target);
+        }
     }
 
     unsafe fn query_counter(&self, query: Self::Query, target: u32) {
         let gl = &self.raw;
-        gl.QueryCounter(query.0.get(), target);
+        if gl.QueryCounter_is_loaded() {
+            gl.QueryCounter(query.0.get(), target);
+        } else {
+            gl.QueryCounterEXT(query.0.get(), target);
+        }
     }
 
     unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32 {
         let gl = &self.raw;
         let mut value = 0;
-        gl.GetQueryObjectuiv(query.0.get(), parameter, &mut value);
+        if gl.GetQueryBufferObjectiv_is_loaded() {
+            gl.GetQueryObjectuiv(query.0.get(), parameter, &mut value);
+        } else {
+            gl.GetQueryObjectuivEXT(query.0.get(), parameter, &mut value);
+        }
         value
     }
 
@@ -4157,7 +4181,11 @@ impl HasContext for Context {
         offset: usize,
     ) {
         let gl = &self.raw;
-        gl.GetQueryObjectui64v(query.0.get(), parameter, offset as *mut _);
+        if gl.GetQueryObjectui64v_is_loaded() {
+            gl.GetQueryObjectui64v(query.0.get(), parameter, offset as *mut _);
+        } else {
+            gl.GetQueryObjectui64vEXT(query.0.get(), parameter, offset as *mut _);
+        }
     }
 
     unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String> {

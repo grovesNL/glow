@@ -177,9 +177,15 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn link_program(&self, program: Self::Program);
 
+    unsafe fn validate_program(&self, program: Self::Program);
+
     unsafe fn get_program_completion_status(&self, program: Self::Program) -> bool;
 
+    unsafe fn get_program_validate_status(&self, program: Self::Program) -> bool;
+
     unsafe fn get_program_link_status(&self, program: Self::Program) -> bool;
+
+    unsafe fn get_program_parameter_i32(&self, program: Self::Program, parameter: u32) -> i32;
 
     unsafe fn get_program_info_log(&self, program: Self::Program) -> String;
 
@@ -457,6 +463,14 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_active_uniforms(&self, program: Self::Program) -> u32;
 
+    #[doc(alias = "GetActiveUniformsiv")]
+    unsafe fn get_active_uniforms_parameter(
+        &self,
+        program: Self::Program,
+        uniforms: &[u32],
+        pname: u32,
+    ) -> Vec<i32>;
+
     unsafe fn get_active_uniform(
         &self,
         program: Self::Program,
@@ -554,6 +568,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn pixel_store_bool(&self, parameter: u32, value: bool);
 
+    unsafe fn get_frag_data_location(&self, program: Self::Program, name: &str) -> i32;
+
     unsafe fn bind_frag_data_location(&self, program: Self::Program, color_number: u32, name: &str);
 
     unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32);
@@ -633,6 +649,9 @@ pub trait HasContext: __private::Sealed {
     );
 
     unsafe fn client_wait_sync(&self, fence: Self::Fence, flags: u32, timeout: i32) -> u32;
+
+    unsafe fn get_sync_parameter_i32(&self, fence: Self::Fence, parameter: u32) -> i32;
+
     unsafe fn wait_sync(&self, fence: Self::Fence, flags: u32, timeout: u64);
 
     unsafe fn copy_buffer_sub_data(
@@ -885,6 +904,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_tex_parameter_i32(&self, target: u32, parameter: u32) -> i32;
 
+    unsafe fn get_tex_parameter_f32(&self, target: u32, parameter: u32) -> f32;
+
     unsafe fn get_buffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;
 
     #[doc(alias = "glGetBooleanv")]
@@ -941,6 +962,8 @@ pub trait HasContext: __private::Sealed {
     ) -> Option<Self::TransformFeedback>;
 
     unsafe fn get_parameter_vertex_array(&self, parameter: u32) -> Option<Self::VertexArray>;
+
+    unsafe fn get_renderbuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;
 
     unsafe fn get_framebuffer_parameter_i32(&self, target: u32, parameter: u32) -> i32;
 
@@ -1029,6 +1052,10 @@ pub trait HasContext: __private::Sealed {
     unsafe fn sampler_parameter_f32_slice(&self, sampler: Self::Sampler, name: u32, value: &[f32]);
 
     unsafe fn sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32, value: i32);
+
+    unsafe fn get_sampler_parameter_i32(&self, sampler: Self::Sampler, name: u32) -> i32;
+
+    unsafe fn get_sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32) -> f32;
 
     unsafe fn generate_mipmap(&self, target: u32);
 
@@ -1174,6 +1201,13 @@ pub trait HasContext: __private::Sealed {
         program: Self::Program,
         location: &Self::UniformLocation,
         v: &mut [i32],
+    );
+
+    unsafe fn get_uniform_u32(
+        &self,
+        program: Self::Program,
+        location: &Self::UniformLocation,
+        v: &mut [u32],
     );
 
     unsafe fn get_uniform_f32(
@@ -1368,6 +1402,16 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn invalidate_framebuffer(&self, target: u32, attachments: &[u32]);
 
+    unsafe fn invalidate_sub_framebuffer(
+        &self,
+        target: u32,
+        attachments: &[u32],
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    );
+
     unsafe fn polygon_offset(&self, factor: f32, units: f32);
 
     unsafe fn polygon_mode(&self, face: u32, mode: u32);
@@ -1542,6 +1586,13 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn vertex_attrib_divisor(&self, index: u32, divisor: u32);
 
+    unsafe fn get_vertex_attrib_parameter_f32_slice(
+        &self,
+        index: u32,
+        pname: u32,
+        result: &mut [f32],
+    );
+
     unsafe fn vertex_attrib_pointer_f32(
         &self,
         index: u32,
@@ -1602,6 +1653,10 @@ pub trait HasContext: __private::Sealed {
     unsafe fn vertex_attrib_3_f32(&self, index: u32, x: f32, y: f32, z: f32);
 
     unsafe fn vertex_attrib_4_f32(&self, index: u32, x: f32, y: f32, z: f32, w: f32);
+
+    unsafe fn vertex_attrib_4_i32(&self, index: u32, x: i32, y: i32, z: i32, w: i32);
+
+    unsafe fn vertex_attrib_4_u32(&self, index: u32, x: u32, y: u32, z: u32, w: u32);
 
     unsafe fn vertex_attrib_1_f32_slice(&self, index: u32, v: &[f32]);
 
@@ -1710,6 +1765,12 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_uniform_block_index(&self, program: Self::Program, name: &str) -> Option<u32>;
 
+    unsafe fn get_uniform_indices(
+        &self,
+        program: Self::Program,
+        names: &[&str],
+    ) -> Vec<Option<u32>>;
+
     unsafe fn uniform_block_binding(&self, program: Self::Program, index: u32, binding: u32);
 
     unsafe fn get_shader_storage_block_index(
@@ -1756,6 +1817,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn delete_transform_feedback(&self, transform_feedback: Self::TransformFeedback);
 
+    unsafe fn is_transform_feedback(&self, transform_feedback: Self::TransformFeedback) -> bool;
+
     unsafe fn create_transform_feedback(&self) -> Result<Self::TransformFeedback, String>;
 
     unsafe fn bind_transform_feedback(
@@ -1801,6 +1864,18 @@ pub trait HasContext: __private::Sealed {
     );
 
     unsafe fn max_shader_compiler_threads(&self, count: u32);
+
+    unsafe fn hint(&self, target: u32, mode: u32);
+
+    unsafe fn sample_coverage(&self, value: f32, invert: bool);
+
+    unsafe fn get_internal_format_i32_slice(
+        &self,
+        target: u32,
+        internal_format: u32,
+        pname: u32,
+        result: &mut [i32],
+    );
 }
 
 pub const ACTIVE_ATOMIC_COUNTER_BUFFERS: u32 = 0x92D9;

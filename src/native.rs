@@ -1267,7 +1267,11 @@ impl HasContext for Context {
     unsafe fn create_vertex_array(&self) -> Result<Self::VertexArray, String> {
         let gl = &self.raw;
         let mut vertex_array = 0;
-        gl.GenVertexArrays(1, &mut vertex_array);
+        if gl.GenVertexArrays_is_loaded() {
+            gl.GenVertexArrays(1, &mut vertex_array);
+        } else {
+            gl.GenVertexArraysOES(1, &mut vertex_array);
+        }
         NonZeroU32::new(vertex_array)
             .map(NativeVertexArray)
             .ok_or_else(|| String::from("Unable to create VertexArray object"))
@@ -1284,12 +1288,20 @@ impl HasContext for Context {
 
     unsafe fn delete_vertex_array(&self, vertex_array: Self::VertexArray) {
         let gl = &self.raw;
-        gl.DeleteVertexArrays(1, &vertex_array.0.get());
+        if gl.DeleteVertexArrays_is_loaded() {
+            gl.DeleteVertexArrays(1, &vertex_array.0.get());
+        } else {
+            gl.DeleteVertexArraysOES(1, &vertex_array.0.get());
+        }
     }
 
     unsafe fn bind_vertex_array(&self, vertex_array: Option<Self::VertexArray>) {
         let gl = &self.raw;
-        gl.BindVertexArray(vertex_array.map(|va| va.0.get()).unwrap_or(0));
+        if gl.BindVertexArray_is_loaded() {
+            gl.BindVertexArray(vertex_array.map(|va| va.0.get()).unwrap_or(0));
+        } else {
+            gl.BindVertexArrayOES(vertex_array.map(|va| va.0.get()).unwrap_or(0));
+        }
     }
 
     unsafe fn clear_color(&self, red: f32, green: f32, blue: f32, alpha: f32) {

@@ -34,6 +34,7 @@
 //! * `GL_KHR_debug`
 //! * `GL_KHR_parallel_shader_compile`
 //! * `GL_NV_copy_buffer`
+//! * `GL_OES_vertex_array_object`
 //!
 //! Supported Features:
 //! * `global_loader`: Include all mechanisms necessary for calling GL using
@@ -4342,6 +4343,8 @@ pub mod enums {
     #[doc = "`GL_VERTEX_ARRAY_BINDING: GLenum = 0x85B5`"]
     #[doc = "* **Group:** GetPName"]
     pub const GL_VERTEX_ARRAY_BINDING: GLenum = 0x85B5;
+    #[doc = "`GL_VERTEX_ARRAY_BINDING_OES: GLenum = 0x85B5`"]
+    pub const GL_VERTEX_ARRAY_BINDING_OES: GLenum = 0x85B5;
     #[doc = "`GL_VERTEX_ARRAY_KHR: GLenum = 0x8074`"]
     pub const GL_VERTEX_ARRAY_KHR: GLenum = 0x8074;
     #[doc = "`GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT: GLbitfield = 0x00000001`"]
@@ -4878,6 +4881,9 @@ pub mod struct_commands {
             self.BindTextures_load_with_dyn(get_proc_address);
             self.BindTransformFeedback_load_with_dyn(get_proc_address);
             self.BindVertexArray_load_with_dyn(get_proc_address);
+            {
+                self.BindVertexArrayOES_load_with_dyn(get_proc_address);
+            }
             self.BindVertexBuffer_load_with_dyn(get_proc_address);
             self.BindVertexBuffers_load_with_dyn(get_proc_address);
             self.BlendBarrier_load_with_dyn(get_proc_address);
@@ -4997,6 +5003,9 @@ pub mod struct_commands {
             self.DeleteTextures_load_with_dyn(get_proc_address);
             self.DeleteTransformFeedbacks_load_with_dyn(get_proc_address);
             self.DeleteVertexArrays_load_with_dyn(get_proc_address);
+            {
+                self.DeleteVertexArraysOES_load_with_dyn(get_proc_address);
+            }
             self.DepthFunc_load_with_dyn(get_proc_address);
             self.DepthMask_load_with_dyn(get_proc_address);
             self.DepthRange_load_with_dyn(get_proc_address);
@@ -5071,6 +5080,9 @@ pub mod struct_commands {
             self.GenTextures_load_with_dyn(get_proc_address);
             self.GenTransformFeedbacks_load_with_dyn(get_proc_address);
             self.GenVertexArrays_load_with_dyn(get_proc_address);
+            {
+                self.GenVertexArraysOES_load_with_dyn(get_proc_address);
+            }
             self.GenerateMipmap_load_with_dyn(get_proc_address);
             self.GenerateTextureMipmap_load_with_dyn(get_proc_address);
             self.GetActiveAtomicCounterBufferiv_load_with_dyn(get_proc_address);
@@ -5248,6 +5260,9 @@ pub mod struct_commands {
             self.IsTexture_load_with_dyn(get_proc_address);
             self.IsTransformFeedback_load_with_dyn(get_proc_address);
             self.IsVertexArray_load_with_dyn(get_proc_address);
+            {
+                self.IsVertexArrayOES_load_with_dyn(get_proc_address);
+            }
             self.LineWidth_load_with_dyn(get_proc_address);
             self.LinkProgram_load_with_dyn(get_proc_address);
             self.LogicOp_load_with_dyn(get_proc_address);
@@ -6698,6 +6713,39 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn BindVertexArray_is_loaded(&self) -> bool {
             !self.glBindVertexArray_p.load(RELAX).is_null()
+        }
+        /// [glBindVertexArrayOES](http://docs.gl/gl4/glBindVertexArrayOES)(array)
+        /// * alias of: [`glBindVertexArray`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn BindVertexArrayOES(&self, array: GLuint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.BindVertexArrayOES({:?});", array);
+            }
+            let out =
+                call_atomic_ptr_1arg("glBindVertexArrayOES", &self.glBindVertexArrayOES_p, array);
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glBindVertexArrayOES");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn BindVertexArrayOES_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glBindVertexArrayOES\0",
+                &self.glBindVertexArrayOES_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn BindVertexArrayOES_is_loaded(&self) -> bool {
+            !self.glBindVertexArrayOES_p.load(RELAX).is_null()
         }
         /// [glBindVertexBuffer](http://docs.gl/gl4/glBindVertexBuffer)(bindingindex, buffer, offset, stride)
         /// * `offset` group: BufferOffset
@@ -11463,6 +11511,44 @@ pub mod struct_commands {
         pub fn DeleteVertexArrays_is_loaded(&self) -> bool {
             !self.glDeleteVertexArrays_p.load(RELAX).is_null()
         }
+        /// [glDeleteVertexArraysOES](http://docs.gl/gl4/glDeleteVertexArraysOES)(n, arrays)
+        /// * `arrays` len: n
+        /// * alias of: [`glDeleteVertexArrays`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn DeleteVertexArraysOES(&self, n: GLsizei, arrays: *const GLuint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.DeleteVertexArraysOES({:?}, {:p});", n, arrays);
+            }
+            let out = call_atomic_ptr_2arg(
+                "glDeleteVertexArraysOES",
+                &self.glDeleteVertexArraysOES_p,
+                n,
+                arrays,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glDeleteVertexArraysOES");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn DeleteVertexArraysOES_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glDeleteVertexArraysOES\0",
+                &self.glDeleteVertexArraysOES_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn DeleteVertexArraysOES_is_loaded(&self) -> bool {
+            !self.glDeleteVertexArraysOES_p.load(RELAX).is_null()
+        }
         /// [glDepthFunc](http://docs.gl/gl4/glDepthFunc)(func)
         /// * `func` group: DepthFunction
         #[cfg_attr(feature = "inline", inline)]
@@ -14144,6 +14230,44 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn GenVertexArrays_is_loaded(&self) -> bool {
             !self.glGenVertexArrays_p.load(RELAX).is_null()
+        }
+        /// [glGenVertexArraysOES](http://docs.gl/gl4/glGenVertexArraysOES)(n, arrays)
+        /// * `arrays` len: n
+        /// * alias of: [`glGenVertexArrays`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn GenVertexArraysOES(&self, n: GLsizei, arrays: *mut GLuint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.GenVertexArraysOES({:?}, {:p});", n, arrays);
+            }
+            let out = call_atomic_ptr_2arg(
+                "glGenVertexArraysOES",
+                &self.glGenVertexArraysOES_p,
+                n,
+                arrays,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glGenVertexArraysOES");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn GenVertexArraysOES_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glGenVertexArraysOES\0",
+                &self.glGenVertexArraysOES_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn GenVertexArraysOES_is_loaded(&self) -> bool {
+            !self.glGenVertexArraysOES_p.load(RELAX).is_null()
         }
         /// [glGenerateMipmap](http://docs.gl/gl4/glGenerateMipmap)(target)
         /// * `target` group: TextureTarget
@@ -21599,6 +21723,38 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn IsVertexArray_is_loaded(&self) -> bool {
             !self.glIsVertexArray_p.load(RELAX).is_null()
+        }
+        /// [glIsVertexArrayOES](http://docs.gl/gl4/glIsVertexArrayOES)(array)
+        /// * alias of: [`glIsVertexArray`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn IsVertexArrayOES(&self, array: GLuint) -> GLboolean {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.IsVertexArrayOES({:?});", array);
+            }
+            let out = call_atomic_ptr_1arg("glIsVertexArrayOES", &self.glIsVertexArrayOES_p, array);
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glIsVertexArrayOES");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn IsVertexArrayOES_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glIsVertexArrayOES\0",
+                &self.glIsVertexArrayOES_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn IsVertexArrayOES_is_loaded(&self) -> bool {
+            !self.glIsVertexArrayOES_p.load(RELAX).is_null()
         }
         /// [glLineWidth](http://docs.gl/gl4/glLineWidth)(width)
         /// * `width` group: CheckedFloat32
@@ -36285,6 +36441,7 @@ pub mod struct_commands {
         glBindTextures_p: APcv,
         glBindTransformFeedback_p: APcv,
         glBindVertexArray_p: APcv,
+        glBindVertexArrayOES_p: APcv,
         glBindVertexBuffer_p: APcv,
         glBindVertexBuffers_p: APcv,
         glBlendBarrier_p: APcv,
@@ -36386,6 +36543,7 @@ pub mod struct_commands {
         glDeleteTextures_p: APcv,
         glDeleteTransformFeedbacks_p: APcv,
         glDeleteVertexArrays_p: APcv,
+        glDeleteVertexArraysOES_p: APcv,
         glDepthFunc_p: APcv,
         glDepthMask_p: APcv,
         glDepthRange_p: APcv,
@@ -36452,6 +36610,7 @@ pub mod struct_commands {
         glGenTextures_p: APcv,
         glGenTransformFeedbacks_p: APcv,
         glGenVertexArrays_p: APcv,
+        glGenVertexArraysOES_p: APcv,
         glGenerateMipmap_p: APcv,
         glGenerateTextureMipmap_p: APcv,
         glGetActiveAtomicCounterBufferiv_p: APcv,
@@ -36613,6 +36772,7 @@ pub mod struct_commands {
         glIsTexture_p: APcv,
         glIsTransformFeedback_p: APcv,
         glIsVertexArray_p: APcv,
+        glIsVertexArrayOES_p: APcv,
         glLineWidth_p: APcv,
         glLinkProgram_p: APcv,
         glLogicOp_p: APcv,

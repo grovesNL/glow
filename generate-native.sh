@@ -36,6 +36,7 @@ gl_extensions=(
     GL_ARB_sync
     GL_KHR_parallel_shader_compile
     GL_ARB_parallel_shader_compile
+    GL_OES_vertex_array_object
 )
 printf -v gl_extensions_comma_joined '%s,' "${gl_extensions[@]}"
 

@@ -1270,7 +1270,10 @@ impl HasContext for Context {
         if gl.GenVertexArrays_is_loaded() {
             gl.GenVertexArrays(1, &mut vertex_array);
         } else {
+            #[cfg(not(target_vendor = "apple"))]
             gl.GenVertexArraysOES(1, &mut vertex_array);
+            #[cfg(target_vendor = "apple")]
+            gl.GenVertexArraysAPPLE(1, &mut vertex_array);
         }
         NonZeroU32::new(vertex_array)
             .map(NativeVertexArray)
@@ -1291,7 +1294,10 @@ impl HasContext for Context {
         if gl.DeleteVertexArrays_is_loaded() {
             gl.DeleteVertexArrays(1, &vertex_array.0.get());
         } else {
+            #[cfg(not(target_vendor = "apple"))]
             gl.DeleteVertexArraysOES(1, &vertex_array.0.get());
+            #[cfg(target_vendor = "apple")]
+            gl.DeleteVertexArraysAPPLE(1, &vertex_array.0.get());
         }
     }
 
@@ -1300,7 +1306,10 @@ impl HasContext for Context {
         if gl.BindVertexArray_is_loaded() {
             gl.BindVertexArray(vertex_array.map(|va| va.0.get()).unwrap_or(0));
         } else {
+            #[cfg(not(target_vendor = "apple"))]
             gl.BindVertexArrayOES(vertex_array.map(|va| va.0.get()).unwrap_or(0));
+            #[cfg(target_vendor = "apple")]
+            gl.BindVertexArrayAPPLE(vertex_array.map(|va| va.0.get()).unwrap_or(0));
         }
     }
 

@@ -2435,7 +2435,7 @@ impl HasContext for Context {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     ) {
         let gl = &self.raw;
         gl.TexImage1D(
@@ -2446,7 +2446,10 @@ impl HasContext for Context {
             border,
             format,
             ty,
-            pixels.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void,
+            match pixels {
+                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
+                PixelUnpackData::Slice(data) => data.as_ptr() as *const std::ffi::c_void,
+            },
         );
     }
 

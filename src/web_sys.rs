@@ -3940,7 +3940,7 @@ impl HasContext for Context {
         _border: i32,
         _format: u32,
         _ty: u32,
-        _pixels: Option<&[u8]>,
+        _pixels: PixelUnpackData,
     ) {
         panic!("Tex image 1D is not supported");
     }

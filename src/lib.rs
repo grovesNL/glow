@@ -1094,7 +1094,7 @@ pub trait HasContext: __private::Sealed {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     );
 
     unsafe fn tex_image_2d_multisample(

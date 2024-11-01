@@ -70,7 +70,7 @@ pub struct ShaderPrecisionFormat {
 
 impl ShaderPrecisionFormat {
     /// Returns OpenGL standard precision that most desktop hardware support
-    pub fn default(precision_type: u32, is_embedded: bool) -> Self {
+    pub fn common_desktop_hardware(precision_type: u32, is_embedded: bool) -> Self {
         let (range_min, range_max, precision) = match precision_type {
             LOW_INT | MEDIUM_INT | HIGH_INT => {
                 // Precision: For integer formats this value is always 0

@@ -5980,7 +5980,7 @@ impl HasContext for Context {
     unsafe fn bind_image_texture(
         &self,
         _unit: u32,
-        _texture: Self::Texture,
+        _texture: Option<Self::Texture>,
         _level: i32,
         _layered: bool,
         _layer: i32,

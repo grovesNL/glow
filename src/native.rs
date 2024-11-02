@@ -4275,7 +4275,7 @@ impl HasContext for Context {
     unsafe fn bind_image_texture(
         &self,
         unit: u32,
-        texture: Self::Texture,
+        texture: Option<Self::Texture>,
         level: i32,
         layered: bool,
         layer: i32,
@@ -4285,7 +4285,7 @@ impl HasContext for Context {
         let gl = &self.raw;
         gl.BindImageTexture(
             unit,
-            texture.0.get(),
+            texture.map(|tex| tex.0.get()).unwrap_or(0),
             level,
             layered as u8,
             layer,

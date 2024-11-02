@@ -1855,7 +1855,7 @@ pub trait HasContext: __private::Sealed {
     unsafe fn bind_image_texture(
         &self,
         unit: u32,
-        texture: Self::Texture,
+        texture: Option<Self::Texture>,
         level: i32,
         layered: bool,
         layer: i32,

@@ -57,6 +57,45 @@ pub struct ActiveTransformFeedback {
     pub name: String,
 }
 
+#[derive(Debug)]
+pub struct ShaderPrecisionFormat {
+    /// The base 2 log of the absolute value of the minimum value that can be represented
+    pub range_min: i32,
+    /// The base 2 log of the absolute value of the maximum value that can be represented.
+    pub range_max: i32,
+    /// The number of bits of precision that can be represented.
+    /// For integer formats this value is always 0.
+    pub precision: i32,
+}
+
+impl ShaderPrecisionFormat {
+    /// Returns OpenGL standard precision that most desktop hardware support
+    pub fn common_desktop_hardware(precision_type: u32, is_embedded: bool) -> Self {
+        let (range_min, range_max, precision) = match precision_type {
+            LOW_INT | MEDIUM_INT | HIGH_INT => {
+                // Precision: For integer formats this value is always 0
+                if is_embedded {
+                    // These values are for a 32-bit twos-complement integer format.
+                    (31, 30, 0)
+                } else {
+                    // Range: from -2^24 to 2^24
+                    (24, 24, 0)
+                }
+            }
+            // IEEE 754 single-precision floating-point
+            // Range: from -2^127 to 2^127
+            // Significand precision: 23 bits
+            LOW_FLOAT | MEDIUM_FLOAT | HIGH_FLOAT => (127, 127, 23),
+            _ => unreachable!("invalid precision"),
+        };
+        Self {
+            range_min,
+            range_max,
+            precision,
+        }
+    }
+}
+
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct DebugMessageLogEntry {
@@ -155,6 +194,12 @@ pub trait HasContext: __private::Sealed {
     unsafe fn get_shader_compile_status(&self, shader: Self::Shader) -> bool;
 
     unsafe fn get_shader_info_log(&self, shader: Self::Shader) -> String;
+
+    unsafe fn get_shader_precision_format(
+        &self,
+        shader_type: u32,
+        precision_mode: u32,
+    ) -> Option<ShaderPrecisionFormat>;
 
     unsafe fn get_tex_image(
         &self,
@@ -1070,7 +1115,7 @@ pub trait HasContext: __private::Sealed {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     );
 
     unsafe fn compressed_tex_image_1d(
@@ -1094,7 +1139,7 @@ pub trait HasContext: __private::Sealed {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     );
 
     unsafe fn tex_image_2d_multisample(
@@ -1130,7 +1175,7 @@ pub trait HasContext: __private::Sealed {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     );
 
     unsafe fn compressed_tex_image_3d(
@@ -1855,7 +1900,7 @@ pub trait HasContext: __private::Sealed {
     unsafe fn bind_image_texture(
         &self,
         unit: u32,
-        texture: Self::Texture,
+        texture: Option<Self::Texture>,
         level: i32,
         layered: bool,
         layer: i32,

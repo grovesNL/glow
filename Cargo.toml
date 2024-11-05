@@ -60,6 +60,7 @@ features = [
   "WebGl2RenderingContext",
   "WebGlSampler",
   "WebGlShader",
+  "WebGlShaderPrecisionFormat",
   "WebGlSync",
   "WebGlTexture",
   "WebGlTransformFeedback",

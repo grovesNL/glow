@@ -1825,6 +1825,26 @@ impl HasContext for Context {
         .unwrap_or_else(|| String::from(""))
     }
 
+    unsafe fn get_shader_precision_format(
+        &self,
+        shader_type: u32,
+        precision_mode: u32,
+    ) -> Option<ShaderPrecisionFormat> {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => {
+                gl.get_shader_precision_format(shader_type, precision_mode)
+            }
+            RawRenderingContext::WebGl2(ref gl) => {
+                gl.get_shader_precision_format(shader_type, precision_mode)
+            }
+        }
+        .map(|spf| ShaderPrecisionFormat {
+            range_min: spf.range_min(),
+            range_max: spf.range_max(),
+            precision: spf.precision(),
+        })
+    }
+
     unsafe fn get_tex_image(
         &self,
         _target: u32,
@@ -3940,7 +3960,7 @@ impl HasContext for Context {
         _border: i32,
         _format: u32,
         _ty: u32,
-        _pixels: Option<&[u8]>,
+        _pixels: PixelUnpackData,
     ) {
         panic!("Tex image 1D is not supported");
     }
@@ -3968,39 +3988,59 @@ impl HasContext for Context {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     ) {
-        let pixels = pixels.map(|bytes| texture_data_view(ty, bytes));
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => {
-                // TODO: Handle return value?
-                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
-                    target,
-                    level,
-                    internal_format,
-                    width,
-                    height,
-                    border,
-                    format,
-                    ty,
-                    pixels.as_ref(),
-                )
-                .unwrap();
+                match pixels {
+                    PixelUnpackData::BufferOffset(_offset) => panic!("Tex image 2D with offset is not supported"),
+                    PixelUnpackData::Slice(data) => {
+                        let data = texture_data_view(ty, data);
+                        gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
+                            target,
+                            level,
+                            internal_format,
+                            width,
+                            height,
+                            border,
+                            format,
+                            ty,
+                            Some(&data),
+                        )
+                    }
+                }
+                .unwrap(); // TODO: Handle return value?
             }
             RawRenderingContext::WebGl2(ref gl) => {
-                // TODO: Handle return value?
-                gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
-                    target,
-                    level,
-                    internal_format,
-                    width,
-                    height,
-                    border,
-                    format,
-                    ty,
-                    pixels.as_ref(),
-                )
-                .unwrap();
+                match pixels {
+                    PixelUnpackData::BufferOffset(offset) => gl
+                        .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_i32(
+                            target,
+                            level,
+                            internal_format,
+                            width,
+                            height,
+                            border,
+                            format,
+                            ty,
+                            offset as i32,
+                        ),
+                    PixelUnpackData::Slice(data) => {
+                        let data = texture_data_view(ty, data);
+                        gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
+                            target,
+                            level,
+                            internal_format,
+                            width,
+                            height,
+                            border,
+                            format,
+                            ty,
+                            Some(&data),
+                        )
+                    }
+                }
+                .unwrap(); // TODO: Handle return value?
             }
         }
     }
@@ -4064,26 +4104,41 @@ impl HasContext for Context {
         border: i32,
         format: u32,
         ty: u32,
-        pixels: Option<&[u8]>,
+        pixels: PixelUnpackData,
     ) {
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("3d textures are not supported"),
             RawRenderingContext::WebGl2(ref gl) => {
-                let pixels = pixels.map(|bytes| texture_data_view(ty, bytes));
-                // TODO: Handle return value?
-                gl.tex_image_3d_with_opt_array_buffer_view(
-                    target,
-                    level,
-                    internal_format,
-                    width,
-                    height,
-                    depth,
-                    border,
-                    format,
-                    ty,
-                    pixels.as_ref(),
-                )
-                .unwrap();
+                match pixels {
+                    PixelUnpackData::BufferOffset(offset) => gl.tex_image_3d_with_i32(
+                        target,
+                        level,
+                        internal_format,
+                        width,
+                        height,
+                        border,
+                        depth,
+                        format,
+                        ty,
+                        offset as i32,
+                    ),
+                    PixelUnpackData::Slice(data) => {
+                        let data = texture_data_view(ty, data);
+                        gl.tex_image_3d_with_opt_array_buffer_view(
+                            target,
+                            level,
+                            internal_format,
+                            width,
+                            height,
+                            border,
+                            depth,
+                            format,
+                            ty,
+                            Some(&data),
+                        )
+                    }
+                }
+                .unwrap(); // TODO: Handle return value?
             }
         }
     }
@@ -5980,7 +6035,7 @@ impl HasContext for Context {
     unsafe fn bind_image_texture(
         &self,
         _unit: u32,
-        _texture: Self::Texture,
+        _texture: Option<Self::Texture>,
         _level: i32,
         _layered: bool,
         _layer: i32,

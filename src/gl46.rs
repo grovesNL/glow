@@ -29,6 +29,7 @@
 //! * `GL_ARB_uniform_buffer_object`
 //! * `GL_ARB_vertex_array_object`
 //! * `GL_EXT_buffer_storage`
+//! * `GL_EXT_disjoint_timer_query`
 //! * `GL_EXT_draw_buffers2`
 //! * `GL_EXT_texture_filter_anisotropic`
 //! * `GL_KHR_debug`
@@ -1014,6 +1015,8 @@ pub mod enums {
     #[doc = "`GL_CURRENT_QUERY: GLenum = 0x8865`"]
     #[doc = "* **Group:** QueryParameterName"]
     pub const GL_CURRENT_QUERY: GLenum = 0x8865;
+    #[doc = "`GL_CURRENT_QUERY_EXT: GLenum = 0x8865`"]
+    pub const GL_CURRENT_QUERY_EXT: GLenum = 0x8865;
     #[doc = "`GL_CURRENT_VERTEX_ATTRIB: GLenum = 0x8626`"]
     #[doc = "* **Groups:** VertexAttribEnum, VertexAttribPropertyARB"]
     pub const GL_CURRENT_VERTEX_ATTRIB: GLenum = 0x8626;
@@ -1667,6 +1670,8 @@ pub mod enums {
     #[doc = "`GL_GET_TEXTURE_IMAGE_TYPE: GLenum = 0x8292`"]
     #[doc = "* **Group:** InternalFormatPName"]
     pub const GL_GET_TEXTURE_IMAGE_TYPE: GLenum = 0x8292;
+    #[doc = "`GL_GPU_DISJOINT_EXT: GLenum = 0x8FBB`"]
+    pub const GL_GPU_DISJOINT_EXT: GLenum = 0x8FBB;
     #[doc = "`GL_GREATER: GLenum = 0x0204`"]
     #[doc = "* **Groups:** StencilFunction, IndexFunctionEXT, AlphaFunction, DepthFunction"]
     pub const GL_GREATER: GLenum = 0x0204;
@@ -2878,6 +2883,8 @@ pub mod enums {
     #[doc = "`GL_QUERY_COUNTER_BITS: GLenum = 0x8864`"]
     #[doc = "* **Group:** QueryParameterName"]
     pub const GL_QUERY_COUNTER_BITS: GLenum = 0x8864;
+    #[doc = "`GL_QUERY_COUNTER_BITS_EXT: GLenum = 0x8864`"]
+    pub const GL_QUERY_COUNTER_BITS_EXT: GLenum = 0x8864;
     #[doc = "`GL_QUERY_KHR: GLenum = 0x82E3`"]
     pub const GL_QUERY_KHR: GLenum = 0x82E3;
     #[doc = "`GL_QUERY_NO_WAIT: GLenum = 0x8E14`"]
@@ -2892,6 +2899,10 @@ pub mod enums {
     #[doc = "`GL_QUERY_RESULT_AVAILABLE: GLenum = 0x8867`"]
     #[doc = "* **Group:** QueryObjectParameterName"]
     pub const GL_QUERY_RESULT_AVAILABLE: GLenum = 0x8867;
+    #[doc = "`GL_QUERY_RESULT_AVAILABLE_EXT: GLenum = 0x8867`"]
+    pub const GL_QUERY_RESULT_AVAILABLE_EXT: GLenum = 0x8867;
+    #[doc = "`GL_QUERY_RESULT_EXT: GLenum = 0x8866`"]
+    pub const GL_QUERY_RESULT_EXT: GLenum = 0x8866;
     #[doc = "`GL_QUERY_RESULT_NO_WAIT: GLenum = 0x9194`"]
     #[doc = "* **Group:** QueryObjectParameterName"]
     pub const GL_QUERY_RESULT_NO_WAIT: GLenum = 0x9194;
@@ -3987,9 +3998,13 @@ pub mod enums {
     #[doc = "`GL_TIMESTAMP: GLenum = 0x8E28`"]
     #[doc = "* **Groups:** QueryCounterTarget, GetPName"]
     pub const GL_TIMESTAMP: GLenum = 0x8E28;
+    #[doc = "`GL_TIMESTAMP_EXT: GLenum = 0x8E28`"]
+    pub const GL_TIMESTAMP_EXT: GLenum = 0x8E28;
     #[doc = "`GL_TIME_ELAPSED: GLenum = 0x88BF`"]
     #[doc = "* **Group:** QueryTarget"]
     pub const GL_TIME_ELAPSED: GLenum = 0x88BF;
+    #[doc = "`GL_TIME_ELAPSED_EXT: GLenum = 0x88BF`"]
+    pub const GL_TIME_ELAPSED_EXT: GLenum = 0x88BF;
     #[doc = "`GL_TOP_LEVEL_ARRAY_SIZE: GLenum = 0x930C`"]
     #[doc = "* **Group:** ProgramResourceProperty"]
     pub const GL_TOP_LEVEL_ARRAY_SIZE: GLenum = 0x930C;
@@ -4856,6 +4871,9 @@ pub mod struct_commands {
             self.AttachShader_load_with_dyn(get_proc_address);
             self.BeginConditionalRender_load_with_dyn(get_proc_address);
             self.BeginQuery_load_with_dyn(get_proc_address);
+            {
+                self.BeginQueryEXT_load_with_dyn(get_proc_address);
+            }
             self.BeginQueryIndexed_load_with_dyn(get_proc_address);
             self.BeginTransformFeedback_load_with_dyn(get_proc_address);
             self.BindAttribLocation_load_with_dyn(get_proc_address);
@@ -4990,6 +5008,9 @@ pub mod struct_commands {
             self.DeleteProgram_load_with_dyn(get_proc_address);
             self.DeleteProgramPipelines_load_with_dyn(get_proc_address);
             self.DeleteQueries_load_with_dyn(get_proc_address);
+            {
+                self.DeleteQueriesEXT_load_with_dyn(get_proc_address);
+            }
             self.DeleteRenderbuffers_load_with_dyn(get_proc_address);
             self.DeleteSamplers_load_with_dyn(get_proc_address);
             self.DeleteShader_load_with_dyn(get_proc_address);
@@ -5047,6 +5068,9 @@ pub mod struct_commands {
             self.Enablei_load_with_dyn(get_proc_address);
             self.EndConditionalRender_load_with_dyn(get_proc_address);
             self.EndQuery_load_with_dyn(get_proc_address);
+            {
+                self.EndQueryEXT_load_with_dyn(get_proc_address);
+            }
             self.EndQueryIndexed_load_with_dyn(get_proc_address);
             self.EndTransformFeedback_load_with_dyn(get_proc_address);
             self.FenceSync_load_with_dyn(get_proc_address);
@@ -5066,6 +5090,9 @@ pub mod struct_commands {
             self.GenFramebuffers_load_with_dyn(get_proc_address);
             self.GenProgramPipelines_load_with_dyn(get_proc_address);
             self.GenQueries_load_with_dyn(get_proc_address);
+            {
+                self.GenQueriesEXT_load_with_dyn(get_proc_address);
+            }
             self.GenRenderbuffers_load_with_dyn(get_proc_address);
             self.GenSamplers_load_with_dyn(get_proc_address);
             self.GenTextures_load_with_dyn(get_proc_address);
@@ -5117,6 +5144,9 @@ pub mod struct_commands {
             self.GetInteger64i_v_load_with_dyn(get_proc_address);
             self.GetInteger64v_load_with_dyn(get_proc_address);
             {
+                self.GetInteger64vEXT_load_with_dyn(get_proc_address);
+            }
+            {
                 self.GetIntegerIndexedvEXT_load_with_dyn(get_proc_address);
             }
             self.GetIntegeri_v_load_with_dyn(get_proc_address);
@@ -5161,10 +5191,25 @@ pub mod struct_commands {
             self.GetQueryBufferObjectuiv_load_with_dyn(get_proc_address);
             self.GetQueryIndexediv_load_with_dyn(get_proc_address);
             self.GetQueryObjecti64v_load_with_dyn(get_proc_address);
+            {
+                self.GetQueryObjecti64vEXT_load_with_dyn(get_proc_address);
+            }
             self.GetQueryObjectiv_load_with_dyn(get_proc_address);
+            {
+                self.GetQueryObjectivEXT_load_with_dyn(get_proc_address);
+            }
             self.GetQueryObjectui64v_load_with_dyn(get_proc_address);
+            {
+                self.GetQueryObjectui64vEXT_load_with_dyn(get_proc_address);
+            }
             self.GetQueryObjectuiv_load_with_dyn(get_proc_address);
+            {
+                self.GetQueryObjectuivEXT_load_with_dyn(get_proc_address);
+            }
             self.GetQueryiv_load_with_dyn(get_proc_address);
+            {
+                self.GetQueryivEXT_load_with_dyn(get_proc_address);
+            }
             self.GetRenderbufferParameteriv_load_with_dyn(get_proc_address);
             self.GetSamplerParameterIiv_load_with_dyn(get_proc_address);
             self.GetSamplerParameterIuiv_load_with_dyn(get_proc_address);
@@ -5241,6 +5286,9 @@ pub mod struct_commands {
             self.IsProgram_load_with_dyn(get_proc_address);
             self.IsProgramPipeline_load_with_dyn(get_proc_address);
             self.IsQuery_load_with_dyn(get_proc_address);
+            {
+                self.IsQueryEXT_load_with_dyn(get_proc_address);
+            }
             self.IsRenderbuffer_load_with_dyn(get_proc_address);
             self.IsSampler_load_with_dyn(get_proc_address);
             self.IsShader_load_with_dyn(get_proc_address);
@@ -5368,6 +5416,9 @@ pub mod struct_commands {
                 self.PushDebugGroupKHR_load_with_dyn(get_proc_address);
             }
             self.QueryCounter_load_with_dyn(get_proc_address);
+            {
+                self.QueryCounterEXT_load_with_dyn(get_proc_address);
+            }
             self.ReadBuffer_load_with_dyn(get_proc_address);
             self.ReadPixels_load_with_dyn(get_proc_address);
             self.ReadnPixels_load_with_dyn(get_proc_address);
@@ -5763,6 +5814,38 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn BeginQuery_is_loaded(&self) -> bool {
             !self.glBeginQuery_p.load(RELAX).is_null()
+        }
+        /// [glBeginQueryEXT](http://docs.gl/gl4/glBeginQueryEXT)(target, id)
+        /// * `target` group: QueryTarget
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn BeginQueryEXT(&self, target: GLenum, id: GLuint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.BeginQueryEXT({:#X}, {:?});", target, id);
+            }
+            let out = call_atomic_ptr_2arg("glBeginQueryEXT", &self.glBeginQueryEXT_p, target, id);
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glBeginQueryEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn BeginQueryEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glBeginQueryEXT\0",
+                &self.glBeginQueryEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn BeginQueryEXT_is_loaded(&self) -> bool {
+            !self.glBeginQueryEXT_p.load(RELAX).is_null()
         }
         /// [glBeginQueryIndexed](http://docs.gl/gl4/glBeginQueryIndexed)(target, index, id)
         /// * `target` group: QueryTarget
@@ -11218,6 +11301,39 @@ pub mod struct_commands {
         pub fn DeleteQueries_is_loaded(&self) -> bool {
             !self.glDeleteQueries_p.load(RELAX).is_null()
         }
+        /// [glDeleteQueriesEXT](http://docs.gl/gl4/glDeleteQueriesEXT)(n, ids)
+        /// * `ids` len: n
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn DeleteQueriesEXT(&self, n: GLsizei, ids: *const GLuint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.DeleteQueriesEXT({:?}, {:p});", n, ids);
+            }
+            let out =
+                call_atomic_ptr_2arg("glDeleteQueriesEXT", &self.glDeleteQueriesEXT_p, n, ids);
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glDeleteQueriesEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn DeleteQueriesEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glDeleteQueriesEXT\0",
+                &self.glDeleteQueriesEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn DeleteQueriesEXT_is_loaded(&self) -> bool {
+            !self.glDeleteQueriesEXT_p.load(RELAX).is_null()
+        }
         /// [glDeleteRenderbuffers](http://docs.gl/gl4/glDeleteRenderbuffers)(n, renderbuffers)
         /// * `renderbuffers` len: n
         #[cfg_attr(feature = "inline", inline)]
@@ -13194,6 +13310,34 @@ pub mod struct_commands {
         pub fn EndQuery_is_loaded(&self) -> bool {
             !self.glEndQuery_p.load(RELAX).is_null()
         }
+        /// [glEndQueryEXT](http://docs.gl/gl4/glEndQueryEXT)(target)
+        /// * `target` group: QueryTarget
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn EndQueryEXT(&self, target: GLenum) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.EndQueryEXT({:#X});", target);
+            }
+            let out = call_atomic_ptr_1arg("glEndQueryEXT", &self.glEndQueryEXT_p, target);
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glEndQueryEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn EndQueryEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(get_proc_address, b"glEndQueryEXT\0", &self.glEndQueryEXT_p)
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn EndQueryEXT_is_loaded(&self) -> bool {
+            !self.glEndQueryEXT_p.load(RELAX).is_null()
+        }
         /// [glEndQueryIndexed](http://docs.gl/gl4/glEndQueryIndexed)(target, index)
         /// * `target` group: QueryTarget
         #[cfg_attr(feature = "inline", inline)]
@@ -13980,6 +14124,38 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn GenQueries_is_loaded(&self) -> bool {
             !self.glGenQueries_p.load(RELAX).is_null()
+        }
+        /// [glGenQueriesEXT](http://docs.gl/gl4/glGenQueriesEXT)(n, ids)
+        /// * `ids` len: n
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn GenQueriesEXT(&self, n: GLsizei, ids: *mut GLuint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.GenQueriesEXT({:?}, {:p});", n, ids);
+            }
+            let out = call_atomic_ptr_2arg("glGenQueriesEXT", &self.glGenQueriesEXT_p, n, ids);
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glGenQueriesEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn GenQueriesEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glGenQueriesEXT\0",
+                &self.glGenQueriesEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn GenQueriesEXT_is_loaded(&self) -> bool {
+            !self.glGenQueriesEXT_p.load(RELAX).is_null()
         }
         /// [glGenRenderbuffers](http://docs.gl/gl4/glGenRenderbuffers)(n, renderbuffers)
         /// * `renderbuffers` len: n
@@ -15986,6 +16162,45 @@ pub mod struct_commands {
         pub fn GetInteger64v_is_loaded(&self) -> bool {
             !self.glGetInteger64v_p.load(RELAX).is_null()
         }
+        /// [glGetInteger64vEXT](http://docs.gl/gl4/glGetInteger64vEXT)(pname, data)
+        /// * `pname` group: GetPName
+        /// * `data` len: COMPSIZE(pname)
+        /// * alias of: [`glGetInteger64v`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn GetInteger64vEXT(&self, pname: GLenum, data: *mut GLint64) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.GetInteger64vEXT({:#X}, {:p});", pname, data);
+            }
+            let out = call_atomic_ptr_2arg(
+                "glGetInteger64vEXT",
+                &self.glGetInteger64vEXT_p,
+                pname,
+                data,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glGetInteger64vEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn GetInteger64vEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glGetInteger64vEXT\0",
+                &self.glGetInteger64vEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn GetInteger64vEXT_is_loaded(&self) -> bool {
+            !self.glGetInteger64vEXT_p.load(RELAX).is_null()
+        }
         /// [glGetIntegerIndexedvEXT](http://docs.gl/gl4/glGetIntegerIndexedvEXT)(target, index, data)
         /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
@@ -17817,6 +18032,56 @@ pub mod struct_commands {
         pub fn GetQueryObjecti64v_is_loaded(&self) -> bool {
             !self.glGetQueryObjecti64v_p.load(RELAX).is_null()
         }
+        /// [glGetQueryObjecti64vEXT](http://docs.gl/gl4/glGetQueryObjecti64vEXT)(id, pname, params)
+        /// * `pname` group: QueryObjectParameterName
+        /// * `params` len: COMPSIZE(pname)
+        /// * alias of: [`glGetQueryObjecti64v`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn GetQueryObjecti64vEXT(
+            &self,
+            id: GLuint,
+            pname: GLenum,
+            params: *mut GLint64,
+        ) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!(
+                    "calling gl.GetQueryObjecti64vEXT({:?}, {:#X}, {:p});",
+                    id,
+                    pname,
+                    params
+                );
+            }
+            let out = call_atomic_ptr_3arg(
+                "glGetQueryObjecti64vEXT",
+                &self.glGetQueryObjecti64vEXT_p,
+                id,
+                pname,
+                params,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glGetQueryObjecti64vEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn GetQueryObjecti64vEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glGetQueryObjecti64vEXT\0",
+                &self.glGetQueryObjecti64vEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn GetQueryObjecti64vEXT_is_loaded(&self) -> bool {
+            !self.glGetQueryObjecti64vEXT_p.load(RELAX).is_null()
+        }
         /// [glGetQueryObjectiv](http://docs.gl/gl4/glGetQueryObject)(id, pname, params)
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
@@ -17860,6 +18125,51 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn GetQueryObjectiv_is_loaded(&self) -> bool {
             !self.glGetQueryObjectiv_p.load(RELAX).is_null()
+        }
+        /// [glGetQueryObjectivEXT](http://docs.gl/gl4/glGetQueryObjectivEXT)(id, pname, params)
+        /// * `pname` group: QueryObjectParameterName
+        /// * `params` len: COMPSIZE(pname)
+        /// * alias of: [`glGetQueryObjectiv`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn GetQueryObjectivEXT(&self, id: GLuint, pname: GLenum, params: *mut GLint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!(
+                    "calling gl.GetQueryObjectivEXT({:?}, {:#X}, {:p});",
+                    id,
+                    pname,
+                    params
+                );
+            }
+            let out = call_atomic_ptr_3arg(
+                "glGetQueryObjectivEXT",
+                &self.glGetQueryObjectivEXT_p,
+                id,
+                pname,
+                params,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glGetQueryObjectivEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn GetQueryObjectivEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glGetQueryObjectivEXT\0",
+                &self.glGetQueryObjectivEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn GetQueryObjectivEXT_is_loaded(&self) -> bool {
+            !self.glGetQueryObjectivEXT_p.load(RELAX).is_null()
         }
         /// [glGetQueryObjectui64v](http://docs.gl/gl4/glGetQueryObjectu)(id, pname, params)
         /// * `pname` group: QueryObjectParameterName
@@ -17905,6 +18215,56 @@ pub mod struct_commands {
         pub fn GetQueryObjectui64v_is_loaded(&self) -> bool {
             !self.glGetQueryObjectui64v_p.load(RELAX).is_null()
         }
+        /// [glGetQueryObjectui64vEXT](http://docs.gl/gl4/glGetQueryObjectui64vEXT)(id, pname, params)
+        /// * `pname` group: QueryObjectParameterName
+        /// * `params` len: COMPSIZE(pname)
+        /// * alias of: [`glGetQueryObjectui64v`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn GetQueryObjectui64vEXT(
+            &self,
+            id: GLuint,
+            pname: GLenum,
+            params: *mut GLuint64,
+        ) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!(
+                    "calling gl.GetQueryObjectui64vEXT({:?}, {:#X}, {:p});",
+                    id,
+                    pname,
+                    params
+                );
+            }
+            let out = call_atomic_ptr_3arg(
+                "glGetQueryObjectui64vEXT",
+                &self.glGetQueryObjectui64vEXT_p,
+                id,
+                pname,
+                params,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glGetQueryObjectui64vEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn GetQueryObjectui64vEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glGetQueryObjectui64vEXT\0",
+                &self.glGetQueryObjectui64vEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn GetQueryObjectui64vEXT_is_loaded(&self) -> bool {
+            !self.glGetQueryObjectui64vEXT_p.load(RELAX).is_null()
+        }
         /// [glGetQueryObjectuiv](http://docs.gl/gl4/glGetQueryObject)(id, pname, params)
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
@@ -17949,6 +18309,50 @@ pub mod struct_commands {
         pub fn GetQueryObjectuiv_is_loaded(&self) -> bool {
             !self.glGetQueryObjectuiv_p.load(RELAX).is_null()
         }
+        /// [glGetQueryObjectuivEXT](http://docs.gl/gl4/glGetQueryObjectuivEXT)(id, pname, params)
+        /// * `pname` group: QueryObjectParameterName
+        /// * `params` len: COMPSIZE(pname)
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn GetQueryObjectuivEXT(&self, id: GLuint, pname: GLenum, params: *mut GLuint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!(
+                    "calling gl.GetQueryObjectuivEXT({:?}, {:#X}, {:p});",
+                    id,
+                    pname,
+                    params
+                );
+            }
+            let out = call_atomic_ptr_3arg(
+                "glGetQueryObjectuivEXT",
+                &self.glGetQueryObjectuivEXT_p,
+                id,
+                pname,
+                params,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glGetQueryObjectuivEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn GetQueryObjectuivEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glGetQueryObjectuivEXT\0",
+                &self.glGetQueryObjectuivEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn GetQueryObjectuivEXT_is_loaded(&self) -> bool {
+            !self.glGetQueryObjectuivEXT_p.load(RELAX).is_null()
+        }
         /// [glGetQueryiv](http://docs.gl/gl4/glGetQuery)(target, pname, params)
         /// * `target` group: QueryTarget
         /// * `pname` group: QueryParameterName
@@ -17984,6 +18388,51 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn GetQueryiv_is_loaded(&self) -> bool {
             !self.glGetQueryiv_p.load(RELAX).is_null()
+        }
+        /// [glGetQueryivEXT](http://docs.gl/gl4/glGetQueryivEXT)(target, pname, params)
+        /// * `target` group: QueryTarget
+        /// * `pname` group: QueryParameterName
+        /// * `params` len: COMPSIZE(pname)
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn GetQueryivEXT(&self, target: GLenum, pname: GLenum, params: *mut GLint) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!(
+                    "calling gl.GetQueryivEXT({:#X}, {:#X}, {:p});",
+                    target,
+                    pname,
+                    params
+                );
+            }
+            let out = call_atomic_ptr_3arg(
+                "glGetQueryivEXT",
+                &self.glGetQueryivEXT_p,
+                target,
+                pname,
+                params,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glGetQueryivEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn GetQueryivEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glGetQueryivEXT\0",
+                &self.glGetQueryivEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn GetQueryivEXT_is_loaded(&self) -> bool {
+            !self.glGetQueryivEXT_p.load(RELAX).is_null()
         }
         /// [glGetRenderbufferParameteriv](http://docs.gl/gl4/glGetRenderbufferParameter)(target, pname, params)
         /// * `target` group: RenderbufferTarget
@@ -21394,6 +21843,33 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn IsQuery_is_loaded(&self) -> bool {
             !self.glIsQuery_p.load(RELAX).is_null()
+        }
+        /// [glIsQueryEXT](http://docs.gl/gl4/glIsQueryEXT)(id)
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn IsQueryEXT(&self, id: GLuint) -> GLboolean {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.IsQueryEXT({:?});", id);
+            }
+            let out = call_atomic_ptr_1arg("glIsQueryEXT", &self.glIsQueryEXT_p, id);
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glIsQueryEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn IsQueryEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(get_proc_address, b"glIsQueryEXT\0", &self.glIsQueryEXT_p)
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn IsQueryEXT_is_loaded(&self) -> bool {
+            !self.glIsQueryEXT_p.load(RELAX).is_null()
         }
         /// [glIsRenderbuffer](http://docs.gl/gl4/glIsRenderbuffer)(renderbuffer)
         #[cfg_attr(feature = "inline", inline)]
@@ -26636,6 +27112,40 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn QueryCounter_is_loaded(&self) -> bool {
             !self.glQueryCounter_p.load(RELAX).is_null()
+        }
+        /// [glQueryCounterEXT](http://docs.gl/gl4/glQueryCounterEXT)(id, target)
+        /// * `target` group: QueryCounterTarget
+        /// * alias of: [`glQueryCounter`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn QueryCounterEXT(&self, id: GLuint, target: GLenum) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.QueryCounterEXT({:?}, {:#X});", id, target);
+            }
+            let out =
+                call_atomic_ptr_2arg("glQueryCounterEXT", &self.glQueryCounterEXT_p, id, target);
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glQueryCounterEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn QueryCounterEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glQueryCounterEXT\0",
+                &self.glQueryCounterEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn QueryCounterEXT_is_loaded(&self) -> bool {
+            !self.glQueryCounterEXT_p.load(RELAX).is_null()
         }
         /// [glReadBuffer](http://docs.gl/gl4/glReadBuffer)(src)
         /// * `src` group: ReadBufferMode
@@ -36263,6 +36773,7 @@ pub mod struct_commands {
         glAttachShader_p: APcv,
         glBeginConditionalRender_p: APcv,
         glBeginQuery_p: APcv,
+        glBeginQueryEXT_p: APcv,
         glBeginQueryIndexed_p: APcv,
         glBeginTransformFeedback_p: APcv,
         glBindAttribLocation_p: APcv,
@@ -36379,6 +36890,7 @@ pub mod struct_commands {
         glDeleteProgram_p: APcv,
         glDeleteProgramPipelines_p: APcv,
         glDeleteQueries_p: APcv,
+        glDeleteQueriesEXT_p: APcv,
         glDeleteRenderbuffers_p: APcv,
         glDeleteSamplers_p: APcv,
         glDeleteShader_p: APcv,
@@ -36428,6 +36940,7 @@ pub mod struct_commands {
         glEnablei_p: APcv,
         glEndConditionalRender_p: APcv,
         glEndQuery_p: APcv,
+        glEndQueryEXT_p: APcv,
         glEndQueryIndexed_p: APcv,
         glEndTransformFeedback_p: APcv,
         glFenceSync_p: APcv,
@@ -36447,6 +36960,7 @@ pub mod struct_commands {
         glGenFramebuffers_p: APcv,
         glGenProgramPipelines_p: APcv,
         glGenQueries_p: APcv,
+        glGenQueriesEXT_p: APcv,
         glGenRenderbuffers_p: APcv,
         glGenSamplers_p: APcv,
         glGenTextures_p: APcv,
@@ -36491,6 +37005,7 @@ pub mod struct_commands {
         glGetGraphicsResetStatus_p: APcv,
         glGetInteger64i_v_p: APcv,
         glGetInteger64v_p: APcv,
+        glGetInteger64vEXT_p: APcv,
         glGetIntegerIndexedvEXT_p: APcv,
         glGetIntegeri_v_p: APcv,
         glGetIntegerv_p: APcv,
@@ -36528,10 +37043,15 @@ pub mod struct_commands {
         glGetQueryBufferObjectuiv_p: APcv,
         glGetQueryIndexediv_p: APcv,
         glGetQueryObjecti64v_p: APcv,
+        glGetQueryObjecti64vEXT_p: APcv,
         glGetQueryObjectiv_p: APcv,
+        glGetQueryObjectivEXT_p: APcv,
         glGetQueryObjectui64v_p: APcv,
+        glGetQueryObjectui64vEXT_p: APcv,
         glGetQueryObjectuiv_p: APcv,
+        glGetQueryObjectuivEXT_p: APcv,
         glGetQueryiv_p: APcv,
+        glGetQueryivEXT_p: APcv,
         glGetRenderbufferParameteriv_p: APcv,
         glGetSamplerParameterIiv_p: APcv,
         glGetSamplerParameterIuiv_p: APcv,
@@ -36606,6 +37126,7 @@ pub mod struct_commands {
         glIsProgram_p: APcv,
         glIsProgramPipeline_p: APcv,
         glIsQuery_p: APcv,
+        glIsQueryEXT_p: APcv,
         glIsRenderbuffer_p: APcv,
         glIsSampler_p: APcv,
         glIsShader_p: APcv,
@@ -36721,6 +37242,7 @@ pub mod struct_commands {
         glPushDebugGroup_p: APcv,
         glPushDebugGroupKHR_p: APcv,
         glQueryCounter_p: APcv,
+        glQueryCounterEXT_p: APcv,
         glReadBuffer_p: APcv,
         glReadPixels_p: APcv,
         glReadnPixels_p: APcv,

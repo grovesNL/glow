@@ -108,12 +108,12 @@ pub struct DebugMessageLogEntry {
 
 pub enum PixelPackData<'a> {
     BufferOffset(u32),
-    Slice(&'a mut [u8]),
+    Slice(Option<&'a mut [u8]>),
 }
 
 pub enum PixelUnpackData<'a> {
     BufferOffset(u32),
-    Slice(&'a [u8]),
+    Slice(Option<&'a [u8]>),
 }
 
 pub enum CompressedPixelUnpackData<'a> {

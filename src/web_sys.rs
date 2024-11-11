@@ -3995,7 +3995,7 @@ impl HasContext for Context {
                 match pixels {
                     PixelUnpackData::BufferOffset(_offset) => panic!("Tex image 2D with offset is not supported"),
                     PixelUnpackData::Slice(data) => {
-                        let data = texture_data_view(ty, data);
+                        let data = data.map(|data| texture_data_view(ty, data));
                         gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
                             target,
                             level,
@@ -4005,7 +4005,7 @@ impl HasContext for Context {
                             border,
                             format,
                             ty,
-                            Some(&data),
+                            data.as_ref(),
                         )
                     }
                 }
@@ -4026,7 +4026,7 @@ impl HasContext for Context {
                             offset as i32,
                         ),
                     PixelUnpackData::Slice(data) => {
-                        let data = texture_data_view(ty, data);
+                        let data = data.map(|data| texture_data_view(ty, data));
                         gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
                             target,
                             level,
@@ -4036,7 +4036,7 @@ impl HasContext for Context {
                             border,
                             format,
                             ty,
-                            Some(&data),
+                            data.as_ref(),
                         )
                     }
                 }
@@ -4123,7 +4123,7 @@ impl HasContext for Context {
                         offset as i32,
                     ),
                     PixelUnpackData::Slice(data) => {
-                        let data = texture_data_view(ty, data);
+                        let data = data.map(|data| texture_data_view(ty, data));
                         gl.tex_image_3d_with_opt_array_buffer_view(
                             target,
                             level,
@@ -4134,7 +4134,7 @@ impl HasContext for Context {
                             depth,
                             format,
                             ty,
-                            Some(&data),
+                            data.as_ref(),
                         )
                     }
                 }
@@ -4918,9 +4918,9 @@ impl HasContext for Context {
                         panic!("Sub image 2D pixel buffer offset is not supported");
                     }
                     PixelUnpackData::Slice(data) => {
-                        let data = texture_data_view(ty, data);
+                        let data = data.map(|data| texture_data_view(ty, data));
                         gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
-                            target, level, x_offset, y_offset, width, height, format, ty, Some(&data),
+                            target, level, x_offset, y_offset, width, height, format, ty, data.as_ref(),
                         )
                     }
                 }
@@ -4941,9 +4941,9 @@ impl HasContext for Context {
                             offset as i32,
                         ),
                     PixelUnpackData::Slice(data) => {
-                        let data = texture_data_view(ty, data);
+                        let data = data.map(|data| texture_data_view(ty, data));
                         gl.tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
-                            target, level, x_offset, y_offset, width, height, format, ty, Some(&data),
+                            target, level, x_offset, y_offset, width, height, format, ty, data.as_ref()
                         )
                     }
                 }
@@ -5063,8 +5063,8 @@ impl HasContext for Context {
                         ty,
                         offset as i32,
                     ),
-                    PixelUnpackData::Slice(slice) => {
-                        let slice = texture_data_view(ty, slice);
+                    PixelUnpackData::Slice(data) => {
+                        let data = data.map(|data| texture_data_view(ty, data));
                         gl.tex_sub_image_3d_with_opt_array_buffer_view(
                             target,
                             level,
@@ -5076,7 +5076,7 @@ impl HasContext for Context {
                             depth,
                             format,
                             ty,
-                            Some(&slice),
+                            data.as_ref(),
                         )
                     }
                 }
@@ -5735,8 +5735,8 @@ impl HasContext for Context {
                     .read_pixels_with_i32(x, y, width, height, format, gltype, offset as i32)
                     .unwrap(),
             },
-            PixelPackData::Slice(bytes) => {
-                let data = texture_data_view(gltype, bytes);
+            PixelPackData::Slice(data) => {
+                let data = data.map(|data| texture_data_view(gltype, data));
                 match self.raw {
                     RawRenderingContext::WebGl1(ref gl) => gl
                         .read_pixels_with_opt_array_buffer_view(
@@ -5746,7 +5746,7 @@ impl HasContext for Context {
                             height,
                             format,
                             gltype,
-                            Some(&data),
+                            data.as_ref(),
                         )
                         .unwrap(),
                     RawRenderingContext::WebGl2(ref gl) => gl
@@ -5757,7 +5757,7 @@ impl HasContext for Context {
                             height,
                             format,
                             gltype,
-                            Some(&data),
+                            data.as_ref(),
                         )
                         .unwrap(),
                 }

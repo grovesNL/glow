@@ -638,6 +638,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&[u8]>, flags: u32);
 
+    unsafe fn named_buffer_storage(&self, target: Self::Buffer, size: i32, data: Option<&[u8]>, flags: u32);
+
     unsafe fn check_framebuffer_status(&self, target: u32) -> u32;
 
     unsafe fn check_named_framebuffer_status(

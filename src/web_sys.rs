@@ -253,8 +253,9 @@ impl Context {
         let (extensions, supported_extensions) = build_extensions!(context, WebGlRenderingContext);
 
         // Retrieve and parse `GL_VERSION`
-        let raw_string = context.get_parameter(VERSION).unwrap().as_string().unwrap();
-        let version = Version::parse(&raw_string).unwrap();
+        let raw_jsvalue = context.get_parameter(VERSION).expect("context.get_parameter(VERSION) shouldn't throw");
+        let raw_string = raw_jsvalue.as_string().unwrap_or_else(|| panic!("{:?} should be a string", raw_jsvalue));
+        let version = Version::parse(&raw_string).expect("context.get_parameter(VERSION) should be parseable as an OpenGL version");
 
         Self {
             raw: RawRenderingContext::WebGl1(context),
@@ -279,8 +280,9 @@ impl Context {
         let (extensions, supported_extensions) = build_extensions!(context, WebGl2RenderingContext);
 
         // Retrieve and parse `GL_VERSION`
-        let raw_string = context.get_parameter(VERSION).unwrap().as_string().unwrap();
-        let version = Version::parse(&raw_string).unwrap();
+        let raw_jsvalue = context.get_parameter(VERSION).expect("context.get_parameter(VERSION) shouldn't throw");
+        let raw_string = raw_jsvalue.as_string().unwrap_or_else(|| panic!("{:?} should be a string", raw_jsvalue));
+        let version = Version::parse(&raw_string).expect("context.get_parameter(VERSION) should be parseable as an OpenGL version");
 
         Self {
             raw: RawRenderingContext::WebGl2(context),

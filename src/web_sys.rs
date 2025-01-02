@@ -5869,11 +5869,13 @@ impl HasContext for Context {
         let raw_query = queries.get_unchecked(query);
         match self.raw {
             RawRenderingContext::WebGl1(ref _gl) => panic!("Query objects are not supported"),
-            RawRenderingContext::WebGl2(ref gl) => gl
-                .get_query_parameter(raw_query, parameter)
-                .as_f64()
-                .map(|v| v as u32)
-                .unwrap_or(0),
+            RawRenderingContext::WebGl2(ref gl) => {
+                let v = gl.get_query_parameter(raw_query, parameter);
+                v.as_f64()
+                    .map(|v| v as u32)
+                    .or_else(|| v.as_bool().map(|v| v as u32))
+                    .unwrap_or(0)
+            }
         }
     }
 

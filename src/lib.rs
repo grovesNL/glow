@@ -1853,6 +1853,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_query_parameter_u32(&self, query: Self::Query, parameter: u32) -> u32;
 
+    unsafe fn get_query_parameter_u64(&self, query: Self::Query, parameter: u32) -> u64;
+
     unsafe fn get_query_parameter_u64_with_offset(
         &self,
         query: Self::Query,

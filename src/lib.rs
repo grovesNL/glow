@@ -4,9 +4,19 @@
 #![allow(clippy::unreadable_literal)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::pedantic)] // For anyone using pedantic and a source dep, this is needed
+#![cfg_attr(not(feature = "std"), no_std)]
+#[macro_use]
+extern crate alloc;
 
-use core::fmt::Debug;
-use core::hash::Hash;
+#[cfg(all(feature = "std", feature = "hashbrown"))]
+compile_error!("\"hashbrown\" feature should not be enabled in \"std\" environment.");
+
+#[cfg(all(not(feature = "std"), not(feature = "hashbrown")))]
+compile_error!("\"hashbrown\" feature should be enabled in \"no_std\" environment.");
+
+use alloc::{boxed::Box, string::String, vec::Vec};
+use core::{fmt::Debug, hash::Hash};
+#[cfg(feature = "std")]
 use std::collections::HashSet;
 
 mod version;

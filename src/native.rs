@@ -201,8 +201,14 @@ impl HasContext for Context {
     type UniformLocation = NativeUniformLocation;
     type TransformFeedback = NativeTransformFeedback;
 
+    #[cfg(feature = "std")]
     fn supported_extensions(&self) -> &HashSet<String> {
         &self.extensions
+    }
+
+    #[cfg(not(feature = "std"))]
+    fn supports_extension(&self) -> Vec<String> {
+        self.extensions.iter().map(|v| v.clone()).collect()
     }
 
     fn supports_debug(&self) -> bool {

@@ -1606,8 +1606,14 @@ impl HasContext for Context {
     type UniformLocation = WebGlUniformLocation;
     type TransformFeedback = WebTransformFeedbackKey;
 
+    #[cfg(feature = "std")]
     fn supported_extensions(&self) -> &HashSet<String> {
-        &self.supported_extensions
+        &self.extensions
+    }
+
+    #[cfg(not(feature = "std"))]
+    fn supports_extension(&self) -> Vec<String> {
+        self.extensions.iter().map(|v| v.clone()).collect()
     }
 
     fn supports_debug(&self) -> bool {

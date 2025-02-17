@@ -16,6 +16,9 @@ compile_error!("\"hashbrown\" feature should be enabled in \"no_std\" environmen
 
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::{fmt::Debug, hash::Hash};
+
+#[cfg(not(feature = "std"))]
+use hashbrown::HashSet;
 #[cfg(feature = "std")]
 use std::collections::HashSet;
 
@@ -163,7 +166,11 @@ pub trait HasContext: __private::Sealed {
     type TransformFeedback: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type UniformLocation: Clone + Debug;
 
+    #[cfg(feature = "std")]
     fn supported_extensions(&self) -> &HashSet<String>;
+
+    #[cfg(not(feature = "std"))]
+    fn supports_extension(&self) -> Vec<String>;
 
     fn supports_debug(&self) -> bool;
 

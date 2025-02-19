@@ -1612,8 +1612,8 @@ impl HasContext for Context {
     }
 
     #[cfg(not(feature = "std"))]
-    fn supports_extension(&self) -> Vec<String> {
-        self.extensions.iter().map(|v| v.clone()).collect()
+    fn supports_extension(&self, extension: &str) -> bool {
+        self.extensions.contains(extension)
     }
 
     fn supports_debug(&self) -> bool {

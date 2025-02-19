@@ -175,7 +175,7 @@ pub trait HasContext: __private::Sealed {
     fn supported_extensions(&self) -> &HashSet<String>;
 
     #[cfg(not(feature = "std"))]
-    fn supports_extension(&self) -> Vec<String>;
+    fn supports_extension(&self, extension: &str) -> bool;
 
     fn supports_debug(&self) -> bool;
 

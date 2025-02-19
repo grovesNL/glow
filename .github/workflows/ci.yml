@@ -51,8 +51,8 @@ jobs:
     - run: cargo build --verbose --target wasm32-unknown-unknown
       env:
         RUSTFLAGS: --cfg=web_sys_unstable_apis 
-    - run: cargo build --verbose --no-default-features
-    - run: cargo build --verbose --target wasm32-unknown-unknown --no-default-features
+    - run: cargo build --verbose --no-default-features --features hashbrown
+    - run: cargo build --verbose --target wasm32-unknown-unknown --no-default-features --features hashbrown
       env:
         RUSTFLAGS: --cfg=web_sys_unstable_apis 
     - run: cargo test --verbose

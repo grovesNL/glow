@@ -2760,6 +2760,16 @@ impl HasContext for Context {
         panic!("Buffer storage is not supported");
     }
 
+    unsafe fn named_buffer_storage(
+        &self,
+        buffer: Self::Buffer,
+        size: i32,
+        data: Option<&[u8]>,
+        flags: u32,
+    ) {
+        panic!("Named buffer storage is not supported");
+    }
+
     unsafe fn check_framebuffer_status(&self, target: u32) -> u32 {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.check_framebuffer_status(target),

@@ -4243,6 +4243,17 @@ impl HasContext for Context {
         value
     }
 
+    unsafe fn get_query_parameter_u64(&self, query: Self::Query, parameter: u32) -> u64 {
+        let gl = &self.raw;
+        let mut value = 0;
+        if gl.GetQueryBufferObjectiv_is_loaded() {
+            gl.GetQueryObjectui64v(query.0.get(), parameter, &mut value);
+        } else {
+            gl.GetQueryObjectui64vEXT(query.0.get(), parameter, &mut value);
+        }
+        value
+    }
+
     unsafe fn get_query_parameter_u64_with_offset(
         &self,
         query: Self::Query,

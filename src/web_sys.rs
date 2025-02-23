@@ -2748,7 +2748,13 @@ impl HasContext for Context {
         panic!("Buffer storage is not supported");
     }
 
-    unsafe fn named_buffer_storage(&self, buffer: Self::Buffer, size: i32, data: Option<&[u8]>, flags: u32) {
+    unsafe fn named_buffer_storage(
+        &self,
+        buffer: Self::Buffer,
+        size: i32,
+        data: Option<&[u8]>,
+        flags: u32,
+    ) {
         panic!("Named buffer storage is not supported");
     }
 

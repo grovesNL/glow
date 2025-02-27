@@ -1,12 +1,27 @@
+#![warn(
+    clippy::alloc_instead_of_core,
+    clippy::std_instead_of_alloc,
+    clippy::std_instead_of_core
+)]
 #![allow(non_upper_case_globals)]
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(clippy::unreadable_literal)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::pedantic)] // For anyone using pedantic and a source dep, this is needed
+#![cfg_attr(not(feature = "std"), no_std)]
+#[macro_use]
+extern crate alloc;
 
-use core::fmt::Debug;
-use core::hash::Hash;
+#[cfg(all(not(feature = "std"), not(feature = "hashbrown")))]
+compile_error!("\"hashbrown\" feature should be enabled in \"no_std\" environment.");
+
+use alloc::{boxed::Box, string::String, vec::Vec};
+use core::{fmt::Debug, hash::Hash};
+
+#[cfg(feature = "hashbrown")]
+use hashbrown::HashSet;
+#[cfg(all(feature = "std", not(feature = "hashbrown")))]
 use std::collections::HashSet;
 
 mod version;
@@ -153,7 +168,11 @@ pub trait HasContext: __private::Sealed {
     type TransformFeedback: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type UniformLocation: Clone + Debug;
 
+    #[cfg(feature = "std")]
     fn supported_extensions(&self) -> &HashSet<String>;
+
+    #[cfg(not(feature = "std"))]
+    fn supports_extension(&self, extension: &str) -> bool;
 
     fn supports_debug(&self) -> bool;
 

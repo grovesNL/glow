@@ -13,18 +13,15 @@
 #[macro_use]
 extern crate alloc;
 
-#[cfg(all(feature = "std", feature = "hashbrown"))]
-compile_error!("\"hashbrown\" feature should not be enabled in \"std\" environment.");
-
 #[cfg(all(not(feature = "std"), not(feature = "hashbrown")))]
 compile_error!("\"hashbrown\" feature should be enabled in \"no_std\" environment.");
 
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::{fmt::Debug, hash::Hash};
 
-#[cfg(not(feature = "std"))]
+#[cfg(feature = "hashbrown")]
 use hashbrown::HashSet;
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(feature = "hashbrown")))]
 use std::collections::HashSet;
 
 mod version;

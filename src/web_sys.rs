@@ -1608,12 +1608,12 @@ impl HasContext for Context {
 
     #[cfg(feature = "std")]
     fn supported_extensions(&self) -> &HashSet<String> {
-        &self.extensions
+        &self.supported_extensions
     }
 
     #[cfg(not(feature = "std"))]
     fn supports_extension(&self, extension: &str) -> bool {
-        self.extensions.contains(extension)
+        self.supported_extensions.contains(extension)
     }
 
     fn supports_debug(&self) -> bool {
@@ -6181,7 +6181,7 @@ impl HasContext for Context {
 /// This function reinterprets the byte data into the correct type for the texture.
 /// The lookup is generated from this table: https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_PIXELS_TYPE_TABLE
 unsafe fn texture_data_view(ty: u32, bytes: &[u8]) -> js_sys::Object {
-    use std::{mem::size_of, slice::from_raw_parts};
+    use core::{mem::size_of, slice::from_raw_parts};
 
     match ty {
         BYTE => {

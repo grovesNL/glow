@@ -22,6 +22,31 @@ cargo build
 cargo build --target wasm32-unknown-unknown
 ```
 
+## `no_std` support
+
+`no_std` support can be enabled by compiling with `--no-default-features` to
+disable `std` support and `--features hashbrown` for `Hash` collections that are only
+defined in `std` for internal usages in crate. For example:
+
+```toml
+[dependencies]
+glow = { version = "0.16", default-features = false, features = ["hashbrown"] }
+```
+
+To support both `std` and `no_std` builds in project, you can use the following
+in your `Cargo.toml`:
+
+```toml
+[features]
+default = ["std"]
+
+std = ["glow/std"]
+hashbrown = ["glow/hashbrown"]
+
+[dependencies]
+glow = { version = "0.16", default-features = false, features = ["hashbrown"] }
+```
+
 ## License
 
 This project is licensed under any one of [Apache License, Version

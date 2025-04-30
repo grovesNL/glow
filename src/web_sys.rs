@@ -2756,6 +2756,10 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn tex_buffer(&self, target: u32, internal_format: u32, buffer: Option<Self::Buffer>) {
+        panic!("Buffer textures are not supported");
+    }
+
     unsafe fn buffer_storage(&self, _target: u32, _size: i32, _data: Option<&[u8]>, _flags: u32) {
         panic!("Buffer storage is not supported");
     }

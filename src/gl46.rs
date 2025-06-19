@@ -116,23 +116,18 @@
 //! * Individual GL commands are generally safe to use once they've been properly loaded for the current context, but this crate doesn't attempt to sort out what is safe and what's not. All GL commands are blanket marked as being `unsafe`.
 //! It's up to you to try and manage this unsafety! Sorry, but this crate just does what you tell it to.
 
-#[cfg(any(
-    all(
-        not(feature = "log"),
-        any(feature = "debug_trace_calls", feature = "debug_automatic_glGetError")
-    ),
-    not(feature = "chlorine"),
-))]
-extern crate std;
-
-use std::os::raw::*;
+use core::ffi::*;
 
 #[cfg(feature = "log")]
 #[allow(unused)]
 use log::{error, trace};
-#[cfg(all(not(feature = "log"), feature = "debug_trace_calls"))]
+#[cfg(all(not(feature = "log"), feature = "std", feature = "debug_trace_calls"))]
 macro_rules! trace { ($($arg:tt)*) => { std::println!($($arg)*) } }
-#[cfg(all(not(feature = "log"), feature = "debug_automatic_glGetError"))]
+#[cfg(all(
+    not(feature = "log"),
+    feature = "std",
+    feature = "debug_automatic_glGetError"
+))]
 macro_rules! error { ($($arg:tt)*) => { std::eprintln!($($arg)*) } }
 
 use core::{
@@ -215,7 +210,7 @@ pub mod types {
         }
     }
     pub type GLDEBUGPROC = Option<
-        unsafe extern "system" fn(
+        unsafe extern "C-unwind" fn(
             source: GLenum,
             gltype: GLenum,
             id: GLuint,
@@ -226,7 +221,7 @@ pub mod types {
         ),
     >;
     pub type GLDEBUGPROCARB = Option<
-        extern "system" fn(
+        extern "C-unwind" fn(
             source: GLenum,
             gltype: GLenum,
             id: GLuint,
@@ -237,7 +232,7 @@ pub mod types {
         ),
     >;
     pub type GLDEBUGPROCKHR = Option<
-        extern "system" fn(
+        extern "C-unwind" fn(
             source: GLenum,
             gltype: GLenum,
             id: GLuint,
@@ -248,7 +243,7 @@ pub mod types {
         ),
     >;
     pub type GLDEBUGPROCAMD = Option<
-        extern "system" fn(
+        extern "C-unwind" fn(
             id: GLuint,
             category: GLenum,
             severity: GLenum,
@@ -5677,8 +5672,6 @@ pub mod struct_commands {
             self.WaitSync_load_with_dyn(get_proc_address);
         }
         /// [glActiveShaderProgram](http://docs.gl/gl4/glActiveShaderProgram)(pipeline, program)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ActiveShaderProgram(&self, pipeline: GLuint, program: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -5718,8 +5711,6 @@ pub mod struct_commands {
         }
         /// [glActiveTexture](http://docs.gl/gl4/glActiveTexture)(texture)
         /// * `texture` group: TextureUnit
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ActiveTexture(&self, texture: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -5749,8 +5740,6 @@ pub mod struct_commands {
             !self.glActiveTexture_p.load(RELAX).is_null()
         }
         /// [glAttachShader](http://docs.gl/gl4/glAttachShader)(program, shader)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn AttachShader(&self, program: GLuint, shader: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -5782,8 +5771,6 @@ pub mod struct_commands {
         }
         /// [glBeginConditionalRender](http://docs.gl/gl4/glBeginConditionalRender)(id, mode)
         /// * `mode` group: ConditionalRenderMode
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BeginConditionalRender(&self, id: GLuint, mode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -5819,8 +5806,6 @@ pub mod struct_commands {
         }
         /// [glBeginQuery](http://docs.gl/gl4/glBeginQuery)(target, id)
         /// * `target` group: QueryTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BeginQuery(&self, target: GLenum, id: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -5847,8 +5832,6 @@ pub mod struct_commands {
         }
         /// [glBeginQueryEXT](http://docs.gl/gl4/glBeginQueryEXT)(target, id)
         /// * `target` group: QueryTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BeginQueryEXT(&self, target: GLenum, id: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -5879,8 +5862,6 @@ pub mod struct_commands {
         }
         /// [glBeginQueryIndexed](http://docs.gl/gl4/glBeginQueryIndexed)(target, index, id)
         /// * `target` group: QueryTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BeginQueryIndexed(&self, target: GLenum, index: GLuint, id: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -5922,8 +5903,6 @@ pub mod struct_commands {
         }
         /// [glBeginTransformFeedback](http://docs.gl/gl4/glBeginTransformFeedback)(primitiveMode)
         /// * `primitiveMode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BeginTransformFeedback(&self, primitiveMode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -5957,8 +5936,6 @@ pub mod struct_commands {
             !self.glBeginTransformFeedback_p.load(RELAX).is_null()
         }
         /// [glBindAttribLocation](http://docs.gl/gl4/glBindAttribLocation)(program, index, name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindAttribLocation(
             &self,
             program: GLuint,
@@ -6005,8 +5982,6 @@ pub mod struct_commands {
         }
         /// [glBindBuffer](http://docs.gl/gl4/glBindBuffer)(target, buffer)
         /// * `target` group: BufferTargetARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindBuffer(&self, target: GLenum, buffer: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6033,8 +6008,6 @@ pub mod struct_commands {
         }
         /// [glBindBufferBase](http://docs.gl/gl4/glBindBufferBase)(target, index, buffer)
         /// * `target` group: BufferTargetARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindBufferBase(&self, target: GLenum, index: GLuint, buffer: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6078,8 +6051,6 @@ pub mod struct_commands {
         /// * `target` group: BufferTargetARB
         /// * `offset` group: BufferOffset
         /// * `size` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindBufferRange(
             &self,
             target: GLenum,
@@ -6133,8 +6104,6 @@ pub mod struct_commands {
         /// [glBindBuffersBase](http://docs.gl/gl4/glBindBuffersBase)(target, first, count, buffers)
         /// * `target` group: BufferTargetARB
         /// * `buffers` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindBuffersBase(
             &self,
             target: GLenum,
@@ -6187,8 +6156,6 @@ pub mod struct_commands {
         /// * `buffers` len: count
         /// * `offsets` len: count
         /// * `sizes` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindBuffersRange(
             &self,
             target: GLenum,
@@ -6244,8 +6211,6 @@ pub mod struct_commands {
         }
         /// [glBindFragDataLocation](http://docs.gl/gl4/glBindFragDataLocation)(program, color, name)
         /// * `name` len: COMPSIZE(name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindFragDataLocation(
             &self,
             program: GLuint,
@@ -6291,8 +6256,6 @@ pub mod struct_commands {
             !self.glBindFragDataLocation_p.load(RELAX).is_null()
         }
         /// [glBindFragDataLocationIndexed](http://docs.gl/gl4/glBindFragDataLocationIndexed)(program, colorNumber, index, name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindFragDataLocationIndexed(
             &self,
             program: GLuint,
@@ -6342,8 +6305,6 @@ pub mod struct_commands {
         }
         /// [glBindFramebuffer](http://docs.gl/gl4/glBindFramebuffer)(target, framebuffer)
         /// * `target` group: FramebufferTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindFramebuffer(&self, target: GLenum, framebuffer: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6384,8 +6345,6 @@ pub mod struct_commands {
         /// [glBindImageTexture](http://docs.gl/gl4/glBindImageTexture)(unit, texture, level, layered, layer, access, format)
         /// * `access` group: BufferAccessARB
         /// * `format` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindImageTexture(
             &self,
             unit: GLuint,
@@ -6444,8 +6403,6 @@ pub mod struct_commands {
         }
         /// [glBindImageTextures](http://docs.gl/gl4/glBindImageTextures)(first, count, textures)
         /// * `textures` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindImageTextures(
             &self,
             first: GLuint,
@@ -6491,8 +6448,6 @@ pub mod struct_commands {
             !self.glBindImageTextures_p.load(RELAX).is_null()
         }
         /// [glBindProgramPipeline](http://docs.gl/gl4/glBindProgramPipeline)(pipeline)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindProgramPipeline(&self, pipeline: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6527,8 +6482,6 @@ pub mod struct_commands {
         }
         /// [glBindRenderbuffer](http://docs.gl/gl4/glBindRenderbuffer)(target, renderbuffer)
         /// * `target` group: RenderbufferTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindRenderbuffer(&self, target: GLenum, renderbuffer: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6567,8 +6520,6 @@ pub mod struct_commands {
             !self.glBindRenderbuffer_p.load(RELAX).is_null()
         }
         /// [glBindSampler](http://docs.gl/gl4/glBindSampler)(unit, sampler)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindSampler(&self, unit: GLuint, sampler: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6595,8 +6546,6 @@ pub mod struct_commands {
         }
         /// [glBindSamplers](http://docs.gl/gl4/glBindSamplers)(first, count, samplers)
         /// * `samplers` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindSamplers(&self, first: GLuint, count: GLsizei, samplers: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6639,8 +6588,6 @@ pub mod struct_commands {
         /// [glBindTexture](http://docs.gl/gl4/glBindTexture)(target, texture)
         /// * `target` group: TextureTarget
         /// * `texture` group: Texture
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindTexture(&self, target: GLenum, texture: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6666,8 +6613,6 @@ pub mod struct_commands {
             !self.glBindTexture_p.load(RELAX).is_null()
         }
         /// [glBindTextureUnit](http://docs.gl/gl4/glBindTextureUnit)(unit, texture)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindTextureUnit(&self, unit: GLuint, texture: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6703,8 +6648,6 @@ pub mod struct_commands {
         }
         /// [glBindTextures](http://docs.gl/gl4/glBindTextures)(first, count, textures)
         /// * `textures` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindTextures(&self, first: GLuint, count: GLsizei, textures: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6746,8 +6689,6 @@ pub mod struct_commands {
         }
         /// [glBindTransformFeedback](http://docs.gl/gl4/glBindTransformFeedback)(target, id)
         /// * `target` group: BindTransformFeedbackTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindTransformFeedback(&self, target: GLenum, id: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6782,8 +6723,6 @@ pub mod struct_commands {
             !self.glBindTransformFeedback_p.load(RELAX).is_null()
         }
         /// [glBindVertexArray](http://docs.gl/gl4/glBindVertexArray)(array)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindVertexArray(&self, array: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6813,8 +6752,6 @@ pub mod struct_commands {
             !self.glBindVertexArray_p.load(RELAX).is_null()
         }
         /// [glBindVertexArrayAPPLE](http://docs.gl/gl4/glBindVertexArrayAPPLE)(array)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindVertexArrayAPPLE(&self, array: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6849,8 +6786,6 @@ pub mod struct_commands {
         }
         /// [glBindVertexArrayOES](http://docs.gl/gl4/glBindVertexArrayOES)(array)
         /// * alias of: [`glBindVertexArray`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindVertexArrayOES(&self, array: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -6882,8 +6817,6 @@ pub mod struct_commands {
         }
         /// [glBindVertexBuffer](http://docs.gl/gl4/glBindVertexBuffer)(bindingindex, buffer, offset, stride)
         /// * `offset` group: BufferOffset
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindVertexBuffer(
             &self,
             bindingindex: GLuint,
@@ -6935,8 +6868,6 @@ pub mod struct_commands {
         /// * `buffers` len: count
         /// * `offsets` len: count
         /// * `strides` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BindVertexBuffers(
             &self,
             first: GLuint,
@@ -6988,8 +6919,6 @@ pub mod struct_commands {
             !self.glBindVertexBuffers_p.load(RELAX).is_null()
         }
         /// [glBlendBarrier](http://docs.gl/gl4/glBlendBarrier)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendBarrier(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -7023,8 +6952,6 @@ pub mod struct_commands {
         /// * `green` group: ColorF
         /// * `blue` group: ColorF
         /// * `alpha` group: ColorF
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendColor(
             &self,
             red: GLfloat,
@@ -7070,8 +6997,6 @@ pub mod struct_commands {
         }
         /// [glBlendEquation](http://docs.gl/gl4/glBlendEquation)(mode)
         /// * `mode` group: BlendEquationModeEXT
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendEquation(&self, mode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -7103,8 +7028,6 @@ pub mod struct_commands {
         /// [glBlendEquationSeparate](http://docs.gl/gl4/glBlendEquationSeparate)(modeRGB, modeAlpha)
         /// * `modeRGB` group: BlendEquationModeEXT
         /// * `modeAlpha` group: BlendEquationModeEXT
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendEquationSeparate(&self, modeRGB: GLenum, modeAlpha: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -7145,8 +7068,6 @@ pub mod struct_commands {
         /// [glBlendEquationSeparatei](http://docs.gl/gl4/glBlendEquationSeparate)(buf, modeRGB, modeAlpha)
         /// * `modeRGB` group: BlendEquationModeEXT
         /// * `modeAlpha` group: BlendEquationModeEXT
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendEquationSeparatei(
             &self,
             buf: GLuint,
@@ -7193,8 +7114,6 @@ pub mod struct_commands {
         }
         /// [glBlendEquationi](http://docs.gl/gl4/glBlendEquation)(buf, mode)
         /// * `mode` group: BlendEquationModeEXT
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendEquationi(&self, buf: GLuint, mode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -7226,8 +7145,6 @@ pub mod struct_commands {
         /// [glBlendFunc](http://docs.gl/gl4/glBlendFunc)(sfactor, dfactor)
         /// * `sfactor` group: BlendingFactor
         /// * `dfactor` group: BlendingFactor
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendFunc(&self, sfactor: GLenum, dfactor: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -7257,8 +7174,6 @@ pub mod struct_commands {
         /// * `dfactorRGB` group: BlendingFactor
         /// * `sfactorAlpha` group: BlendingFactor
         /// * `dfactorAlpha` group: BlendingFactor
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendFuncSeparate(
             &self,
             sfactorRGB: GLenum,
@@ -7311,8 +7226,6 @@ pub mod struct_commands {
         /// * `dstRGB` group: BlendingFactor
         /// * `srcAlpha` group: BlendingFactor
         /// * `dstAlpha` group: BlendingFactor
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendFuncSeparatei(
             &self,
             buf: GLuint,
@@ -7366,8 +7279,6 @@ pub mod struct_commands {
         /// [glBlendFunci](http://docs.gl/gl4/glBlendFunc)(buf, src, dst)
         /// * `src` group: BlendingFactor
         /// * `dst` group: BlendingFactor
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlendFunci(&self, buf: GLuint, src: GLenum, dst: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -7395,8 +7306,6 @@ pub mod struct_commands {
         /// [glBlitFramebuffer](http://docs.gl/gl4/glBlitFramebuffer)(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter)
         /// * `mask` group: ClearBufferMask
         /// * `filter` group: BlitFramebufferFilter
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlitFramebuffer(
             &self,
             srcX0: GLint,
@@ -7453,8 +7362,6 @@ pub mod struct_commands {
         /// [glBlitNamedFramebuffer](http://docs.gl/gl4/glBlitNamedFramebuffer)(readFramebuffer, drawFramebuffer, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter)
         /// * `mask` group: ClearBufferMask
         /// * `filter` group: BlitFramebufferFilter
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BlitNamedFramebuffer(
             &self,
             readFramebuffer: GLuint,
@@ -7517,8 +7424,6 @@ pub mod struct_commands {
         /// * `size` group: BufferSize
         /// * `data` len: size
         /// * `usage` group: BufferUsageARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BufferData(
             &self,
             target: GLenum,
@@ -7566,8 +7471,6 @@ pub mod struct_commands {
         /// * `target` group: BufferStorageTarget
         /// * `data` len: size
         /// * `flags` group: BufferStorageMask
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BufferStorage(
             &self,
             target: GLenum,
@@ -7620,8 +7523,6 @@ pub mod struct_commands {
         /// * `data` len: size
         /// * `flags` group: BufferStorageMask
         /// * alias of: [`glBufferStorage`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BufferStorageEXT(
             &self,
             target: GLenum,
@@ -7674,8 +7575,6 @@ pub mod struct_commands {
         /// * `offset` group: BufferOffset
         /// * `size` group: BufferSize
         /// * `data` len: size
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn BufferSubData(
             &self,
             target: GLenum,
@@ -7726,8 +7625,6 @@ pub mod struct_commands {
         /// [glCheckFramebufferStatus](http://docs.gl/gl4/glCheckFramebufferStatus)(target)
         /// * `target` group: FramebufferTarget
         /// * return value group: FramebufferStatus
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CheckFramebufferStatus(&self, target: GLenum) -> GLenum {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -7763,8 +7660,6 @@ pub mod struct_commands {
         /// [glCheckNamedFramebufferStatus](http://docs.gl/gl4/glCheckNamedFramebufferStatus)(framebuffer, target)
         /// * `target` group: FramebufferTarget
         /// * return value group: FramebufferStatus
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CheckNamedFramebufferStatus(
             &self,
             framebuffer: GLuint,
@@ -7809,8 +7704,6 @@ pub mod struct_commands {
         /// [glClampColor](http://docs.gl/gl4/glClampColor)(target, clamp)
         /// * `target` group: ClampColorTargetARB
         /// * `clamp` group: ClampColorModeARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClampColor(&self, target: GLenum, clamp: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -7837,8 +7730,6 @@ pub mod struct_commands {
         }
         /// [glClear](http://docs.gl/gl4/glClear)(mask)
         /// * `mask` group: ClearBufferMask
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Clear(&self, mask: GLbitfield) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -7869,8 +7760,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `data` len: COMPSIZE(format,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearBufferData(
             &self,
             target: GLenum,
@@ -7929,8 +7818,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `data` len: COMPSIZE(format,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearBufferSubData(
             &self,
             target: GLenum,
@@ -7990,8 +7877,6 @@ pub mod struct_commands {
         /// [glClearBufferfi](http://docs.gl/gl4/glClearBuffer)(buffer, drawbuffer, depth, stencil)
         /// * `buffer` group: Buffer
         /// * `drawbuffer` group: DrawBufferName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearBufferfi(
             &self,
             buffer: GLenum,
@@ -8043,8 +7928,6 @@ pub mod struct_commands {
         /// * `buffer` group: Buffer
         /// * `drawbuffer` group: DrawBufferName
         /// * `value` len: COMPSIZE(buffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearBufferfv(
             &self,
             buffer: GLenum,
@@ -8093,8 +7976,6 @@ pub mod struct_commands {
         /// * `buffer` group: Buffer
         /// * `drawbuffer` group: DrawBufferName
         /// * `value` len: COMPSIZE(buffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearBufferiv(&self, buffer: GLenum, drawbuffer: GLint, value: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -8138,8 +8019,6 @@ pub mod struct_commands {
         /// * `buffer` group: Buffer
         /// * `drawbuffer` group: DrawBufferName
         /// * `value` len: COMPSIZE(buffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearBufferuiv(
             &self,
             buffer: GLenum,
@@ -8189,8 +8068,6 @@ pub mod struct_commands {
         /// * `green` group: ColorF
         /// * `blue` group: ColorF
         /// * `alpha` group: ColorF
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearColor(
             &self,
             red: GLfloat,
@@ -8235,8 +8112,6 @@ pub mod struct_commands {
             !self.glClearColor_p.load(RELAX).is_null()
         }
         /// [glClearDepth](http://docs.gl/gl4/glClearDepth)(depth)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearDepth(&self, depth: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -8262,8 +8137,6 @@ pub mod struct_commands {
             !self.glClearDepth_p.load(RELAX).is_null()
         }
         /// [glClearDepthf](http://docs.gl/gl4/glClearDepth)(d)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearDepthf(&self, d: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -8292,8 +8165,6 @@ pub mod struct_commands {
         /// * `internalformat` group: InternalFormat
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearNamedBufferData(
             &self,
             buffer: GLuint,
@@ -8349,8 +8220,6 @@ pub mod struct_commands {
         /// * `size` group: BufferSize
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearNamedBufferSubData(
             &self,
             buffer: GLuint,
@@ -8400,8 +8269,6 @@ pub mod struct_commands {
         }
         /// [glClearNamedFramebufferfi](http://docs.gl/gl4/glClearNamedFramebuffer)(framebuffer, buffer, drawbuffer, depth, stencil)
         /// * `buffer` group: Buffer
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearNamedFramebufferfi(
             &self,
             framebuffer: GLuint,
@@ -8454,8 +8321,6 @@ pub mod struct_commands {
         }
         /// [glClearNamedFramebufferfv](http://docs.gl/gl4/glClearNamedFramebuffer)(framebuffer, buffer, drawbuffer, value)
         /// * `buffer` group: Buffer
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearNamedFramebufferfv(
             &self,
             framebuffer: GLuint,
@@ -8505,8 +8370,6 @@ pub mod struct_commands {
         }
         /// [glClearNamedFramebufferiv](http://docs.gl/gl4/glClearNamedFramebuffer)(framebuffer, buffer, drawbuffer, value)
         /// * `buffer` group: Buffer
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearNamedFramebufferiv(
             &self,
             framebuffer: GLuint,
@@ -8556,8 +8419,6 @@ pub mod struct_commands {
         }
         /// [glClearNamedFramebufferuiv](http://docs.gl/gl4/glClearNamedFramebuffer)(framebuffer, buffer, drawbuffer, value)
         /// * `buffer` group: Buffer
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearNamedFramebufferuiv(
             &self,
             framebuffer: GLuint,
@@ -8607,8 +8468,6 @@ pub mod struct_commands {
         }
         /// [glClearStencil](http://docs.gl/gl4/glClearStencil)(s)
         /// * `s` group: StencilValue
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearStencil(&self, s: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -8641,8 +8500,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `data` len: COMPSIZE(format,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearTexImage(
             &self,
             texture: GLuint,
@@ -8697,8 +8554,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `data` len: COMPSIZE(format,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClearTexSubImage(
             &self,
             texture: GLuint,
@@ -8758,8 +8613,6 @@ pub mod struct_commands {
         /// * `sync` group: sync
         /// * `flags` group: SyncObjectMask
         /// * return value group: SyncStatus
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClientWaitSync(
             &self,
             sync: GLsync,
@@ -8807,8 +8660,6 @@ pub mod struct_commands {
         /// [glClipControl](http://docs.gl/gl4/glClipControl)(origin, depth)
         /// * `origin` group: ClipControlOrigin
         /// * `depth` group: ClipControlDepth
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ClipControl(&self, origin: GLenum, depth: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -8834,8 +8685,6 @@ pub mod struct_commands {
             !self.glClipControl_p.load(RELAX).is_null()
         }
         /// [glColorMask](http://docs.gl/gl4/glColorMask)(red, green, blue, alpha)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ColorMask(
             &self,
             red: GLboolean,
@@ -8875,8 +8724,6 @@ pub mod struct_commands {
         }
         /// [glColorMaskIndexedEXT](http://docs.gl/gl4/glColorMaskIndexedEXT)(index, r, g, b, a)
         /// * alias of: [`glColorMaski`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ColorMaskIndexedEXT(
             &self,
             index: GLuint,
@@ -8928,8 +8775,6 @@ pub mod struct_commands {
             !self.glColorMaskIndexedEXT_p.load(RELAX).is_null()
         }
         /// [glColorMaski](http://docs.gl/gl4/glColorMask)(index, r, g, b, a)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ColorMaski(
             &self,
             index: GLuint,
@@ -8969,8 +8814,6 @@ pub mod struct_commands {
             !self.glColorMaski_p.load(RELAX).is_null()
         }
         /// [glCompileShader](http://docs.gl/gl4/glCompileShader)(shader)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompileShader(&self, shader: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -9006,8 +8849,6 @@ pub mod struct_commands {
         /// * `border` group: CheckedInt32
         /// * `data` group: CompressedTextureARB
         /// * `data` len: imageSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompressedTexImage1D(
             &self,
             target: GLenum,
@@ -9071,8 +8912,6 @@ pub mod struct_commands {
         /// * `border` group: CheckedInt32
         /// * `data` group: CompressedTextureARB
         /// * `data` len: imageSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompressedTexImage2D(
             &self,
             target: GLenum,
@@ -9129,8 +8968,6 @@ pub mod struct_commands {
         /// * `border` group: CheckedInt32
         /// * `data` group: CompressedTextureARB
         /// * `data` len: imageSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompressedTexImage3D(
             &self,
             target: GLenum,
@@ -9189,8 +9026,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `data` group: CompressedTextureARB
         /// * `data` len: imageSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompressedTexSubImage1D(
             &self,
             target: GLenum,
@@ -9246,8 +9081,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `data` group: CompressedTextureARB
         /// * `data` len: imageSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompressedTexSubImage2D(
             &self,
             target: GLenum,
@@ -9308,8 +9141,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `data` group: CompressedTextureARB
         /// * `data` len: imageSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompressedTexSubImage3D(
             &self,
             target: GLenum,
@@ -9367,8 +9198,6 @@ pub mod struct_commands {
         }
         /// [glCompressedTextureSubImage1D](http://docs.gl/gl4/glCompressedTextureSubImage1D)(texture, level, xoffset, width, format, imageSize, data)
         /// * `format` group: PixelFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompressedTextureSubImage1D(
             &self,
             texture: GLuint,
@@ -9418,8 +9247,6 @@ pub mod struct_commands {
         }
         /// [glCompressedTextureSubImage2D](http://docs.gl/gl4/glCompressedTextureSubImage2D)(texture, level, xoffset, yoffset, width, height, format, imageSize, data)
         /// * `format` group: PixelFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompressedTextureSubImage2D(
             &self,
             texture: GLuint,
@@ -9473,8 +9300,6 @@ pub mod struct_commands {
         }
         /// [glCompressedTextureSubImage3D](http://docs.gl/gl4/glCompressedTextureSubImage3D)(texture, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data)
         /// * `format` group: PixelFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CompressedTextureSubImage3D(
             &self,
             texture: GLuint,
@@ -9536,8 +9361,6 @@ pub mod struct_commands {
         /// * `readOffset` group: BufferOffset
         /// * `writeOffset` group: BufferOffset
         /// * `size` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyBufferSubData(
             &self,
             readTarget: GLenum,
@@ -9595,8 +9418,6 @@ pub mod struct_commands {
         /// * `writeOffset` group: BufferOffset
         /// * `size` group: BufferSize
         /// * alias of: [`glCopyBufferSubData`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyBufferSubDataNV(
             &self,
             readTarget: GLenum,
@@ -9650,8 +9471,6 @@ pub mod struct_commands {
         /// [glCopyImageSubData](http://docs.gl/gl4/glCopyImageSubData)(srcName, srcTarget, srcLevel, srcX, srcY, srcZ, dstName, dstTarget, dstLevel, dstX, dstY, dstZ, srcWidth, srcHeight, srcDepth)
         /// * `srcTarget` group: CopyImageSubDataTarget
         /// * `dstTarget` group: CopyImageSubDataTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyImageSubData(
             &self,
             srcName: GLuint,
@@ -9717,8 +9536,6 @@ pub mod struct_commands {
         }
         /// [glCopyNamedBufferSubData](http://docs.gl/gl4/glCopyNamedBufferSubData)(readBuffer, writeBuffer, readOffset, writeOffset, size)
         /// * `size` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyNamedBufferSubData(
             &self,
             readBuffer: GLuint,
@@ -9776,8 +9593,6 @@ pub mod struct_commands {
         /// * `x` group: WinCoord
         /// * `y` group: WinCoord
         /// * `border` group: CheckedInt32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyTexImage1D(
             &self,
             target: GLenum,
@@ -9841,8 +9656,6 @@ pub mod struct_commands {
         /// * `x` group: WinCoord
         /// * `y` group: WinCoord
         /// * `border` group: CheckedInt32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyTexImage2D(
             &self,
             target: GLenum,
@@ -9908,8 +9721,6 @@ pub mod struct_commands {
         /// * `xoffset` group: CheckedInt32
         /// * `x` group: WinCoord
         /// * `y` group: WinCoord
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyTexSubImage1D(
             &self,
             target: GLenum,
@@ -9970,8 +9781,6 @@ pub mod struct_commands {
         /// * `yoffset` group: CheckedInt32
         /// * `x` group: WinCoord
         /// * `y` group: WinCoord
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyTexSubImage2D(
             &self,
             target: GLenum,
@@ -10029,8 +9838,6 @@ pub mod struct_commands {
         /// * `zoffset` group: CheckedInt32
         /// * `x` group: WinCoord
         /// * `y` group: WinCoord
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyTexSubImage3D(
             &self,
             target: GLenum,
@@ -10083,8 +9890,6 @@ pub mod struct_commands {
             !self.glCopyTexSubImage3D_p.load(RELAX).is_null()
         }
         /// [glCopyTextureSubImage1D](http://docs.gl/gl4/glCopyTextureSubImage1D)(texture, level, xoffset, x, y, width)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyTextureSubImage1D(
             &self,
             texture: GLuint,
@@ -10139,8 +9944,6 @@ pub mod struct_commands {
             !self.glCopyTextureSubImage1D_p.load(RELAX).is_null()
         }
         /// [glCopyTextureSubImage2D](http://docs.gl/gl4/glCopyTextureSubImage2D)(texture, level, xoffset, yoffset, x, y, width, height)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyTextureSubImage2D(
             &self,
             texture: GLuint,
@@ -10191,8 +9994,6 @@ pub mod struct_commands {
             !self.glCopyTextureSubImage2D_p.load(RELAX).is_null()
         }
         /// [glCopyTextureSubImage3D](http://docs.gl/gl4/glCopyTextureSubImage3D)(texture, level, xoffset, yoffset, zoffset, x, y, width, height)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CopyTextureSubImage3D(
             &self,
             texture: GLuint,
@@ -10246,8 +10047,6 @@ pub mod struct_commands {
         }
         /// [glCreateBuffers](http://docs.gl/gl4/glCreateBuffers)(n, buffers)
         /// * `buffers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateBuffers(&self, n: GLsizei, buffers: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10278,8 +10077,6 @@ pub mod struct_commands {
         }
         /// [glCreateFramebuffers](http://docs.gl/gl4/glCreateFramebuffers)(n, framebuffers)
         /// * `framebuffers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateFramebuffers(&self, n: GLsizei, framebuffers: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10318,8 +10115,6 @@ pub mod struct_commands {
             !self.glCreateFramebuffers_p.load(RELAX).is_null()
         }
         /// [glCreateProgram](http://docs.gl/gl4/glCreateProgram)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateProgram(&self) -> GLuint {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10350,8 +10145,6 @@ pub mod struct_commands {
         }
         /// [glCreateProgramPipelines](http://docs.gl/gl4/glCreateProgramPipelines)(n, pipelines)
         /// * `pipelines` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateProgramPipelines(&self, n: GLsizei, pipelines: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10392,8 +10185,6 @@ pub mod struct_commands {
         /// [glCreateQueries](http://docs.gl/gl4/glCreateQueries)(target, n, ids)
         /// * `target` group: QueryTarget
         /// * `ids` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateQueries(&self, target: GLenum, n: GLsizei, ids: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10430,8 +10221,6 @@ pub mod struct_commands {
         }
         /// [glCreateRenderbuffers](http://docs.gl/gl4/glCreateRenderbuffers)(n, renderbuffers)
         /// * `renderbuffers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateRenderbuffers(&self, n: GLsizei, renderbuffers: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10471,8 +10260,6 @@ pub mod struct_commands {
         }
         /// [glCreateSamplers](http://docs.gl/gl4/glCreateSamplers)(n, samplers)
         /// * `samplers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateSamplers(&self, n: GLsizei, samplers: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10504,8 +10291,6 @@ pub mod struct_commands {
         }
         /// [glCreateShader](http://docs.gl/gl4/glCreateShader)(type_)
         /// * `type_` group: ShaderType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateShader(&self, type_: GLenum) -> GLuint {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10537,8 +10322,6 @@ pub mod struct_commands {
         /// [glCreateShaderProgramv](http://docs.gl/gl4/glCreateShaderProgramv)(type_, count, strings)
         /// * `type_` group: ShaderType
         /// * `strings` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateShaderProgramv(
             &self,
             type_: GLenum,
@@ -10586,8 +10369,6 @@ pub mod struct_commands {
         /// [glCreateTextures](http://docs.gl/gl4/glCreateTextures)(target, n, textures)
         /// * `target` group: TextureTarget
         /// * `textures` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateTextures(&self, target: GLenum, n: GLsizei, textures: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10629,8 +10410,6 @@ pub mod struct_commands {
         }
         /// [glCreateTransformFeedbacks](http://docs.gl/gl4/glCreateTransformFeedbacks)(n, ids)
         /// * `ids` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateTransformFeedbacks(&self, n: GLsizei, ids: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10666,8 +10445,6 @@ pub mod struct_commands {
         }
         /// [glCreateVertexArrays](http://docs.gl/gl4/glCreateVertexArrays)(n, arrays)
         /// * `arrays` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CreateVertexArrays(&self, n: GLsizei, arrays: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10703,8 +10480,6 @@ pub mod struct_commands {
         }
         /// [glCullFace](http://docs.gl/gl4/glCullFace)(mode)
         /// * `mode` group: CullFaceMode
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn CullFace(&self, mode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10730,8 +10505,6 @@ pub mod struct_commands {
             !self.glCullFace_p.load(RELAX).is_null()
         }
         /// [glDebugMessageCallback](http://docs.gl/gl4/glDebugMessageCallback)(callback, userParam)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DebugMessageCallback(&self, callback: GLDEBUGPROC, userParam: *const c_void) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -10772,8 +10545,6 @@ pub mod struct_commands {
         /// [glDebugMessageCallbackARB](http://docs.gl/gl4/glDebugMessageCallbackARB)(callback, userParam)
         /// * `userParam` len: COMPSIZE(callback)
         /// * alias of: [`glDebugMessageCallback`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DebugMessageCallbackARB(
             &self,
             callback: GLDEBUGPROCARB,
@@ -10817,8 +10588,6 @@ pub mod struct_commands {
         }
         /// [glDebugMessageCallbackKHR](http://docs.gl/gl4/glDebugMessageCallbackKHR)(callback, userParam)
         /// * alias of: [`glDebugMessageCallback`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DebugMessageCallbackKHR(
             &self,
             callback: GLDEBUGPROCKHR,
@@ -10865,8 +10634,6 @@ pub mod struct_commands {
         /// * `type_` group: DebugType
         /// * `severity` group: DebugSeverity
         /// * `ids` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DebugMessageControl(
             &self,
             source: GLenum,
@@ -10926,8 +10693,6 @@ pub mod struct_commands {
         /// * `severity` group: DebugSeverity
         /// * `ids` len: count
         /// * alias of: [`glDebugMessageControl`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DebugMessageControlARB(
             &self,
             source: GLenum,
@@ -10986,8 +10751,6 @@ pub mod struct_commands {
         /// * `type_` group: DebugType
         /// * `severity` group: DebugSeverity
         /// * alias of: [`glDebugMessageControl`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DebugMessageControlKHR(
             &self,
             source: GLenum,
@@ -11046,8 +10809,6 @@ pub mod struct_commands {
         /// * `type_` group: DebugType
         /// * `severity` group: DebugSeverity
         /// * `buf` len: COMPSIZE(buf,length)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DebugMessageInsert(
             &self,
             source: GLenum,
@@ -11107,8 +10868,6 @@ pub mod struct_commands {
         /// * `severity` group: DebugSeverity
         /// * `buf` len: length
         /// * alias of: [`glDebugMessageInsert`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DebugMessageInsertARB(
             &self,
             source: GLenum,
@@ -11167,8 +10926,6 @@ pub mod struct_commands {
         /// * `type_` group: DebugType
         /// * `severity` group: DebugSeverity
         /// * alias of: [`glDebugMessageInsert`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DebugMessageInsertKHR(
             &self,
             source: GLenum,
@@ -11224,8 +10981,6 @@ pub mod struct_commands {
         }
         /// [glDeleteBuffers](http://docs.gl/gl4/glDeleteBuffers)(n, buffers)
         /// * `buffers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteBuffers(&self, n: GLsizei, buffers: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11256,8 +11011,6 @@ pub mod struct_commands {
         }
         /// [glDeleteFramebuffers](http://docs.gl/gl4/glDeleteFramebuffers)(n, framebuffers)
         /// * `framebuffers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteFramebuffers(&self, n: GLsizei, framebuffers: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11296,8 +11049,6 @@ pub mod struct_commands {
             !self.glDeleteFramebuffers_p.load(RELAX).is_null()
         }
         /// [glDeleteProgram](http://docs.gl/gl4/glDeleteProgram)(program)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteProgram(&self, program: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11328,8 +11079,6 @@ pub mod struct_commands {
         }
         /// [glDeleteProgramPipelines](http://docs.gl/gl4/glDeleteProgramPipelines)(n, pipelines)
         /// * `pipelines` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteProgramPipelines(&self, n: GLsizei, pipelines: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11369,8 +11118,6 @@ pub mod struct_commands {
         }
         /// [glDeleteQueries](http://docs.gl/gl4/glDeleteQueries)(n, ids)
         /// * `ids` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteQueries(&self, n: GLsizei, ids: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11401,8 +11148,6 @@ pub mod struct_commands {
         }
         /// [glDeleteQueriesEXT](http://docs.gl/gl4/glDeleteQueriesEXT)(n, ids)
         /// * `ids` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteQueriesEXT(&self, n: GLsizei, ids: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11434,8 +11179,6 @@ pub mod struct_commands {
         }
         /// [glDeleteRenderbuffers](http://docs.gl/gl4/glDeleteRenderbuffers)(n, renderbuffers)
         /// * `renderbuffers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteRenderbuffers(&self, n: GLsizei, renderbuffers: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11475,8 +11218,6 @@ pub mod struct_commands {
         }
         /// [glDeleteSamplers](http://docs.gl/gl4/glDeleteSamplers)(count, samplers)
         /// * `samplers` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteSamplers(&self, count: GLsizei, samplers: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11511,8 +11252,6 @@ pub mod struct_commands {
             !self.glDeleteSamplers_p.load(RELAX).is_null()
         }
         /// [glDeleteShader](http://docs.gl/gl4/glDeleteShader)(shader)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteShader(&self, shader: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11543,8 +11282,6 @@ pub mod struct_commands {
         }
         /// [glDeleteSync](http://docs.gl/gl4/glDeleteSync)(sync)
         /// * `sync` group: sync
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteSync(&self, sync: GLsync) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11572,8 +11309,6 @@ pub mod struct_commands {
         /// [glDeleteTextures](http://docs.gl/gl4/glDeleteTextures)(n, textures)
         /// * `textures` group: Texture
         /// * `textures` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteTextures(&self, n: GLsizei, textures: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11605,8 +11340,6 @@ pub mod struct_commands {
         }
         /// [glDeleteTransformFeedbacks](http://docs.gl/gl4/glDeleteTransformFeedbacks)(n, ids)
         /// * `ids` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteTransformFeedbacks(&self, n: GLsizei, ids: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11642,8 +11375,6 @@ pub mod struct_commands {
         }
         /// [glDeleteVertexArrays](http://docs.gl/gl4/glDeleteVertexArrays)(n, arrays)
         /// * `arrays` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteVertexArrays(&self, n: GLsizei, arrays: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11680,8 +11411,6 @@ pub mod struct_commands {
         /// [glDeleteVertexArraysAPPLE](http://docs.gl/gl4/glDeleteVertexArraysAPPLE)(n, arrays)
         /// * `arrays` len: n
         /// * alias of: [`glDeleteVertexArrays`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteVertexArraysAPPLE(&self, n: GLsizei, arrays: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11718,8 +11447,6 @@ pub mod struct_commands {
         /// [glDeleteVertexArraysOES](http://docs.gl/gl4/glDeleteVertexArraysOES)(n, arrays)
         /// * `arrays` len: n
         /// * alias of: [`glDeleteVertexArrays`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DeleteVertexArraysOES(&self, n: GLsizei, arrays: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11755,8 +11482,6 @@ pub mod struct_commands {
         }
         /// [glDepthFunc](http://docs.gl/gl4/glDepthFunc)(func)
         /// * `func` group: DepthFunction
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DepthFunc(&self, func: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11782,8 +11507,6 @@ pub mod struct_commands {
             !self.glDepthFunc_p.load(RELAX).is_null()
         }
         /// [glDepthMask](http://docs.gl/gl4/glDepthMask)(flag)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DepthMask(&self, flag: GLboolean) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11809,8 +11532,6 @@ pub mod struct_commands {
             !self.glDepthMask_p.load(RELAX).is_null()
         }
         /// [glDepthRange](http://docs.gl/gl4/glDepthRange)(n, f)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DepthRange(&self, n: GLdouble, f: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11837,8 +11558,6 @@ pub mod struct_commands {
         }
         /// [glDepthRangeArrayv](http://docs.gl/gl4/glDepthRangeArrayv)(first, count, v)
         /// * `v` len: COMPSIZE(count)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DepthRangeArrayv(&self, first: GLuint, count: GLsizei, v: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11879,8 +11598,6 @@ pub mod struct_commands {
             !self.glDepthRangeArrayv_p.load(RELAX).is_null()
         }
         /// [glDepthRangeIndexed](http://docs.gl/gl4/glDepthRangeIndexed)(index, n, f)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DepthRangeIndexed(&self, index: GLuint, n: GLdouble, f: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11921,8 +11638,6 @@ pub mod struct_commands {
             !self.glDepthRangeIndexed_p.load(RELAX).is_null()
         }
         /// [glDepthRangef](http://docs.gl/gl4/glDepthRange)(n, f)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DepthRangef(&self, n: GLfloat, f: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11948,8 +11663,6 @@ pub mod struct_commands {
             !self.glDepthRangef_p.load(RELAX).is_null()
         }
         /// [glDetachShader](http://docs.gl/gl4/glDetachShader)(program, shader)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DetachShader(&self, program: GLuint, shader: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -11981,8 +11694,6 @@ pub mod struct_commands {
         }
         /// [glDisable](http://docs.gl/gl4/glDisable)(cap)
         /// * `cap` group: EnableCap
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Disable(&self, cap: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12010,8 +11721,6 @@ pub mod struct_commands {
         /// [glDisableIndexedEXT](http://docs.gl/gl4/glDisableIndexedEXT)(target, index)
         /// * `target` group: EnableCap
         /// * alias of: [`glDisablei`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DisableIndexedEXT(&self, target: GLenum, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12046,8 +11755,6 @@ pub mod struct_commands {
             !self.glDisableIndexedEXT_p.load(RELAX).is_null()
         }
         /// [glDisableVertexArrayAttrib](http://docs.gl/gl4/glDisableVertexArrayAttrib)(vaobj, index)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DisableVertexArrayAttrib(&self, vaobj: GLuint, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12086,8 +11793,6 @@ pub mod struct_commands {
             !self.glDisableVertexArrayAttrib_p.load(RELAX).is_null()
         }
         /// [glDisableVertexAttribArray](http://docs.gl/gl4/glDisableVertexAttribArray)(index)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DisableVertexAttribArray(&self, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12122,8 +11827,6 @@ pub mod struct_commands {
         }
         /// [glDisablei](http://docs.gl/gl4/glDisable)(target, index)
         /// * `target` group: EnableCap
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Disablei(&self, target: GLenum, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12149,8 +11852,6 @@ pub mod struct_commands {
             !self.glDisablei_p.load(RELAX).is_null()
         }
         /// [glDispatchCompute](http://docs.gl/gl4/glDispatchCompute)(num_groups_x, num_groups_y, num_groups_z)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DispatchCompute(
             &self,
             num_groups_x: GLuint,
@@ -12197,8 +11898,6 @@ pub mod struct_commands {
         }
         /// [glDispatchComputeIndirect](http://docs.gl/gl4/glDispatchComputeIndirect)(indirect)
         /// * `indirect` group: BufferOffset
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DispatchComputeIndirect(&self, indirect: GLintptr) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12233,8 +11932,6 @@ pub mod struct_commands {
         }
         /// [glDrawArrays](http://docs.gl/gl4/glDrawArrays)(mode, first, count)
         /// * `mode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawArrays(&self, mode: GLenum, first: GLint, count: GLsizei) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12267,8 +11964,6 @@ pub mod struct_commands {
         }
         /// [glDrawArraysIndirect](http://docs.gl/gl4/glDrawArraysIndirect)(mode, indirect)
         /// * `mode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawArraysIndirect(&self, mode: GLenum, indirect: *const c_void) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12308,8 +12003,6 @@ pub mod struct_commands {
         }
         /// [glDrawArraysInstanced](http://docs.gl/gl4/glDrawArraysInstanced)(mode, first, count, instancecount)
         /// * `mode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawArraysInstanced(
             &self,
             mode: GLenum,
@@ -12360,8 +12053,6 @@ pub mod struct_commands {
         /// [glDrawArraysInstancedARB](http://docs.gl/gl4/glDrawArraysInstancedARB)(mode, first, count, primcount)
         /// * `mode` group: PrimitiveType
         /// * alias of: [`glDrawArraysInstanced`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawArraysInstancedARB(
             &self,
             mode: GLenum,
@@ -12411,8 +12102,6 @@ pub mod struct_commands {
         }
         /// [glDrawArraysInstancedBaseInstance](http://docs.gl/gl4/glDrawArraysInstancedBaseInstance)(mode, first, count, instancecount, baseinstance)
         /// * `mode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawArraysInstancedBaseInstance(
             &self,
             mode: GLenum,
@@ -12468,8 +12157,6 @@ pub mod struct_commands {
         }
         /// [glDrawBuffer](http://docs.gl/gl4/glDrawBuffer)(buf)
         /// * `buf` group: DrawBufferMode
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawBuffer(&self, buf: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12497,8 +12184,6 @@ pub mod struct_commands {
         /// [glDrawBuffers](http://docs.gl/gl4/glDrawBuffers)(n, bufs)
         /// * `bufs` group: DrawBufferMode
         /// * `bufs` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawBuffers(&self, n: GLsizei, bufs: *const GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -12527,8 +12212,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
         /// * `indices` len: COMPSIZE(count,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawElements(
             &self,
             mode: GLenum,
@@ -12580,8 +12263,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
         /// * `indices` len: COMPSIZE(count,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawElementsBaseVertex(
             &self,
             mode: GLenum,
@@ -12635,8 +12316,6 @@ pub mod struct_commands {
         /// [glDrawElementsIndirect](http://docs.gl/gl4/glDrawElementsIndirect)(mode, type_, indirect)
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawElementsIndirect(
             &self,
             mode: GLenum,
@@ -12685,8 +12364,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
         /// * `indices` len: COMPSIZE(count,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawElementsInstanced(
             &self,
             mode: GLenum,
@@ -12742,8 +12419,6 @@ pub mod struct_commands {
         /// * `type_` group: DrawElementsType
         /// * `indices` len: COMPSIZE(count,type)
         /// * alias of: [`glDrawElementsInstanced`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawElementsInstancedARB(
             &self,
             mode: GLenum,
@@ -12798,8 +12473,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `type_` group: PrimitiveType
         /// * `indices` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawElementsInstancedBaseInstance(
             &self,
             mode: GLenum,
@@ -12852,8 +12525,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
         /// * `indices` len: COMPSIZE(count,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawElementsInstancedBaseVertex(
             &self,
             mode: GLenum,
@@ -12906,8 +12577,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
         /// * `indices` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawElementsInstancedBaseVertexBaseInstance(
             &self,
             mode: GLenum,
@@ -12962,8 +12631,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
         /// * `indices` len: COMPSIZE(count,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawRangeElements(
             &self,
             mode: GLenum,
@@ -13021,8 +12688,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
         /// * `indices` len: COMPSIZE(count,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawRangeElementsBaseVertex(
             &self,
             mode: GLenum,
@@ -13072,8 +12737,6 @@ pub mod struct_commands {
         }
         /// [glDrawTransformFeedback](http://docs.gl/gl4/glDrawTransformFeedback)(mode, id)
         /// * `mode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawTransformFeedback(&self, mode: GLenum, id: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13109,8 +12772,6 @@ pub mod struct_commands {
         }
         /// [glDrawTransformFeedbackInstanced](http://docs.gl/gl4/glDrawTransformFeedbackInstanced)(mode, id, instancecount)
         /// * `mode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawTransformFeedbackInstanced(
             &self,
             mode: GLenum,
@@ -13160,8 +12821,6 @@ pub mod struct_commands {
         }
         /// [glDrawTransformFeedbackStream](http://docs.gl/gl4/glDrawTransformFeedbackStream)(mode, id, stream)
         /// * `mode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawTransformFeedbackStream(&self, mode: GLenum, id: GLuint, stream: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13203,8 +12862,6 @@ pub mod struct_commands {
         }
         /// [glDrawTransformFeedbackStreamInstanced](http://docs.gl/gl4/glDrawTransformFeedbackStreamInstanced)(mode, id, stream, instancecount)
         /// * `mode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn DrawTransformFeedbackStreamInstanced(
             &self,
             mode: GLenum,
@@ -13257,8 +12914,6 @@ pub mod struct_commands {
         }
         /// [glEnable](http://docs.gl/gl4/glEnable)(cap)
         /// * `cap` group: EnableCap
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Enable(&self, cap: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13286,8 +12941,6 @@ pub mod struct_commands {
         /// [glEnableIndexedEXT](http://docs.gl/gl4/glEnableIndexedEXT)(target, index)
         /// * `target` group: EnableCap
         /// * alias of: [`glEnablei`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn EnableIndexedEXT(&self, target: GLenum, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13322,8 +12975,6 @@ pub mod struct_commands {
             !self.glEnableIndexedEXT_p.load(RELAX).is_null()
         }
         /// [glEnableVertexArrayAttrib](http://docs.gl/gl4/glEnableVertexArrayAttrib)(vaobj, index)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn EnableVertexArrayAttrib(&self, vaobj: GLuint, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13362,8 +13013,6 @@ pub mod struct_commands {
             !self.glEnableVertexArrayAttrib_p.load(RELAX).is_null()
         }
         /// [glEnableVertexAttribArray](http://docs.gl/gl4/glEnableVertexAttribArray)(index)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn EnableVertexAttribArray(&self, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13398,8 +13047,6 @@ pub mod struct_commands {
         }
         /// [glEnablei](http://docs.gl/gl4/glEnable)(target, index)
         /// * `target` group: EnableCap
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Enablei(&self, target: GLenum, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13425,8 +13072,6 @@ pub mod struct_commands {
             !self.glEnablei_p.load(RELAX).is_null()
         }
         /// [glEndConditionalRender](http://docs.gl/gl4/glEndConditionalRender)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn EndConditionalRender(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13458,8 +13103,6 @@ pub mod struct_commands {
         }
         /// [glEndQuery](http://docs.gl/gl4/glEndQuery)(target)
         /// * `target` group: QueryTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn EndQuery(&self, target: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13486,8 +13129,6 @@ pub mod struct_commands {
         }
         /// [glEndQueryEXT](http://docs.gl/gl4/glEndQueryEXT)(target)
         /// * `target` group: QueryTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn EndQueryEXT(&self, target: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13514,8 +13155,6 @@ pub mod struct_commands {
         }
         /// [glEndQueryIndexed](http://docs.gl/gl4/glEndQueryIndexed)(target, index)
         /// * `target` group: QueryTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn EndQueryIndexed(&self, target: GLenum, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13550,8 +13189,6 @@ pub mod struct_commands {
             !self.glEndQueryIndexed_p.load(RELAX).is_null()
         }
         /// [glEndTransformFeedback](http://docs.gl/gl4/glEndTransformFeedback)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn EndTransformFeedback(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13585,8 +13222,6 @@ pub mod struct_commands {
         /// * `condition` group: SyncCondition
         /// * `flags` group: SyncBehaviorFlags
         /// * return value group: sync
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FenceSync(&self, condition: GLenum, flags: GLbitfield) -> GLsync {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13612,8 +13247,6 @@ pub mod struct_commands {
             !self.glFenceSync_p.load(RELAX).is_null()
         }
         /// [glFinish](http://docs.gl/gl4/glFinish)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Finish(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13639,8 +13272,6 @@ pub mod struct_commands {
             !self.glFinish_p.load(RELAX).is_null()
         }
         /// [glFlush](http://docs.gl/gl4/glFlush)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Flush(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13669,8 +13300,6 @@ pub mod struct_commands {
         /// * `target` group: BufferTargetARB
         /// * `offset` group: BufferOffset
         /// * `length` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FlushMappedBufferRange(
             &self,
             target: GLenum,
@@ -13717,8 +13346,6 @@ pub mod struct_commands {
         }
         /// [glFlushMappedNamedBufferRange](http://docs.gl/gl4/glFlushMappedNamedBufferRange)(buffer, offset, length)
         /// * `length` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FlushMappedNamedBufferRange(
             &self,
             buffer: GLuint,
@@ -13766,8 +13393,6 @@ pub mod struct_commands {
         /// [glFramebufferParameteri](http://docs.gl/gl4/glFramebufferParameter)(target, pname, param)
         /// * `target` group: FramebufferTarget
         /// * `pname` group: FramebufferParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FramebufferParameteri(&self, target: GLenum, pname: GLenum, param: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -13811,8 +13436,6 @@ pub mod struct_commands {
         /// * `target` group: FramebufferTarget
         /// * `attachment` group: FramebufferAttachment
         /// * `renderbuffertarget` group: RenderbufferTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FramebufferRenderbuffer(
             &self,
             target: GLenum,
@@ -13863,8 +13486,6 @@ pub mod struct_commands {
         /// [glFramebufferTexture](http://docs.gl/gl4/glFramebufferTexture)(target, attachment, texture, level)
         /// * `target` group: FramebufferTarget
         /// * `attachment` group: FramebufferAttachment
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FramebufferTexture(
             &self,
             target: GLenum,
@@ -13916,8 +13537,6 @@ pub mod struct_commands {
         /// * `target` group: FramebufferTarget
         /// * `attachment` group: FramebufferAttachment
         /// * `textarget` group: TextureTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FramebufferTexture1D(
             &self,
             target: GLenum,
@@ -13972,8 +13591,6 @@ pub mod struct_commands {
         /// * `target` group: FramebufferTarget
         /// * `attachment` group: FramebufferAttachment
         /// * `textarget` group: TextureTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FramebufferTexture2D(
             &self,
             target: GLenum,
@@ -14028,8 +13645,6 @@ pub mod struct_commands {
         /// * `target` group: FramebufferTarget
         /// * `attachment` group: FramebufferAttachment
         /// * `textarget` group: TextureTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FramebufferTexture3D(
             &self,
             target: GLenum,
@@ -14089,8 +13704,6 @@ pub mod struct_commands {
         /// * `texture` group: Texture
         /// * `level` group: CheckedInt32
         /// * `layer` group: CheckedInt32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FramebufferTextureLayer(
             &self,
             target: GLenum,
@@ -14143,8 +13756,6 @@ pub mod struct_commands {
         }
         /// [glFrontFace](http://docs.gl/gl4/glFrontFace)(mode)
         /// * `mode` group: FrontFaceDirection
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn FrontFace(&self, mode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14171,8 +13782,6 @@ pub mod struct_commands {
         }
         /// [glGenBuffers](http://docs.gl/gl4/glGenBuffers)(n, buffers)
         /// * `buffers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenBuffers(&self, n: GLsizei, buffers: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14199,8 +13808,6 @@ pub mod struct_commands {
         }
         /// [glGenFramebuffers](http://docs.gl/gl4/glGenFramebuffers)(n, framebuffers)
         /// * `framebuffers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenFramebuffers(&self, n: GLsizei, framebuffers: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14236,8 +13843,6 @@ pub mod struct_commands {
         }
         /// [glGenProgramPipelines](http://docs.gl/gl4/glGenProgramPipelines)(n, pipelines)
         /// * `pipelines` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenProgramPipelines(&self, n: GLsizei, pipelines: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14273,8 +13878,6 @@ pub mod struct_commands {
         }
         /// [glGenQueries](http://docs.gl/gl4/glGenQueries)(n, ids)
         /// * `ids` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenQueries(&self, n: GLsizei, ids: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14301,8 +13904,6 @@ pub mod struct_commands {
         }
         /// [glGenQueriesEXT](http://docs.gl/gl4/glGenQueriesEXT)(n, ids)
         /// * `ids` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenQueriesEXT(&self, n: GLsizei, ids: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14333,8 +13934,6 @@ pub mod struct_commands {
         }
         /// [glGenRenderbuffers](http://docs.gl/gl4/glGenRenderbuffers)(n, renderbuffers)
         /// * `renderbuffers` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenRenderbuffers(&self, n: GLsizei, renderbuffers: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14370,8 +13969,6 @@ pub mod struct_commands {
         }
         /// [glGenSamplers](http://docs.gl/gl4/glGenSamplers)(count, samplers)
         /// * `samplers` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenSamplers(&self, count: GLsizei, samplers: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14399,8 +13996,6 @@ pub mod struct_commands {
         /// [glGenTextures](http://docs.gl/gl4/glGenTextures)(n, textures)
         /// * `textures` group: Texture
         /// * `textures` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenTextures(&self, n: GLsizei, textures: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14427,8 +14022,6 @@ pub mod struct_commands {
         }
         /// [glGenTransformFeedbacks](http://docs.gl/gl4/glGenTransformFeedbacks)(n, ids)
         /// * `ids` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenTransformFeedbacks(&self, n: GLsizei, ids: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14464,8 +14057,6 @@ pub mod struct_commands {
         }
         /// [glGenVertexArrays](http://docs.gl/gl4/glGenVertexArrays)(n, arrays)
         /// * `arrays` len: n
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenVertexArrays(&self, n: GLsizei, arrays: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14498,8 +14089,6 @@ pub mod struct_commands {
         /// [glGenVertexArraysAPPLE](http://docs.gl/gl4/glGenVertexArraysAPPLE)(n, arrays)
         /// * `arrays` len: n
         /// * alias of: [`glGenVertexArrays`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenVertexArraysAPPLE(&self, n: GLsizei, arrays: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14536,8 +14125,6 @@ pub mod struct_commands {
         /// [glGenVertexArraysOES](http://docs.gl/gl4/glGenVertexArraysOES)(n, arrays)
         /// * `arrays` len: n
         /// * alias of: [`glGenVertexArrays`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenVertexArraysOES(&self, n: GLsizei, arrays: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14573,8 +14160,6 @@ pub mod struct_commands {
         }
         /// [glGenerateMipmap](http://docs.gl/gl4/glGenerateMipmap)(target)
         /// * `target` group: TextureTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenerateMipmap(&self, target: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14604,8 +14189,6 @@ pub mod struct_commands {
             !self.glGenerateMipmap_p.load(RELAX).is_null()
         }
         /// [glGenerateTextureMipmap](http://docs.gl/gl4/glGenerateTextureMipmap)(texture)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GenerateTextureMipmap(&self, texture: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -14641,8 +14224,6 @@ pub mod struct_commands {
         /// [glGetActiveAtomicCounterBufferiv](http://docs.gl/gl4/glGetActiveAtomicCounterBuffer)(program, bufferIndex, pname, params)
         /// * `pname` group: AtomicCounterBufferPName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveAtomicCounterBufferiv(
             &self,
             program: GLuint,
@@ -14699,8 +14280,6 @@ pub mod struct_commands {
         /// * `type_` group: AttributeType
         /// * `type_` len: 1
         /// * `name` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveAttrib(
             &self,
             program: GLuint,
@@ -14761,8 +14340,6 @@ pub mod struct_commands {
         /// * `shadertype` group: ShaderType
         /// * `length` len: 1
         /// * `name` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveSubroutineName(
             &self,
             program: GLuint,
@@ -14820,8 +14397,6 @@ pub mod struct_commands {
         /// * `shadertype` group: ShaderType
         /// * `length` len: 1
         /// * `name` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveSubroutineUniformName(
             &self,
             program: GLuint,
@@ -14874,8 +14449,6 @@ pub mod struct_commands {
         /// * `shadertype` group: ShaderType
         /// * `pname` group: SubroutineParameterName
         /// * `values` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveSubroutineUniformiv(
             &self,
             program: GLuint,
@@ -14932,8 +14505,6 @@ pub mod struct_commands {
         /// * `type_` group: UniformType
         /// * `type_` len: 1
         /// * `name` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveUniform(
             &self,
             program: GLuint,
@@ -14993,8 +14564,6 @@ pub mod struct_commands {
         /// [glGetActiveUniformBlockName](http://docs.gl/gl4/glGetActiveUniformBlockName)(program, uniformBlockIndex, bufSize, length, uniformBlockName)
         /// * `length` len: 1
         /// * `uniformBlockName` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveUniformBlockName(
             &self,
             program: GLuint,
@@ -15048,8 +14617,6 @@ pub mod struct_commands {
         /// [glGetActiveUniformBlockiv](http://docs.gl/gl4/glGetActiveUniformBlockiv)(program, uniformBlockIndex, pname, params)
         /// * `pname` group: UniformBlockPName
         /// * `params` len: COMPSIZE(program,uniformBlockIndex,pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveUniformBlockiv(
             &self,
             program: GLuint,
@@ -15100,8 +14667,6 @@ pub mod struct_commands {
         /// [glGetActiveUniformName](http://docs.gl/gl4/glGetActiveUniformName)(program, uniformIndex, bufSize, length, uniformName)
         /// * `length` len: 1
         /// * `uniformName` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveUniformName(
             &self,
             program: GLuint,
@@ -15156,8 +14721,6 @@ pub mod struct_commands {
         /// * `uniformIndices` len: uniformCount
         /// * `pname` group: UniformPName
         /// * `params` len: COMPSIZE(uniformCount,pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetActiveUniformsiv(
             &self,
             program: GLuint,
@@ -15211,8 +14774,6 @@ pub mod struct_commands {
         /// [glGetAttachedShaders](http://docs.gl/gl4/glGetAttachedShaders)(program, maxCount, count, shaders)
         /// * `count` len: 1
         /// * `shaders` len: maxCount
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetAttachedShaders(
             &self,
             program: GLuint,
@@ -15261,8 +14822,6 @@ pub mod struct_commands {
             !self.glGetAttachedShaders_p.load(RELAX).is_null()
         }
         /// [glGetAttribLocation](http://docs.gl/gl4/glGetAttribLocation)(program, name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetAttribLocation(&self, program: GLuint, name: *const GLchar) -> GLint {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -15300,8 +14859,6 @@ pub mod struct_commands {
         /// * `target` group: BufferTargetARB
         /// * `data` len: COMPSIZE(target)
         /// * alias of: [`glGetBooleani_v`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetBooleanIndexedvEXT(
             &self,
             target: GLenum,
@@ -15349,8 +14906,6 @@ pub mod struct_commands {
         /// [glGetBooleani_v](http://docs.gl/gl4/glGet)(target, index, data)
         /// * `target` group: BufferTargetARB
         /// * `data` len: COMPSIZE(target)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetBooleani_v(&self, target: GLenum, index: GLuint, data: *mut GLboolean) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -15393,8 +14948,6 @@ pub mod struct_commands {
         /// [glGetBooleanv](http://docs.gl/gl4/glGet)(pname, data)
         /// * `pname` group: GetPName
         /// * `data` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetBooleanv(&self, pname: GLenum, data: *mut GLboolean) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -15423,8 +14976,6 @@ pub mod struct_commands {
         /// * `target` group: BufferTargetARB
         /// * `pname` group: BufferPNameARB
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetBufferParameteri64v(
             &self,
             target: GLenum,
@@ -15473,8 +15024,6 @@ pub mod struct_commands {
         /// * `target` group: BufferTargetARB
         /// * `pname` group: BufferPNameARB
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetBufferParameteriv(
             &self,
             target: GLenum,
@@ -15523,8 +15072,6 @@ pub mod struct_commands {
         /// * `target` group: BufferTargetARB
         /// * `pname` group: BufferPointerNameARB
         /// * `params` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetBufferPointerv(
             &self,
             target: GLenum,
@@ -15574,8 +15121,6 @@ pub mod struct_commands {
         /// * `offset` group: BufferOffset
         /// * `size` group: BufferSize
         /// * `data` len: size
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetBufferSubData(
             &self,
             target: GLenum,
@@ -15628,8 +15173,6 @@ pub mod struct_commands {
         /// * `level` group: CheckedInt32
         /// * `img` group: CompressedTextureARB
         /// * `img` len: COMPSIZE(target,level)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetCompressedTexImage(&self, target: GLenum, level: GLint, img: *mut c_void) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -15670,8 +15213,6 @@ pub mod struct_commands {
             !self.glGetCompressedTexImage_p.load(RELAX).is_null()
         }
         /// [glGetCompressedTextureImage](http://docs.gl/gl4/glGetCompressedTextureImage)(texture, level, bufSize, pixels)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetCompressedTextureImage(
             &self,
             texture: GLuint,
@@ -15720,8 +15261,6 @@ pub mod struct_commands {
             !self.glGetCompressedTextureImage_p.load(RELAX).is_null()
         }
         /// [glGetCompressedTextureSubImage](http://docs.gl/gl4/glGetCompressedTextureSubImage)(texture, level, xoffset, yoffset, zoffset, width, height, depth, bufSize, pixels)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetCompressedTextureSubImage(
             &self,
             texture: GLuint,
@@ -15785,8 +15324,6 @@ pub mod struct_commands {
         /// * `severities` len: count
         /// * `lengths` len: count
         /// * `messageLog` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetDebugMessageLog(
             &self,
             count: GLuint,
@@ -15847,8 +15384,6 @@ pub mod struct_commands {
         /// * `lengths` len: count
         /// * `messageLog` len: bufSize
         /// * alias of: [`glGetDebugMessageLog`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetDebugMessageLogARB(
             &self,
             count: GLuint,
@@ -15909,8 +15444,6 @@ pub mod struct_commands {
         /// * `lengths` len: count
         /// * `messageLog` len: bufSize
         /// * alias of: [`glGetDebugMessageLog`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetDebugMessageLogKHR(
             &self,
             count: GLuint,
@@ -15963,8 +15496,6 @@ pub mod struct_commands {
         /// [glGetDoublei_v](http://docs.gl/gl4/glGetDoublei_v)(target, index, data)
         /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetDoublei_v(&self, target: GLenum, index: GLuint, data: *mut GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16007,8 +15538,6 @@ pub mod struct_commands {
         /// [glGetDoublev](http://docs.gl/gl4/glGetDoublev)(pname, data)
         /// * `pname` group: GetPName
         /// * `data` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetDoublev(&self, pname: GLenum, data: *mut GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16035,8 +15564,6 @@ pub mod struct_commands {
         }
         /// [glGetError](http://docs.gl/gl4/glGetError)()
         /// * return value group: ErrorCode
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetError(&self) -> GLenum {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16061,8 +15588,6 @@ pub mod struct_commands {
         /// [glGetFloati_v](http://docs.gl/gl4/glGetFloati_v)(target, index, data)
         /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetFloati_v(&self, target: GLenum, index: GLuint, data: *mut GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16096,8 +15621,6 @@ pub mod struct_commands {
         /// [glGetFloatv](http://docs.gl/gl4/glGet)(pname, data)
         /// * `pname` group: GetPName
         /// * `data` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetFloatv(&self, pname: GLenum, data: *mut GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16123,8 +15646,6 @@ pub mod struct_commands {
             !self.glGetFloatv_p.load(RELAX).is_null()
         }
         /// [glGetFragDataIndex](http://docs.gl/gl4/glGetFragDataIndex)(program, name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetFragDataIndex(&self, program: GLuint, name: *const GLchar) -> GLint {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16160,8 +15681,6 @@ pub mod struct_commands {
         }
         /// [glGetFragDataLocation](http://docs.gl/gl4/glGetFragDataLocation)(program, name)
         /// * `name` len: COMPSIZE(name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetFragDataLocation(&self, program: GLuint, name: *const GLchar) -> GLint {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16200,8 +15719,6 @@ pub mod struct_commands {
         /// * `attachment` group: FramebufferAttachment
         /// * `pname` group: FramebufferAttachmentParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetFramebufferAttachmentParameteriv(
             &self,
             target: GLenum,
@@ -16256,8 +15773,6 @@ pub mod struct_commands {
         /// * `target` group: FramebufferTarget
         /// * `pname` group: FramebufferAttachmentParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetFramebufferParameteriv(
             &self,
             target: GLenum,
@@ -16304,8 +15819,6 @@ pub mod struct_commands {
         }
         /// [glGetGraphicsResetStatus](http://docs.gl/gl4/glGetGraphicsResetStatus)()
         /// * return value group: GraphicsResetStatus
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetGraphicsResetStatus(&self) -> GLenum {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16338,8 +15851,6 @@ pub mod struct_commands {
         /// [glGetInteger64i_v](http://docs.gl/gl4/glGet)(target, index, data)
         /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetInteger64i_v(&self, target: GLenum, index: GLuint, data: *mut GLint64) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16382,8 +15893,6 @@ pub mod struct_commands {
         /// [glGetInteger64v](http://docs.gl/gl4/glGet)(pname, data)
         /// * `pname` group: GetPName
         /// * `data` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetInteger64v(&self, pname: GLenum, data: *mut GLint64) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16416,8 +15925,6 @@ pub mod struct_commands {
         /// * `pname` group: GetPName
         /// * `data` len: COMPSIZE(pname)
         /// * alias of: [`glGetInteger64v`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetInteger64vEXT(&self, pname: GLenum, data: *mut GLint64) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16455,8 +15962,6 @@ pub mod struct_commands {
         /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
         /// * alias of: [`glGetIntegeri_v`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetIntegerIndexedvEXT(
             &self,
             target: GLenum,
@@ -16504,8 +16009,6 @@ pub mod struct_commands {
         /// [glGetIntegeri_v](http://docs.gl/gl4/glGet)(target, index, data)
         /// * `target` group: GetPName
         /// * `data` len: COMPSIZE(target)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetIntegeri_v(&self, target: GLenum, index: GLuint, data: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16548,8 +16051,6 @@ pub mod struct_commands {
         /// [glGetIntegerv](http://docs.gl/gl4/glGet)(pname, data)
         /// * `pname` group: GetPName
         /// * `data` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetIntegerv(&self, pname: GLenum, data: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16579,8 +16080,6 @@ pub mod struct_commands {
         /// * `internalformat` group: InternalFormat
         /// * `pname` group: InternalFormatPName
         /// * `params` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetInternalformati64v(
             &self,
             target: GLenum,
@@ -16636,8 +16135,6 @@ pub mod struct_commands {
         /// * `internalformat` group: InternalFormat
         /// * `pname` group: InternalFormatPName
         /// * `params` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetInternalformativ(
             &self,
             target: GLenum,
@@ -16691,8 +16188,6 @@ pub mod struct_commands {
         /// [glGetMultisamplefv](http://docs.gl/gl4/glGetMultisample)(pname, index, val)
         /// * `pname` group: GetMultisamplePNameNV
         /// * `val` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetMultisamplefv(&self, pname: GLenum, index: GLuint, val: *mut GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -16734,8 +16229,6 @@ pub mod struct_commands {
         }
         /// [glGetNamedBufferParameteri64v](http://docs.gl/gl4/glGetNamedBufferParameter)(buffer, pname, params)
         /// * `pname` group: BufferPNameARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetNamedBufferParameteri64v(
             &self,
             buffer: GLuint,
@@ -16782,8 +16275,6 @@ pub mod struct_commands {
         }
         /// [glGetNamedBufferParameteriv](http://docs.gl/gl4/glGetNamedBufferParameter)(buffer, pname, params)
         /// * `pname` group: BufferPNameARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetNamedBufferParameteriv(
             &self,
             buffer: GLuint,
@@ -16830,8 +16321,6 @@ pub mod struct_commands {
         }
         /// [glGetNamedBufferPointerv](http://docs.gl/gl4/glGetNamedBufferPointerv)(buffer, pname, params)
         /// * `pname` group: BufferPointerNameARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetNamedBufferPointerv(
             &self,
             buffer: GLuint,
@@ -16878,8 +16367,6 @@ pub mod struct_commands {
         }
         /// [glGetNamedBufferSubData](http://docs.gl/gl4/glGetNamedBufferSubData)(buffer, offset, size, data)
         /// * `size` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetNamedBufferSubData(
             &self,
             buffer: GLuint,
@@ -16930,8 +16417,6 @@ pub mod struct_commands {
         /// [glGetNamedFramebufferAttachmentParameteriv](http://docs.gl/gl4/glGetNamedFramebufferAttachmentParameter)(framebuffer, attachment, pname, params)
         /// * `attachment` group: FramebufferAttachment
         /// * `pname` group: FramebufferAttachmentParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetNamedFramebufferAttachmentParameteriv(
             &self,
             framebuffer: GLuint,
@@ -16978,8 +16463,6 @@ pub mod struct_commands {
         }
         /// [glGetNamedFramebufferParameteriv](http://docs.gl/gl4/glGetNamedFramebufferParameter)(framebuffer, pname, param)
         /// * `pname` group: GetFramebufferParameter
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetNamedFramebufferParameteriv(
             &self,
             framebuffer: GLuint,
@@ -17029,8 +16512,6 @@ pub mod struct_commands {
         }
         /// [glGetNamedRenderbufferParameteriv](http://docs.gl/gl4/glGetNamedRenderbufferParameter)(renderbuffer, pname, params)
         /// * `pname` group: RenderbufferParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetNamedRenderbufferParameteriv(
             &self,
             renderbuffer: GLuint,
@@ -17082,8 +16563,6 @@ pub mod struct_commands {
         /// * `identifier` group: ObjectIdentifier
         /// * `length` len: 1
         /// * `label` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetObjectLabel(
             &self,
             identifier: GLenum,
@@ -17137,8 +16616,6 @@ pub mod struct_commands {
         /// [glGetObjectLabelKHR](http://docs.gl/gl4/glGetObjectLabelKHR)(identifier, name, bufSize, length, label)
         /// * `label` len: bufSize
         /// * alias of: [`glGetObjectLabel`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetObjectLabelKHR(
             &self,
             identifier: GLenum,
@@ -17192,8 +16669,6 @@ pub mod struct_commands {
         /// [glGetObjectPtrLabel](http://docs.gl/gl4/glGetObjectPtrLabel)(ptr, bufSize, length, label)
         /// * `length` len: 1
         /// * `label` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetObjectPtrLabel(
             &self,
             ptr: *const c_void,
@@ -17245,8 +16720,6 @@ pub mod struct_commands {
         /// * `length` len: 1
         /// * `label` len: bufSize
         /// * alias of: [`glGetObjectPtrLabel`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetObjectPtrLabelKHR(
             &self,
             ptr: *const c_void,
@@ -17297,8 +16770,6 @@ pub mod struct_commands {
         /// [glGetPointerv](http://docs.gl/gl4/glGetPointerv)(pname, params)
         /// * `pname` group: GetPointervPName
         /// * `params` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetPointerv(&self, pname: GLenum, params: *mut *mut c_void) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -17325,8 +16796,6 @@ pub mod struct_commands {
         }
         /// [glGetPointervKHR](http://docs.gl/gl4/glGetPointervKHR)(pname, params)
         /// * alias of: [`glGetPointerv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetPointervKHR(&self, pname: GLenum, params: *mut *mut c_void) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -17360,8 +16829,6 @@ pub mod struct_commands {
         /// * `length` len: 1
         /// * `binaryFormat` len: 1
         /// * `binary` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramBinary(
             &self,
             program: GLuint,
@@ -17415,8 +16882,6 @@ pub mod struct_commands {
         /// [glGetProgramInfoLog](http://docs.gl/gl4/glGetProgramInfoLog)(program, bufSize, length, infoLog)
         /// * `length` len: 1
         /// * `infoLog` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramInfoLog(
             &self,
             program: GLuint,
@@ -17468,8 +16933,6 @@ pub mod struct_commands {
         /// * `programInterface` group: ProgramInterface
         /// * `pname` group: ProgramInterfacePName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramInterfaceiv(
             &self,
             program: GLuint,
@@ -17520,8 +16983,6 @@ pub mod struct_commands {
         /// [glGetProgramPipelineInfoLog](http://docs.gl/gl4/glGetProgramPipelineInfoLog)(pipeline, bufSize, length, infoLog)
         /// * `length` len: 1
         /// * `infoLog` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramPipelineInfoLog(
             &self,
             pipeline: GLuint,
@@ -17572,8 +17033,6 @@ pub mod struct_commands {
         /// [glGetProgramPipelineiv](http://docs.gl/gl4/glGetProgramPipeline)(pipeline, pname, params)
         /// * `pname` group: PipelineParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramPipelineiv(
             &self,
             pipeline: GLuint,
@@ -17621,8 +17080,6 @@ pub mod struct_commands {
         /// [glGetProgramResourceIndex](http://docs.gl/gl4/glGetProgramResourceIndex)(program, programInterface, name)
         /// * `programInterface` group: ProgramInterface
         /// * `name` len: COMPSIZE(name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramResourceIndex(
             &self,
             program: GLuint,
@@ -17670,8 +17127,6 @@ pub mod struct_commands {
         /// [glGetProgramResourceLocation](http://docs.gl/gl4/glGetProgramResourceLocation)(program, programInterface, name)
         /// * `programInterface` group: ProgramInterface
         /// * `name` len: COMPSIZE(name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramResourceLocation(
             &self,
             program: GLuint,
@@ -17719,8 +17174,6 @@ pub mod struct_commands {
         /// [glGetProgramResourceLocationIndex](http://docs.gl/gl4/glGetProgramResourceLocationIndex)(program, programInterface, name)
         /// * `programInterface` group: ProgramInterface
         /// * `name` len: COMPSIZE(name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramResourceLocationIndex(
             &self,
             program: GLuint,
@@ -17772,8 +17225,6 @@ pub mod struct_commands {
         /// * `programInterface` group: ProgramInterface
         /// * `length` len: 1
         /// * `name` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramResourceName(
             &self,
             program: GLuint,
@@ -17833,8 +17284,6 @@ pub mod struct_commands {
         /// * `props` len: propCount
         /// * `length` len: 1
         /// * `params` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramResourceiv(
             &self,
             program: GLuint,
@@ -17888,8 +17337,6 @@ pub mod struct_commands {
         /// * `shadertype` group: ShaderType
         /// * `pname` group: ProgramStagePName
         /// * `values` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramStageiv(
             &self,
             program: GLuint,
@@ -17940,8 +17387,6 @@ pub mod struct_commands {
         /// [glGetProgramiv](http://docs.gl/gl4/glGetProgram)(program, pname, params)
         /// * `pname` group: ProgramPropertyARB
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetProgramiv(&self, program: GLuint, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -17983,8 +17428,6 @@ pub mod struct_commands {
         }
         /// [glGetQueryBufferObjecti64v](http://docs.gl/gl4/glGetQueryBufferObject)(id, buffer, pname, offset)
         /// * `pname` group: QueryObjectParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryBufferObjecti64v(
             &self,
             id: GLuint,
@@ -18034,8 +17477,6 @@ pub mod struct_commands {
         }
         /// [glGetQueryBufferObjectiv](http://docs.gl/gl4/glGetQueryBufferObject)(id, buffer, pname, offset)
         /// * `pname` group: QueryObjectParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryBufferObjectiv(
             &self,
             id: GLuint,
@@ -18085,8 +17526,6 @@ pub mod struct_commands {
         }
         /// [glGetQueryBufferObjectui64v](http://docs.gl/gl4/glGetQueryBufferObjectu)(id, buffer, pname, offset)
         /// * `pname` group: QueryObjectParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryBufferObjectui64v(
             &self,
             id: GLuint,
@@ -18136,8 +17575,6 @@ pub mod struct_commands {
         }
         /// [glGetQueryBufferObjectuiv](http://docs.gl/gl4/glGetQueryBufferObject)(id, buffer, pname, offset)
         /// * `pname` group: QueryObjectParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryBufferObjectuiv(
             &self,
             id: GLuint,
@@ -18189,8 +17626,6 @@ pub mod struct_commands {
         /// * `target` group: QueryTarget
         /// * `pname` group: QueryParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryIndexediv(
             &self,
             target: GLenum,
@@ -18241,8 +17676,6 @@ pub mod struct_commands {
         /// [glGetQueryObjecti64v](http://docs.gl/gl4/glGetQueryObject)(id, pname, params)
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryObjecti64v(&self, id: GLuint, pname: GLenum, params: *mut GLint64) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -18286,8 +17719,6 @@ pub mod struct_commands {
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
         /// * alias of: [`glGetQueryObjecti64v`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryObjecti64vEXT(
             &self,
             id: GLuint,
@@ -18335,8 +17766,6 @@ pub mod struct_commands {
         /// [glGetQueryObjectiv](http://docs.gl/gl4/glGetQueryObject)(id, pname, params)
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryObjectiv(&self, id: GLuint, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -18380,8 +17809,6 @@ pub mod struct_commands {
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
         /// * alias of: [`glGetQueryObjectiv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryObjectivEXT(&self, id: GLuint, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -18424,8 +17851,6 @@ pub mod struct_commands {
         /// [glGetQueryObjectui64v](http://docs.gl/gl4/glGetQueryObjectu)(id, pname, params)
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryObjectui64v(&self, id: GLuint, pname: GLenum, params: *mut GLuint64) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -18469,8 +17894,6 @@ pub mod struct_commands {
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
         /// * alias of: [`glGetQueryObjectui64v`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryObjectui64vEXT(
             &self,
             id: GLuint,
@@ -18518,8 +17941,6 @@ pub mod struct_commands {
         /// [glGetQueryObjectuiv](http://docs.gl/gl4/glGetQueryObject)(id, pname, params)
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryObjectuiv(&self, id: GLuint, pname: GLenum, params: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -18562,8 +17983,6 @@ pub mod struct_commands {
         /// [glGetQueryObjectuivEXT](http://docs.gl/gl4/glGetQueryObjectuivEXT)(id, pname, params)
         /// * `pname` group: QueryObjectParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryObjectuivEXT(&self, id: GLuint, pname: GLenum, params: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -18607,8 +18026,6 @@ pub mod struct_commands {
         /// * `target` group: QueryTarget
         /// * `pname` group: QueryParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryiv(&self, target: GLenum, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -18643,8 +18060,6 @@ pub mod struct_commands {
         /// * `target` group: QueryTarget
         /// * `pname` group: QueryParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetQueryivEXT(&self, target: GLenum, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -18688,8 +18103,6 @@ pub mod struct_commands {
         /// * `target` group: RenderbufferTarget
         /// * `pname` group: RenderbufferParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetRenderbufferParameteriv(
             &self,
             target: GLenum,
@@ -18737,8 +18150,6 @@ pub mod struct_commands {
         /// [glGetSamplerParameterIiv](http://docs.gl/gl4/glGetSamplerParameter)(sampler, pname, params)
         /// * `pname` group: SamplerParameterI
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetSamplerParameterIiv(
             &self,
             sampler: GLuint,
@@ -18786,8 +18197,6 @@ pub mod struct_commands {
         /// [glGetSamplerParameterIuiv](http://docs.gl/gl4/glGetSamplerParameter)(sampler, pname, params)
         /// * `pname` group: SamplerParameterI
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetSamplerParameterIuiv(
             &self,
             sampler: GLuint,
@@ -18835,8 +18244,6 @@ pub mod struct_commands {
         /// [glGetSamplerParameterfv](http://docs.gl/gl4/glGetSamplerParameter)(sampler, pname, params)
         /// * `pname` group: SamplerParameterF
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetSamplerParameterfv(
             &self,
             sampler: GLuint,
@@ -18884,8 +18291,6 @@ pub mod struct_commands {
         /// [glGetSamplerParameteriv](http://docs.gl/gl4/glGetSamplerParameter)(sampler, pname, params)
         /// * `pname` group: SamplerParameterI
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetSamplerParameteriv(
             &self,
             sampler: GLuint,
@@ -18933,8 +18338,6 @@ pub mod struct_commands {
         /// [glGetShaderInfoLog](http://docs.gl/gl4/glGetShaderInfoLog)(shader, bufSize, length, infoLog)
         /// * `length` len: 1
         /// * `infoLog` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetShaderInfoLog(
             &self,
             shader: GLuint,
@@ -18987,8 +18390,6 @@ pub mod struct_commands {
         /// * `precisiontype` group: PrecisionType
         /// * `range` len: 2
         /// * `precision` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetShaderPrecisionFormat(
             &self,
             shadertype: GLenum,
@@ -19039,8 +18440,6 @@ pub mod struct_commands {
         /// [glGetShaderSource](http://docs.gl/gl4/glGetShaderSource)(shader, bufSize, length, source)
         /// * `length` len: 1
         /// * `source` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetShaderSource(
             &self,
             shader: GLuint,
@@ -19091,8 +18490,6 @@ pub mod struct_commands {
         /// [glGetShaderiv](http://docs.gl/gl4/glGetShaderiv)(shader, pname, params)
         /// * `pname` group: ShaderParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetShaderiv(&self, shader: GLuint, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -19131,8 +18528,6 @@ pub mod struct_commands {
         /// [glGetString](http://docs.gl/gl4/glGetString)(name)
         /// * `name` group: StringName
         /// * return value group: String
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetString(&self, name: GLenum) -> *const GLubyte {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -19160,8 +18555,6 @@ pub mod struct_commands {
         /// [glGetStringi](http://docs.gl/gl4/glGetString)(name, index)
         /// * `name` group: StringName
         /// * return value group: String
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetStringi(&self, name: GLenum, index: GLuint) -> *const GLubyte {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -19188,8 +18581,6 @@ pub mod struct_commands {
         }
         /// [glGetSubroutineIndex](http://docs.gl/gl4/glGetSubroutineIndex)(program, shadertype, name)
         /// * `shadertype` group: ShaderType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetSubroutineIndex(
             &self,
             program: GLuint,
@@ -19236,8 +18627,6 @@ pub mod struct_commands {
         }
         /// [glGetSubroutineUniformLocation](http://docs.gl/gl4/glGetSubroutineUniformLocation)(program, shadertype, name)
         /// * `shadertype` group: ShaderType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetSubroutineUniformLocation(
             &self,
             program: GLuint,
@@ -19287,8 +18676,6 @@ pub mod struct_commands {
         /// * `pname` group: SyncParameterName
         /// * `length` len: 1
         /// * `values` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetSynciv(
             &self,
             sync: GLsync,
@@ -19341,8 +18728,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `pixels` len: COMPSIZE(target,level,format,type)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTexImage(
             &self,
             target: GLenum,
@@ -19394,8 +18779,6 @@ pub mod struct_commands {
         /// * `level` group: CheckedInt32
         /// * `pname` group: GetTextureParameter
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTexLevelParameterfv(
             &self,
             target: GLenum,
@@ -19448,8 +18831,6 @@ pub mod struct_commands {
         /// * `level` group: CheckedInt32
         /// * `pname` group: GetTextureParameter
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTexLevelParameteriv(
             &self,
             target: GLenum,
@@ -19501,8 +18882,6 @@ pub mod struct_commands {
         /// * `target` group: TextureTarget
         /// * `pname` group: GetTextureParameter
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTexParameterIiv(&self, target: GLenum, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -19546,8 +18925,6 @@ pub mod struct_commands {
         /// * `target` group: TextureTarget
         /// * `pname` group: GetTextureParameter
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTexParameterIuiv(
             &self,
             target: GLenum,
@@ -19596,8 +18973,6 @@ pub mod struct_commands {
         /// * `target` group: TextureTarget
         /// * `pname` group: GetTextureParameter
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTexParameterfv(
             &self,
             target: GLenum,
@@ -19646,8 +19021,6 @@ pub mod struct_commands {
         /// * `target` group: TextureTarget
         /// * `pname` group: GetTextureParameter
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTexParameteriv(&self, target: GLenum, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -19690,8 +19063,6 @@ pub mod struct_commands {
         /// [glGetTextureImage](http://docs.gl/gl4/glGetTextureImage)(texture, level, format, type_, bufSize, pixels)
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTextureImage(
             &self,
             texture: GLuint,
@@ -19747,8 +19118,6 @@ pub mod struct_commands {
         }
         /// [glGetTextureLevelParameterfv](http://docs.gl/gl4/glGetTextureLevelParameter)(texture, level, pname, params)
         /// * `pname` group: GetTextureParameter
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTextureLevelParameterfv(
             &self,
             texture: GLuint,
@@ -19798,8 +19167,6 @@ pub mod struct_commands {
         }
         /// [glGetTextureLevelParameteriv](http://docs.gl/gl4/glGetTextureLevelParameter)(texture, level, pname, params)
         /// * `pname` group: GetTextureParameter
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTextureLevelParameteriv(
             &self,
             texture: GLuint,
@@ -19849,8 +19216,6 @@ pub mod struct_commands {
         }
         /// [glGetTextureParameterIiv](http://docs.gl/gl4/glGetTextureParameter)(texture, pname, params)
         /// * `pname` group: GetTextureParameter
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTextureParameterIiv(
             &self,
             texture: GLuint,
@@ -19897,8 +19262,6 @@ pub mod struct_commands {
         }
         /// [glGetTextureParameterIuiv](http://docs.gl/gl4/glGetTextureParameter)(texture, pname, params)
         /// * `pname` group: GetTextureParameter
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTextureParameterIuiv(
             &self,
             texture: GLuint,
@@ -19945,8 +19308,6 @@ pub mod struct_commands {
         }
         /// [glGetTextureParameterfv](http://docs.gl/gl4/glGetTextureParameter)(texture, pname, params)
         /// * `pname` group: GetTextureParameter
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTextureParameterfv(
             &self,
             texture: GLuint,
@@ -19993,8 +19354,6 @@ pub mod struct_commands {
         }
         /// [glGetTextureParameteriv](http://docs.gl/gl4/glGetTextureParameter)(texture, pname, params)
         /// * `pname` group: GetTextureParameter
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTextureParameteriv(
             &self,
             texture: GLuint,
@@ -20042,8 +19401,6 @@ pub mod struct_commands {
         /// [glGetTextureSubImage](http://docs.gl/gl4/glGetTextureSubImage)(texture, level, xoffset, yoffset, zoffset, width, height, depth, format, type_, bufSize, pixels)
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTextureSubImage(
             &self,
             texture: GLuint,
@@ -20107,8 +19464,6 @@ pub mod struct_commands {
         /// * `type_` group: AttributeType
         /// * `type_` len: 1
         /// * `name` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTransformFeedbackVarying(
             &self,
             program: GLuint,
@@ -20158,8 +19513,6 @@ pub mod struct_commands {
         }
         /// [glGetTransformFeedbacki64_v](http://docs.gl/gl4/glGetTransformFeedbacki64_v)(xfb, pname, index, param)
         /// * `pname` group: TransformFeedbackPName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTransformFeedbacki64_v(
             &self,
             xfb: GLuint,
@@ -20209,8 +19562,6 @@ pub mod struct_commands {
         }
         /// [glGetTransformFeedbacki_v](http://docs.gl/gl4/glGetTransformFeedbacki_v)(xfb, pname, index, param)
         /// * `pname` group: TransformFeedbackPName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTransformFeedbacki_v(
             &self,
             xfb: GLuint,
@@ -20260,8 +19611,6 @@ pub mod struct_commands {
         }
         /// [glGetTransformFeedbackiv](http://docs.gl/gl4/glGetTransformFeedback)(xfb, pname, param)
         /// * `pname` group: TransformFeedbackPName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetTransformFeedbackiv(&self, xfb: GLuint, pname: GLenum, param: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -20303,8 +19652,6 @@ pub mod struct_commands {
         }
         /// [glGetUniformBlockIndex](http://docs.gl/gl4/glGetUniformBlockIndex)(program, uniformBlockName)
         /// * `uniformBlockName` len: COMPSIZE()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetUniformBlockIndex(
             &self,
             program: GLuint,
@@ -20349,8 +19696,6 @@ pub mod struct_commands {
         /// [glGetUniformIndices](http://docs.gl/gl4/glGetUniformIndices)(program, uniformCount, uniformNames, uniformIndices)
         /// * `uniformNames` len: COMPSIZE(uniformCount)
         /// * `uniformIndices` len: COMPSIZE(uniformCount)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetUniformIndices(
             &self,
             program: GLuint,
@@ -20399,8 +19744,6 @@ pub mod struct_commands {
             !self.glGetUniformIndices_p.load(RELAX).is_null()
         }
         /// [glGetUniformLocation](http://docs.gl/gl4/glGetUniformLocation)(program, name)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetUniformLocation(&self, program: GLuint, name: *const GLchar) -> GLint {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -20437,8 +19780,6 @@ pub mod struct_commands {
         /// [glGetUniformSubroutineuiv](http://docs.gl/gl4/glGetUniformSubroutine)(shadertype, location, params)
         /// * `shadertype` group: ShaderType
         /// * `params` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetUniformSubroutineuiv(
             &self,
             shadertype: GLenum,
@@ -20485,8 +19826,6 @@ pub mod struct_commands {
         }
         /// [glGetUniformdv](http://docs.gl/gl4/glGetUniformdv)(program, location, params)
         /// * `params` len: COMPSIZE(program,location)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetUniformdv(&self, program: GLuint, location: GLint, params: *mut GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -20528,8 +19867,6 @@ pub mod struct_commands {
         }
         /// [glGetUniformfv](http://docs.gl/gl4/glGetUniform)(program, location, params)
         /// * `params` len: COMPSIZE(program,location)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetUniformfv(&self, program: GLuint, location: GLint, params: *mut GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -20571,8 +19908,6 @@ pub mod struct_commands {
         }
         /// [glGetUniformiv](http://docs.gl/gl4/glGetUniform)(program, location, params)
         /// * `params` len: COMPSIZE(program,location)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetUniformiv(&self, program: GLuint, location: GLint, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -20614,8 +19949,6 @@ pub mod struct_commands {
         }
         /// [glGetUniformuiv](http://docs.gl/gl4/glGetUniform)(program, location, params)
         /// * `params` len: COMPSIZE(program,location)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetUniformuiv(&self, program: GLuint, location: GLint, params: *mut GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -20657,8 +19990,6 @@ pub mod struct_commands {
         }
         /// [glGetVertexArrayIndexed64iv](http://docs.gl/gl4/glGetVertexArrayIndexed6)(vaobj, index, pname, param)
         /// * `pname` group: VertexArrayPName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexArrayIndexed64iv(
             &self,
             vaobj: GLuint,
@@ -20708,8 +20039,6 @@ pub mod struct_commands {
         }
         /// [glGetVertexArrayIndexediv](http://docs.gl/gl4/glGetVertexArrayIndexed)(vaobj, index, pname, param)
         /// * `pname` group: VertexArrayPName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexArrayIndexediv(
             &self,
             vaobj: GLuint,
@@ -20759,8 +20088,6 @@ pub mod struct_commands {
         }
         /// [glGetVertexArrayiv](http://docs.gl/gl4/glGetVertexArray)(vaobj, pname, param)
         /// * `pname` group: VertexArrayPName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexArrayiv(&self, vaobj: GLuint, pname: GLenum, param: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -20803,8 +20130,6 @@ pub mod struct_commands {
         /// [glGetVertexAttribIiv](http://docs.gl/gl4/glGetVertexAttrib)(index, pname, params)
         /// * `pname` group: VertexAttribEnum
         /// * `params` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexAttribIiv(&self, index: GLuint, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -20847,8 +20172,6 @@ pub mod struct_commands {
         /// [glGetVertexAttribIuiv](http://docs.gl/gl4/glGetVertexAttrib)(index, pname, params)
         /// * `pname` group: VertexAttribEnum
         /// * `params` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexAttribIuiv(
             &self,
             index: GLuint,
@@ -20896,8 +20219,6 @@ pub mod struct_commands {
         /// [glGetVertexAttribLdv](http://docs.gl/gl4/glGetVertexAttribLdv)(index, pname, params)
         /// * `pname` group: VertexAttribEnum
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexAttribLdv(
             &self,
             index: GLuint,
@@ -20945,8 +20266,6 @@ pub mod struct_commands {
         /// [glGetVertexAttribPointerv](http://docs.gl/gl4/glGetVertexAttribPointerv)(index, pname, pointer)
         /// * `pname` group: VertexAttribPointerPropertyARB
         /// * `pointer` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexAttribPointerv(
             &self,
             index: GLuint,
@@ -20994,8 +20313,6 @@ pub mod struct_commands {
         /// [glGetVertexAttribdv](http://docs.gl/gl4/glGetVertexAttribdv)(index, pname, params)
         /// * `pname` group: VertexAttribPropertyARB
         /// * `params` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexAttribdv(
             &self,
             index: GLuint,
@@ -21043,8 +20360,6 @@ pub mod struct_commands {
         /// [glGetVertexAttribfv](http://docs.gl/gl4/glGetVertexAttrib)(index, pname, params)
         /// * `pname` group: VertexAttribPropertyARB
         /// * `params` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexAttribfv(&self, index: GLuint, pname: GLenum, params: *mut GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -21087,8 +20402,6 @@ pub mod struct_commands {
         /// [glGetVertexAttribiv](http://docs.gl/gl4/glGetVertexAttrib)(index, pname, params)
         /// * `pname` group: VertexAttribPropertyARB
         /// * `params` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetVertexAttribiv(&self, index: GLuint, pname: GLenum, params: *mut GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -21130,8 +20443,6 @@ pub mod struct_commands {
         }
         /// [glGetnCompressedTexImage](http://docs.gl/gl4/glGetnCompressedTexImage)(target, lod, bufSize, pixels)
         /// * `target` group: TextureTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetnCompressedTexImage(
             &self,
             target: GLenum,
@@ -21184,8 +20495,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `pixels` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetnTexImage(
             &self,
             target: GLenum,
@@ -21241,8 +20550,6 @@ pub mod struct_commands {
         }
         /// [glGetnUniformdv](http://docs.gl/gl4/glGetnUniformdv)(program, location, bufSize, params)
         /// * `params` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetnUniformdv(
             &self,
             program: GLuint,
@@ -21292,8 +20599,6 @@ pub mod struct_commands {
         }
         /// [glGetnUniformfv](http://docs.gl/gl4/glGetnUniform)(program, location, bufSize, params)
         /// * `params` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetnUniformfv(
             &self,
             program: GLuint,
@@ -21343,8 +20648,6 @@ pub mod struct_commands {
         }
         /// [glGetnUniformiv](http://docs.gl/gl4/glGetnUniform)(program, location, bufSize, params)
         /// * `params` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetnUniformiv(
             &self,
             program: GLuint,
@@ -21394,8 +20697,6 @@ pub mod struct_commands {
         }
         /// [glGetnUniformuiv](http://docs.gl/gl4/glGetnUniform)(program, location, bufSize, params)
         /// * `params` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn GetnUniformuiv(
             &self,
             program: GLuint,
@@ -21446,8 +20747,6 @@ pub mod struct_commands {
         /// [glHint](http://docs.gl/gl4/glHint)(target, mode)
         /// * `target` group: HintTarget
         /// * `mode` group: HintMode
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Hint(&self, target: GLenum, mode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -21473,8 +20772,6 @@ pub mod struct_commands {
             !self.glHint_p.load(RELAX).is_null()
         }
         /// [glInvalidateBufferData](http://docs.gl/gl4/glInvalidateBufferData)(buffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn InvalidateBufferData(&self, buffer: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -21510,8 +20807,6 @@ pub mod struct_commands {
         /// [glInvalidateBufferSubData](http://docs.gl/gl4/glInvalidateBufferSubData)(buffer, offset, length)
         /// * `offset` group: BufferOffset
         /// * `length` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn InvalidateBufferSubData(
             &self,
             buffer: GLuint,
@@ -21560,8 +20855,6 @@ pub mod struct_commands {
         /// * `target` group: FramebufferTarget
         /// * `attachments` group: InvalidateFramebufferAttachment
         /// * `attachments` len: numAttachments
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn InvalidateFramebuffer(
             &self,
             target: GLenum,
@@ -21608,8 +20901,6 @@ pub mod struct_commands {
         }
         /// [glInvalidateNamedFramebufferData](http://docs.gl/gl4/glInvalidateNamedFramebufferData)(framebuffer, numAttachments, attachments)
         /// * `attachments` group: FramebufferAttachment
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn InvalidateNamedFramebufferData(
             &self,
             framebuffer: GLuint,
@@ -21659,8 +20950,6 @@ pub mod struct_commands {
         }
         /// [glInvalidateNamedFramebufferSubData](http://docs.gl/gl4/glInvalidateNamedFramebufferSubData)(framebuffer, numAttachments, attachments, x, y, width, height)
         /// * `attachments` group: FramebufferAttachment
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn InvalidateNamedFramebufferSubData(
             &self,
             framebuffer: GLuint,
@@ -21715,8 +21004,6 @@ pub mod struct_commands {
         /// * `target` group: FramebufferTarget
         /// * `attachments` group: InvalidateFramebufferAttachment
         /// * `attachments` len: numAttachments
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn InvalidateSubFramebuffer(
             &self,
             target: GLenum,
@@ -21765,8 +21052,6 @@ pub mod struct_commands {
             !self.glInvalidateSubFramebuffer_p.load(RELAX).is_null()
         }
         /// [glInvalidateTexImage](http://docs.gl/gl4/glInvalidateTexImage)(texture, level)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn InvalidateTexImage(&self, texture: GLuint, level: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -21801,8 +21086,6 @@ pub mod struct_commands {
             !self.glInvalidateTexImage_p.load(RELAX).is_null()
         }
         /// [glInvalidateTexSubImage](http://docs.gl/gl4/glInvalidateTexSubImage)(texture, level, xoffset, yoffset, zoffset, width, height, depth)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn InvalidateTexSubImage(
             &self,
             texture: GLuint,
@@ -21853,8 +21136,6 @@ pub mod struct_commands {
             !self.glInvalidateTexSubImage_p.load(RELAX).is_null()
         }
         /// [glIsBuffer](http://docs.gl/gl4/glIsBuffer)(buffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsBuffer(&self, buffer: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -21881,8 +21162,6 @@ pub mod struct_commands {
         }
         /// [glIsEnabled](http://docs.gl/gl4/glIsEnabled)(cap)
         /// * `cap` group: EnableCap
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsEnabled(&self, cap: GLenum) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -21910,8 +21189,6 @@ pub mod struct_commands {
         /// [glIsEnabledIndexedEXT](http://docs.gl/gl4/glIsEnabledIndexedEXT)(target, index)
         /// * `target` group: EnableCap
         /// * alias of: [`glIsEnabledi`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsEnabledIndexedEXT(&self, target: GLenum, index: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -21951,8 +21228,6 @@ pub mod struct_commands {
         }
         /// [glIsEnabledi](http://docs.gl/gl4/glIsEnabled)(target, index)
         /// * `target` group: EnableCap
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsEnabledi(&self, target: GLenum, index: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -21978,8 +21253,6 @@ pub mod struct_commands {
             !self.glIsEnabledi_p.load(RELAX).is_null()
         }
         /// [glIsFramebuffer](http://docs.gl/gl4/glIsFramebuffer)(framebuffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsFramebuffer(&self, framebuffer: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22009,8 +21282,6 @@ pub mod struct_commands {
             !self.glIsFramebuffer_p.load(RELAX).is_null()
         }
         /// [glIsProgram](http://docs.gl/gl4/glIsProgram)(program)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsProgram(&self, program: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22036,8 +21307,6 @@ pub mod struct_commands {
             !self.glIsProgram_p.load(RELAX).is_null()
         }
         /// [glIsProgramPipeline](http://docs.gl/gl4/glIsProgramPipeline)(pipeline)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsProgramPipeline(&self, pipeline: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22068,8 +21337,6 @@ pub mod struct_commands {
             !self.glIsProgramPipeline_p.load(RELAX).is_null()
         }
         /// [glIsQuery](http://docs.gl/gl4/glIsQuery)(id)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsQuery(&self, id: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22095,8 +21362,6 @@ pub mod struct_commands {
             !self.glIsQuery_p.load(RELAX).is_null()
         }
         /// [glIsQueryEXT](http://docs.gl/gl4/glIsQueryEXT)(id)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsQueryEXT(&self, id: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22122,8 +21387,6 @@ pub mod struct_commands {
             !self.glIsQueryEXT_p.load(RELAX).is_null()
         }
         /// [glIsRenderbuffer](http://docs.gl/gl4/glIsRenderbuffer)(renderbuffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsRenderbuffer(&self, renderbuffer: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22154,8 +21417,6 @@ pub mod struct_commands {
             !self.glIsRenderbuffer_p.load(RELAX).is_null()
         }
         /// [glIsSampler](http://docs.gl/gl4/glIsSampler)(sampler)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsSampler(&self, sampler: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22181,8 +21442,6 @@ pub mod struct_commands {
             !self.glIsSampler_p.load(RELAX).is_null()
         }
         /// [glIsShader](http://docs.gl/gl4/glIsShader)(shader)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsShader(&self, shader: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22209,8 +21468,6 @@ pub mod struct_commands {
         }
         /// [glIsSync](http://docs.gl/gl4/glIsSync)(sync)
         /// * `sync` group: sync
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsSync(&self, sync: GLsync) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22237,8 +21494,6 @@ pub mod struct_commands {
         }
         /// [glIsTexture](http://docs.gl/gl4/glIsTexture)(texture)
         /// * `texture` group: Texture
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsTexture(&self, texture: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22264,8 +21519,6 @@ pub mod struct_commands {
             !self.glIsTexture_p.load(RELAX).is_null()
         }
         /// [glIsTransformFeedback](http://docs.gl/gl4/glIsTransformFeedback)(id)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsTransformFeedback(&self, id: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22296,8 +21549,6 @@ pub mod struct_commands {
             !self.glIsTransformFeedback_p.load(RELAX).is_null()
         }
         /// [glIsVertexArray](http://docs.gl/gl4/glIsVertexArray)(array)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsVertexArray(&self, array: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22328,8 +21579,6 @@ pub mod struct_commands {
         }
         /// [glIsVertexArrayAPPLE](http://docs.gl/gl4/glIsVertexArrayAPPLE)(array)
         /// * alias of: [`glIsVertexArray`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsVertexArrayAPPLE(&self, array: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22361,8 +21610,6 @@ pub mod struct_commands {
         }
         /// [glIsVertexArrayOES](http://docs.gl/gl4/glIsVertexArrayOES)(array)
         /// * alias of: [`glIsVertexArray`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn IsVertexArrayOES(&self, array: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22393,8 +21640,6 @@ pub mod struct_commands {
         }
         /// [glLineWidth](http://docs.gl/gl4/glLineWidth)(width)
         /// * `width` group: CheckedFloat32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn LineWidth(&self, width: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22420,8 +21665,6 @@ pub mod struct_commands {
             !self.glLineWidth_p.load(RELAX).is_null()
         }
         /// [glLinkProgram](http://docs.gl/gl4/glLinkProgram)(program)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn LinkProgram(&self, program: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22448,8 +21691,6 @@ pub mod struct_commands {
         }
         /// [glLogicOp](http://docs.gl/gl4/glLogicOp)(opcode)
         /// * `opcode` group: LogicOp
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn LogicOp(&self, opcode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22477,8 +21718,6 @@ pub mod struct_commands {
         /// [glMapBuffer](http://docs.gl/gl4/glMapBuffer)(target, access)
         /// * `target` group: BufferTargetARB
         /// * `access` group: BufferAccessARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MapBuffer(&self, target: GLenum, access: GLenum) -> *mut c_void {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22508,8 +21747,6 @@ pub mod struct_commands {
         /// * `offset` group: BufferOffset
         /// * `length` group: BufferSize
         /// * `access` group: MapBufferAccessMask
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MapBufferRange(
             &self,
             target: GLenum,
@@ -22559,8 +21796,6 @@ pub mod struct_commands {
         }
         /// [glMapNamedBuffer](http://docs.gl/gl4/glMapNamedBuffer)(buffer, access)
         /// * `access` group: BufferAccessARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MapNamedBuffer(&self, buffer: GLuint, access: GLenum) -> *mut c_void {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22593,8 +21828,6 @@ pub mod struct_commands {
         /// [glMapNamedBufferRange](http://docs.gl/gl4/glMapNamedBufferRange)(buffer, offset, length, access)
         /// * `length` group: BufferSize
         /// * `access` group: MapBufferAccessMask
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MapNamedBufferRange(
             &self,
             buffer: GLuint,
@@ -22644,8 +21877,6 @@ pub mod struct_commands {
         }
         /// [glMaxShaderCompilerThreadsARB](http://docs.gl/gl4/glMaxShaderCompilerThreadsARB)(count)
         /// * alias of: [`glMaxShaderCompilerThreadsKHR`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MaxShaderCompilerThreadsARB(&self, count: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22679,8 +21910,6 @@ pub mod struct_commands {
             !self.glMaxShaderCompilerThreadsARB_p.load(RELAX).is_null()
         }
         /// [glMaxShaderCompilerThreadsKHR](http://docs.gl/gl4/glMaxShaderCompilerThreadsKHR)(count)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MaxShaderCompilerThreadsKHR(&self, count: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22715,8 +21944,6 @@ pub mod struct_commands {
         }
         /// [glMemoryBarrier](http://docs.gl/gl4/glMemoryBarrier)(barriers)
         /// * `barriers` group: MemoryBarrierMask
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MemoryBarrier(&self, barriers: GLbitfield) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22747,8 +21974,6 @@ pub mod struct_commands {
         }
         /// [glMemoryBarrierByRegion](http://docs.gl/gl4/glMemoryBarrierByRegion)(barriers)
         /// * `barriers` group: MemoryBarrierMask
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MemoryBarrierByRegion(&self, barriers: GLbitfield) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22783,8 +22008,6 @@ pub mod struct_commands {
         }
         /// [glMinSampleShading](http://docs.gl/gl4/glMinSampleShading)(value)
         /// * `value` group: ColorF
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MinSampleShading(&self, value: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -22817,8 +22040,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `first` len: COMPSIZE(drawcount)
         /// * `count` len: COMPSIZE(drawcount)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MultiDrawArrays(
             &self,
             mode: GLenum,
@@ -22869,8 +22090,6 @@ pub mod struct_commands {
         /// [glMultiDrawArraysIndirect](http://docs.gl/gl4/glMultiDrawArraysIndirect)(mode, indirect, drawcount, stride)
         /// * `mode` group: PrimitiveType
         /// * `indirect` len: COMPSIZE(drawcount,stride)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MultiDrawArraysIndirect(
             &self,
             mode: GLenum,
@@ -22920,8 +22139,6 @@ pub mod struct_commands {
         }
         /// [glMultiDrawArraysIndirectCount](http://docs.gl/gl4/glMultiDrawArraysIndirectCount)(mode, indirect, drawcount, maxdrawcount, stride)
         /// * `mode` group: PrimitiveType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MultiDrawArraysIndirectCount(
             &self,
             mode: GLenum,
@@ -22977,8 +22194,6 @@ pub mod struct_commands {
         /// * `count` len: COMPSIZE(drawcount)
         /// * `type_` group: DrawElementsType
         /// * `indices` len: COMPSIZE(drawcount)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MultiDrawElements(
             &self,
             mode: GLenum,
@@ -23035,8 +22250,6 @@ pub mod struct_commands {
         /// * `type_` group: DrawElementsType
         /// * `indices` len: COMPSIZE(drawcount)
         /// * `basevertex` len: COMPSIZE(drawcount)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MultiDrawElementsBaseVertex(
             &self,
             mode: GLenum,
@@ -23094,8 +22307,6 @@ pub mod struct_commands {
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
         /// * `indirect` len: COMPSIZE(drawcount,stride)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MultiDrawElementsIndirect(
             &self,
             mode: GLenum,
@@ -23149,8 +22360,6 @@ pub mod struct_commands {
         /// [glMultiDrawElementsIndirectCount](http://docs.gl/gl4/glMultiDrawElementsIndirectCount)(mode, type_, indirect, drawcount, maxdrawcount, stride)
         /// * `mode` group: PrimitiveType
         /// * `type_` group: DrawElementsType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn MultiDrawElementsIndirectCount(
             &self,
             mode: GLenum,
@@ -23202,8 +22411,6 @@ pub mod struct_commands {
         /// [glNamedBufferData](http://docs.gl/gl4/glNamedBufferData)(buffer, size, data, usage)
         /// * `size` group: BufferSize
         /// * `usage` group: VertexBufferObjectUsage
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedBufferData(
             &self,
             buffer: GLuint,
@@ -23255,8 +22462,6 @@ pub mod struct_commands {
         /// * `size` group: BufferSize
         /// * `data` len: size
         /// * `flags` group: BufferStorageMask
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedBufferStorage(
             &self,
             buffer: GLuint,
@@ -23307,8 +22512,6 @@ pub mod struct_commands {
         /// [glNamedBufferSubData](http://docs.gl/gl4/glNamedBufferSubData)(buffer, offset, size, data)
         /// * `size` group: BufferSize
         /// * `data` len: COMPSIZE(size)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedBufferSubData(
             &self,
             buffer: GLuint,
@@ -23358,8 +22561,6 @@ pub mod struct_commands {
         }
         /// [glNamedFramebufferDrawBuffer](http://docs.gl/gl4/glNamedFramebufferDrawBuffer)(framebuffer, buf)
         /// * `buf` group: ColorBuffer
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedFramebufferDrawBuffer(&self, framebuffer: GLuint, buf: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -23399,8 +22600,6 @@ pub mod struct_commands {
         }
         /// [glNamedFramebufferDrawBuffers](http://docs.gl/gl4/glNamedFramebufferDrawBuffers)(framebuffer, n, bufs)
         /// * `bufs` group: ColorBuffer
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedFramebufferDrawBuffers(
             &self,
             framebuffer: GLuint,
@@ -23447,8 +22646,6 @@ pub mod struct_commands {
         }
         /// [glNamedFramebufferParameteri](http://docs.gl/gl4/glNamedFramebufferParameter)(framebuffer, pname, param)
         /// * `pname` group: FramebufferParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedFramebufferParameteri(
             &self,
             framebuffer: GLuint,
@@ -23495,8 +22692,6 @@ pub mod struct_commands {
         }
         /// [glNamedFramebufferReadBuffer](http://docs.gl/gl4/glNamedFramebufferReadBuffer)(framebuffer, src)
         /// * `src` group: ColorBuffer
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedFramebufferReadBuffer(&self, framebuffer: GLuint, src: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -23537,8 +22732,6 @@ pub mod struct_commands {
         /// [glNamedFramebufferRenderbuffer](http://docs.gl/gl4/glNamedFramebufferRenderbuffer)(framebuffer, attachment, renderbuffertarget, renderbuffer)
         /// * `attachment` group: FramebufferAttachment
         /// * `renderbuffertarget` group: RenderbufferTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedFramebufferRenderbuffer(
             &self,
             framebuffer: GLuint,
@@ -23588,8 +22781,6 @@ pub mod struct_commands {
         }
         /// [glNamedFramebufferTexture](http://docs.gl/gl4/glNamedFramebufferTexture)(framebuffer, attachment, texture, level)
         /// * `attachment` group: FramebufferAttachment
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedFramebufferTexture(
             &self,
             framebuffer: GLuint,
@@ -23639,8 +22830,6 @@ pub mod struct_commands {
         }
         /// [glNamedFramebufferTextureLayer](http://docs.gl/gl4/glNamedFramebufferTextureLayer)(framebuffer, attachment, texture, level, layer)
         /// * `attachment` group: FramebufferAttachment
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedFramebufferTextureLayer(
             &self,
             framebuffer: GLuint,
@@ -23693,8 +22882,6 @@ pub mod struct_commands {
         }
         /// [glNamedRenderbufferStorage](http://docs.gl/gl4/glNamedRenderbufferStorage)(renderbuffer, internalformat, width, height)
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedRenderbufferStorage(
             &self,
             renderbuffer: GLuint,
@@ -23744,8 +22931,6 @@ pub mod struct_commands {
         }
         /// [glNamedRenderbufferStorageMultisample](http://docs.gl/gl4/glNamedRenderbufferStorageMultisample)(renderbuffer, samples, internalformat, width, height)
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn NamedRenderbufferStorageMultisample(
             &self,
             renderbuffer: GLuint,
@@ -23795,8 +22980,6 @@ pub mod struct_commands {
         /// [glObjectLabel](http://docs.gl/gl4/glObjectLabel)(identifier, name, length, label)
         /// * `identifier` group: ObjectIdentifier
         /// * `label` len: COMPSIZE(label,length)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ObjectLabel(
             &self,
             identifier: GLenum,
@@ -23843,8 +23026,6 @@ pub mod struct_commands {
         /// [glObjectLabelKHR](http://docs.gl/gl4/glObjectLabelKHR)(identifier, name, length, label)
         /// * `identifier` group: ObjectIdentifier
         /// * alias of: [`glObjectLabel`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ObjectLabelKHR(
             &self,
             identifier: GLenum,
@@ -23894,8 +23075,6 @@ pub mod struct_commands {
         }
         /// [glObjectPtrLabel](http://docs.gl/gl4/glObjectPtrLabel)(ptr, length, label)
         /// * `label` len: COMPSIZE(label,length)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ObjectPtrLabel(
             &self,
             ptr: *const c_void,
@@ -23942,8 +23121,6 @@ pub mod struct_commands {
         }
         /// [glObjectPtrLabelKHR](http://docs.gl/gl4/glObjectPtrLabelKHR)(ptr, length, label)
         /// * alias of: [`glObjectPtrLabel`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ObjectPtrLabelKHR(
             &self,
             ptr: *const c_void,
@@ -23991,8 +23168,6 @@ pub mod struct_commands {
         /// [glPatchParameterfv](http://docs.gl/gl4/glPatchParameter)(pname, values)
         /// * `pname` group: PatchParameterName
         /// * `values` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PatchParameterfv(&self, pname: GLenum, values: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24028,8 +23203,6 @@ pub mod struct_commands {
         }
         /// [glPatchParameteri](http://docs.gl/gl4/glPatchParameter)(pname, value)
         /// * `pname` group: PatchParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PatchParameteri(&self, pname: GLenum, value: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24060,8 +23233,6 @@ pub mod struct_commands {
             !self.glPatchParameteri_p.load(RELAX).is_null()
         }
         /// [glPauseTransformFeedback](http://docs.gl/gl4/glPauseTransformFeedback)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PauseTransformFeedback(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24094,8 +23265,6 @@ pub mod struct_commands {
         /// [glPixelStoref](http://docs.gl/gl4/glPixelStore)(pname, param)
         /// * `pname` group: PixelStoreParameter
         /// * `param` group: CheckedFloat32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PixelStoref(&self, pname: GLenum, param: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24123,8 +23292,6 @@ pub mod struct_commands {
         /// [glPixelStorei](http://docs.gl/gl4/glPixelStore)(pname, param)
         /// * `pname` group: PixelStoreParameter
         /// * `param` group: CheckedInt32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PixelStorei(&self, pname: GLenum, param: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24152,8 +23319,6 @@ pub mod struct_commands {
         /// [glPointParameterf](http://docs.gl/gl4/glPointParameter)(pname, param)
         /// * `pname` group: PointParameterNameARB
         /// * `param` group: CheckedFloat32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PointParameterf(&self, pname: GLenum, param: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24187,8 +23352,6 @@ pub mod struct_commands {
         /// * `pname` group: PointParameterNameARB
         /// * `params` group: CheckedFloat32
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PointParameterfv(&self, pname: GLenum, params: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24224,8 +23387,6 @@ pub mod struct_commands {
         }
         /// [glPointParameteri](http://docs.gl/gl4/glPointParameter)(pname, param)
         /// * `pname` group: PointParameterNameARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PointParameteri(&self, pname: GLenum, param: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24258,8 +23419,6 @@ pub mod struct_commands {
         /// [glPointParameteriv](http://docs.gl/gl4/glPointParameter)(pname, params)
         /// * `pname` group: PointParameterNameARB
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PointParameteriv(&self, pname: GLenum, params: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24295,8 +23454,6 @@ pub mod struct_commands {
         }
         /// [glPointSize](http://docs.gl/gl4/glPointSize)(size)
         /// * `size` group: CheckedFloat32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PointSize(&self, size: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24324,8 +23481,6 @@ pub mod struct_commands {
         /// [glPolygonMode](http://docs.gl/gl4/glPolygonMode)(face, mode)
         /// * `face` group: MaterialFace
         /// * `mode` group: PolygonMode
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PolygonMode(&self, face: GLenum, mode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24351,8 +23506,6 @@ pub mod struct_commands {
             !self.glPolygonMode_p.load(RELAX).is_null()
         }
         /// [glPolygonOffset](http://docs.gl/gl4/glPolygonOffset)(factor, units)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PolygonOffset(&self, factor: GLfloat, units: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24383,8 +23536,6 @@ pub mod struct_commands {
             !self.glPolygonOffset_p.load(RELAX).is_null()
         }
         /// [glPolygonOffsetClamp](http://docs.gl/gl4/glPolygonOffsetClamp)(factor, units, clamp)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PolygonOffsetClamp(&self, factor: GLfloat, units: GLfloat, clamp: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24425,8 +23576,6 @@ pub mod struct_commands {
             !self.glPolygonOffsetClamp_p.load(RELAX).is_null()
         }
         /// [glPopDebugGroup](http://docs.gl/gl4/glPopDebugGroup)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PopDebugGroup(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24457,8 +23606,6 @@ pub mod struct_commands {
         }
         /// [glPopDebugGroupKHR](http://docs.gl/gl4/glPopDebugGroupKHR)()
         /// * alias of: [`glPopDebugGroup`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PopDebugGroupKHR(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24488,8 +23635,6 @@ pub mod struct_commands {
             !self.glPopDebugGroupKHR_p.load(RELAX).is_null()
         }
         /// [glPrimitiveBoundingBox](http://docs.gl/gl4/glPrimitiveBoundingBox)(minX, minY, minZ, minW, maxX, maxY, maxZ, maxW)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PrimitiveBoundingBox(
             &self,
             minX: GLfloat,
@@ -24540,8 +23685,6 @@ pub mod struct_commands {
             !self.glPrimitiveBoundingBox_p.load(RELAX).is_null()
         }
         /// [glPrimitiveRestartIndex](http://docs.gl/gl4/glPrimitiveRestartIndex)(index)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PrimitiveRestartIndex(&self, index: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24576,8 +23719,6 @@ pub mod struct_commands {
         }
         /// [glProgramBinary](http://docs.gl/gl4/glProgramBinary)(program, binaryFormat, binary, length)
         /// * `binary` len: length
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramBinary(
             &self,
             program: GLuint,
@@ -24627,8 +23768,6 @@ pub mod struct_commands {
         }
         /// [glProgramParameteri](http://docs.gl/gl4/glProgramParameteri)(program, pname, value)
         /// * `pname` group: ProgramParameterPName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramParameteri(&self, program: GLuint, pname: GLenum, value: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24669,8 +23808,6 @@ pub mod struct_commands {
             !self.glProgramParameteri_p.load(RELAX).is_null()
         }
         /// [glProgramUniform1d](http://docs.gl/gl4/glProgramUniform1d)(program, location, v0)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform1d(&self, program: GLuint, location: GLint, v0: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24712,8 +23849,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform1dv](http://docs.gl/gl4/glProgramUniform1dv)(program, location, count, value)
         /// * `value` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform1dv(
             &self,
             program: GLuint,
@@ -24762,8 +23897,6 @@ pub mod struct_commands {
             !self.glProgramUniform1dv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform1f](http://docs.gl/gl4/glProgramUniform)(program, location, v0)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform1f(&self, program: GLuint, location: GLint, v0: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24805,8 +23938,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform1fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform1fv(
             &self,
             program: GLuint,
@@ -24855,8 +23986,6 @@ pub mod struct_commands {
             !self.glProgramUniform1fv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform1i](http://docs.gl/gl4/glProgramUniform)(program, location, v0)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform1i(&self, program: GLuint, location: GLint, v0: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24898,8 +24027,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform1iv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform1iv(
             &self,
             program: GLuint,
@@ -24948,8 +24075,6 @@ pub mod struct_commands {
             !self.glProgramUniform1iv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform1ui](http://docs.gl/gl4/glProgramUniform)(program, location, v0)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform1ui(&self, program: GLuint, location: GLint, v0: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -24991,8 +24116,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform1uiv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform1uiv(
             &self,
             program: GLuint,
@@ -25041,8 +24164,6 @@ pub mod struct_commands {
             !self.glProgramUniform1uiv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform2d](http://docs.gl/gl4/glProgramUniform2d)(program, location, v0, v1)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform2d(
             &self,
             program: GLuint,
@@ -25092,8 +24213,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform2dv](http://docs.gl/gl4/glProgramUniform2dv)(program, location, count, value)
         /// * `value` len: count*2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform2dv(
             &self,
             program: GLuint,
@@ -25142,8 +24261,6 @@ pub mod struct_commands {
             !self.glProgramUniform2dv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform2f](http://docs.gl/gl4/glProgramUniform)(program, location, v0, v1)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform2f(
             &self,
             program: GLuint,
@@ -25193,8 +24310,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform2fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count*2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform2fv(
             &self,
             program: GLuint,
@@ -25243,8 +24358,6 @@ pub mod struct_commands {
             !self.glProgramUniform2fv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform2i](http://docs.gl/gl4/glProgramUniform)(program, location, v0, v1)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform2i(
             &self,
             program: GLuint,
@@ -25294,8 +24407,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform2iv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count*2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform2iv(
             &self,
             program: GLuint,
@@ -25344,8 +24455,6 @@ pub mod struct_commands {
             !self.glProgramUniform2iv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform2ui](http://docs.gl/gl4/glProgramUniform)(program, location, v0, v1)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform2ui(
             &self,
             program: GLuint,
@@ -25395,8 +24504,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform2uiv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count*2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform2uiv(
             &self,
             program: GLuint,
@@ -25445,8 +24552,6 @@ pub mod struct_commands {
             !self.glProgramUniform2uiv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform3d](http://docs.gl/gl4/glProgramUniform3d)(program, location, v0, v1, v2)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform3d(
             &self,
             program: GLuint,
@@ -25499,8 +24604,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform3dv](http://docs.gl/gl4/glProgramUniform3dv)(program, location, count, value)
         /// * `value` len: count*3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform3dv(
             &self,
             program: GLuint,
@@ -25549,8 +24652,6 @@ pub mod struct_commands {
             !self.glProgramUniform3dv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform3f](http://docs.gl/gl4/glProgramUniform)(program, location, v0, v1, v2)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform3f(
             &self,
             program: GLuint,
@@ -25603,8 +24704,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform3fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count*3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform3fv(
             &self,
             program: GLuint,
@@ -25653,8 +24752,6 @@ pub mod struct_commands {
             !self.glProgramUniform3fv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform3i](http://docs.gl/gl4/glProgramUniform)(program, location, v0, v1, v2)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform3i(
             &self,
             program: GLuint,
@@ -25707,8 +24804,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform3iv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count*3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform3iv(
             &self,
             program: GLuint,
@@ -25757,8 +24852,6 @@ pub mod struct_commands {
             !self.glProgramUniform3iv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform3ui](http://docs.gl/gl4/glProgramUniform)(program, location, v0, v1, v2)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform3ui(
             &self,
             program: GLuint,
@@ -25811,8 +24904,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform3uiv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count*3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform3uiv(
             &self,
             program: GLuint,
@@ -25861,8 +24952,6 @@ pub mod struct_commands {
             !self.glProgramUniform3uiv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform4d](http://docs.gl/gl4/glProgramUniform4d)(program, location, v0, v1, v2, v3)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform4d(
             &self,
             program: GLuint,
@@ -25918,8 +25007,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform4dv](http://docs.gl/gl4/glProgramUniform4dv)(program, location, count, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform4dv(
             &self,
             program: GLuint,
@@ -25968,8 +25055,6 @@ pub mod struct_commands {
             !self.glProgramUniform4dv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform4f](http://docs.gl/gl4/glProgramUniform)(program, location, v0, v1, v2, v3)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform4f(
             &self,
             program: GLuint,
@@ -26025,8 +25110,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform4fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform4fv(
             &self,
             program: GLuint,
@@ -26075,8 +25158,6 @@ pub mod struct_commands {
             !self.glProgramUniform4fv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform4i](http://docs.gl/gl4/glProgramUniform)(program, location, v0, v1, v2, v3)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform4i(
             &self,
             program: GLuint,
@@ -26132,8 +25213,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform4iv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform4iv(
             &self,
             program: GLuint,
@@ -26182,8 +25261,6 @@ pub mod struct_commands {
             !self.glProgramUniform4iv_p.load(RELAX).is_null()
         }
         /// [glProgramUniform4ui](http://docs.gl/gl4/glProgramUniform)(program, location, v0, v1, v2, v3)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform4ui(
             &self,
             program: GLuint,
@@ -26239,8 +25316,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniform4uiv](http://docs.gl/gl4/glProgramUniform)(program, location, count, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniform4uiv(
             &self,
             program: GLuint,
@@ -26290,8 +25365,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix2dv](http://docs.gl/gl4/glProgramUniformMatrix2dv)(program, location, count, transpose, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix2dv(
             &self,
             program: GLuint,
@@ -26344,8 +25417,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix2fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, transpose, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix2fv(
             &self,
             program: GLuint,
@@ -26398,8 +25469,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix2x3dv](http://docs.gl/gl4/glProgramUniformMatrix2x3dv)(program, location, count, transpose, value)
         /// * `value` len: count*6
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix2x3dv(
             &self,
             program: GLuint,
@@ -26452,8 +25521,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix2x3fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, transpose, value)
         /// * `value` len: count*6
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix2x3fv(
             &self,
             program: GLuint,
@@ -26506,8 +25573,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix2x4dv](http://docs.gl/gl4/glProgramUniformMatrix2x4dv)(program, location, count, transpose, value)
         /// * `value` len: count*8
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix2x4dv(
             &self,
             program: GLuint,
@@ -26560,8 +25625,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix2x4fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, transpose, value)
         /// * `value` len: count*8
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix2x4fv(
             &self,
             program: GLuint,
@@ -26614,8 +25677,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix3dv](http://docs.gl/gl4/glProgramUniformMatrix3dv)(program, location, count, transpose, value)
         /// * `value` len: count*9
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix3dv(
             &self,
             program: GLuint,
@@ -26668,8 +25729,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix3fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, transpose, value)
         /// * `value` len: count*9
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix3fv(
             &self,
             program: GLuint,
@@ -26722,8 +25781,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix3x2dv](http://docs.gl/gl4/glProgramUniformMatrix3x2dv)(program, location, count, transpose, value)
         /// * `value` len: count*6
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix3x2dv(
             &self,
             program: GLuint,
@@ -26776,8 +25833,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix3x2fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, transpose, value)
         /// * `value` len: count*6
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix3x2fv(
             &self,
             program: GLuint,
@@ -26830,8 +25885,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix3x4dv](http://docs.gl/gl4/glProgramUniformMatrix3x4dv)(program, location, count, transpose, value)
         /// * `value` len: count*12
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix3x4dv(
             &self,
             program: GLuint,
@@ -26884,8 +25937,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix3x4fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, transpose, value)
         /// * `value` len: count*12
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix3x4fv(
             &self,
             program: GLuint,
@@ -26938,8 +25989,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix4dv](http://docs.gl/gl4/glProgramUniformMatrix4dv)(program, location, count, transpose, value)
         /// * `value` len: count*16
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix4dv(
             &self,
             program: GLuint,
@@ -26992,8 +26041,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix4fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, transpose, value)
         /// * `value` len: count*16
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix4fv(
             &self,
             program: GLuint,
@@ -27046,8 +26093,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix4x2dv](http://docs.gl/gl4/glProgramUniformMatrix4x2dv)(program, location, count, transpose, value)
         /// * `value` len: count*8
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix4x2dv(
             &self,
             program: GLuint,
@@ -27100,8 +26145,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix4x2fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, transpose, value)
         /// * `value` len: count*8
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix4x2fv(
             &self,
             program: GLuint,
@@ -27154,8 +26197,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix4x3dv](http://docs.gl/gl4/glProgramUniformMatrix4x3dv)(program, location, count, transpose, value)
         /// * `value` len: count*12
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix4x3dv(
             &self,
             program: GLuint,
@@ -27208,8 +26249,6 @@ pub mod struct_commands {
         }
         /// [glProgramUniformMatrix4x3fv](http://docs.gl/gl4/glProgramUniform)(program, location, count, transpose, value)
         /// * `value` len: count*12
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProgramUniformMatrix4x3fv(
             &self,
             program: GLuint,
@@ -27262,8 +26301,6 @@ pub mod struct_commands {
         }
         /// [glProvokingVertex](http://docs.gl/gl4/glProvokingVertex)(mode)
         /// * `mode` group: VertexProvokingMode
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ProvokingVertex(&self, mode: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -27295,8 +26332,6 @@ pub mod struct_commands {
         /// [glPushDebugGroup](http://docs.gl/gl4/glPushDebugGroup)(source, id, length, message)
         /// * `source` group: DebugSource
         /// * `message` len: COMPSIZE(message,length)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PushDebugGroup(
             &self,
             source: GLenum,
@@ -27347,8 +26382,6 @@ pub mod struct_commands {
         /// [glPushDebugGroupKHR](http://docs.gl/gl4/glPushDebugGroupKHR)(source, id, length, message)
         /// * `source` group: DebugSource
         /// * alias of: [`glPushDebugGroup`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn PushDebugGroupKHR(
             &self,
             source: GLenum,
@@ -27398,8 +26431,6 @@ pub mod struct_commands {
         }
         /// [glQueryCounter](http://docs.gl/gl4/glQueryCounter)(id, target)
         /// * `target` group: QueryCounterTarget
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn QueryCounter(&self, id: GLuint, target: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -27431,8 +26462,6 @@ pub mod struct_commands {
         /// [glQueryCounterEXT](http://docs.gl/gl4/glQueryCounterEXT)(id, target)
         /// * `target` group: QueryCounterTarget
         /// * alias of: [`glQueryCounter`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn QueryCounterEXT(&self, id: GLuint, target: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -27464,8 +26493,6 @@ pub mod struct_commands {
         }
         /// [glReadBuffer](http://docs.gl/gl4/glReadBuffer)(src)
         /// * `src` group: ReadBufferMode
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ReadBuffer(&self, src: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -27496,8 +26523,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `pixels` len: COMPSIZE(format,type,width,height)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ReadPixels(
             &self,
             x: GLint,
@@ -27554,8 +26579,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `data` len: bufSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ReadnPixels(
             &self,
             x: GLint,
@@ -27612,8 +26635,6 @@ pub mod struct_commands {
             !self.glReadnPixels_p.load(RELAX).is_null()
         }
         /// [glReleaseShaderCompiler](http://docs.gl/gl4/glReleaseShaderCompiler)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ReleaseShaderCompiler(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -27646,8 +26667,6 @@ pub mod struct_commands {
         /// [glRenderbufferStorage](http://docs.gl/gl4/glRenderbufferStorage)(target, internalformat, width, height)
         /// * `target` group: RenderbufferTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn RenderbufferStorage(
             &self,
             target: GLenum,
@@ -27698,8 +26717,6 @@ pub mod struct_commands {
         /// [glRenderbufferStorageMultisample](http://docs.gl/gl4/glRenderbufferStorageMultisample)(target, samples, internalformat, width, height)
         /// * `target` group: RenderbufferTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn RenderbufferStorageMultisample(
             &self,
             target: GLenum,
@@ -27754,8 +26771,6 @@ pub mod struct_commands {
                 .is_null()
         }
         /// [glResumeTransformFeedback](http://docs.gl/gl4/glResumeTransformFeedback)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ResumeTransformFeedback(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -27788,8 +26803,6 @@ pub mod struct_commands {
             !self.glResumeTransformFeedback_p.load(RELAX).is_null()
         }
         /// [glSampleCoverage](http://docs.gl/gl4/glSampleCoverage)(value, invert)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn SampleCoverage(&self, value: GLfloat, invert: GLboolean) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -27820,8 +26833,6 @@ pub mod struct_commands {
             !self.glSampleCoverage_p.load(RELAX).is_null()
         }
         /// [glSampleMaski](http://docs.gl/gl4/glSampleMask)(maskNumber, mask)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn SampleMaski(&self, maskNumber: GLuint, mask: GLbitfield) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -27850,8 +26861,6 @@ pub mod struct_commands {
         /// [glSamplerParameterIiv](http://docs.gl/gl4/glSamplerParameter)(sampler, pname, param)
         /// * `pname` group: SamplerParameterI
         /// * `param` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn SamplerParameterIiv(
             &self,
             sampler: GLuint,
@@ -27899,8 +26908,6 @@ pub mod struct_commands {
         /// [glSamplerParameterIuiv](http://docs.gl/gl4/glSamplerParameter)(sampler, pname, param)
         /// * `pname` group: SamplerParameterI
         /// * `param` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn SamplerParameterIuiv(
             &self,
             sampler: GLuint,
@@ -27947,8 +26954,6 @@ pub mod struct_commands {
         }
         /// [glSamplerParameterf](http://docs.gl/gl4/glSamplerParameter)(sampler, pname, param)
         /// * `pname` group: SamplerParameterF
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn SamplerParameterf(&self, sampler: GLuint, pname: GLenum, param: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -27991,8 +26996,6 @@ pub mod struct_commands {
         /// [glSamplerParameterfv](http://docs.gl/gl4/glSamplerParameter)(sampler, pname, param)
         /// * `pname` group: SamplerParameterF
         /// * `param` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn SamplerParameterfv(
             &self,
             sampler: GLuint,
@@ -28039,8 +27042,6 @@ pub mod struct_commands {
         }
         /// [glSamplerParameteri](http://docs.gl/gl4/glSamplerParameter)(sampler, pname, param)
         /// * `pname` group: SamplerParameterI
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn SamplerParameteri(&self, sampler: GLuint, pname: GLenum, param: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -28083,8 +27084,6 @@ pub mod struct_commands {
         /// [glSamplerParameteriv](http://docs.gl/gl4/glSamplerParameter)(sampler, pname, param)
         /// * `pname` group: SamplerParameterI
         /// * `param` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn SamplerParameteriv(
             &self,
             sampler: GLuint,
@@ -28132,8 +27131,6 @@ pub mod struct_commands {
         /// [glScissor](http://docs.gl/gl4/glScissor)(x, y, width, height)
         /// * `x` group: WinCoord
         /// * `y` group: WinCoord
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Scissor(&self, x: GLint, y: GLint, width: GLsizei, height: GLsizei) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -28166,8 +27163,6 @@ pub mod struct_commands {
         }
         /// [glScissorArrayv](http://docs.gl/gl4/glScissorArrayv)(first, count, v)
         /// * `v` len: COMPSIZE(count)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ScissorArrayv(&self, first: GLuint, count: GLsizei, v: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -28203,8 +27198,6 @@ pub mod struct_commands {
             !self.glScissorArrayv_p.load(RELAX).is_null()
         }
         /// [glScissorIndexed](http://docs.gl/gl4/glScissorIndexed)(index, left, bottom, width, height)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ScissorIndexed(
             &self,
             index: GLuint,
@@ -28257,8 +27250,6 @@ pub mod struct_commands {
         }
         /// [glScissorIndexedv](http://docs.gl/gl4/glScissorIndexedv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ScissorIndexedv(&self, index: GLuint, v: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -28292,8 +27283,6 @@ pub mod struct_commands {
         /// * `shaders` len: count
         /// * `binaryFormat` group: ShaderBinaryFormat
         /// * `binary` len: length
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ShaderBinary(
             &self,
             count: GLsizei,
@@ -28347,8 +27336,6 @@ pub mod struct_commands {
         /// [glShaderSource](http://docs.gl/gl4/glShaderSource)(shader, count, string, length)
         /// * `string` len: count
         /// * `length` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ShaderSource(
             &self,
             shader: GLuint,
@@ -28397,8 +27384,6 @@ pub mod struct_commands {
             !self.glShaderSource_p.load(RELAX).is_null()
         }
         /// [glShaderStorageBlockBinding](http://docs.gl/gl4/glShaderStorageBlockBinding)(program, storageBlockIndex, storageBlockBinding)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ShaderStorageBlockBinding(
             &self,
             program: GLuint,
@@ -28444,8 +27429,6 @@ pub mod struct_commands {
             !self.glShaderStorageBlockBinding_p.load(RELAX).is_null()
         }
         /// [glSpecializeShader](http://docs.gl/gl4/glSpecializeShader)(shader, pEntryPoint, numSpecializationConstants, pConstantIndex, pConstantValue)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn SpecializeShader(
             &self,
             shader: GLuint,
@@ -28500,8 +27483,6 @@ pub mod struct_commands {
         /// * `func` group: StencilFunction
         /// * `ref_` group: StencilValue
         /// * `mask` group: MaskedStencilValue
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn StencilFunc(&self, func: GLenum, ref_: GLint, mask: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -28537,8 +27518,6 @@ pub mod struct_commands {
         /// * `func` group: StencilFunction
         /// * `ref_` group: StencilValue
         /// * `mask` group: MaskedStencilValue
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn StencilFuncSeparate(
             &self,
             face: GLenum,
@@ -28588,8 +27567,6 @@ pub mod struct_commands {
         }
         /// [glStencilMask](http://docs.gl/gl4/glStencilMask)(mask)
         /// * `mask` group: MaskedStencilValue
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn StencilMask(&self, mask: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -28617,8 +27594,6 @@ pub mod struct_commands {
         /// [glStencilMaskSeparate](http://docs.gl/gl4/glStencilMaskSeparate)(face, mask)
         /// * `face` group: StencilFaceDirection
         /// * `mask` group: MaskedStencilValue
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn StencilMaskSeparate(&self, face: GLenum, mask: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -28656,8 +27631,6 @@ pub mod struct_commands {
         /// * `fail` group: StencilOp
         /// * `zfail` group: StencilOp
         /// * `zpass` group: StencilOp
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn StencilOp(&self, fail: GLenum, zfail: GLenum, zpass: GLenum) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -28692,8 +27665,6 @@ pub mod struct_commands {
         /// * `sfail` group: StencilOp
         /// * `dpfail` group: StencilOp
         /// * `dppass` group: StencilOp
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn StencilOpSeparate(
             &self,
             face: GLenum,
@@ -28744,8 +27715,6 @@ pub mod struct_commands {
         /// [glTexBuffer](http://docs.gl/gl4/glTexBuffer)(target, internalformat, buffer)
         /// * `target` group: TextureTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexBuffer(&self, target: GLenum, internalformat: GLenum, buffer: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -28786,8 +27755,6 @@ pub mod struct_commands {
         /// * `internalformat` group: InternalFormat
         /// * `offset` group: BufferOffset
         /// * `size` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexBufferRange(
             &self,
             target: GLenum,
@@ -28846,8 +27813,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `pixels` len: COMPSIZE(format,type,width)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexImage1D(
             &self,
             target: GLenum,
@@ -28911,8 +27876,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `pixels` len: COMPSIZE(format,type,width,height)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexImage2D(
             &self,
             target: GLenum,
@@ -28963,8 +27926,6 @@ pub mod struct_commands {
         /// [glTexImage2DMultisample](http://docs.gl/gl4/glTexImage2DMultisample)(target, samples, internalformat, width, height, fixedsamplelocations)
         /// * `target` group: TextureTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexImage2DMultisample(
             &self,
             target: GLenum,
@@ -29026,8 +27987,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `pixels` len: COMPSIZE(format,type,width,height,depth)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexImage3D(
             &self,
             target: GLenum,
@@ -29080,8 +28039,6 @@ pub mod struct_commands {
         /// [glTexImage3DMultisample](http://docs.gl/gl4/glTexImage3DMultisample)(target, samples, internalformat, width, height, depth, fixedsamplelocations)
         /// * `target` group: TextureTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexImage3DMultisample(
             &self,
             target: GLenum,
@@ -29142,8 +28099,6 @@ pub mod struct_commands {
         /// * `target` group: TextureTarget
         /// * `pname` group: TextureParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexParameterIiv(&self, target: GLenum, pname: GLenum, params: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -29187,8 +28142,6 @@ pub mod struct_commands {
         /// * `target` group: TextureTarget
         /// * `pname` group: TextureParameterName
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexParameterIuiv(
             &self,
             target: GLenum,
@@ -29237,8 +28190,6 @@ pub mod struct_commands {
         /// * `target` group: TextureTarget
         /// * `pname` group: TextureParameterName
         /// * `param` group: CheckedFloat32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexParameterf(&self, target: GLenum, pname: GLenum, param: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -29283,8 +28234,6 @@ pub mod struct_commands {
         /// * `pname` group: TextureParameterName
         /// * `params` group: CheckedFloat32
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexParameterfv(&self, target: GLenum, pname: GLenum, params: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -29328,8 +28277,6 @@ pub mod struct_commands {
         /// * `target` group: TextureTarget
         /// * `pname` group: TextureParameterName
         /// * `param` group: CheckedInt32
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexParameteri(&self, target: GLenum, pname: GLenum, param: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -29374,8 +28321,6 @@ pub mod struct_commands {
         /// * `pname` group: TextureParameterName
         /// * `params` group: CheckedInt32
         /// * `params` len: COMPSIZE(pname)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexParameteriv(&self, target: GLenum, pname: GLenum, params: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -29418,8 +28363,6 @@ pub mod struct_commands {
         /// [glTexStorage1D](http://docs.gl/gl4/glTexStorage1D)(target, levels, internalformat, width)
         /// * `target` group: TextureTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexStorage1D(
             &self,
             target: GLenum,
@@ -29470,8 +28413,6 @@ pub mod struct_commands {
         /// [glTexStorage2D](http://docs.gl/gl4/glTexStorage2D)(target, levels, internalformat, width, height)
         /// * `target` group: TextureTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexStorage2D(
             &self,
             target: GLenum,
@@ -29525,8 +28466,6 @@ pub mod struct_commands {
         /// [glTexStorage2DMultisample](http://docs.gl/gl4/glTexStorage2DMultisample)(target, samples, internalformat, width, height, fixedsamplelocations)
         /// * `target` group: TextureTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexStorage2DMultisample(
             &self,
             target: GLenum,
@@ -29583,8 +28522,6 @@ pub mod struct_commands {
         /// [glTexStorage3D](http://docs.gl/gl4/glTexStorage3D)(target, levels, internalformat, width, height, depth)
         /// * `target` group: TextureTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexStorage3D(
             &self,
             target: GLenum,
@@ -29641,8 +28578,6 @@ pub mod struct_commands {
         /// [glTexStorage3DMultisample](http://docs.gl/gl4/glTexStorage3DMultisample)(target, samples, internalformat, width, height, depth, fixedsamplelocations)
         /// * `target` group: TextureTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexStorage3DMultisample(
             &self,
             target: GLenum,
@@ -29697,8 +28632,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `pixels` len: COMPSIZE(format,type,width)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexSubImage1D(
             &self,
             target: GLenum,
@@ -29763,8 +28696,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `pixels` len: COMPSIZE(format,type,width,height)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexSubImage2D(
             &self,
             target: GLenum,
@@ -29825,8 +28756,6 @@ pub mod struct_commands {
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
         /// * `pixels` len: COMPSIZE(format,type,width,height,depth)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TexSubImage3D(
             &self,
             target: GLenum,
@@ -29883,8 +28812,6 @@ pub mod struct_commands {
             !self.glTexSubImage3D_p.load(RELAX).is_null()
         }
         /// [glTextureBarrier](http://docs.gl/gl4/glTextureBarrier)()
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureBarrier(&self) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -29915,8 +28842,6 @@ pub mod struct_commands {
         }
         /// [glTextureBuffer](http://docs.gl/gl4/glTextureBuffer)(texture, internalformat, buffer)
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureBuffer(
             &self,
             texture: GLuint,
@@ -29964,8 +28889,6 @@ pub mod struct_commands {
         /// [glTextureBufferRange](http://docs.gl/gl4/glTextureBufferRange)(texture, internalformat, buffer, offset, size)
         /// * `internalformat` group: InternalFormat
         /// * `size` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureBufferRange(
             &self,
             texture: GLuint,
@@ -30018,8 +28941,6 @@ pub mod struct_commands {
         }
         /// [glTextureParameterIiv](http://docs.gl/gl4/glTextureParameter)(texture, pname, params)
         /// * `pname` group: TextureParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureParameterIiv(
             &self,
             texture: GLuint,
@@ -30066,8 +28987,6 @@ pub mod struct_commands {
         }
         /// [glTextureParameterIuiv](http://docs.gl/gl4/glTextureParameter)(texture, pname, params)
         /// * `pname` group: TextureParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureParameterIuiv(
             &self,
             texture: GLuint,
@@ -30114,8 +29033,6 @@ pub mod struct_commands {
         }
         /// [glTextureParameterf](http://docs.gl/gl4/glTextureParameter)(texture, pname, param)
         /// * `pname` group: TextureParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureParameterf(&self, texture: GLuint, pname: GLenum, param: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -30157,8 +29074,6 @@ pub mod struct_commands {
         }
         /// [glTextureParameterfv](http://docs.gl/gl4/glTextureParameter)(texture, pname, param)
         /// * `pname` group: TextureParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureParameterfv(
             &self,
             texture: GLuint,
@@ -30205,8 +29120,6 @@ pub mod struct_commands {
         }
         /// [glTextureParameteri](http://docs.gl/gl4/glTextureParameter)(texture, pname, param)
         /// * `pname` group: TextureParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureParameteri(&self, texture: GLuint, pname: GLenum, param: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -30248,8 +29161,6 @@ pub mod struct_commands {
         }
         /// [glTextureParameteriv](http://docs.gl/gl4/glTextureParameter)(texture, pname, param)
         /// * `pname` group: TextureParameterName
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureParameteriv(
             &self,
             texture: GLuint,
@@ -30296,8 +29207,6 @@ pub mod struct_commands {
         }
         /// [glTextureStorage1D](http://docs.gl/gl4/glTextureStorage1D)(texture, levels, internalformat, width)
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureStorage1D(
             &self,
             texture: GLuint,
@@ -30347,8 +29256,6 @@ pub mod struct_commands {
         }
         /// [glTextureStorage2D](http://docs.gl/gl4/glTextureStorage2D)(texture, levels, internalformat, width, height)
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureStorage2D(
             &self,
             texture: GLuint,
@@ -30401,8 +29308,6 @@ pub mod struct_commands {
         }
         /// [glTextureStorage2DMultisample](http://docs.gl/gl4/glTextureStorage2DMultisample)(texture, samples, internalformat, width, height, fixedsamplelocations)
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureStorage2DMultisample(
             &self,
             texture: GLuint,
@@ -30458,8 +29363,6 @@ pub mod struct_commands {
         }
         /// [glTextureStorage3D](http://docs.gl/gl4/glTextureStorage3D)(texture, levels, internalformat, width, height, depth)
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureStorage3D(
             &self,
             texture: GLuint,
@@ -30515,8 +29418,6 @@ pub mod struct_commands {
         }
         /// [glTextureStorage3DMultisample](http://docs.gl/gl4/glTextureStorage3DMultisample)(texture, samples, internalformat, width, height, depth, fixedsamplelocations)
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureStorage3DMultisample(
             &self,
             texture: GLuint,
@@ -30567,8 +29468,6 @@ pub mod struct_commands {
         /// [glTextureSubImage1D](http://docs.gl/gl4/glTextureSubImage1D)(texture, level, xoffset, width, format, type_, pixels)
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureSubImage1D(
             &self,
             texture: GLuint,
@@ -30628,8 +29527,6 @@ pub mod struct_commands {
         /// [glTextureSubImage2D](http://docs.gl/gl4/glTextureSubImage2D)(texture, level, xoffset, yoffset, width, height, format, type_, pixels)
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureSubImage2D(
             &self,
             texture: GLuint,
@@ -30684,8 +29581,6 @@ pub mod struct_commands {
         /// [glTextureSubImage3D](http://docs.gl/gl4/glTextureSubImage3D)(texture, level, xoffset, yoffset, zoffset, width, height, depth, format, type_, pixels)
         /// * `format` group: PixelFormat
         /// * `type_` group: PixelType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureSubImage3D(
             &self,
             texture: GLuint,
@@ -30744,8 +29639,6 @@ pub mod struct_commands {
         /// [glTextureView](http://docs.gl/gl4/glTextureView)(texture, target, origtexture, internalformat, minlevel, numlevels, minlayer, numlayers)
         /// * `target` group: TextureTarget
         /// * `internalformat` group: InternalFormat
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TextureView(
             &self,
             texture: GLuint,
@@ -30802,8 +29695,6 @@ pub mod struct_commands {
             !self.glTextureView_p.load(RELAX).is_null()
         }
         /// [glTransformFeedbackBufferBase](http://docs.gl/gl4/glTransformFeedbackBufferBase)(xfb, index, buffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TransformFeedbackBufferBase(
             &self,
             xfb: GLuint,
@@ -30850,8 +29741,6 @@ pub mod struct_commands {
         }
         /// [glTransformFeedbackBufferRange](http://docs.gl/gl4/glTransformFeedbackBufferRange)(xfb, index, buffer, offset, size)
         /// * `size` group: BufferSize
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TransformFeedbackBufferRange(
             &self,
             xfb: GLuint,
@@ -30905,8 +29794,6 @@ pub mod struct_commands {
         /// [glTransformFeedbackVaryings](http://docs.gl/gl4/glTransformFeedbackVaryings)(program, count, varyings, bufferMode)
         /// * `varyings` len: count
         /// * `bufferMode` group: TransformFeedbackBufferMode
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn TransformFeedbackVaryings(
             &self,
             program: GLuint,
@@ -30955,8 +29842,6 @@ pub mod struct_commands {
             !self.glTransformFeedbackVaryings_p.load(RELAX).is_null()
         }
         /// [glUniform1d](http://docs.gl/gl4/glUniform1d)(location, x)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform1d(&self, location: GLint, x: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -30983,8 +29868,6 @@ pub mod struct_commands {
         }
         /// [glUniform1dv](http://docs.gl/gl4/glUniform1dv)(location, count, value)
         /// * `value` len: count*1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform1dv(&self, location: GLint, count: GLsizei, value: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31016,8 +29899,6 @@ pub mod struct_commands {
             !self.glUniform1dv_p.load(RELAX).is_null()
         }
         /// [glUniform1f](http://docs.gl/gl4/glUniform)(location, v0)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform1f(&self, location: GLint, v0: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31044,8 +29925,6 @@ pub mod struct_commands {
         }
         /// [glUniform1fv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform1fv(&self, location: GLint, count: GLsizei, value: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31077,8 +29956,6 @@ pub mod struct_commands {
             !self.glUniform1fv_p.load(RELAX).is_null()
         }
         /// [glUniform1i](http://docs.gl/gl4/glUniform)(location, v0)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform1i(&self, location: GLint, v0: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31105,8 +29982,6 @@ pub mod struct_commands {
         }
         /// [glUniform1iv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform1iv(&self, location: GLint, count: GLsizei, value: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31138,8 +30013,6 @@ pub mod struct_commands {
             !self.glUniform1iv_p.load(RELAX).is_null()
         }
         /// [glUniform1ui](http://docs.gl/gl4/glUniform)(location, v0)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform1ui(&self, location: GLint, v0: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31166,8 +30039,6 @@ pub mod struct_commands {
         }
         /// [glUniform1uiv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform1uiv(&self, location: GLint, count: GLsizei, value: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31204,8 +30075,6 @@ pub mod struct_commands {
             !self.glUniform1uiv_p.load(RELAX).is_null()
         }
         /// [glUniform2d](http://docs.gl/gl4/glUniform2d)(location, x, y)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform2d(&self, location: GLint, x: GLdouble, y: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31232,8 +30101,6 @@ pub mod struct_commands {
         }
         /// [glUniform2dv](http://docs.gl/gl4/glUniform2dv)(location, count, value)
         /// * `value` len: count*2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform2dv(&self, location: GLint, count: GLsizei, value: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31265,8 +30132,6 @@ pub mod struct_commands {
             !self.glUniform2dv_p.load(RELAX).is_null()
         }
         /// [glUniform2f](http://docs.gl/gl4/glUniform)(location, v0, v1)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform2f(&self, location: GLint, v0: GLfloat, v1: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31293,8 +30158,6 @@ pub mod struct_commands {
         }
         /// [glUniform2fv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform2fv(&self, location: GLint, count: GLsizei, value: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31326,8 +30189,6 @@ pub mod struct_commands {
             !self.glUniform2fv_p.load(RELAX).is_null()
         }
         /// [glUniform2i](http://docs.gl/gl4/glUniform)(location, v0, v1)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform2i(&self, location: GLint, v0: GLint, v1: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31354,8 +30215,6 @@ pub mod struct_commands {
         }
         /// [glUniform2iv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform2iv(&self, location: GLint, count: GLsizei, value: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31387,8 +30246,6 @@ pub mod struct_commands {
             !self.glUniform2iv_p.load(RELAX).is_null()
         }
         /// [glUniform2ui](http://docs.gl/gl4/glUniform)(location, v0, v1)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform2ui(&self, location: GLint, v0: GLuint, v1: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31415,8 +30272,6 @@ pub mod struct_commands {
         }
         /// [glUniform2uiv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform2uiv(&self, location: GLint, count: GLsizei, value: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31453,8 +30308,6 @@ pub mod struct_commands {
             !self.glUniform2uiv_p.load(RELAX).is_null()
         }
         /// [glUniform3d](http://docs.gl/gl4/glUniform3d)(location, x, y, z)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform3d(&self, location: GLint, x: GLdouble, y: GLdouble, z: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31487,8 +30340,6 @@ pub mod struct_commands {
         }
         /// [glUniform3dv](http://docs.gl/gl4/glUniform3dv)(location, count, value)
         /// * `value` len: count*3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform3dv(&self, location: GLint, count: GLsizei, value: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31520,8 +30371,6 @@ pub mod struct_commands {
             !self.glUniform3dv_p.load(RELAX).is_null()
         }
         /// [glUniform3f](http://docs.gl/gl4/glUniform)(location, v0, v1, v2)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform3f(&self, location: GLint, v0: GLfloat, v1: GLfloat, v2: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31555,8 +30404,6 @@ pub mod struct_commands {
         }
         /// [glUniform3fv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform3fv(&self, location: GLint, count: GLsizei, value: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31588,8 +30435,6 @@ pub mod struct_commands {
             !self.glUniform3fv_p.load(RELAX).is_null()
         }
         /// [glUniform3i](http://docs.gl/gl4/glUniform)(location, v0, v1, v2)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform3i(&self, location: GLint, v0: GLint, v1: GLint, v2: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31623,8 +30468,6 @@ pub mod struct_commands {
         }
         /// [glUniform3iv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform3iv(&self, location: GLint, count: GLsizei, value: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31656,8 +30499,6 @@ pub mod struct_commands {
             !self.glUniform3iv_p.load(RELAX).is_null()
         }
         /// [glUniform3ui](http://docs.gl/gl4/glUniform)(location, v0, v1, v2)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform3ui(&self, location: GLint, v0: GLuint, v1: GLuint, v2: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31691,8 +30532,6 @@ pub mod struct_commands {
         }
         /// [glUniform3uiv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform3uiv(&self, location: GLint, count: GLsizei, value: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31729,8 +30568,6 @@ pub mod struct_commands {
             !self.glUniform3uiv_p.load(RELAX).is_null()
         }
         /// [glUniform4d](http://docs.gl/gl4/glUniform4d)(location, x, y, z, w)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform4d(
             &self,
             location: GLint,
@@ -31772,8 +30609,6 @@ pub mod struct_commands {
         }
         /// [glUniform4dv](http://docs.gl/gl4/glUniform4dv)(location, count, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform4dv(&self, location: GLint, count: GLsizei, value: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31805,8 +30640,6 @@ pub mod struct_commands {
             !self.glUniform4dv_p.load(RELAX).is_null()
         }
         /// [glUniform4f](http://docs.gl/gl4/glUniform)(location, v0, v1, v2, v3)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform4f(
             &self,
             location: GLint,
@@ -31848,8 +30681,6 @@ pub mod struct_commands {
         }
         /// [glUniform4fv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform4fv(&self, location: GLint, count: GLsizei, value: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31881,8 +30712,6 @@ pub mod struct_commands {
             !self.glUniform4fv_p.load(RELAX).is_null()
         }
         /// [glUniform4i](http://docs.gl/gl4/glUniform)(location, v0, v1, v2, v3)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform4i(
             &self,
             location: GLint,
@@ -31924,8 +30753,6 @@ pub mod struct_commands {
         }
         /// [glUniform4iv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform4iv(&self, location: GLint, count: GLsizei, value: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -31957,8 +30784,6 @@ pub mod struct_commands {
             !self.glUniform4iv_p.load(RELAX).is_null()
         }
         /// [glUniform4ui](http://docs.gl/gl4/glUniform)(location, v0, v1, v2, v3)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform4ui(
             &self,
             location: GLint,
@@ -32007,8 +30832,6 @@ pub mod struct_commands {
         }
         /// [glUniform4uiv](http://docs.gl/gl4/glUniform)(location, count, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Uniform4uiv(&self, location: GLint, count: GLsizei, value: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -32045,8 +30868,6 @@ pub mod struct_commands {
             !self.glUniform4uiv_p.load(RELAX).is_null()
         }
         /// [glUniformBlockBinding](http://docs.gl/gl4/glUniformBlockBinding)(program, uniformBlockIndex, uniformBlockBinding)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformBlockBinding(
             &self,
             program: GLuint,
@@ -32093,8 +30914,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix2dv](http://docs.gl/gl4/glUniformMatrix2dv)(location, count, transpose, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix2dv(
             &self,
             location: GLint,
@@ -32144,8 +30963,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix2fv](http://docs.gl/gl4/glUniform)(location, count, transpose, value)
         /// * `value` len: count*4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix2fv(
             &self,
             location: GLint,
@@ -32195,8 +31012,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix2x3dv](http://docs.gl/gl4/glUniformMatrix2x3dv)(location, count, transpose, value)
         /// * `value` len: count*6
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix2x3dv(
             &self,
             location: GLint,
@@ -32246,8 +31061,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix2x3fv](http://docs.gl/gl4/glUniform)(location, count, transpose, value)
         /// * `value` len: count*6
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix2x3fv(
             &self,
             location: GLint,
@@ -32297,8 +31110,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix2x4dv](http://docs.gl/gl4/glUniformMatrix2x4dv)(location, count, transpose, value)
         /// * `value` len: count*8
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix2x4dv(
             &self,
             location: GLint,
@@ -32348,8 +31159,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix2x4fv](http://docs.gl/gl4/glUniform)(location, count, transpose, value)
         /// * `value` len: count*8
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix2x4fv(
             &self,
             location: GLint,
@@ -32399,8 +31208,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix3dv](http://docs.gl/gl4/glUniformMatrix3dv)(location, count, transpose, value)
         /// * `value` len: count*9
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix3dv(
             &self,
             location: GLint,
@@ -32450,8 +31257,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix3fv](http://docs.gl/gl4/glUniform)(location, count, transpose, value)
         /// * `value` len: count*9
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix3fv(
             &self,
             location: GLint,
@@ -32501,8 +31306,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix3x2dv](http://docs.gl/gl4/glUniformMatrix3x2dv)(location, count, transpose, value)
         /// * `value` len: count*6
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix3x2dv(
             &self,
             location: GLint,
@@ -32552,8 +31355,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix3x2fv](http://docs.gl/gl4/glUniform)(location, count, transpose, value)
         /// * `value` len: count*6
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix3x2fv(
             &self,
             location: GLint,
@@ -32603,8 +31404,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix3x4dv](http://docs.gl/gl4/glUniformMatrix3x4dv)(location, count, transpose, value)
         /// * `value` len: count*12
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix3x4dv(
             &self,
             location: GLint,
@@ -32654,8 +31453,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix3x4fv](http://docs.gl/gl4/glUniform)(location, count, transpose, value)
         /// * `value` len: count*12
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix3x4fv(
             &self,
             location: GLint,
@@ -32705,8 +31502,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix4dv](http://docs.gl/gl4/glUniformMatrix4dv)(location, count, transpose, value)
         /// * `value` len: count*16
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix4dv(
             &self,
             location: GLint,
@@ -32756,8 +31551,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix4fv](http://docs.gl/gl4/glUniform)(location, count, transpose, value)
         /// * `value` len: count*16
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix4fv(
             &self,
             location: GLint,
@@ -32807,8 +31600,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix4x2dv](http://docs.gl/gl4/glUniformMatrix4x2dv)(location, count, transpose, value)
         /// * `value` len: count*8
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix4x2dv(
             &self,
             location: GLint,
@@ -32858,8 +31649,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix4x2fv](http://docs.gl/gl4/glUniform)(location, count, transpose, value)
         /// * `value` len: count*8
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix4x2fv(
             &self,
             location: GLint,
@@ -32909,8 +31698,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix4x3dv](http://docs.gl/gl4/glUniformMatrix4x3dv)(location, count, transpose, value)
         /// * `value` len: count*12
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix4x3dv(
             &self,
             location: GLint,
@@ -32960,8 +31747,6 @@ pub mod struct_commands {
         }
         /// [glUniformMatrix4x3fv](http://docs.gl/gl4/glUniform)(location, count, transpose, value)
         /// * `value` len: count*12
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformMatrix4x3fv(
             &self,
             location: GLint,
@@ -33012,8 +31797,6 @@ pub mod struct_commands {
         /// [glUniformSubroutinesuiv](http://docs.gl/gl4/glUniformSubroutines)(shadertype, count, indices)
         /// * `shadertype` group: ShaderType
         /// * `indices` len: count
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UniformSubroutinesuiv(
             &self,
             shadertype: GLenum,
@@ -33060,8 +31843,6 @@ pub mod struct_commands {
         }
         /// [glUnmapBuffer](http://docs.gl/gl4/glUnmapBuffer)(target)
         /// * `target` group: BufferTargetARB
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UnmapBuffer(&self, target: GLenum) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33087,8 +31868,6 @@ pub mod struct_commands {
             !self.glUnmapBuffer_p.load(RELAX).is_null()
         }
         /// [glUnmapNamedBuffer](http://docs.gl/gl4/glUnmapNamedBuffer)(buffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UnmapNamedBuffer(&self, buffer: GLuint) -> GLboolean {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33119,8 +31898,6 @@ pub mod struct_commands {
             !self.glUnmapNamedBuffer_p.load(RELAX).is_null()
         }
         /// [glUseProgram](http://docs.gl/gl4/glUseProgram)(program)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UseProgram(&self, program: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33147,8 +31924,6 @@ pub mod struct_commands {
         }
         /// [glUseProgramStages](http://docs.gl/gl4/glUseProgramStages)(pipeline, stages, program)
         /// * `stages` group: UseProgramStageMask
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn UseProgramStages(
             &self,
             pipeline: GLuint,
@@ -33194,8 +31969,6 @@ pub mod struct_commands {
             !self.glUseProgramStages_p.load(RELAX).is_null()
         }
         /// [glValidateProgram](http://docs.gl/gl4/glValidateProgram)(program)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ValidateProgram(&self, program: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33225,8 +31998,6 @@ pub mod struct_commands {
             !self.glValidateProgram_p.load(RELAX).is_null()
         }
         /// [glValidateProgramPipeline](http://docs.gl/gl4/glValidateProgramPipeline)(pipeline)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ValidateProgramPipeline(&self, pipeline: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33260,8 +32031,6 @@ pub mod struct_commands {
             !self.glValidateProgramPipeline_p.load(RELAX).is_null()
         }
         /// [glVertexArrayAttribBinding](http://docs.gl/gl4/glVertexArrayAttribBinding)(vaobj, attribindex, bindingindex)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexArrayAttribBinding(
             &self,
             vaobj: GLuint,
@@ -33308,8 +32077,6 @@ pub mod struct_commands {
         }
         /// [glVertexArrayAttribFormat](http://docs.gl/gl4/glVertexArrayAttribFormat)(vaobj, attribindex, size, type_, normalized, relativeoffset)
         /// * `type_` group: VertexAttribType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexArrayAttribFormat(
             &self,
             vaobj: GLuint,
@@ -33365,8 +32132,6 @@ pub mod struct_commands {
         }
         /// [glVertexArrayAttribIFormat](http://docs.gl/gl4/glVertexArrayAttribIFormat)(vaobj, attribindex, size, type_, relativeoffset)
         /// * `type_` group: VertexAttribIType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexArrayAttribIFormat(
             &self,
             vaobj: GLuint,
@@ -33419,8 +32184,6 @@ pub mod struct_commands {
         }
         /// [glVertexArrayAttribLFormat](http://docs.gl/gl4/glVertexArrayAttribLFormat)(vaobj, attribindex, size, type_, relativeoffset)
         /// * `type_` group: VertexAttribLType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexArrayAttribLFormat(
             &self,
             vaobj: GLuint,
@@ -33472,8 +32235,6 @@ pub mod struct_commands {
             !self.glVertexArrayAttribLFormat_p.load(RELAX).is_null()
         }
         /// [glVertexArrayBindingDivisor](http://docs.gl/gl4/glVertexArrayBindingDivisor)(vaobj, bindingindex, divisor)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexArrayBindingDivisor(
             &self,
             vaobj: GLuint,
@@ -33519,8 +32280,6 @@ pub mod struct_commands {
             !self.glVertexArrayBindingDivisor_p.load(RELAX).is_null()
         }
         /// [glVertexArrayElementBuffer](http://docs.gl/gl4/glVertexArrayElementBuffer)(vaobj, buffer)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexArrayElementBuffer(&self, vaobj: GLuint, buffer: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33559,8 +32318,6 @@ pub mod struct_commands {
             !self.glVertexArrayElementBuffer_p.load(RELAX).is_null()
         }
         /// [glVertexArrayVertexBuffer](http://docs.gl/gl4/glVertexArrayVertexBuffer)(vaobj, bindingindex, buffer, offset, stride)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexArrayVertexBuffer(
             &self,
             vaobj: GLuint,
@@ -33612,8 +32369,6 @@ pub mod struct_commands {
             !self.glVertexArrayVertexBuffer_p.load(RELAX).is_null()
         }
         /// [glVertexArrayVertexBuffers](http://docs.gl/gl4/glVertexArrayVertexBuffers)(vaobj, first, count, buffers, offsets, strides)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexArrayVertexBuffers(
             &self,
             vaobj: GLuint,
@@ -33669,8 +32424,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib1d](http://docs.gl/gl4/glVertexAttrib1d)(index, x)
         /// * vector equivalent: [`glVertexAttrib1dv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib1d(&self, index: GLuint, x: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33701,8 +32454,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib1dv](http://docs.gl/gl4/glVertexAttrib1dv)(index, v)
         /// * `v` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib1dv(&self, index: GLuint, v: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33734,8 +32485,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib1f](http://docs.gl/gl4/glVertexAttrib)(index, x)
         /// * vector equivalent: [`glVertexAttrib1fv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib1f(&self, index: GLuint, x: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33766,8 +32515,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib1fv](http://docs.gl/gl4/glVertexAttrib)(index, v)
         /// * `v` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib1fv(&self, index: GLuint, v: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33799,8 +32546,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib1s](http://docs.gl/gl4/glVertexAttrib1s)(index, x)
         /// * vector equivalent: [`glVertexAttrib1sv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib1s(&self, index: GLuint, x: GLshort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33831,8 +32576,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib1sv](http://docs.gl/gl4/glVertexAttrib1sv)(index, v)
         /// * `v` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib1sv(&self, index: GLuint, v: *const GLshort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33864,8 +32607,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib2d](http://docs.gl/gl4/glVertexAttrib2d)(index, x, y)
         /// * vector equivalent: [`glVertexAttrib2dv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib2d(&self, index: GLuint, x: GLdouble, y: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33897,8 +32638,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib2dv](http://docs.gl/gl4/glVertexAttrib2dv)(index, v)
         /// * `v` len: 2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib2dv(&self, index: GLuint, v: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33930,8 +32669,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib2f](http://docs.gl/gl4/glVertexAttrib)(index, x, y)
         /// * vector equivalent: [`glVertexAttrib2fv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib2f(&self, index: GLuint, x: GLfloat, y: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33963,8 +32700,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib2fv](http://docs.gl/gl4/glVertexAttrib)(index, v)
         /// * `v` len: 2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib2fv(&self, index: GLuint, v: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -33996,8 +32731,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib2s](http://docs.gl/gl4/glVertexAttrib2s)(index, x, y)
         /// * vector equivalent: [`glVertexAttrib2sv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib2s(&self, index: GLuint, x: GLshort, y: GLshort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34029,8 +32762,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib2sv](http://docs.gl/gl4/glVertexAttrib2sv)(index, v)
         /// * `v` len: 2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib2sv(&self, index: GLuint, v: *const GLshort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34062,8 +32793,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib3d](http://docs.gl/gl4/glVertexAttrib3d)(index, x, y, z)
         /// * vector equivalent: [`glVertexAttrib3dv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib3d(&self, index: GLuint, x: GLdouble, y: GLdouble, z: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34101,8 +32830,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib3dv](http://docs.gl/gl4/glVertexAttrib3dv)(index, v)
         /// * `v` len: 3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib3dv(&self, index: GLuint, v: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34134,8 +32861,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib3f](http://docs.gl/gl4/glVertexAttrib)(index, x, y, z)
         /// * vector equivalent: [`glVertexAttrib3fv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib3f(&self, index: GLuint, x: GLfloat, y: GLfloat, z: GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34173,8 +32898,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib3fv](http://docs.gl/gl4/glVertexAttrib)(index, v)
         /// * `v` len: 3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib3fv(&self, index: GLuint, v: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34206,8 +32929,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib3s](http://docs.gl/gl4/glVertexAttrib3s)(index, x, y, z)
         /// * vector equivalent: [`glVertexAttrib3sv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib3s(&self, index: GLuint, x: GLshort, y: GLshort, z: GLshort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34245,8 +32966,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib3sv](http://docs.gl/gl4/glVertexAttrib3sv)(index, v)
         /// * `v` len: 3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib3sv(&self, index: GLuint, v: *const GLshort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34278,8 +32997,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4Nbv](http://docs.gl/gl4/glVertexAttrib4Nbv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4Nbv(&self, index: GLuint, v: *const GLbyte) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34311,8 +33028,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4Niv](http://docs.gl/gl4/glVertexAttrib4N)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4Niv(&self, index: GLuint, v: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34344,8 +33059,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4Nsv](http://docs.gl/gl4/glVertexAttrib4Nsv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4Nsv(&self, index: GLuint, v: *const GLshort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34376,8 +33089,6 @@ pub mod struct_commands {
             !self.glVertexAttrib4Nsv_p.load(RELAX).is_null()
         }
         /// [glVertexAttrib4Nub](http://docs.gl/gl4/glVertexAttrib4Nub)(index, x, y, z, w)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4Nub(
             &self,
             index: GLuint,
@@ -34430,8 +33141,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4Nubv](http://docs.gl/gl4/glVertexAttrib4Nubv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4Nubv(&self, index: GLuint, v: *const GLubyte) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34463,8 +33172,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4Nuiv](http://docs.gl/gl4/glVertexAttrib4N)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4Nuiv(&self, index: GLuint, v: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34496,8 +33203,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4Nusv](http://docs.gl/gl4/glVertexAttrib4Nusv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4Nusv(&self, index: GLuint, v: *const GLushort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34529,8 +33234,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4bv](http://docs.gl/gl4/glVertexAttrib4bv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4bv(&self, index: GLuint, v: *const GLbyte) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34562,8 +33265,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4d](http://docs.gl/gl4/glVertexAttrib4d)(index, x, y, z, w)
         /// * vector equivalent: [`glVertexAttrib4dv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4d(
             &self,
             index: GLuint,
@@ -34616,8 +33317,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4dv](http://docs.gl/gl4/glVertexAttrib4dv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4dv(&self, index: GLuint, v: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34649,8 +33348,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4f](http://docs.gl/gl4/glVertexAttrib)(index, x, y, z, w)
         /// * vector equivalent: [`glVertexAttrib4fv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4f(
             &self,
             index: GLuint,
@@ -34703,8 +33400,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4fv](http://docs.gl/gl4/glVertexAttrib)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4fv(&self, index: GLuint, v: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34736,8 +33431,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4iv](http://docs.gl/gl4/glVertexAttrib)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4iv(&self, index: GLuint, v: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34769,8 +33462,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4s](http://docs.gl/gl4/glVertexAttrib4s)(index, x, y, z, w)
         /// * vector equivalent: [`glVertexAttrib4sv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4s(
             &self,
             index: GLuint,
@@ -34823,8 +33514,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4sv](http://docs.gl/gl4/glVertexAttrib4sv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4sv(&self, index: GLuint, v: *const GLshort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34856,8 +33545,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4ubv](http://docs.gl/gl4/glVertexAttrib4ubv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4ubv(&self, index: GLuint, v: *const GLubyte) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34889,8 +33576,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4uiv](http://docs.gl/gl4/glVertexAttrib)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4uiv(&self, index: GLuint, v: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34922,8 +33607,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttrib4usv](http://docs.gl/gl4/glVertexAttrib4usv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttrib4usv(&self, index: GLuint, v: *const GLushort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34954,8 +33637,6 @@ pub mod struct_commands {
             !self.glVertexAttrib4usv_p.load(RELAX).is_null()
         }
         /// [glVertexAttribBinding](http://docs.gl/gl4/glVertexAttribBinding)(attribindex, bindingindex)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribBinding(&self, attribindex: GLuint, bindingindex: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -34994,8 +33675,6 @@ pub mod struct_commands {
             !self.glVertexAttribBinding_p.load(RELAX).is_null()
         }
         /// [glVertexAttribDivisor](http://docs.gl/gl4/glVertexAttribDivisor)(index, divisor)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribDivisor(&self, index: GLuint, divisor: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35035,8 +33714,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribDivisorARB](http://docs.gl/gl4/glVertexAttribDivisorARB)(index, divisor)
         /// * alias of: [`glVertexAttribDivisor`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribDivisorARB(&self, index: GLuint, divisor: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35076,8 +33753,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribFormat](http://docs.gl/gl4/glVertexAttribFormat)(attribindex, size, type_, normalized, relativeoffset)
         /// * `type_` group: VertexAttribType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribFormat(
             &self,
             attribindex: GLuint,
@@ -35130,8 +33805,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI1i](http://docs.gl/gl4/glVertexAttribI)(index, x)
         /// * vector equivalent: [`glVertexAttribI1iv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI1i(&self, index: GLuint, x: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35163,8 +33836,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI1iv](http://docs.gl/gl4/glVertexAttribI)(index, v)
         /// * `v` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI1iv(&self, index: GLuint, v: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35196,8 +33867,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI1ui](http://docs.gl/gl4/glVertexAttribI)(index, x)
         /// * vector equivalent: [`glVertexAttribI1uiv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI1ui(&self, index: GLuint, x: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35229,8 +33898,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI1uiv](http://docs.gl/gl4/glVertexAttribI)(index, v)
         /// * `v` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI1uiv(&self, index: GLuint, v: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35262,8 +33929,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI2i](http://docs.gl/gl4/glVertexAttribI)(index, x, y)
         /// * vector equivalent: [`glVertexAttribI2iv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI2i(&self, index: GLuint, x: GLint, y: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35295,8 +33960,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI2iv](http://docs.gl/gl4/glVertexAttribI)(index, v)
         /// * `v` len: 2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI2iv(&self, index: GLuint, v: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35328,8 +33991,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI2ui](http://docs.gl/gl4/glVertexAttribI)(index, x, y)
         /// * vector equivalent: [`glVertexAttribI2uiv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI2ui(&self, index: GLuint, x: GLuint, y: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35371,8 +34032,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI2uiv](http://docs.gl/gl4/glVertexAttribI)(index, v)
         /// * `v` len: 2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI2uiv(&self, index: GLuint, v: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35404,8 +34063,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI3i](http://docs.gl/gl4/glVertexAttribI)(index, x, y, z)
         /// * vector equivalent: [`glVertexAttribI3iv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI3i(&self, index: GLuint, x: GLint, y: GLint, z: GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35449,8 +34106,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI3iv](http://docs.gl/gl4/glVertexAttribI)(index, v)
         /// * `v` len: 3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI3iv(&self, index: GLuint, v: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35482,8 +34137,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI3ui](http://docs.gl/gl4/glVertexAttribI)(index, x, y, z)
         /// * vector equivalent: [`glVertexAttribI3uiv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI3ui(&self, index: GLuint, x: GLuint, y: GLuint, z: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35527,8 +34180,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI3uiv](http://docs.gl/gl4/glVertexAttribI)(index, v)
         /// * `v` len: 3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI3uiv(&self, index: GLuint, v: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35560,8 +34211,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI4bv](http://docs.gl/gl4/glVertexAttribI4bv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI4bv(&self, index: GLuint, v: *const GLbyte) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35593,8 +34242,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI4i](http://docs.gl/gl4/glVertexAttribI)(index, x, y, z, w)
         /// * vector equivalent: [`glVertexAttribI4iv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI4i(
             &self,
             index: GLuint,
@@ -35647,8 +34294,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI4iv](http://docs.gl/gl4/glVertexAttrib)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI4iv(&self, index: GLuint, v: *const GLint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35680,8 +34325,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI4sv](http://docs.gl/gl4/glVertexAttribI4sv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI4sv(&self, index: GLuint, v: *const GLshort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35713,8 +34356,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI4ubv](http://docs.gl/gl4/glVertexAttribI4ubv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI4ubv(&self, index: GLuint, v: *const GLubyte) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35746,8 +34387,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI4ui](http://docs.gl/gl4/glVertexAttrib)(index, x, y, z, w)
         /// * vector equivalent: [`glVertexAttribI4uiv`]
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI4ui(
             &self,
             index: GLuint,
@@ -35800,8 +34439,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI4uiv](http://docs.gl/gl4/glVertexAttrib)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI4uiv(&self, index: GLuint, v: *const GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35833,8 +34470,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribI4usv](http://docs.gl/gl4/glVertexAttribI4usv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribI4usv(&self, index: GLuint, v: *const GLushort) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -35866,8 +34501,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribIFormat](http://docs.gl/gl4/glVertexAttribIFormat)(attribindex, size, type_, relativeoffset)
         /// * `type_` group: VertexAttribIType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribIFormat(
             &self,
             attribindex: GLuint,
@@ -35918,8 +34551,6 @@ pub mod struct_commands {
         /// [glVertexAttribIPointer](http://docs.gl/gl4/glVertexAttribPointer)(index, size, type_, stride, pointer)
         /// * `type_` group: VertexAttribIType
         /// * `pointer` len: COMPSIZE(size,type,stride)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribIPointer(
             &self,
             index: GLuint,
@@ -35971,8 +34602,6 @@ pub mod struct_commands {
             !self.glVertexAttribIPointer_p.load(RELAX).is_null()
         }
         /// [glVertexAttribL1d](http://docs.gl/gl4/glVertexAttribL1d)(index, x)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribL1d(&self, index: GLuint, x: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36004,8 +34633,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribL1dv](http://docs.gl/gl4/glVertexAttribL1dv)(index, v)
         /// * `v` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribL1dv(&self, index: GLuint, v: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36036,8 +34663,6 @@ pub mod struct_commands {
             !self.glVertexAttribL1dv_p.load(RELAX).is_null()
         }
         /// [glVertexAttribL2d](http://docs.gl/gl4/glVertexAttribL2d)(index, x, y)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribL2d(&self, index: GLuint, x: GLdouble, y: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36069,8 +34694,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribL2dv](http://docs.gl/gl4/glVertexAttribL2dv)(index, v)
         /// * `v` len: 2
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribL2dv(&self, index: GLuint, v: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36101,8 +34724,6 @@ pub mod struct_commands {
             !self.glVertexAttribL2dv_p.load(RELAX).is_null()
         }
         /// [glVertexAttribL3d](http://docs.gl/gl4/glVertexAttribL3d)(index, x, y, z)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribL3d(&self, index: GLuint, x: GLdouble, y: GLdouble, z: GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36146,8 +34767,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribL3dv](http://docs.gl/gl4/glVertexAttribL3dv)(index, v)
         /// * `v` len: 3
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribL3dv(&self, index: GLuint, v: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36178,8 +34797,6 @@ pub mod struct_commands {
             !self.glVertexAttribL3dv_p.load(RELAX).is_null()
         }
         /// [glVertexAttribL4d](http://docs.gl/gl4/glVertexAttribL4d)(index, x, y, z, w)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribL4d(
             &self,
             index: GLuint,
@@ -36232,8 +34849,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribL4dv](http://docs.gl/gl4/glVertexAttribL4dv)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribL4dv(&self, index: GLuint, v: *const GLdouble) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36265,8 +34880,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribLFormat](http://docs.gl/gl4/glVertexAttribLFormat)(attribindex, size, type_, relativeoffset)
         /// * `type_` group: VertexAttribLType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribLFormat(
             &self,
             attribindex: GLuint,
@@ -36317,8 +34930,6 @@ pub mod struct_commands {
         /// [glVertexAttribLPointer](http://docs.gl/gl4/glVertexAttribLPointer)(index, size, type_, stride, pointer)
         /// * `type_` group: VertexAttribLType
         /// * `pointer` len: size
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribLPointer(
             &self,
             index: GLuint,
@@ -36371,8 +34982,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribP1ui](http://docs.gl/gl4/glVertexAttribP)(index, type_, normalized, value)
         /// * `type_` group: VertexAttribPointerType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribP1ui(
             &self,
             index: GLuint,
@@ -36423,8 +35032,6 @@ pub mod struct_commands {
         /// [glVertexAttribP1uiv](http://docs.gl/gl4/glVertexAttribP)(index, type_, normalized, value)
         /// * `type_` group: VertexAttribPointerType
         /// * `value` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribP1uiv(
             &self,
             index: GLuint,
@@ -36474,8 +35081,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribP2ui](http://docs.gl/gl4/glVertexAttribP)(index, type_, normalized, value)
         /// * `type_` group: VertexAttribPointerType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribP2ui(
             &self,
             index: GLuint,
@@ -36526,8 +35131,6 @@ pub mod struct_commands {
         /// [glVertexAttribP2uiv](http://docs.gl/gl4/glVertexAttribP)(index, type_, normalized, value)
         /// * `type_` group: VertexAttribPointerType
         /// * `value` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribP2uiv(
             &self,
             index: GLuint,
@@ -36577,8 +35180,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribP3ui](http://docs.gl/gl4/glVertexAttribP)(index, type_, normalized, value)
         /// * `type_` group: VertexAttribPointerType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribP3ui(
             &self,
             index: GLuint,
@@ -36629,8 +35230,6 @@ pub mod struct_commands {
         /// [glVertexAttribP3uiv](http://docs.gl/gl4/glVertexAttribP)(index, type_, normalized, value)
         /// * `type_` group: VertexAttribPointerType
         /// * `value` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribP3uiv(
             &self,
             index: GLuint,
@@ -36680,8 +35279,6 @@ pub mod struct_commands {
         }
         /// [glVertexAttribP4ui](http://docs.gl/gl4/glVertexAttribP)(index, type_, normalized, value)
         /// * `type_` group: VertexAttribPointerType
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribP4ui(
             &self,
             index: GLuint,
@@ -36732,8 +35329,6 @@ pub mod struct_commands {
         /// [glVertexAttribP4uiv](http://docs.gl/gl4/glVertexAttribP)(index, type_, normalized, value)
         /// * `type_` group: VertexAttribPointerType
         /// * `value` len: 1
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribP4uiv(
             &self,
             index: GLuint,
@@ -36784,8 +35379,6 @@ pub mod struct_commands {
         /// [glVertexAttribPointer](http://docs.gl/gl4/glVertexAttribPointer)(index, size, type_, normalized, stride, pointer)
         /// * `type_` group: VertexAttribPointerType
         /// * `pointer` len: COMPSIZE(size,type,stride)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexAttribPointer(
             &self,
             index: GLuint,
@@ -36840,8 +35433,6 @@ pub mod struct_commands {
             !self.glVertexAttribPointer_p.load(RELAX).is_null()
         }
         /// [glVertexBindingDivisor](http://docs.gl/gl4/glVertexBindingDivisor)(bindingindex, divisor)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn VertexBindingDivisor(&self, bindingindex: GLuint, divisor: GLuint) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36882,8 +35473,6 @@ pub mod struct_commands {
         /// [glViewport](http://docs.gl/gl4/glViewport)(x, y, width, height)
         /// * `x` group: WinCoord
         /// * `y` group: WinCoord
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn Viewport(&self, x: GLint, y: GLint, width: GLsizei, height: GLsizei) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36916,8 +35505,6 @@ pub mod struct_commands {
         }
         /// [glViewportArrayv](http://docs.gl/gl4/glViewportArrayv)(first, count, v)
         /// * `v` len: COMPSIZE(count)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ViewportArrayv(&self, first: GLuint, count: GLsizei, v: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -36958,8 +35545,6 @@ pub mod struct_commands {
             !self.glViewportArrayv_p.load(RELAX).is_null()
         }
         /// [glViewportIndexedf](http://docs.gl/gl4/glViewportIndexed)(index, x, y, w, h)
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ViewportIndexedf(
             &self,
             index: GLuint,
@@ -37012,8 +35597,6 @@ pub mod struct_commands {
         }
         /// [glViewportIndexedfv](http://docs.gl/gl4/glViewportIndexed)(index, v)
         /// * `v` len: 4
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn ViewportIndexedfv(&self, index: GLuint, v: *const GLfloat) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {
@@ -37046,8 +35629,6 @@ pub mod struct_commands {
         /// [glWaitSync](http://docs.gl/gl4/glWaitSync)(sync, flags, timeout)
         /// * `sync` group: sync
         /// * `flags` group: SyncBehaviorFlags
-        #[cfg_attr(feature = "inline", inline)]
-        #[cfg_attr(feature = "inline_always", inline(always))]
         pub unsafe fn WaitSync(&self, sync: GLsync, flags: GLbitfield, timeout: GLuint64) {
             #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
             {

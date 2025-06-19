@@ -1,6 +1,8 @@
+#[cfg(any(target_arch = "wasm32", feature = "glutin_winit", feature = "sdl2"))]
 use glow::*;
 
 fn main() {
+    #[cfg(any(target_arch = "wasm32", feature = "glutin_winit", feature = "sdl2"))]
     unsafe {
         // Create a context from a WebGL2 context on wasm32 targets
         #[cfg(target_arch = "wasm32")]
@@ -27,6 +29,8 @@ fn main() {
         // Create a context from a glutin window on non-wasm32 targets
         #[cfg(feature = "glutin_winit")]
         let (gl, gl_surface, gl_context, shader_version, _window, event_loop) = {
+            use core::num::NonZeroU32;
+
             use glutin::{
                 config::{ConfigTemplateBuilder, GlConfig},
                 context::{ContextApi, ContextAttributesBuilder, NotCurrentGlContext},
@@ -35,7 +39,6 @@ fn main() {
             };
             use glutin_winit::{DisplayBuilder, GlWindow};
             use raw_window_handle::HasRawWindowHandle;
-            use std::num::NonZeroU32;
 
             let event_loop = winit::event_loop::EventLoopBuilder::new().build().unwrap();
             let window_builder = winit::window::WindowBuilder::new()

@@ -19,7 +19,7 @@ targets = [
   "x86_64-pc-windows-msvc",
   "i686-unknown-linux-gnu",
   "i686-pc-windows-msvc",
-  "wasm32-unknown-unknown"
+  "wasm32-unknown-unknown",
 ]
 
 [lib]
@@ -27,20 +27,39 @@ name = "glow"
 path = "src/lib.rs"
 
 [dependencies]
-log = { version = "0.4.16", optional = true }
+log = { version = "0.4.16", optional = true, default-features = false }
 
 [features]
+default = ["std"]
+std = [
+  "log/std",
+  "wasm_bindgen/std",
+  "web_sys/std",
+  "js_sys/std",
+  "slotmap/std",
+]
 debug_trace_calls = []
 debug_automatic_glGetError = []
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-js-sys = "~0.3"
-wasm-bindgen = "~0.2"
-slotmap = "1"
+[target.'cfg(target_arch = "wasm32")'.dependencies.js_sys]
+version = "~0.3"
+package = "js-sys"
+default-features = false
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.wasm_bindgen]
+version = "~0.2"
+package = "wasm-bindgen"
+default-features = false
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.slotmap]
+version = "1"
+package = "slotmap"
+default-features = false
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.web_sys]
-version = "~0.3.60"
+version = "~0.3.77"
 package = "web-sys"
+default-features = false
 features = [
   "Document",
   "Element",

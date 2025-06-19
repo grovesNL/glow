@@ -1,8 +1,14 @@
+use alloc::{
+    borrow::ToOwned,
+    collections::BTreeSet,
+    ffi::CString,
+    string::{String, ToString},
+    vec::Vec,
+};
+use core::{ffi::CStr, num::NonZeroU32, ptr};
+
 use super::*;
 use crate::{gl46 as native_gl, version::Version};
-use std::ffi::CStr;
-use std::ptr;
-use std::{collections::HashSet, ffi::CString, num::NonZeroU32};
 
 #[derive(Default)]
 struct Constants {
@@ -16,7 +22,7 @@ struct Constants {
 /// guarantee that it's not undefined behavior to keep a `Box` here while it's used as a raw
 /// pointer in the C API.
 struct DebugCallbackRawPtr {
-    callback: *mut std::os::raw::c_void,
+    callback: *mut core::ffi::c_void,
 }
 
 unsafe impl Send for DebugCallbackRawPtr {}
@@ -35,7 +41,7 @@ impl Drop for DebugCallbackRawPtr {
 
 pub struct Context {
     raw: native_gl::GlFns,
-    extensions: HashSet<String>,
+    extensions: BTreeSet<String>,
     constants: Constants,
     version: Version,
     debug_callback: Option<DebugCallbackRawPtr>,
@@ -44,13 +50,12 @@ pub struct Context {
 impl Context {
     pub unsafe fn from_loader_function_cstr<F>(mut loader_function: F) -> Self
     where
-        F: FnMut(&CStr) -> *const std::os::raw::c_void,
+        F: FnMut(&CStr) -> *const core::ffi::c_void,
     {
-        let raw: native_gl::GlFns =
-            native_gl::GlFns::load_with(|p: *const std::os::raw::c_char| {
-                let c_str = std::ffi::CStr::from_ptr(p);
-                loader_function(c_str) as *mut std::os::raw::c_void
-            });
+        let raw: native_gl::GlFns = native_gl::GlFns::load_with(|p: *const core::ffi::c_char| {
+            let c_str = core::ffi::CStr::from_ptr(p);
+            loader_function(c_str) as *mut core::ffi::c_void
+        });
 
         // Retrieve and parse `GL_VERSION`
         let raw_string = raw.GetString(VERSION);
@@ -59,7 +64,7 @@ impl Context {
             panic!("Reading GL_VERSION failed. Make sure there is a valid GL context currently active.")
         }
 
-        let raw_version = std::ffi::CStr::from_ptr(raw_string as *const native_gl::GLchar)
+        let raw_version = core::ffi::CStr::from_ptr(raw_string as *const native_gl::GLchar)
             .to_str()
             .unwrap()
             .to_owned();
@@ -68,7 +73,7 @@ impl Context {
         // Setup extensions and constants after the context has been built
         let mut context = Self {
             raw,
-            extensions: HashSet::new(),
+            extensions: BTreeSet::new(),
             constants: Constants::default(),
             version,
             debug_callback: None,
@@ -106,7 +111,7 @@ impl Context {
 
     pub unsafe fn from_loader_function<F>(mut loader_function: F) -> Self
     where
-        F: FnMut(&str) -> *const std::os::raw::c_void,
+        F: FnMut(&str) -> *const core::ffi::c_void,
     {
         Self::from_loader_function_cstr(move |name| loader_function(name.to_str().unwrap()))
     }
@@ -139,8 +144,8 @@ impl Context {
     }
 }
 
-impl std::fmt::Debug for Context {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Debug for Context {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(f, "Native_GL_Context")
     }
 }
@@ -201,7 +206,7 @@ impl HasContext for Context {
     type UniformLocation = NativeUniformLocation;
     type TransformFeedback = NativeTransformFeedback;
 
-    fn supported_extensions(&self) -> &HashSet<String> {
+    fn supported_extensions(&self) -> &BTreeSet<String> {
         &self.extensions
     }
 
@@ -356,7 +361,7 @@ impl HasContext for Context {
         gl.GetShaderiv(shader.0.get(), INFO_LOG_LENGTH, &mut length);
         if length > 0 {
             let mut log = String::with_capacity(length as usize);
-            log.extend(std::iter::repeat('\0').take(length as usize));
+            log.extend(core::iter::repeat('\0').take(length as usize));
             gl.GetShaderInfoLog(
                 shader.0.get(),
                 length,
@@ -415,8 +420,8 @@ impl HasContext for Context {
             format,
             ty,
             match pixels {
-                PixelPackData::BufferOffset(offset) => offset as *mut std::ffi::c_void,
-                PixelPackData::Slice(Some(data)) => data.as_mut_ptr() as *mut std::ffi::c_void,
+                PixelPackData::BufferOffset(offset) => offset as *mut core::ffi::c_void,
+                PixelPackData::Slice(Some(data)) => data.as_mut_ptr() as *mut core::ffi::c_void,
                 PixelPackData::Slice(None) => ptr::null_mut(),
             },
         );
@@ -493,7 +498,7 @@ impl HasContext for Context {
         gl.GetProgramiv(program.0.get(), INFO_LOG_LENGTH, &mut length);
         if length > 0 {
             let mut log = String::with_capacity(length as usize);
-            log.extend(std::iter::repeat('\0').take(length as usize));
+            log.extend(core::iter::repeat('\0').take(length as usize));
             gl.GetProgramInfoLog(
                 program.0.get(),
                 length,
@@ -1148,7 +1153,7 @@ impl HasContext for Context {
         );
 
         let mut name = String::with_capacity(uniform_max_size as usize);
-        name.extend(std::iter::repeat('\0').take(uniform_max_size as usize));
+        name.extend(core::iter::repeat('\0').take(uniform_max_size as usize));
         let mut length = 0;
         let mut size = 0;
         let mut utype = 0;
@@ -1423,12 +1428,12 @@ impl HasContext for Context {
 
     unsafe fn buffer_data_size(&self, target: u32, size: i32, usage: u32) {
         let gl = &self.raw;
-        gl.BufferData(target, size as isize, std::ptr::null(), usage);
+        gl.BufferData(target, size as isize, core::ptr::null(), usage);
     }
 
     unsafe fn named_buffer_data_size(&self, buffer: Self::Buffer, size: i32, usage: u32) {
         let gl = &self.raw;
-        gl.NamedBufferData(buffer.0.get(), size as isize, std::ptr::null(), usage);
+        gl.NamedBufferData(buffer.0.get(), size as isize, core::ptr::null(), usage);
     }
 
     unsafe fn buffer_data_u8_slice(&self, target: u32, data: &[u8], usage: u32) {
@@ -1436,7 +1441,7 @@ impl HasContext for Context {
         gl.BufferData(
             target,
             data.len() as isize,
-            data.as_ptr() as *const std::ffi::c_void,
+            data.as_ptr() as *const core::ffi::c_void,
             usage,
         );
     }
@@ -1446,7 +1451,7 @@ impl HasContext for Context {
         gl.NamedBufferData(
             buffer.0.get(),
             data.len() as isize,
-            data.as_ptr() as *const std::ffi::c_void,
+            data.as_ptr() as *const core::ffi::c_void,
             usage,
         );
     }
@@ -1457,7 +1462,7 @@ impl HasContext for Context {
             target,
             offset as isize,
             src_data.len() as isize,
-            src_data.as_ptr() as *const std::ffi::c_void,
+            src_data.as_ptr() as *const core::ffi::c_void,
         );
     }
 
@@ -1472,7 +1477,7 @@ impl HasContext for Context {
             buffer.0.get(),
             offset as isize,
             src_data.len() as isize,
-            src_data.as_ptr() as *const std::ffi::c_void,
+            src_data.as_ptr() as *const core::ffi::c_void,
         );
     }
 
@@ -1482,14 +1487,15 @@ impl HasContext for Context {
             target,
             offset as isize,
             dst_data.len() as isize,
-            dst_data.as_mut_ptr() as *mut std::ffi::c_void,
+            dst_data.as_mut_ptr() as *mut core::ffi::c_void,
         );
     }
 
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&[u8]>, flags: u32) {
         let gl = &self.raw;
         let size = size as isize;
-        let data = data.map(|p| p.as_ptr()).unwrap_or(std::ptr::null()) as *const std::ffi::c_void;
+        let data =
+            data.map(|p| p.as_ptr()).unwrap_or(core::ptr::null()) as *const core::ffi::c_void;
         if gl.BufferStorage_is_loaded() {
             gl.BufferStorage(target, size, data, flags);
         } else {
@@ -1818,7 +1824,7 @@ impl HasContext for Context {
 
     unsafe fn draw_arrays_indirect_offset(&self, mode: u32, offset: i32) {
         let gl = &self.raw;
-        gl.DrawArraysIndirect(mode, offset as *const std::ffi::c_void);
+        gl.DrawArraysIndirect(mode, offset as *const core::ffi::c_void);
     }
 
     unsafe fn draw_buffer(&self, draw_buffer: u32) {
@@ -1859,7 +1865,7 @@ impl HasContext for Context {
             mode as u32,
             count,
             element_type as u32,
-            offset as *const std::ffi::c_void,
+            offset as *const core::ffi::c_void,
         );
     }
 
@@ -1876,7 +1882,7 @@ impl HasContext for Context {
             mode as u32,
             count,
             element_type as u32,
-            offset as *const std::ffi::c_void,
+            offset as *const core::ffi::c_void,
             base_vertex,
         );
     }
@@ -1894,7 +1900,7 @@ impl HasContext for Context {
             mode as u32,
             count,
             element_type as u32,
-            offset as *const std::ffi::c_void,
+            offset as *const core::ffi::c_void,
             instance_count,
         );
     }
@@ -1913,7 +1919,7 @@ impl HasContext for Context {
             mode as u32,
             count,
             element_type as u32,
-            offset as *const std::ffi::c_void,
+            offset as *const core::ffi::c_void,
             instance_count,
             base_vertex,
         );
@@ -1934,7 +1940,7 @@ impl HasContext for Context {
             mode as u32,
             count,
             element_type as u32,
-            offset as *const std::ffi::c_void,
+            offset as *const core::ffi::c_void,
             instance_count,
             base_vertex,
             base_instance,
@@ -1943,7 +1949,7 @@ impl HasContext for Context {
 
     unsafe fn draw_elements_indirect_offset(&self, mode: u32, element_type: u32, offset: i32) {
         let gl = &self.raw;
-        gl.DrawElementsIndirect(mode, element_type, offset as *const std::ffi::c_void);
+        gl.DrawElementsIndirect(mode, element_type, offset as *const core::ffi::c_void);
     }
 
     unsafe fn enable(&self, parameter: u32) {
@@ -2212,7 +2218,7 @@ impl HasContext for Context {
     unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String {
         let gl = &self.raw;
         let raw_ptr = gl.GetStringi(parameter, index);
-        std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::GLchar)
+        core::ffi::CStr::from_ptr(raw_ptr as *const native_gl::GLchar)
             .to_str()
             .unwrap()
             .to_owned()
@@ -2227,7 +2233,7 @@ impl HasContext for Context {
                 parameter
             )
         }
-        std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::GLchar)
+        core::ffi::CStr::from_ptr(raw_ptr as *const native_gl::GLchar)
             .to_str()
             .unwrap()
             .to_owned()
@@ -2386,7 +2392,7 @@ impl HasContext for Context {
             &mut attribute_max_size,
         );
         let mut name = String::with_capacity(attribute_max_size as usize);
-        name.extend(std::iter::repeat('\0').take(attribute_max_size as usize));
+        name.extend(core::iter::repeat('\0').take(attribute_max_size as usize));
         let mut length = 0;
         let mut size = 0;
         let mut atype = 0;
@@ -2507,8 +2513,8 @@ impl HasContext for Context {
             format,
             ty,
             match pixels {
-                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
-                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const std::ffi::c_void,
+                PixelUnpackData::BufferOffset(offset) => offset as *const core::ffi::c_void,
+                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const core::ffi::c_void,
                 PixelUnpackData::Slice(None) => ptr::null(),
             },
         );
@@ -2532,7 +2538,7 @@ impl HasContext for Context {
             width,
             border,
             image_size,
-            pixels.as_ptr() as *const std::ffi::c_void,
+            pixels.as_ptr() as *const core::ffi::c_void,
         );
     }
 
@@ -2559,8 +2565,8 @@ impl HasContext for Context {
             format,
             ty,
             match pixels {
-                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
-                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const std::ffi::c_void,
+                PixelUnpackData::BufferOffset(offset) => offset as *const core::ffi::c_void,
+                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const core::ffi::c_void,
                 PixelUnpackData::Slice(None) => ptr::null(),
             },
         );
@@ -2606,7 +2612,7 @@ impl HasContext for Context {
             height,
             border,
             image_size,
-            pixels.as_ptr() as *const std::ffi::c_void,
+            pixels.as_ptr() as *const core::ffi::c_void,
         );
     }
 
@@ -2635,8 +2641,8 @@ impl HasContext for Context {
             format,
             ty,
             match pixels {
-                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
-                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const std::ffi::c_void,
+                PixelUnpackData::BufferOffset(offset) => offset as *const core::ffi::c_void,
+                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const core::ffi::c_void,
                 PixelUnpackData::Slice(None) => ptr::null(),
             },
         );
@@ -2664,7 +2670,7 @@ impl HasContext for Context {
             depth,
             border,
             image_size,
-            pixels.as_ptr() as *const std::ffi::c_void,
+            pixels.as_ptr() as *const core::ffi::c_void,
         );
     }
 
@@ -3317,8 +3323,8 @@ impl HasContext for Context {
             format,
             ty,
             match pixels {
-                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
-                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const std::ffi::c_void,
+                PixelUnpackData::BufferOffset(offset) => offset as *const core::ffi::c_void,
+                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const core::ffi::c_void,
                 PixelUnpackData::Slice(None) => ptr::null(),
             },
         );
@@ -3347,8 +3353,8 @@ impl HasContext for Context {
             format,
             ty,
             match pixels {
-                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
-                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const std::ffi::c_void,
+                PixelUnpackData::BufferOffset(offset) => offset as *const core::ffi::c_void,
+                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const core::ffi::c_void,
                 PixelUnpackData::Slice(None) => ptr::null(),
             },
         );
@@ -3368,11 +3374,11 @@ impl HasContext for Context {
         let gl = &self.raw;
         let (data, image_size) = match pixels {
             CompressedPixelUnpackData::BufferRange(ref range) => (
-                range.start as *const std::ffi::c_void,
+                range.start as *const core::ffi::c_void,
                 (range.end - range.start) as i32,
             ),
             CompressedPixelUnpackData::Slice(data) => {
-                (data.as_ptr() as *const std::ffi::c_void, data.len() as i32)
+                (data.as_ptr() as *const core::ffi::c_void, data.len() as i32)
             }
         };
 
@@ -3408,8 +3414,8 @@ impl HasContext for Context {
             format,
             ty,
             match pixels {
-                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
-                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const std::ffi::c_void,
+                PixelUnpackData::BufferOffset(offset) => offset as *const core::ffi::c_void,
+                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const core::ffi::c_void,
                 PixelUnpackData::Slice(None) => ptr::null(),
             },
         );
@@ -3442,8 +3448,8 @@ impl HasContext for Context {
             format,
             ty,
             match pixels {
-                PixelUnpackData::BufferOffset(offset) => offset as *const std::ffi::c_void,
-                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const std::ffi::c_void,
+                PixelUnpackData::BufferOffset(offset) => offset as *const core::ffi::c_void,
+                PixelUnpackData::Slice(Some(data)) => data.as_ptr() as *const core::ffi::c_void,
                 PixelUnpackData::Slice(None) => ptr::null(),
             },
         );
@@ -3465,11 +3471,11 @@ impl HasContext for Context {
         let gl = &self.raw;
         let (data, image_size) = match pixels {
             CompressedPixelUnpackData::BufferRange(ref range) => (
-                range.start as *const std::ffi::c_void,
+                range.start as *const core::ffi::c_void,
                 (range.end - range.start) as i32,
             ),
             CompressedPixelUnpackData::Slice(data) => {
-                (data.as_ptr() as *const std::ffi::c_void, data.len() as i32)
+                (data.as_ptr() as *const core::ffi::c_void, data.len() as i32)
             }
         };
 
@@ -3629,7 +3635,7 @@ impl HasContext for Context {
             data_type,
             normalized as u8,
             stride,
-            offset as *const std::ffi::c_void,
+            offset as *const core::ffi::c_void,
         );
     }
 
@@ -3647,7 +3653,7 @@ impl HasContext for Context {
             size,
             data_type,
             stride,
-            offset as *const std::ffi::c_void,
+            offset as *const core::ffi::c_void,
         );
     }
 
@@ -3665,7 +3671,7 @@ impl HasContext for Context {
             size,
             data_type,
             stride,
-            offset as *const std::ffi::c_void,
+            offset as *const core::ffi::c_void,
         );
     }
 
@@ -3888,7 +3894,7 @@ impl HasContext for Context {
         let gl = &self.raw;
 
         let ids_ptr = if ids.is_empty() {
-            std::ptr::null()
+            core::ptr::null()
         } else {
             ids.as_ptr()
         };
@@ -3937,7 +3943,7 @@ impl HasContext for Context {
             None => {
                 let trait_object: DebugCallback = Box::new(callback);
                 let thin_ptr = Box::new(trait_object);
-                let raw_ptr = Box::into_raw(thin_ptr) as *mut _ as *mut std::ffi::c_void;
+                let raw_ptr = Box::into_raw(thin_ptr) as *mut _ as *mut core::ffi::c_void;
 
                 let gl = &self.raw;
 
@@ -3986,7 +3992,7 @@ impl HasContext for Context {
         let mut offset = 0;
         for i in 0..received {
             let message =
-                std::ffi::CStr::from_ptr(message_log[offset..].as_ptr()).to_string_lossy();
+                core::ffi::CStr::from_ptr(message_log[offset..].as_ptr()).to_string_lossy();
             offset += lengths[i] as usize;
             entries.push(DebugMessageLogEntry {
                 source: sources[i],
@@ -4032,7 +4038,7 @@ impl HasContext for Context {
                     lbl.as_ptr() as *const native_gl::GLchar,
                 );
             }
-            None => gl.ObjectLabel(identifier, name, 0, std::ptr::null()),
+            None => gl.ObjectLabel(identifier, name, 0, core::ptr::null()),
         }
     }
 
@@ -4048,7 +4054,7 @@ impl HasContext for Context {
             label_buf.as_mut_ptr(),
         );
         label_buf.set_len(len as usize);
-        std::ffi::CStr::from_ptr(label_buf.as_ptr())
+        core::ffi::CStr::from_ptr(label_buf.as_ptr())
             .to_str()
             .unwrap()
             .to_owned()
@@ -4065,12 +4071,12 @@ impl HasContext for Context {
                 let lbl = l.as_ref().as_bytes();
                 let length = lbl.len() as i32;
                 gl.ObjectPtrLabel(
-                    sync.0 as *mut std::ffi::c_void,
+                    sync.0 as *mut core::ffi::c_void,
                     length,
                     lbl.as_ptr() as *const native_gl::GLchar,
                 );
             }
-            None => gl.ObjectPtrLabel(sync.0 as *mut std::ffi::c_void, 0, std::ptr::null()),
+            None => gl.ObjectPtrLabel(sync.0 as *mut core::ffi::c_void, 0, core::ptr::null()),
         }
     }
 
@@ -4079,13 +4085,13 @@ impl HasContext for Context {
         let mut len = 0;
         let mut label_buf = Vec::with_capacity(self.constants.max_label_length as usize);
         gl.GetObjectPtrLabel(
-            sync.0 as *mut std::ffi::c_void,
+            sync.0 as *mut core::ffi::c_void,
             self.constants.max_label_length,
             &mut len,
             label_buf.as_mut_ptr(),
         );
         label_buf.set_len(len as usize);
-        std::ffi::CStr::from_ptr(label_buf.as_ptr())
+        core::ffi::CStr::from_ptr(label_buf.as_ptr())
             .to_str()
             .unwrap()
             .to_owned()
@@ -4198,8 +4204,8 @@ impl HasContext for Context {
             format,
             gltype,
             match pixels {
-                PixelPackData::BufferOffset(offset) => offset as *mut std::ffi::c_void,
-                PixelPackData::Slice(Some(data)) => data.as_mut_ptr() as *mut std::ffi::c_void,
+                PixelPackData::BufferOffset(offset) => offset as *mut core::ffi::c_void,
+                PixelPackData::Slice(Some(data)) => data.as_mut_ptr() as *mut core::ffi::c_void,
                 PixelPackData::Slice(None) => ptr::null_mut(),
             },
         );
@@ -4346,7 +4352,7 @@ impl HasContext for Context {
             program.0.get(),
             index,
             name_bytes.len() as i32,
-            std::ptr::null_mut(),
+            core::ptr::null_mut(),
             &mut size,
             &mut tftype,
             name_bytes.as_mut_ptr(),
@@ -4451,18 +4457,18 @@ impl HasContext for Context {
 
         if length > 0 {
             assert_eq!(
-                std::mem::size_of::<u8>(),
-                std::mem::size_of::<native_gl::GLchar>(),
+                core::mem::size_of::<u8>(),
+                core::mem::size_of::<native_gl::GLchar>(),
                 "This operation is only safe in systems in which the length of \
                 a GLchar is the same as that of an u8"
             );
             assert_eq!(
-                std::mem::align_of::<u8>(),
-                std::mem::align_of::<native_gl::GLchar>(),
+                core::mem::align_of::<u8>(),
+                core::mem::align_of::<native_gl::GLchar>(),
                 "This operation is only safe in systems in which the alignment \
                 of a GLchar is the same as that of an u8"
             );
-            let buffer = std::slice::from_raw_parts(
+            let buffer = core::slice::from_raw_parts(
                 buffer.as_ptr() as *const u8,
                 (length as usize + 1).min(buffer.len()),
             );
@@ -4524,9 +4530,9 @@ impl Drop for Context {
                 unsafe {
                     let gl = &self.raw;
                     if gl.DebugMessageCallback_is_loaded() {
-                        gl.DebugMessageCallback(None, std::ptr::null());
+                        gl.DebugMessageCallback(None, core::ptr::null());
                     } else {
-                        gl.DebugMessageCallbackKHR(None, std::ptr::null());
+                        gl.DebugMessageCallbackKHR(None, core::ptr::null());
                     }
                 }
             }
@@ -4542,14 +4548,45 @@ extern "system" fn raw_debug_message_callback(
     severity: u32,
     length: i32,
     message: *const native_gl::GLchar,
-    user_param: *mut std::ffi::c_void,
+    user_param: *mut core::ffi::c_void,
 ) {
-    let _result = std::panic::catch_unwind(move || unsafe {
+    catch_unwind(move || unsafe {
         let callback: &DebugCallback = &*(user_param as *const DebugCallback);
-        let slice = std::slice::from_raw_parts(message as *const u8, length as usize);
+        let slice = core::slice::from_raw_parts(message as *const u8, length as usize);
         let msg = String::from_utf8_lossy(slice);
         (callback)(source, gltype, id, severity, &msg);
     });
+}
+
+#[cfg(feature = "std")]
+fn catch_unwind<F: FnOnce() + core::panic::UnwindSafe>(f: F) {
+    extern crate std;
+    std::panic::catch_unwind(f).ok();
+}
+
+#[cfg(not(feature = "std"))]
+fn catch_unwind<F: FnOnce() + core::panic::UnwindSafe>(f: F) {
+    // No real option here, just abort by panicking while panicking.
+    struct PanicOnDrop;
+
+    impl Drop for PanicOnDrop {
+        fn drop(&mut self) {
+            panic!("Panic while panicking");
+        }
+    }
+
+    struct AbortOnDrop;
+
+    impl Drop for AbortOnDrop {
+        fn drop(&mut self) {
+            let _bomb = PanicOnDrop;
+            panic!("Panic while panicking");
+        }
+    }
+
+    let _bomb = AbortOnDrop;
+    f();
+    core::mem::forget(_bomb);
 }
 
 #[cfg(test)]

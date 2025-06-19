@@ -1,13 +1,24 @@
+#![warn(
+    clippy::alloc_instead_of_core,
+    clippy::std_instead_of_alloc,
+    clippy::std_instead_of_core
+)]
 #![allow(non_upper_case_globals)]
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(clippy::unreadable_literal)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::pedantic)] // For anyone using pedantic and a source dep, this is needed
+#![no_std]
 
-use core::fmt::Debug;
-use core::hash::Hash;
-use std::collections::HashSet;
+#[macro_use]
+extern crate alloc;
+
+#[cfg(feature = "std")]
+extern crate std;
+
+use alloc::{boxed::Box, collections::BTreeSet, string::String, vec::Vec};
+use core::{fmt::Debug, hash::Hash};
 
 mod version;
 pub use version::Version;
@@ -153,7 +164,7 @@ pub trait HasContext: __private::Sealed {
     type TransformFeedback: Copy + Clone + Debug + Eq + Hash + Ord + PartialEq + PartialOrd;
     type UniformLocation: Clone + Debug;
 
-    fn supported_extensions(&self) -> &HashSet<String>;
+    fn supported_extensions(&self) -> &BTreeSet<String>;
 
     fn supports_debug(&self) -> bool;
 

@@ -4541,7 +4541,7 @@ impl Drop for Context {
     }
 }
 
-extern "system" fn raw_debug_message_callback(
+extern "C-unwind" fn raw_debug_message_callback(
     source: u32,
     gltype: u32,
     id: u32,
@@ -4550,43 +4550,12 @@ extern "system" fn raw_debug_message_callback(
     message: *const native_gl::GLchar,
     user_param: *mut core::ffi::c_void,
 ) {
-    catch_unwind(move || unsafe {
+    unsafe {
         let callback: &DebugCallback = &*(user_param as *const DebugCallback);
         let slice = core::slice::from_raw_parts(message as *const u8, length as usize);
         let msg = String::from_utf8_lossy(slice);
         (callback)(source, gltype, id, severity, &msg);
-    });
-}
-
-#[cfg(feature = "std")]
-fn catch_unwind<F: FnOnce() + core::panic::UnwindSafe>(f: F) {
-    extern crate std;
-    std::panic::catch_unwind(f).ok();
-}
-
-#[cfg(not(feature = "std"))]
-fn catch_unwind<F: FnOnce() + core::panic::UnwindSafe>(f: F) {
-    // No real option here, just abort by panicking while panicking.
-    struct PanicOnDrop;
-
-    impl Drop for PanicOnDrop {
-        fn drop(&mut self) {
-            panic!("Panic while panicking");
-        }
     }
-
-    struct AbortOnDrop;
-
-    impl Drop for AbortOnDrop {
-        fn drop(&mut self) {
-            let _bomb = PanicOnDrop;
-            panic!("Panic while panicking");
-        }
-    }
-
-    let _bomb = AbortOnDrop;
-    f();
-    core::mem::forget(_bomb);
 }
 
 #[cfg(test)]

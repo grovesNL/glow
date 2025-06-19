@@ -215,7 +215,7 @@ pub mod types {
         }
     }
     pub type GLDEBUGPROC = Option<
-        unsafe extern "system" fn(
+        unsafe extern "C-unwind" fn(
             source: GLenum,
             gltype: GLenum,
             id: GLuint,
@@ -226,7 +226,7 @@ pub mod types {
         ),
     >;
     pub type GLDEBUGPROCARB = Option<
-        extern "system" fn(
+        extern "C-unwind" fn(
             source: GLenum,
             gltype: GLenum,
             id: GLuint,
@@ -237,7 +237,7 @@ pub mod types {
         ),
     >;
     pub type GLDEBUGPROCKHR = Option<
-        extern "system" fn(
+        extern "C-unwind" fn(
             source: GLenum,
             gltype: GLenum,
             id: GLuint,
@@ -248,7 +248,7 @@ pub mod types {
         ),
     >;
     pub type GLDEBUGPROCAMD = Option<
-        extern "system" fn(
+        extern "C-unwind" fn(
             id: GLuint,
             category: GLenum,
             severity: GLenum,

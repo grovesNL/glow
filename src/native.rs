@@ -2487,6 +2487,11 @@ impl HasContext for Context {
         value
     }
 
+    unsafe fn get_sampler_parameter_f32_slice(&self, sampler: Self::Sampler, name: u32, out: &mut [f32] ) {
+        let gl = &self.raw;
+        gl.GetSamplerParameterfv(sampler.0.get(), name, out.as_mut_ptr());
+    }
+
     unsafe fn generate_mipmap(&self, target: u32) {
         let gl = &self.raw;
         gl.GenerateMipmap(target);

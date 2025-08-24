@@ -3,6 +3,7 @@
 #![allow(bad_style)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
+#![allow(warnings)]
 
 //! Bindings to Gl 4.6
 //!
@@ -4840,9 +4841,11 @@ unsafe fn call_atomic_ptr_15arg<Ret, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O
 
 pub use struct_commands::*;
 pub mod struct_commands {
+    #![allow(clippy::all)]
     //! Contains the [`GlFns`] type for using the struct GL loader.
     use super::*;
     impl GlFns {
+        #![allow(clippy::all)]
         /// Constructs a new struct with all pointers loaded by the `get_proc_address` given.
         pub unsafe fn load_with<F>(mut get_proc_address: F) -> Self
         where

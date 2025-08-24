@@ -98,9 +98,3 @@ features = [
   "WebglLoseContext",
   "OvrMultiview2",
 ]
-
-[workspace]
-members = [
-  "examples/hello",
-  "examples/howto",
-]

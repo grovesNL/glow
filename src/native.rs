@@ -2037,6 +2037,26 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn framebuffer_texture_2d_multisample(
+        &self,
+        target: u32,
+        attachment: u32,
+        texture_target: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+        samples: i32,
+    ) {
+        let gl = &self.raw;
+        gl.FramebufferTexture2DMultisampleEXT(
+            target,
+            attachment,
+            texture_target,
+            texture.map(|t| t.0.get()).unwrap_or(0),
+            level,
+            samples,
+        );
+    }
+
     unsafe fn framebuffer_texture_3d(
         &self,
         target: u32,

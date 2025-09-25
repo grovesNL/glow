@@ -39,6 +39,7 @@ gl_extensions=(
     GL_OES_vertex_array_object
     GL_APPLE_vertex_array_object
     GL_EXT_disjoint_timer_query
+    GL_EXT_multisampled_render_to_texture
 )
 printf -v gl_extensions_comma_joined '%s,' "${gl_extensions[@]}"
 

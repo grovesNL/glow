@@ -34,17 +34,18 @@ fn main() {
                 surface::{GlSurface, SwapInterval},
             };
             use glutin_winit::{DisplayBuilder, GlWindow};
-            use raw_window_handle::HasRawWindowHandle;
+            use raw_window_handle::HasWindowHandle;
             use std::num::NonZeroU32;
 
-            let event_loop = winit::event_loop::EventLoopBuilder::new().build().unwrap();
-            let window_builder = winit::window::WindowBuilder::new()
+            let event_loop = winit::event_loop::EventLoop::builder().build().unwrap();
+            let window_builder = winit::window::Window::default_attributes()
                 .with_title("Hello triangle!")
                 .with_inner_size(winit::dpi::LogicalSize::new(1024.0, 768.0));
 
             let template = ConfigTemplateBuilder::new();
 
-            let display_builder = DisplayBuilder::new().with_window_builder(Some(window_builder));
+            let display_builder =
+                DisplayBuilder::new().with_window_attributes(Some(window_builder));
 
             let (window, gl_config) = display_builder
                 .build(&event_loop, template, |configs| {
@@ -60,7 +61,9 @@ fn main() {
                 })
                 .unwrap();
 
-            let raw_window_handle = window.as_ref().map(|window| window.raw_window_handle());
+            let raw_window_handle = window
+                .as_ref()
+                .and_then(|window| window.window_handle().map(Into::into).ok());
 
             let gl_display = gl_config.display();
             let context_attributes = ContextAttributesBuilder::new()
@@ -76,7 +79,7 @@ fn main() {
 
             let window = window.unwrap();
 
-            let attrs = window.build_surface_attributes(Default::default());
+            let attrs = window.build_surface_attributes(Default::default()).unwrap();
             let gl_surface = gl_display
                 .create_window_surface(&gl_config, &attrs)
                 .unwrap();
@@ -183,22 +186,48 @@ fn main() {
 
         #[cfg(feature = "glutin_winit")]
         {
-            use glutin::prelude::GlSurface;
-            use winit::event::{Event, WindowEvent};
-            let _ = event_loop.run(move |event, elwt| {
-                if let Event::WindowEvent { event, .. } = event {
+            use glutin::{
+                context::PossiblyCurrentContext,
+                prelude::GlSurface,
+                surface::{Surface, WindowSurface},
+            };
+            use winit::{
+                application::ApplicationHandler, event::WindowEvent, event_loop::ActiveEventLoop,
+                window::WindowId,
+            };
+
+            struct App {
+                gl: Context,
+                gl_surface: Surface<WindowSurface>,
+                gl_context: PossiblyCurrentContext,
+            }
+
+            impl ApplicationHandler for App {
+                fn window_event(
+                    &mut self,
+                    event_loop: &ActiveEventLoop,
+                    _window_id: WindowId,
+                    event: WindowEvent,
+                ) {
                     match event {
                         WindowEvent::CloseRequested => {
-                            elwt.exit();
+                            event_loop.exit();
                         }
-                        WindowEvent::RedrawRequested => {
-                            gl.clear(glow::COLOR_BUFFER_BIT);
-                            gl.draw_arrays(glow::TRIANGLES, 0, 3);
-                            gl_surface.swap_buffers(&gl_context).unwrap();
-                        }
+                        WindowEvent::RedrawRequested => unsafe {
+                            self.gl.clear(glow::COLOR_BUFFER_BIT);
+                            self.gl.draw_arrays(glow::TRIANGLES, 0, 3);
+                            self.gl_surface.swap_buffers(&self.gl_context).unwrap();
+                        },
                         _ => (),
                     }
                 }
+
+                fn resumed(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop) {}
+            }
+            let _ = event_loop.run_app(&mut App {
+                gl,
+                gl_surface,
+                gl_context,
             });
         }
 

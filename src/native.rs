@@ -1486,6 +1486,15 @@ impl HasContext for Context {
         );
     }
 
+    unsafe fn tex_buffer(&self, target: u32, internal_format: u32, buffer: Option<Self::Buffer>) {
+        let gl = &self.raw;
+        gl.TexBuffer(
+            target,
+            internal_format,
+            buffer.map(|b| b.0.get()).unwrap_or(0),
+        );
+    }
+
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&[u8]>, flags: u32) {
         let gl = &self.raw;
         let size = size as isize;

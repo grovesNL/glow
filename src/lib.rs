@@ -636,6 +636,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_buffer_sub_data(&self, target: u32, offset: i32, dst_data: &mut [u8]);
 
+    unsafe fn tex_buffer(&self, target: u32, internal_format: u32, buffer: Option<Self::Buffer>);
+
     unsafe fn buffer_storage(&self, target: u32, size: i32, data: Option<&[u8]>, flags: u32);
 
     unsafe fn named_buffer_storage(

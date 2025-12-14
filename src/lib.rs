@@ -1122,7 +1122,12 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn get_sampler_parameter_f32(&self, sampler: Self::Sampler, name: u32) -> f32;
 
-    unsafe fn get_sampler_parameter_f32_slice(&self, sampler: Self::Sampler, name: u32, out: &mut [f32] );
+    unsafe fn get_sampler_parameter_f32_slice(
+        &self,
+        sampler: Self::Sampler,
+        name: u32,
+        out: &mut [f32],
+    );
 
     unsafe fn generate_mipmap(&self, target: u32);
 

@@ -3974,7 +3974,12 @@ impl HasContext for Context {
         .unwrap_or(0.)
     }
 
-    unsafe fn get_sampler_parameter_f32_slice(&self, sampler: Self::Sampler, name: u32, out: &mut [f32]) {
+    unsafe fn get_sampler_parameter_f32_slice(
+        &self,
+        sampler: Self::Sampler,
+        name: u32,
+        out: &mut [f32],
+    ) {
         // There is no current WebGL API to access this like there is for C
         panic!("Sampler parameter for `f32_slice` is not supported")
     }

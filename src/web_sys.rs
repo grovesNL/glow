@@ -3492,6 +3492,42 @@ impl HasContext for Context {
         .unwrap_or(0.)
     }
 
+    unsafe fn get_texture_level_parameter_i32(
+        &self,
+        _texture: Self::Texture,
+        _level: i32,
+        _parameter: u32,
+    ) -> i32 {
+        panic!("Texture level parameters are not supported in WebGL");
+    }
+
+    unsafe fn get_texture_level_parameter_f32(
+        &self,
+        _texture: Self::Texture,
+        _level: i32,
+        _parameter: u32,
+    ) -> f32 {
+        panic!("Texture level parameters are not supported in WebGL");
+    }
+
+    unsafe fn get_tex_level_parameter_i32(
+        &self,
+        _target: u32,
+        _level: i32,
+        _parameter: u32,
+    ) -> i32 {
+        panic!("Tex level parameters are not supported in WebGL");
+    }
+
+    unsafe fn get_tex_level_parameter_f32(
+        &self,
+        _target: u32,
+        _level: i32,
+        _parameter: u32,
+    ) -> f32 {
+        panic!("Tex level parameters are not supported in WebGL");
+    }
+
     unsafe fn get_buffer_parameter_i32(&self, target: u32, parameter: u32) -> i32 {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.get_buffer_parameter(target, parameter),

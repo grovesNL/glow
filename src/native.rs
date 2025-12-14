@@ -2178,6 +2178,44 @@ impl HasContext for Context {
         value
     }
 
+    unsafe fn get_texture_level_parameter_i32(
+        &self,
+        texture: Self::Texture,
+        level: i32,
+        parameter: u32,
+    ) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetTextureLevelParameteriv(texture.0.get(), level, parameter, &mut value);
+        value
+    }
+
+    unsafe fn get_texture_level_parameter_f32(
+        &self,
+        texture: Self::Texture,
+        level: i32,
+        parameter: u32,
+    ) -> f32 {
+        let gl = &self.raw;
+        let mut value = 0.0;
+        gl.GetTextureLevelParameterfv(texture.0.get(), level, parameter, &mut value);
+        value
+    }
+
+    unsafe fn get_tex_level_parameter_i32(&self, target: u32, level: i32, parameter: u32) -> i32 {
+        let gl = &self.raw;
+        let mut value = 0;
+        gl.GetTexLevelParameteriv(target, level, parameter, &mut value);
+        value
+    }
+
+    unsafe fn get_tex_level_parameter_f32(&self, target: u32, level: i32, parameter: u32) -> f32 {
+        let gl = &self.raw;
+        let mut value = 0.0;
+        gl.GetTexLevelParameterfv(target, level, parameter, &mut value);
+        value
+    }
+
     unsafe fn get_buffer_parameter_i32(&self, target: u32, parameter: u32) -> i32 {
         let gl = &self.raw;
         let mut value = 0;

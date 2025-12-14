@@ -907,6 +907,16 @@ pub trait HasContext: __private::Sealed {
         level: i32,
     );
 
+    unsafe fn framebuffer_texture_2d_multisample(
+        &self,
+        target: u32,
+        attachment: u32,
+        texture_target: u32,
+        texture: Option<Self::Texture>,
+        level: i32,
+        samples: i32,
+    );
+
     unsafe fn framebuffer_texture_3d(
         &self,
         target: u32,

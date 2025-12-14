@@ -3375,6 +3375,18 @@ impl HasContext for Context {
         }
     }
 
+    unsafe fn framebuffer_texture_2d_multisample(
+        &self,
+        _target: u32,
+        _attachment: u32,
+        _texture_target: u32,
+        _texture: Option<Self::Texture>,
+        _level: i32,
+        _samples: i32,
+    ) {
+        panic!("Framebuffer texture 2D multisample is not supported");
+    }
+
     unsafe fn framebuffer_texture_3d(
         &self,
         _target: u32,

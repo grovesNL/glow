@@ -32,6 +32,7 @@
 //! * `GL_EXT_buffer_storage`
 //! * `GL_EXT_disjoint_timer_query`
 //! * `GL_EXT_draw_buffers2`
+//! * `GL_EXT_multisampled_render_to_texture`
 //! * `GL_EXT_texture_filter_anisotropic`
 //! * `GL_KHR_debug`
 //! * `GL_KHR_parallel_shader_compile`
@@ -1543,6 +1544,13 @@ pub mod enums {
     #[doc = "`GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL: GLenum = 0x8CD2`"]
     #[doc = "* **Group:** FramebufferAttachmentParameterName"]
     pub const GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL: GLenum = 0x8CD2;
+    #[doc = "`GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_SAMPLES_EXT: GLenum = 0x8D6C`"]
+    #[doc = "* **Group:** FramebufferAttachmentParameterName"]
+    #[cfg_attr(
+        docs_rs,
+        doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+    )]
+    pub const GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_SAMPLES_EXT: GLenum = 0x8D6C;
     #[doc = "`GL_FRAMEBUFFER_BARRIER_BIT: GLbitfield = 0x00000400`"]
     #[doc = "* **Group:** MemoryBarrierMask"]
     pub const GL_FRAMEBUFFER_BARRIER_BIT: GLbitfield = 0x00000400;
@@ -1588,6 +1596,12 @@ pub mod enums {
     #[doc = "`GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: GLenum = 0x8D56`"]
     #[doc = "* **Group:** FramebufferStatus"]
     pub const GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: GLenum = 0x8D56;
+    #[doc = "`GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT: GLenum = 0x8D56`"]
+    #[cfg_attr(
+        docs_rs,
+        doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+    )]
+    pub const GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT: GLenum = 0x8D56;
     #[doc = "`GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER: GLenum = 0x8CDC`"]
     #[doc = "* **Group:** FramebufferStatus"]
     pub const GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER: GLenum = 0x8CDC;
@@ -2344,6 +2358,12 @@ pub mod enums {
     pub const GL_MAX_RENDERBUFFER_SIZE: GLenum = 0x84E8;
     #[doc = "`GL_MAX_SAMPLES: GLenum = 0x8D57`"]
     pub const GL_MAX_SAMPLES: GLenum = 0x8D57;
+    #[doc = "`GL_MAX_SAMPLES_EXT: GLenum = 0x8D57`"]
+    #[cfg_attr(
+        docs_rs,
+        doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+    )]
+    pub const GL_MAX_SAMPLES_EXT: GLenum = 0x8D57;
     #[doc = "`GL_MAX_SAMPLE_MASK_WORDS: GLenum = 0x8E59`"]
     #[doc = "* **Group:** GetPName"]
     pub const GL_MAX_SAMPLE_MASK_WORDS: GLenum = 0x8E59;
@@ -3043,6 +3063,13 @@ pub mod enums {
     #[doc = "`GL_RENDERBUFFER_SAMPLES: GLenum = 0x8CAB`"]
     #[doc = "* **Group:** RenderbufferParameterName"]
     pub const GL_RENDERBUFFER_SAMPLES: GLenum = 0x8CAB;
+    #[doc = "`GL_RENDERBUFFER_SAMPLES_EXT: GLenum = 0x8CAB`"]
+    #[doc = "* **Group:** RenderbufferParameterName"]
+    #[cfg_attr(
+        docs_rs,
+        doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+    )]
+    pub const GL_RENDERBUFFER_SAMPLES_EXT: GLenum = 0x8CAB;
     #[doc = "`GL_RENDERBUFFER_STENCIL_SIZE: GLenum = 0x8D55`"]
     #[doc = "* **Group:** RenderbufferParameterName"]
     pub const GL_RENDERBUFFER_STENCIL_SIZE: GLenum = 0x8D55;
@@ -5101,6 +5128,13 @@ pub mod struct_commands {
             self.FramebufferTexture_load_with_dyn(get_proc_address);
             self.FramebufferTexture1D_load_with_dyn(get_proc_address);
             self.FramebufferTexture2D_load_with_dyn(get_proc_address);
+            #[cfg_attr(
+                docs_rs,
+                doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+            )]
+            {
+                self.FramebufferTexture2DMultisampleEXT_load_with_dyn(get_proc_address);
+            }
             self.FramebufferTexture3D_load_with_dyn(get_proc_address);
             self.FramebufferTextureLayer_load_with_dyn(get_proc_address);
             self.FrontFace_load_with_dyn(get_proc_address);
@@ -5455,6 +5489,13 @@ pub mod struct_commands {
             self.ReleaseShaderCompiler_load_with_dyn(get_proc_address);
             self.RenderbufferStorage_load_with_dyn(get_proc_address);
             self.RenderbufferStorageMultisample_load_with_dyn(get_proc_address);
+            #[cfg_attr(
+                docs_rs,
+                doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+            )]
+            {
+                self.RenderbufferStorageMultisampleEXT_load_with_dyn(get_proc_address);
+            }
             self.ResumeTransformFeedback_load_with_dyn(get_proc_address);
             self.SampleCoverage_load_with_dyn(get_proc_address);
             self.SampleMaski_load_with_dyn(get_proc_address);
@@ -14023,6 +14064,72 @@ pub mod struct_commands {
         #[doc(hidden)]
         pub fn FramebufferTexture2D_is_loaded(&self) -> bool {
             !self.glFramebufferTexture2D_p.load(RELAX).is_null()
+        }
+        /// [glFramebufferTexture2DMultisampleEXT](http://docs.gl/gl4/glFramebufferTexture2DMultisampleEXT)(target, attachment, textarget, texture, level, samples)
+        /// * `target` group: FramebufferTarget
+        /// * `attachment` group: FramebufferAttachment
+        /// * `textarget` group: TextureTarget
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        #[cfg_attr(
+            docs_rs,
+            doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+        )]
+        pub unsafe fn FramebufferTexture2DMultisampleEXT(
+            &self,
+            target: GLenum,
+            attachment: GLenum,
+            textarget: GLenum,
+            texture: GLuint,
+            level: GLint,
+            samples: GLsizei,
+        ) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!("calling gl.FramebufferTexture2DMultisampleEXT({:#X}, {:#X}, {:#X}, {:?}, {:?}, {:?});", target, attachment, textarget, texture, level, samples);
+            }
+            let out = call_atomic_ptr_6arg(
+                "glFramebufferTexture2DMultisampleEXT",
+                &self.glFramebufferTexture2DMultisampleEXT_p,
+                target,
+                attachment,
+                textarget,
+                texture,
+                level,
+                samples,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glFramebufferTexture2DMultisampleEXT");
+            }
+            out
+        }
+        #[cfg_attr(
+            docs_rs,
+            doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+        )]
+        #[doc(hidden)]
+        pub unsafe fn FramebufferTexture2DMultisampleEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glFramebufferTexture2DMultisampleEXT\0",
+                &self.glFramebufferTexture2DMultisampleEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        #[cfg_attr(
+            docs_rs,
+            doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+        )]
+        pub fn FramebufferTexture2DMultisampleEXT_is_loaded(&self) -> bool {
+            !self
+                .glFramebufferTexture2DMultisampleEXT_p
+                .load(RELAX)
+                .is_null()
         }
         /// [glFramebufferTexture3D](http://docs.gl/gl4/glFramebufferTexture3D)(target, attachment, textarget, texture, level, zoffset)
         /// * `target` group: FramebufferTarget
@@ -27753,6 +27860,77 @@ pub mod struct_commands {
                 .load(RELAX)
                 .is_null()
         }
+        /// [glRenderbufferStorageMultisampleEXT](http://docs.gl/gl4/glRenderbufferStorageMultisampleEXT)(target, samples, internalformat, width, height)
+        /// * `target` group: RenderbufferTarget
+        /// * `internalformat` group: InternalFormat
+        /// * alias of: [`glRenderbufferStorageMultisample`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        #[cfg_attr(
+            docs_rs,
+            doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+        )]
+        pub unsafe fn RenderbufferStorageMultisampleEXT(
+            &self,
+            target: GLenum,
+            samples: GLsizei,
+            internalformat: GLenum,
+            width: GLsizei,
+            height: GLsizei,
+        ) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!(
+                    "calling gl.RenderbufferStorageMultisampleEXT({:#X}, {:?}, {:#X}, {:?}, {:?});",
+                    target,
+                    samples,
+                    internalformat,
+                    width,
+                    height
+                );
+            }
+            let out = call_atomic_ptr_5arg(
+                "glRenderbufferStorageMultisampleEXT",
+                &self.glRenderbufferStorageMultisampleEXT_p,
+                target,
+                samples,
+                internalformat,
+                width,
+                height,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glRenderbufferStorageMultisampleEXT");
+            }
+            out
+        }
+        #[cfg_attr(
+            docs_rs,
+            doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+        )]
+        #[doc(hidden)]
+        pub unsafe fn RenderbufferStorageMultisampleEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glRenderbufferStorageMultisampleEXT\0",
+                &self.glRenderbufferStorageMultisampleEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        #[cfg_attr(
+            docs_rs,
+            doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+        )]
+        pub fn RenderbufferStorageMultisampleEXT_is_loaded(&self) -> bool {
+            !self
+                .glRenderbufferStorageMultisampleEXT_p
+                .load(RELAX)
+                .is_null()
+        }
         /// [glResumeTransformFeedback](http://docs.gl/gl4/glResumeTransformFeedback)()
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
@@ -37272,6 +37450,11 @@ pub mod struct_commands {
         glFramebufferTexture_p: APcv,
         glFramebufferTexture1D_p: APcv,
         glFramebufferTexture2D_p: APcv,
+        #[cfg_attr(
+            docs_rs,
+            doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+        )]
+        glFramebufferTexture2DMultisampleEXT_p: APcv,
         glFramebufferTexture3D_p: APcv,
         glFramebufferTextureLayer_p: APcv,
         glFrontFace_p: APcv,
@@ -37572,6 +37755,11 @@ pub mod struct_commands {
         glReleaseShaderCompiler_p: APcv,
         glRenderbufferStorage_p: APcv,
         glRenderbufferStorageMultisample_p: APcv,
+        #[cfg_attr(
+            docs_rs,
+            doc(cfg(any(feature = "GL_EXT_multisampled_render_to_texture")))
+        )]
+        glRenderbufferStorageMultisampleEXT_p: APcv,
         glResumeTransformFeedback_p: APcv,
         glSampleCoverage_p: APcv,
         glSampleMaski_p: APcv,

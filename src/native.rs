@@ -4,6 +4,16 @@ use std::ffi::CStr;
 use std::ptr;
 use std::{collections::HashSet, ffi::CString, num::NonZeroU32};
 
+macro_rules! khr_fallback {
+    ($gl:ident . $is_loaded:ident, $gl2:ident . $khr:ident, $gl3:ident . $core:ident ($($arg:expr),* $(,)?) $(,)?) => {
+        if $gl.$is_loaded() {
+            $gl3.$core($($arg),*)
+        } else {
+            $gl2.$khr($($arg),*)
+        }
+    };
+}
+
 #[derive(Default)]
 struct Constants {
     max_label_length: i32,
@@ -3981,13 +3991,17 @@ impl HasContext for Context {
             ids.as_ptr()
         };
 
-        gl.DebugMessageControl(
-            source,
-            msg_type,
-            severity,
-            ids.len() as i32,
-            ids_ptr,
-            enabled as u8,
+        khr_fallback!(
+            gl.DebugMessageControl_is_loaded,
+            gl.DebugMessageControlKHR,
+            gl.DebugMessageControl(
+                source,
+                msg_type,
+                severity,
+                ids.len() as i32,
+                ids_ptr,
+                enabled as u8,
+            ),
         );
     }
 
@@ -4004,13 +4018,17 @@ impl HasContext for Context {
         let gl = &self.raw;
         let message = msg.as_ref().as_bytes();
         let length = message.len() as i32;
-        gl.DebugMessageInsert(
-            source,
-            msg_type,
-            id,
-            severity,
-            length,
-            message.as_ptr() as *const native_gl::GLchar,
+        khr_fallback!(
+            gl.DebugMessageInsert_is_loaded,
+            gl.DebugMessageInsertKHR,
+            gl.DebugMessageInsert(
+                source,
+                msg_type,
+                id,
+                severity,
+                length,
+                message.as_ptr() as *const native_gl::GLchar,
+            ),
         );
     }
 
@@ -4029,12 +4047,11 @@ impl HasContext for Context {
 
                 let gl = &self.raw;
 
-                if gl.DebugMessageCallback_is_loaded() {
-                    gl.DebugMessageCallback(Some(raw_debug_message_callback), raw_ptr);
-                } else {
-                    // Fallback to extension
-                    gl.DebugMessageCallbackKHR(Some(raw_debug_message_callback), raw_ptr);
-                }
+                khr_fallback!(
+                    gl.DebugMessageCallback_is_loaded,
+                    gl.DebugMessageCallbackKHR,
+                    gl.DebugMessageCallback(Some(raw_debug_message_callback), raw_ptr),
+                );
 
                 self.debug_callback = Some(DebugCallbackRawPtr { callback: raw_ptr });
             }
@@ -4052,15 +4069,19 @@ impl HasContext for Context {
         let mut message_log = Vec::with_capacity(buf_size as usize);
 
         let gl = &self.raw;
-        let received = gl.GetDebugMessageLog(
-            count,
-            buf_size,
-            sources.as_mut_ptr(),
-            types.as_mut_ptr(),
-            ids.as_mut_ptr(),
-            severities.as_mut_ptr(),
-            lengths.as_mut_ptr(),
-            message_log.as_mut_ptr(),
+        let received = khr_fallback!(
+            gl.GetDebugMessageLog_is_loaded,
+            gl.GetDebugMessageLogKHR,
+            gl.GetDebugMessageLog(
+                count,
+                buf_size,
+                sources.as_mut_ptr(),
+                types.as_mut_ptr(),
+                ids.as_mut_ptr(),
+                severities.as_mut_ptr(),
+                lengths.as_mut_ptr(),
+                message_log.as_mut_ptr(),
+            ),
         ) as usize;
 
         sources.set_len(received);
@@ -4095,12 +4116,20 @@ impl HasContext for Context {
         let gl = &self.raw;
         let msg = message.as_ref().as_bytes();
         let length = msg.len() as i32;
-        gl.PushDebugGroup(source, id, length, msg.as_ptr() as *const native_gl::GLchar);
+        khr_fallback!(
+            gl.PushDebugGroup_is_loaded,
+            gl.PushDebugGroupKHR,
+            gl.PushDebugGroup(source, id, length, msg.as_ptr() as *const native_gl::GLchar),
+        );
     }
 
     unsafe fn pop_debug_group(&self) {
         let gl = &self.raw;
-        gl.PopDebugGroup();
+        khr_fallback!(
+            gl.PopDebugGroup_is_loaded,
+            gl.PopDebugGroupKHR,
+            gl.PopDebugGroup(),
+        );
     }
 
     unsafe fn object_label<S>(&self, identifier: u32, name: u32, label: Option<S>)
@@ -4113,14 +4142,24 @@ impl HasContext for Context {
             Some(l) => {
                 let lbl = l.as_ref().as_bytes();
                 let length = lbl.len() as i32;
-                gl.ObjectLabel(
-                    identifier,
-                    name,
-                    length,
-                    lbl.as_ptr() as *const native_gl::GLchar,
+                khr_fallback!(
+                    gl.ObjectLabel_is_loaded,
+                    gl.ObjectLabelKHR,
+                    gl.ObjectLabel(
+                        identifier,
+                        name,
+                        length,
+                        lbl.as_ptr() as *const native_gl::GLchar,
+                    ),
                 );
             }
-            None => gl.ObjectLabel(identifier, name, 0, std::ptr::null()),
+            None => {
+                khr_fallback!(
+                    gl.ObjectLabel_is_loaded,
+                    gl.ObjectLabelKHR,
+                    gl.ObjectLabel(identifier, name, 0, std::ptr::null()),
+                );
+            }
         }
     }
 
@@ -4128,12 +4167,16 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut len = 0;
         let mut label_buf = Vec::with_capacity(self.constants.max_label_length as usize);
-        gl.GetObjectLabel(
-            identifier,
-            name,
-            self.constants.max_label_length,
-            &mut len,
-            label_buf.as_mut_ptr(),
+        khr_fallback!(
+            gl.GetObjectLabel_is_loaded,
+            gl.GetObjectLabelKHR,
+            gl.GetObjectLabel(
+                identifier,
+                name,
+                self.constants.max_label_length,
+                &mut len,
+                label_buf.as_mut_ptr(),
+            ),
         );
         label_buf.set_len(len as usize);
         std::ffi::CStr::from_ptr(label_buf.as_ptr())
@@ -4152,13 +4195,23 @@ impl HasContext for Context {
             Some(l) => {
                 let lbl = l.as_ref().as_bytes();
                 let length = lbl.len() as i32;
-                gl.ObjectPtrLabel(
-                    sync.0 as *mut std::ffi::c_void,
-                    length,
-                    lbl.as_ptr() as *const native_gl::GLchar,
+                khr_fallback!(
+                    gl.ObjectPtrLabel_is_loaded,
+                    gl.ObjectPtrLabelKHR,
+                    gl.ObjectPtrLabel(
+                        sync.0 as *mut std::ffi::c_void,
+                        length,
+                        lbl.as_ptr() as *const native_gl::GLchar,
+                    ),
                 );
             }
-            None => gl.ObjectPtrLabel(sync.0 as *mut std::ffi::c_void, 0, std::ptr::null()),
+            None => {
+                khr_fallback!(
+                    gl.ObjectPtrLabel_is_loaded,
+                    gl.ObjectPtrLabelKHR,
+                    gl.ObjectPtrLabel(sync.0 as *mut std::ffi::c_void, 0, std::ptr::null()),
+                );
+            }
         }
     }
 
@@ -4166,11 +4219,15 @@ impl HasContext for Context {
         let gl = &self.raw;
         let mut len = 0;
         let mut label_buf = Vec::with_capacity(self.constants.max_label_length as usize);
-        gl.GetObjectPtrLabel(
-            sync.0 as *mut std::ffi::c_void,
-            self.constants.max_label_length,
-            &mut len,
-            label_buf.as_mut_ptr(),
+        khr_fallback!(
+            gl.GetObjectPtrLabel_is_loaded,
+            gl.GetObjectPtrLabelKHR,
+            gl.GetObjectPtrLabel(
+                sync.0 as *mut std::ffi::c_void,
+                self.constants.max_label_length,
+                &mut len,
+                label_buf.as_mut_ptr(),
+            ),
         );
         label_buf.set_len(len as usize);
         std::ffi::CStr::from_ptr(label_buf.as_ptr())

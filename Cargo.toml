@@ -33,12 +33,12 @@ log = { version = "0.4.16", optional = true }
 debug_trace_calls = []
 debug_automatic_glGetError = []
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
+[target.'cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))'.dependencies]
 js-sys = "~0.3"
 wasm-bindgen = "~0.2"
 slotmap = "1"
 
-[target.'cfg(target_arch = "wasm32")'.dependencies.web_sys]
+[target.'cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))'.dependencies.web_sys]
 version = "~0.3.60"
 package = "web-sys"
 features = [

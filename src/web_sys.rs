@@ -5,13 +5,10 @@ use slotmap::{new_key_type, SlotMap};
 use std::cell::RefCell;
 use web_sys::{
     self, HtmlCanvasElement, HtmlImageElement, HtmlVideoElement, ImageBitmap, ImageData,
-    WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlQuery,
+    VideoFrame, WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlQuery,
     WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
     WebGlTransformFeedback, WebGlUniformLocation, WebGlVertexArrayObject,
 };
-
-#[cfg(web_sys_unstable_apis)]
-use web_sys::VideoFrame;
 
 #[derive(Debug)]
 enum RawRenderingContext {
@@ -606,7 +603,6 @@ impl Context {
         }
     }
 
-    #[cfg(web_sys_unstable_apis)]
     pub unsafe fn tex_image_2d_with_video_frame(
         &self,
         target: u32,
@@ -644,7 +640,6 @@ impl Context {
         }
     }
 
-    #[cfg(web_sys_unstable_apis)]
     /// WebGL2 Only
     pub unsafe fn tex_image_2d_with_video_frame_and_width_and_height(
         &self,
@@ -958,7 +953,6 @@ impl Context {
         }
     }
 
-    #[cfg(web_sys_unstable_apis)]
     pub unsafe fn tex_sub_image_2d_with_video_frame(
         &self,
         target: u32,
@@ -999,7 +993,6 @@ impl Context {
         }
     }
 
-    #[cfg(web_sys_unstable_apis)]
     /// WebGL2 Only
     pub unsafe fn tex_sub_image_2d_with_video_frame_and_width_and_height(
         &self,
@@ -1222,7 +1215,6 @@ impl Context {
         }
     }
 
-    #[cfg(web_sys_unstable_apis)]
     /// WebGL2 Only
     pub unsafe fn tex_image_3d_with_video_frame(
         &self,
@@ -1399,7 +1391,6 @@ impl Context {
         }
     }
 
-    #[cfg(web_sys_unstable_apis)]
     /// WebGL2 Only
     pub unsafe fn tex_sub_image_3d_with_video_frame(
         &self,

@@ -12,17 +12,17 @@ use std::collections::HashSet;
 mod version;
 pub use version::Version;
 
-#[cfg(any(not(target_arch = "wasm32"), target_os = "emscripten"))]
+#[cfg(any(not(target_family = "wasm"), target_os = "emscripten"))]
 mod native;
-#[cfg(any(not(target_arch = "wasm32"), target_os = "emscripten"))]
+#[cfg(any(not(target_family = "wasm"), target_os = "emscripten"))]
 pub use native::*;
-#[cfg(any(not(target_arch = "wasm32"), target_os = "emscripten"))]
+#[cfg(any(not(target_family = "wasm"), target_os = "emscripten"))]
 mod gl46;
 
-#[cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))]
+#[cfg(all(target_family = "wasm", not(target_os = "emscripten")))]
 #[path = "web_sys.rs"]
 mod web;
-#[cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))]
+#[cfg(all(target_family = "wasm", not(target_os = "emscripten")))]
 pub use web::*;
 
 pub type Shader = <Context as HasContext>::Shader;

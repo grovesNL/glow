@@ -52,6 +52,12 @@ jobs:
     - run: cargo test --verbose
     - run: (cd examples/hello && cargo build --features glutin_winit)
     - run: (cd examples/hello && cargo build --target wasm32-unknown-unknown)
+    - name: wasm64
+      if: matrix.build == 'nightly'
+      run: |
+        rustup component add rust-src
+        cargo build --verbose --target wasm64-unknown-unknown -Z build-std=std,panic_abort
+        (cd examples/hello && cargo build --target wasm64-unknown-unknown -Z build-std=std,panic_abort)
     - name: sdl
       if: ${{ matrix.sdl == true }}
       run: |

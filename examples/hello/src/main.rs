@@ -2,8 +2,8 @@ use glow::*;
 
 fn main() {
     unsafe {
-        // Create a context from a WebGL2 context on wasm32 targets
-        #[cfg(target_arch = "wasm32")]
+        // Create a context from a WebGL2 context on wasm targets
+        #[cfg(target_family = "wasm")]
         let (gl, shader_version) = {
             use wasm_bindgen::JsCast;
             let canvas = web_sys::window()
@@ -255,7 +255,7 @@ fn main() {
             }
         }
 
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(target_family = "wasm")]
         {
             // This could be called from `requestAnimationFrame`, a winit event
             // loop, etc.

@@ -6,20 +6,25 @@ edition = "2018"
 [dependencies]
 glow = { path = "../../" }
 
-[target.'cfg(not(any(target_arch = "wasm32")))'.dependencies]
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
 glutin = { version = "0.32.2", optional = true }
 glutin-winit = { version = "0.5.0", optional = true }
 winit = { version = "0.30.9", features = ["rwh_06"], optional = true }
 raw-window-handle = { version = "0.6.2", optional = true }
 sdl2 = { version = "0.37", optional = true }
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
+[target.'cfg(target_family = "wasm")'.dependencies]
 web-sys = { version = "0.3", features = [
     "HtmlCanvasElement",
     "WebGl2RenderingContext",
     "Window",
 ] }
 wasm-bindgen = { version = "0.2" }
+
+# Wasm64 support requires a more recent version of the wasm-bindgen ecosystem
+[target.'cfg(target_arch = "wasm64")'.dependencies]
+web-sys = "0.3.100"
+wasm-bindgen = "0.2.123"
 
 [features]
 glutin_winit = ["glutin", "glutin-winit", "winit", "raw-window-handle"]

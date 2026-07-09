@@ -15,7 +15,7 @@ jobs:
         include:
         - build: pinned
           os: ubuntu-latest
-          rust: 1.77.0
+          rust: 1.86.0
           sdl: true
         - build: stable
           os: ubuntu-latest

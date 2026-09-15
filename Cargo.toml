@@ -49,6 +49,7 @@ features = [
   "HtmlVideoElement",
   "ImageBitmap",
   "ImageData",
+  "OffscreenCanvas",
   "VideoFrame",
   "WebGlActiveInfo",
   "WebGlBuffer",

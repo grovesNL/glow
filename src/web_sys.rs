@@ -5,9 +5,9 @@ use slotmap::{new_key_type, SlotMap};
 use std::cell::RefCell;
 use web_sys::{
     self, HtmlCanvasElement, HtmlImageElement, HtmlVideoElement, ImageBitmap, ImageData,
-    VideoFrame, WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer, WebGlProgram, WebGlQuery,
-    WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader, WebGlSync, WebGlTexture,
-    WebGlTransformFeedback, WebGlUniformLocation, WebGlVertexArrayObject,
+    OffscreenCanvas, VideoFrame, WebGl2RenderingContext, WebGlBuffer, WebGlFramebuffer,
+    WebGlProgram, WebGlQuery, WebGlRenderbuffer, WebGlRenderingContext, WebGlSampler, WebGlShader,
+    WebGlSync, WebGlTexture, WebGlTransformFeedback, WebGlUniformLocation, WebGlVertexArrayObject,
 };
 
 #[derive(Debug)]
@@ -314,6 +314,7 @@ impl Context {
     //
     // - image_bitmap
     // - html_canvas
+    // - offscreen_canvas
     // - html_image
     // - html_video
     // - video_frame
@@ -458,6 +459,69 @@ impl Context {
                 )
                 .unwrap();
             }
+        }
+    }
+
+    pub unsafe fn tex_image_2d_with_offscreen_canvas(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        format: u32,
+        ty: u32,
+        canvas: &OffscreenCanvas,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl
+                .tex_image_2d_with_u32_and_u32_and_offscreen_canvas(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    canvas,
+                )
+                .unwrap(),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .tex_image_2d_with_u32_and_u32_and_offscreen_canvas(
+                    target,
+                    level,
+                    internal_format,
+                    format,
+                    ty,
+                    canvas,
+                )
+                .unwrap(),
+        }
+    }
+
+    /// WebGL2 Only
+    pub unsafe fn tex_image_2d_with_offscreen_canvas_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        canvas: &OffscreenCanvas,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => panic!("Width and height not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_offscreen_canvas(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    0,
+                    format,
+                    ty,
+                    canvas,
+                )
+                .unwrap(),
         }
     }
 
@@ -849,6 +913,53 @@ impl Context {
         }
     }
 
+    pub unsafe fn tex_sub_image_2d_with_offscreen_canvas(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        format: u32,
+        ty: u32,
+        canvas: &OffscreenCanvas,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(ref gl) => gl
+                .tex_sub_image_2d_with_u32_and_u32_and_offscreen_canvas(
+                    target, level, x_offset, y_offset, format, ty, canvas,
+                )
+                .unwrap(),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .tex_sub_image_2d_with_u32_and_u32_and_offscreen_canvas(
+                    target, level, x_offset, y_offset, format, ty, canvas,
+                )
+                .unwrap(),
+        }
+    }
+
+    /// WebGL2 Only
+    pub unsafe fn tex_sub_image_2d_with_offscreen_canvas_and_width_and_height(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        width: i32,
+        height: i32,
+        format: u32,
+        ty: u32,
+        canvas: &OffscreenCanvas,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => panic!("Width and height not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_offscreen_canvas(
+                    target, level, x_offset, y_offset, width, height, format, ty, canvas,
+                )
+                .unwrap(),
+        }
+    }
+
     pub unsafe fn tex_sub_image_2d_with_html_image(
         &self,
         target: u32,
@@ -1148,6 +1259,39 @@ impl Context {
     }
 
     /// WebGL2 Only
+    pub unsafe fn tex_image_3d_with_offscreen_canvas(
+        &self,
+        target: u32,
+        level: i32,
+        internal_format: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        border: i32,
+        format: u32,
+        ty: u32,
+        canvas: &OffscreenCanvas,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => panic!("3D images not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .tex_image_3d_with_offscreen_canvas(
+                    target,
+                    level,
+                    internal_format,
+                    width,
+                    height,
+                    depth,
+                    border,
+                    format,
+                    ty,
+                    canvas,
+                )
+                .unwrap(),
+        }
+    }
+
+    /// WebGL2 Only
     pub unsafe fn tex_image_3d_with_html_image_element(
         &self,
         target: u32,
@@ -1334,6 +1478,32 @@ impl Context {
                 )
                 .unwrap(); // TODO: Handle return value?
             }
+        }
+    }
+
+    /// WebGL2 Only
+    pub unsafe fn tex_sub_image_3d_with_offscreen_canvas(
+        &self,
+        target: u32,
+        level: i32,
+        x_offset: i32,
+        y_offset: i32,
+        z_offset: i32,
+        width: i32,
+        height: i32,
+        depth: i32,
+        format: u32,
+        ty: u32,
+        canvas: &OffscreenCanvas,
+    ) {
+        match self.raw {
+            RawRenderingContext::WebGl1(_) => panic!("3D images not supported"),
+            RawRenderingContext::WebGl2(ref gl) => gl
+                .tex_sub_image_3d_with_offscreen_canvas(
+                    target, level, x_offset, y_offset, z_offset, width, height, depth, format, ty,
+                    canvas,
+                )
+                .unwrap(),
         }
     }
 

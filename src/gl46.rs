@@ -33,6 +33,7 @@
 //! * `GL_EXT_disjoint_timer_query`
 //! * `GL_EXT_draw_buffers2`
 //! * `GL_EXT_multisampled_render_to_texture`
+//! * `GL_EXT_polygon_offset_clamp`
 //! * `GL_EXT_texture_filter_anisotropic`
 //! * `GL_KHR_debug`
 //! * `GL_KHR_parallel_shader_compile`
@@ -2766,6 +2767,9 @@ pub mod enums {
     pub const GL_POLYGON_MODE: GLenum = 0x0B40;
     #[doc = "`GL_POLYGON_OFFSET_CLAMP: GLenum = 0x8E1B`"]
     pub const GL_POLYGON_OFFSET_CLAMP: GLenum = 0x8E1B;
+    #[doc = "`GL_POLYGON_OFFSET_CLAMP_EXT: GLenum = 0x8E1B`"]
+    #[doc = "* **Alias Of:** `GL_POLYGON_OFFSET_CLAMP`"]
+    pub const GL_POLYGON_OFFSET_CLAMP_EXT: GLenum = 0x8E1B;
     #[doc = "`GL_POLYGON_OFFSET_FACTOR: GLenum = 0x8038`"]
     #[doc = "* **Group:** GetPName"]
     pub const GL_POLYGON_OFFSET_FACTOR: GLenum = 0x8038;
@@ -5416,6 +5420,9 @@ pub mod struct_commands {
             self.PolygonMode_load_with_dyn(get_proc_address);
             self.PolygonOffset_load_with_dyn(get_proc_address);
             self.PolygonOffsetClamp_load_with_dyn(get_proc_address);
+            {
+                self.PolygonOffsetClampEXT_load_with_dyn(get_proc_address);
+            }
             self.PopDebugGroup_load_with_dyn(get_proc_address);
             {
                 self.PopDebugGroupKHR_load_with_dyn(get_proc_address);
@@ -24531,6 +24538,54 @@ pub mod struct_commands {
         pub fn PolygonOffsetClamp_is_loaded(&self) -> bool {
             !self.glPolygonOffsetClamp_p.load(RELAX).is_null()
         }
+        /// [glPolygonOffsetClampEXT](http://docs.gl/gl4/glPolygonOffsetClampEXT)(factor, units, clamp)
+        /// * alias of: [`glPolygonOffsetClamp`]
+        #[cfg_attr(feature = "inline", inline)]
+        #[cfg_attr(feature = "inline_always", inline(always))]
+        pub unsafe fn PolygonOffsetClampEXT(
+            &self,
+            factor: GLfloat,
+            units: GLfloat,
+            clamp: GLfloat,
+        ) {
+            #[cfg(all(debug_assertions, feature = "debug_trace_calls"))]
+            {
+                trace!(
+                    "calling gl.PolygonOffsetClampEXT({:?}, {:?}, {:?});",
+                    factor,
+                    units,
+                    clamp
+                );
+            }
+            let out = call_atomic_ptr_3arg(
+                "glPolygonOffsetClampEXT",
+                &self.glPolygonOffsetClampEXT_p,
+                factor,
+                units,
+                clamp,
+            );
+            #[cfg(all(debug_assertions, feature = "debug_automatic_glGetError"))]
+            {
+                self.automatic_glGetError("glPolygonOffsetClampEXT");
+            }
+            out
+        }
+        #[doc(hidden)]
+        pub unsafe fn PolygonOffsetClampEXT_load_with_dyn(
+            &self,
+            get_proc_address: &mut dyn FnMut(*const c_char) -> *mut c_void,
+        ) -> bool {
+            load_dyn_name_atomic_ptr(
+                get_proc_address,
+                b"glPolygonOffsetClampEXT\0",
+                &self.glPolygonOffsetClampEXT_p,
+            )
+        }
+        #[inline]
+        #[doc(hidden)]
+        pub fn PolygonOffsetClampEXT_is_loaded(&self) -> bool {
+            !self.glPolygonOffsetClampEXT_p.load(RELAX).is_null()
+        }
         /// [glPopDebugGroup](http://docs.gl/gl4/glPopDebugGroup)()
         #[cfg_attr(feature = "inline", inline)]
         #[cfg_attr(feature = "inline_always", inline(always))]
@@ -37688,6 +37743,7 @@ pub mod struct_commands {
         glPolygonMode_p: APcv,
         glPolygonOffset_p: APcv,
         glPolygonOffsetClamp_p: APcv,
+        glPolygonOffsetClampEXT_p: APcv,
         glPopDebugGroup_p: APcv,
         glPopDebugGroupKHR_p: APcv,
         glPrimitiveBoundingBox_p: APcv,

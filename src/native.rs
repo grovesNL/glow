@@ -3332,6 +3332,15 @@ impl HasContext for Context {
         gl.PolygonOffset(factor, units);
     }
 
+    unsafe fn polygon_offset_clamp(&self, factor: f32, units: f32, clamp: f32) {
+        let gl = &self.raw;
+        if gl.PolygonOffsetClamp_is_loaded() {
+            gl.PolygonOffsetClamp(factor, units, clamp);
+        } else {
+            gl.PolygonOffsetClampEXT(factor, units, clamp);
+        }
+    }
+
     unsafe fn polygon_mode(&self, face: u32, mode: u32) {
         let gl = &self.raw;
         gl.PolygonMode(face as u32, mode as u32);

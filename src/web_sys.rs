@@ -27,6 +27,7 @@ struct Extensions {
     pub ext_disjoint_timer_query_webgl2: Option<web_sys::ExtDisjointTimerQuery>,
     pub ext_float_blend: Option<()>,
     pub ext_frag_depth: Option<web_sys::ExtFragDepth>,
+    pub ext_polygon_offset_clamp: Option<web_sys::ExtPolygonOffsetClamp>,
     pub ext_shader_texture_lod: Option<web_sys::ExtShaderTextureLod>,
     pub ext_srgb: Option<web_sys::ExtSRgb>,
     pub ext_texture_compression_bptc: Option<()>,
@@ -132,6 +133,10 @@ macro_rules! build_extensions {
             ),
             ext_float_blend: get_extension_no_object(&$context, "EXT_float_blend"),
             ext_frag_depth: get_extension::<web_sys::ExtFragDepth>(&$context, "EXT_frag_depth"),
+            ext_polygon_offset_clamp: get_extension::<web_sys::ExtPolygonOffsetClamp>(
+                &$context,
+                "EXT_polygon_offset_clamp",
+            ),
             ext_shader_texture_lod: get_extension::<web_sys::ExtShaderTextureLod>(
                 &$context,
                 "EXT_shader_texture_lod",
@@ -4916,6 +4921,13 @@ impl HasContext for Context {
         match self.raw {
             RawRenderingContext::WebGl1(ref gl) => gl.polygon_offset(factor, units),
             RawRenderingContext::WebGl2(ref gl) => gl.polygon_offset(factor, units),
+        }
+    }
+
+    unsafe fn polygon_offset_clamp(&self, factor: f32, units: f32, clamp: f32) {
+        match &self.extensions.ext_polygon_offset_clamp {
+            None => panic!("EXT_polygon_offset_clamp extension not supported"),
+            Some(extension) => extension.polygon_offset_clamp_ext(factor, units, clamp),
         }
     }
 

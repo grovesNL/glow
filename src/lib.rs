@@ -1504,6 +1504,8 @@ pub trait HasContext: __private::Sealed {
 
     unsafe fn polygon_offset(&self, factor: f32, units: f32);
 
+    unsafe fn polygon_offset_clamp(&self, factor: f32, units: f32, clamp: f32);
+
     unsafe fn polygon_mode(&self, face: u32, mode: u32);
 
     unsafe fn finish(&self);

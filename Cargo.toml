@@ -34,12 +34,12 @@ debug_trace_calls = []
 debug_automatic_glGetError = []
 
 [target.'cfg(all(target_family = "wasm", not(target_os = "emscripten")))'.dependencies]
-js-sys = "~0.3"
-wasm-bindgen = "~0.2"
+js-sys = "~0.3.106"
+wasm-bindgen = "~0.2.129"
 slotmap = "1"
 
 [target.'cfg(all(target_family = "wasm", not(target_os = "emscripten")))'.dependencies.web_sys]
-version = "~0.3.60"
+version = "~0.3.106"
 package = "web-sys"
 features = [
   "Document",
@@ -74,6 +74,7 @@ features = [
   "ExtColorBufferHalfFloat",
   "ExtDisjointTimerQuery",
   "ExtFragDepth",
+  "ExtPolygonOffsetClamp",
   "ExtShaderTextureLod",
   "ExtSRgb",
   "ExtTextureFilterAnisotropic",
@@ -98,12 +99,6 @@ features = [
   "WebglLoseContext",
   "OvrMultiview2",
 ]
-
-# Wasm64 support requires a more recent version of the wasm-bindgen ecosystem
-[target.'cfg(all(target_arch = "wasm64", not(target_os = "emscripten")))'.dependencies]
-js-sys = "~0.3.100"
-wasm-bindgen = "~0.2.123"
-web_sys = { version = "~0.3.100", package = "web-sys" }
 
 [workspace]
 members = ["examples/hello", "examples/howto"]

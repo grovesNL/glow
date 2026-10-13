@@ -10,6 +10,7 @@ homepage = "https://github.com/grovesNL/glow.git"
 repository = "https://github.com/grovesNL/glow"
 license = "MIT OR Apache-2.0 OR Zlib"
 edition = "2021"
+rust-version = "1.86.0"
 
 [package.metadata.docs.rs]
 default-target = "x86_64-unknown-linux-gnu"

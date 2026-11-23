@@ -371,7 +371,7 @@ impl HasContext for Context {
                 shader.0.get(),
                 length,
                 &mut length,
-                (&log[..]).as_ptr() as *mut native_gl::GLchar,
+                log.as_mut_ptr() as *mut native_gl::GLchar,
             );
             log.truncate(length as usize);
             log
@@ -508,7 +508,7 @@ impl HasContext for Context {
                 program.0.get(),
                 length,
                 &mut length,
-                (&log[..]).as_ptr() as *mut native_gl::GLchar,
+                log.as_mut_ptr() as *mut native_gl::GLchar,
             );
             log.truncate(length as usize);
             log
@@ -1169,7 +1169,7 @@ impl HasContext for Context {
             &mut length,
             &mut size,
             &mut utype,
-            name.as_ptr() as *mut native_gl::GLchar,
+            name.as_mut_ptr() as *mut native_gl::GLchar,
         );
         name.truncate(length as usize);
 
@@ -2485,7 +2485,7 @@ impl HasContext for Context {
             &mut length,
             &mut size,
             &mut atype,
-            name.as_ptr() as *mut native_gl::GLchar,
+            name.as_mut_ptr() as *mut native_gl::GLchar,
         );
 
         name.truncate(length as usize);

@@ -4075,13 +4075,13 @@ impl HasContext for Context {
 
     unsafe fn get_debug_message_log(&self, count: u32) -> Vec<DebugMessageLogEntry> {
         let ct = count as usize;
-        let mut sources = Vec::with_capacity(ct);
-        let mut types = Vec::with_capacity(ct);
-        let mut ids = Vec::with_capacity(ct);
-        let mut severities = Vec::with_capacity(ct);
-        let mut lengths = Vec::with_capacity(ct);
+        let mut sources = vec![0; ct];
+        let mut types = vec![0; ct];
+        let mut ids = vec![0; ct];
+        let mut severities = vec![0; ct];
+        let mut lengths = vec![0; ct];
         let buf_size = (count * MAX_DEBUG_MESSAGE_LENGTH) as i32;
-        let mut message_log = Vec::with_capacity(buf_size as usize);
+        let mut message_log = vec![0u8; buf_size as usize];
 
         let gl = &self.raw;
         let received = khr_fallback!(
@@ -4095,29 +4095,25 @@ impl HasContext for Context {
                 ids.as_mut_ptr(),
                 severities.as_mut_ptr(),
                 lengths.as_mut_ptr(),
-                message_log.as_mut_ptr(),
+                message_log.as_mut_ptr() as *mut native_gl::GLchar,
             ),
         ) as usize;
+        let received = received.min(ct);
 
-        sources.set_len(received);
-        types.set_len(received);
-        ids.set_len(received);
-        severities.set_len(received);
-        lengths.set_len(received);
-        message_log.set_len(buf_size as usize);
-
-        let mut entries = Vec::new();
-        let mut offset = 0;
+        let mut entries = Vec::with_capacity(received);
+        let mut offset = 0usize;
         for i in 0..received {
-            let message =
-                std::ffi::CStr::from_ptr(message_log[offset..].as_ptr()).to_string_lossy();
-            offset += lengths[i] as usize;
+            // Messages are packed back to back, each NUL-terminated, and each length includes
+            // the terminator.
+            let rest = message_log.get(offset..).unwrap_or_default();
+            let message = rest.split(|&b| b == 0).next().unwrap_or_default();
+            offset = offset.saturating_add(lengths[i].max(0) as usize);
             entries.push(DebugMessageLogEntry {
                 source: sources[i],
                 msg_type: types[i],
                 id: ids[i],
                 severity: severities[i],
-                message: message.to_string(),
+                message: String::from_utf8_lossy(message).into_owned(),
             });
         }
 

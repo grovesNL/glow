@@ -4113,8 +4113,8 @@ impl HasContext for Context {
         let mut entries = Vec::with_capacity(received);
         let mut offset = 0usize;
         for i in 0..received {
-            // Messages are packed back to back, each NUL-terminated, and each length includes
-            // the terminator.
+            // Each message is NUL-terminated and packed back to back. Its length includes the
+            // terminator.
             let rest = message_log.get(offset..).unwrap_or_default();
             let message = rest.split(|&b| b == 0).next().unwrap_or_default();
             offset = offset.saturating_add(lengths[i].max(0) as usize);

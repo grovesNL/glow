@@ -44,12 +44,17 @@ impl Drop for DebugCallbackRawPtr {
     }
 }
 
-/// Converts a buffer filled in by GL into a `String`, keeping the first `length` bytes.
+/// Converts a buffer filled in by GL into a `String`, keeping the first `length` bytes up to
+/// any NUL.
 ///
-/// GL doesn't guarantee its output is UTF-8, so invalid sequences are replaced instead of
+/// Stopping at a NUL guards against drivers whose reported length counts the terminator. GL
+/// also doesn't guarantee its output is UTF-8, so invalid sequences are replaced instead of
 /// being trusted.
 fn string_from_gl_buffer(mut buffer: Vec<u8>, length: i32) -> String {
     buffer.truncate(length.max(0) as usize);
+    if let Some(nul) = buffer.iter().position(|&b| b == 0) {
+        buffer.truncate(nul);
+    }
     String::from_utf8(buffer)
         .unwrap_or_else(|error| String::from_utf8_lossy(error.as_bytes()).into_owned())
 }
@@ -4721,5 +4726,8 @@ mod tests {
         // Out-of-range lengths are tolerated.
         assert_eq!(string_from_gl_buffer(b"abc".to_vec(), -1), "");
         assert_eq!(string_from_gl_buffer(b"abc".to_vec(), 10), "abc");
+        // A length that counts the NUL terminator doesn't leak it into the string.
+        assert_eq!(string_from_gl_buffer(b"abc\0".to_vec(), 4), "abc");
+        assert_eq!(string_from_gl_buffer(b"abc\0\0\0".to_vec(), 10), "abc");
     }
 }

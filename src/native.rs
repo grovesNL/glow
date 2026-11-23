@@ -47,8 +47,8 @@ impl Drop for DebugCallbackRawPtr {
 /// Converts a buffer filled in by GL into a `String`, keeping the first `length` bytes up to
 /// any NUL.
 ///
-/// Stopping at a NUL guards against drivers whose reported length counts the terminator. GL
-/// also doesn't guarantee its output is UTF-8, so invalid sequences are replaced instead of
+/// Stopping at a NUL guards against drivers that count the terminator in the reported length.
+/// GL also doesn't guarantee its output is UTF-8, so invalid sequences are replaced instead of
 /// being trusted.
 fn string_from_gl_buffer(mut buffer: Vec<u8>, length: i32) -> String {
     buffer.truncate(length.max(0) as usize);

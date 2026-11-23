@@ -4713,19 +4713,23 @@ mod tests {
     fn test_string_from_gl_buffer() {
         // Keeps only the bytes GL reported writing.
         assert_eq!(string_from_gl_buffer(b"u_color\0\0".to_vec(), 7), "u_color");
+
         // Invalid UTF-8 is replaced instead of being trusted.
         assert_eq!(
             string_from_gl_buffer(b"bad \xff byte".to_vec(), 10),
             "bad \u{FFFD} byte"
         );
+
         // A length that cuts a multi-byte character doesn't panic.
         assert_eq!(
             string_from_gl_buffer("é".as_bytes().to_vec(), 1),
             "\u{FFFD}"
         );
+
         // Out-of-range lengths are tolerated.
         assert_eq!(string_from_gl_buffer(b"abc".to_vec(), -1), "");
         assert_eq!(string_from_gl_buffer(b"abc".to_vec(), 10), "abc");
+
         // A length that counts the NUL terminator doesn't leak it into the string.
         assert_eq!(string_from_gl_buffer(b"abc\0".to_vec(), 4), "abc");
         assert_eq!(string_from_gl_buffer(b"abc\0\0\0".to_vec(), 10), "abc");

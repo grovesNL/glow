@@ -4086,8 +4086,8 @@ impl HasContext for Context {
         let mut ids = vec![0; ct];
         let mut severities = vec![0; ct];
         let mut lengths = vec![0; ct];
-        // Room for `count` messages of the longest length GL allows (which includes the NUL
-        // terminator), capped so the size still fits in the `i32` GL takes.
+        // Each message can be up to `MAX_DEBUG_MESSAGE_LENGTH` bytes, including its NUL
+        // terminator. GL takes the buffer size as an `i32`, so cap it there.
         let buf_size = ct
             .saturating_mul(self.constants.max_debug_message_length.max(0) as usize)
             .min(i32::MAX as usize);

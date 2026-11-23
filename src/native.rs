@@ -80,9 +80,8 @@ impl Context {
         }
 
         let raw_version = std::ffi::CStr::from_ptr(raw_string as *const native_gl::GLchar)
-            .to_str()
-            .unwrap()
-            .to_owned();
+            .to_string_lossy()
+            .into_owned();
         let version = Version::parse(&raw_version).unwrap();
 
         // Setup extensions and constants after the context has been built
@@ -2305,10 +2304,15 @@ impl HasContext for Context {
     unsafe fn get_parameter_indexed_string(&self, parameter: u32, index: u32) -> String {
         let gl = &self.raw;
         let raw_ptr = gl.GetStringi(parameter, index);
+        if raw_ptr.is_null() {
+            panic!(
+                "Get parameter indexed string 0x{:X} at index {} failed.",
+                parameter, index
+            )
+        }
         std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::GLchar)
-            .to_str()
-            .unwrap()
-            .to_owned()
+            .to_string_lossy()
+            .into_owned()
     }
 
     unsafe fn get_parameter_string(&self, parameter: u32) -> String {
@@ -2321,9 +2325,8 @@ impl HasContext for Context {
             )
         }
         std::ffi::CStr::from_ptr(raw_ptr as *const native_gl::GLchar)
-            .to_str()
-            .unwrap()
-            .to_owned()
+            .to_string_lossy()
+            .into_owned()
     }
 
     unsafe fn get_parameter_buffer(&self, parameter: u32) -> Option<Self::Buffer> {
@@ -4178,23 +4181,19 @@ impl HasContext for Context {
     unsafe fn get_object_label(&self, identifier: u32, name: u32) -> String {
         let gl = &self.raw;
         let mut len = 0;
-        let mut label_buf = Vec::with_capacity(self.constants.max_label_length as usize);
+        let mut label_buf = vec![0u8; self.constants.max_label_length.max(0) as usize];
         khr_fallback!(
             gl.GetObjectLabel_is_loaded,
             gl.GetObjectLabelKHR,
             gl.GetObjectLabel(
                 identifier,
                 name,
-                self.constants.max_label_length,
+                label_buf.len() as i32,
                 &mut len,
-                label_buf.as_mut_ptr(),
+                label_buf.as_mut_ptr() as *mut native_gl::GLchar,
             ),
         );
-        label_buf.set_len(len as usize);
-        std::ffi::CStr::from_ptr(label_buf.as_ptr())
-            .to_str()
-            .unwrap()
-            .to_owned()
+        string_from_gl_buffer(label_buf, len)
     }
 
     unsafe fn object_ptr_label<S>(&self, sync: Self::Fence, label: Option<S>)
@@ -4230,22 +4229,18 @@ impl HasContext for Context {
     unsafe fn get_object_ptr_label(&self, sync: Self::Fence) -> String {
         let gl = &self.raw;
         let mut len = 0;
-        let mut label_buf = Vec::with_capacity(self.constants.max_label_length as usize);
+        let mut label_buf = vec![0u8; self.constants.max_label_length.max(0) as usize];
         khr_fallback!(
             gl.GetObjectPtrLabel_is_loaded,
             gl.GetObjectPtrLabelKHR,
             gl.GetObjectPtrLabel(
                 sync.0 as *mut std::ffi::c_void,
-                self.constants.max_label_length,
+                label_buf.len() as i32,
                 &mut len,
-                label_buf.as_mut_ptr(),
+                label_buf.as_mut_ptr() as *mut native_gl::GLchar,
             ),
         );
-        label_buf.set_len(len as usize);
-        std::ffi::CStr::from_ptr(label_buf.as_ptr())
-            .to_str()
-            .unwrap()
-            .to_owned()
+        string_from_gl_buffer(label_buf, len)
     }
 
     unsafe fn get_uniform_block_index(&self, program: Self::Program, name: &str) -> Option<u32> {
@@ -4607,44 +4602,16 @@ impl HasContext for Context {
             256
         };
 
-        let mut buffer = vec![0; len];
+        let mut buffer = vec![0u8; len];
         let mut length = 0;
         gl.GetActiveUniformBlockName(
             program.0.get(),
             uniform_block_index,
             buffer.len() as _,
             &mut length,
-            buffer.as_mut_ptr(),
+            buffer.as_mut_ptr() as *mut native_gl::GLchar,
         );
-
-        if length > 0 {
-            assert_eq!(
-                std::mem::size_of::<u8>(),
-                std::mem::size_of::<native_gl::GLchar>(),
-                "This operation is only safe in systems in which the length of \
-                a GLchar is the same as that of an u8"
-            );
-            assert_eq!(
-                std::mem::align_of::<u8>(),
-                std::mem::align_of::<native_gl::GLchar>(),
-                "This operation is only safe in systems in which the alignment \
-                of a GLchar is the same as that of an u8"
-            );
-            let buffer = std::slice::from_raw_parts(
-                buffer.as_ptr() as *const u8,
-                (length as usize + 1).min(buffer.len()),
-            );
-
-            let name = CStr::from_bytes_with_nul(&buffer[..])
-                .unwrap()
-                .to_str()
-                .unwrap()
-                .to_owned();
-
-            name
-        } else {
-            String::from("")
-        }
+        string_from_gl_buffer(buffer, length)
     }
 
     unsafe fn max_shader_compiler_threads(&self, count: u32) {

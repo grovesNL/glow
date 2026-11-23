@@ -43,6 +43,16 @@ impl Drop for DebugCallbackRawPtr {
     }
 }
 
+/// Converts a buffer filled in by GL into a `String`, keeping the first `length` bytes.
+///
+/// GL doesn't guarantee its output is UTF-8, so invalid sequences are replaced instead of
+/// being trusted.
+fn string_from_gl_buffer(mut buffer: Vec<u8>, length: i32) -> String {
+    buffer.truncate(length.max(0) as usize);
+    String::from_utf8(buffer)
+        .unwrap_or_else(|error| String::from_utf8_lossy(error.as_bytes()).into_owned())
+}
+
 pub struct Context {
     raw: native_gl::GlFns,
     extensions: HashSet<String>,
@@ -365,16 +375,14 @@ impl HasContext for Context {
         let mut length = 0;
         gl.GetShaderiv(shader.0.get(), INFO_LOG_LENGTH, &mut length);
         if length > 0 {
-            let mut log = String::with_capacity(length as usize);
-            log.extend(std::iter::repeat('\0').take(length as usize));
+            let mut log = vec![0u8; length as usize];
             gl.GetShaderInfoLog(
                 shader.0.get(),
                 length,
                 &mut length,
                 log.as_mut_ptr() as *mut native_gl::GLchar,
             );
-            log.truncate(length as usize);
-            log
+            string_from_gl_buffer(log, length)
         } else {
             String::from("")
         }
@@ -502,16 +510,14 @@ impl HasContext for Context {
         let mut length = 0;
         gl.GetProgramiv(program.0.get(), INFO_LOG_LENGTH, &mut length);
         if length > 0 {
-            let mut log = String::with_capacity(length as usize);
-            log.extend(std::iter::repeat('\0').take(length as usize));
+            let mut log = vec![0u8; length as usize];
             gl.GetProgramInfoLog(
                 program.0.get(),
                 length,
                 &mut length,
                 log.as_mut_ptr() as *mut native_gl::GLchar,
             );
-            log.truncate(length as usize);
-            log
+            string_from_gl_buffer(log, length)
         } else {
             String::from("")
         }
@@ -1157,8 +1163,7 @@ impl HasContext for Context {
             &mut uniform_max_size,
         );
 
-        let mut name = String::with_capacity(uniform_max_size as usize);
-        name.extend(std::iter::repeat('\0').take(uniform_max_size as usize));
+        let mut name = vec![0u8; uniform_max_size.max(0) as usize];
         let mut length = 0;
         let mut size = 0;
         let mut utype = 0;
@@ -1171,7 +1176,7 @@ impl HasContext for Context {
             &mut utype,
             name.as_mut_ptr() as *mut native_gl::GLchar,
         );
-        name.truncate(length as usize);
+        let name = string_from_gl_buffer(name, length);
 
         Some(ActiveUniform { size, utype, name })
     }
@@ -2473,8 +2478,7 @@ impl HasContext for Context {
             ACTIVE_ATTRIBUTE_MAX_LENGTH,
             &mut attribute_max_size,
         );
-        let mut name = String::with_capacity(attribute_max_size as usize);
-        name.extend(std::iter::repeat('\0').take(attribute_max_size as usize));
+        let mut name = vec![0u8; attribute_max_size.max(0) as usize];
         let mut length = 0;
         let mut size = 0;
         let mut atype = 0;
@@ -2487,8 +2491,7 @@ impl HasContext for Context {
             &mut atype,
             name.as_mut_ptr() as *mut native_gl::GLchar,
         );
-
-        name.truncate(length as usize);
+        let name = string_from_gl_buffer(name, length);
 
         Some(ActiveAttribute { name, size, atype })
     }
@@ -4731,5 +4734,24 @@ mod tests {
     fn test_sync() {
         fn assert_sync<T: Sync>() {}
         assert_sync::<Context>();
+    }
+
+    #[test]
+    fn test_string_from_gl_buffer() {
+        // Keeps only the bytes GL reported writing.
+        assert_eq!(string_from_gl_buffer(b"u_color\0\0".to_vec(), 7), "u_color");
+        // Invalid UTF-8 is replaced instead of being trusted.
+        assert_eq!(
+            string_from_gl_buffer(b"bad \xff byte".to_vec(), 10),
+            "bad \u{FFFD} byte"
+        );
+        // A length that cuts a multi-byte character doesn't panic.
+        assert_eq!(
+            string_from_gl_buffer("é".as_bytes().to_vec(), 1),
+            "\u{FFFD}"
+        );
+        // Out-of-range lengths are tolerated.
+        assert_eq!(string_from_gl_buffer(b"abc".to_vec(), -1), "");
+        assert_eq!(string_from_gl_buffer(b"abc".to_vec(), 10), "abc");
     }
 }

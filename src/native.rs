@@ -17,6 +17,7 @@ macro_rules! khr_fallback {
 #[derive(Default)]
 struct Constants {
     max_label_length: i32,
+    max_debug_message_length: i32,
 }
 
 /// Store a boxed callback (i.e., `Box<Box<dyn FnMut(...)>>`) as a raw pointer, so that it can be
@@ -114,11 +115,11 @@ impl Context {
 
         // After the extensions are known, we can populate constants (including
         // constants that depend on extensions being enabled)
-        context.constants.max_label_length = if context.supports_debug() {
-            context.get_parameter_i32(MAX_LABEL_LENGTH)
-        } else {
-            0
-        };
+        if context.supports_debug() {
+            context.constants.max_label_length = context.get_parameter_i32(MAX_LABEL_LENGTH);
+            context.constants.max_debug_message_length =
+                context.get_parameter_i32(MAX_DEBUG_MESSAGE_LENGTH);
+        }
 
         context
     }
@@ -4080,8 +4081,12 @@ impl HasContext for Context {
         let mut ids = vec![0; ct];
         let mut severities = vec![0; ct];
         let mut lengths = vec![0; ct];
-        let buf_size = (count * MAX_DEBUG_MESSAGE_LENGTH) as i32;
-        let mut message_log = vec![0u8; buf_size as usize];
+        // Room for `count` messages of the longest length GL allows (which includes the NUL
+        // terminator), capped so the size still fits in the `i32` GL takes.
+        let buf_size = ct
+            .saturating_mul(self.constants.max_debug_message_length.max(0) as usize)
+            .min(i32::MAX as usize);
+        let mut message_log = vec![0u8; buf_size];
 
         let gl = &self.raw;
         let received = khr_fallback!(
@@ -4089,7 +4094,7 @@ impl HasContext for Context {
             gl.GetDebugMessageLogKHR,
             gl.GetDebugMessageLog(
                 count,
-                buf_size,
+                buf_size as i32,
                 sources.as_mut_ptr(),
                 types.as_mut_ptr(),
                 ids.as_mut_ptr(),
